@@ -31,7 +31,6 @@ export class Sync extends EventTarget {
   constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';
     window.addEventListener('online',()=>this.schedule(0));
     window.addEventListener('offline',()=>this.set('offline','Offline · lokal gespeichert'));
-    document.addEventListener('visibilitychange',()=>{if(!document.hidden)this.schedule(0);});
   }
   set(status,message){this.status=status;this.message=message;this.dispatchEvent(new Event('change'));}
   get configured(){return !!this.store.doc.config.url&&!!this.store.doc.config.token;}

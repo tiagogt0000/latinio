@@ -61,3 +61,7 @@ Neue Übungsarten können auf denselben Daten- und Synchronisierungsmechanismen 
 ## Prüfstand dieser Lieferung
 
 Die automatisierten Prüfungen decken Antwortbewertung, Klammern, Tippfehlerkorrektur, Wiederholungsabstände, Import und die Google-Versionslogik mit nachgebildeten Google-Diensten ab. Sie ersetzen keine Prüfung am echten iPhone und keine Live-Prüfung des bereitgestellten Google-Skripts. Die Cloud-Verbindung ist erst nach Einrichtung und erfolgreichem Abgleich tatsächlich aktiv. Ohne Konfiguration zeigt die App ausdrücklich „Cloud noch nicht verbunden“ und speichert lokal.
+
+## Update 0.1.1
+
+Beim Start und bei Rückkehr in die App sperrt ein zentraler Cloud-Dialog die Bedienung, bis der Abgleich abgeschlossen ist. Ein neuerer Stand muss zuerst geladen werden. Bei einem Verbindungsfehler stehen „Erneut versuchen“ und „Offline fortfahren“ zur Verfügung. Ohne eingerichtete Cloud bleibt die Einrichtung zugänglich. Das Google-Skript und das Datenformat bleiben unverändert.
