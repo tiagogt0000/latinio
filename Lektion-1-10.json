@@ -1,0 +1,499 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "lektion-1-10",
+  "name": "Lektion 1–10",
+  "words": [
+    {
+      "latin": "gerere",
+      "meanings": [
+        [
+          "ausführen"
+        ],
+        [
+          "führen"
+        ],
+        [
+          "tragen"
+        ]
+      ]
+    },
+    {
+      "latin": "remanere",
+      "meanings": [
+        [
+          "(zurück)bleiben"
+        ]
+      ]
+    },
+    {
+      "latin": "agere",
+      "meanings": [
+        [
+          "handeln"
+        ],
+        [
+          "treiben"
+        ],
+        [
+          "verhandeln"
+        ]
+      ]
+    },
+    {
+      "latin": "vox, vocis",
+      "meanings": [
+        [
+          "Äußerung"
+        ],
+        [
+          "Laut"
+        ],
+        [
+          "Stimme"
+        ]
+      ]
+    },
+    {
+      "latin": "mons, montis",
+      "meanings": [
+        [
+          "Berg"
+        ]
+      ]
+    },
+    {
+      "latin": "ducere",
+      "meanings": [
+        [
+          "führen"
+        ],
+        [
+          "ziehen"
+        ]
+      ]
+    },
+    {
+      "latin": "propinquus",
+      "meanings": [
+        [
+          "Verwandter"
+        ]
+      ]
+    },
+    {
+      "latin": "soror, sororis",
+      "meanings": [
+        [
+          "Schwester"
+        ]
+      ]
+    },
+    {
+      "latin": "orare",
+      "meanings": [
+        [
+          "bitten"
+        ],
+        [
+          "beten"
+        ]
+      ]
+    },
+    {
+      "latin": "convenire",
+      "meanings": [
+        [
+          "besuchen"
+        ],
+        [
+          "zusammenkommen"
+        ]
+      ]
+    },
+    {
+      "latin": "praebere",
+      "meanings": [
+        [
+          "hinhalten"
+        ],
+        [
+          "geben"
+        ]
+      ]
+    },
+    {
+      "latin": "munus, muneris",
+      "meanings": [
+        [
+          "Aufgabe"
+        ],
+        [
+          "Geschenk"
+        ]
+      ]
+    },
+    {
+      "latin": "sicut",
+      "meanings": [
+        [
+          "(so) wie"
+        ]
+      ]
+    },
+    {
+      "latin": "iter, itineris",
+      "meanings": [
+        [
+          "Reise"
+        ],
+        [
+          "Weg"
+        ],
+        [
+          "Marsch"
+        ]
+      ]
+    },
+    {
+      "latin": "cupere",
+      "meanings": [
+        [
+          "verlangen"
+        ],
+        [
+          "wünschen"
+        ],
+        [
+          "wollen"
+        ]
+      ]
+    },
+    {
+      "latin": "scire",
+      "meanings": [
+        [
+          "kennen"
+        ],
+        [
+          "wissen"
+        ],
+        [
+          "verstehen"
+        ]
+      ]
+    },
+    {
+      "latin": "liber, libri",
+      "meanings": [
+        [
+          "Buch"
+        ]
+      ]
+    },
+    {
+      "latin": "comes, comitis",
+      "meanings": [
+        [
+          "Gefährte"
+        ],
+        [
+          "Begleiter"
+        ]
+      ]
+    },
+    {
+      "latin": "capere",
+      "meanings": [
+        [
+          "fassen"
+        ],
+        [
+          "nehmen"
+        ],
+        [
+          "erobern"
+        ]
+      ]
+    },
+    {
+      "latin": "corripere",
+      "meanings": [
+        [
+          "ergreifen"
+        ],
+        [
+          "gewaltsam an sich reißen"
+        ]
+      ]
+    },
+    {
+      "latin": "carmen, carminis",
+      "meanings": [
+        [
+          "Lied"
+        ],
+        [
+          "Gedicht"
+        ]
+      ]
+    },
+    {
+      "latin": "legere",
+      "meanings": [
+        [
+          "lesen"
+        ],
+        [
+          "auswählen"
+        ]
+      ]
+    },
+    {
+      "latin": "deinde",
+      "meanings": [
+        [
+          "dann"
+        ],
+        [
+          "darauf"
+        ]
+      ]
+    },
+    {
+      "latin": "gaudere",
+      "meanings": [
+        [
+          "sich freuen"
+        ]
+      ]
+    },
+    {
+      "latin": "tandem",
+      "meanings": [
+        [
+          "endlich"
+        ]
+      ]
+    },
+    {
+      "latin": "patere",
+      "meanings": [
+        [
+          "offenstehen"
+        ],
+        [
+          "sich erstrecken"
+        ]
+      ]
+    },
+    {
+      "latin": "contendere",
+      "meanings": [
+        [
+          "eilen"
+        ],
+        [
+          "sich anstrengen"
+        ]
+      ]
+    },
+    {
+      "latin": "apud",
+      "meanings": [
+        [
+          "bei"
+        ],
+        [
+          "nahe bei"
+        ]
+      ]
+    },
+    {
+      "latin": "dubitare",
+      "meanings": [
+        [
+          "zögern"
+        ]
+      ]
+    },
+    {
+      "latin": "undique",
+      "meanings": [
+        [
+          "von allen Seiten"
+        ]
+      ]
+    },
+    {
+      "latin": "nuntius",
+      "meanings": [
+        [
+          "Bote"
+        ],
+        [
+          "Nachricht"
+        ]
+      ]
+    },
+    {
+      "latin": "repente",
+      "meanings": [
+        [
+          "plötzlich"
+        ]
+      ]
+    },
+    {
+      "latin": "quod",
+      "meanings": [
+        [
+          "dass"
+        ],
+        [
+          "weil"
+        ]
+      ]
+    },
+    {
+      "latin": "dolere",
+      "meanings": [
+        [
+          "schmerzen"
+        ],
+        [
+          "bedauern"
+        ]
+      ]
+    },
+    {
+      "latin": "pugnare",
+      "meanings": [
+        [
+          "kämpfen"
+        ]
+      ]
+    },
+    {
+      "latin": "arma",
+      "meanings": [
+        [
+          "Waffen"
+        ],
+        [
+          "Gerät"
+        ]
+      ]
+    },
+    {
+      "latin": "debere",
+      "meanings": [
+        [
+          "müssen"
+        ],
+        [
+          "sollen"
+        ],
+        [
+          "schulden"
+        ]
+      ]
+    },
+    {
+      "latin": "periculum",
+      "meanings": [
+        [
+          "Gefahr"
+        ]
+      ]
+    },
+    {
+      "latin": "mittere",
+      "meanings": [
+        [
+          "(los)lassen"
+        ],
+        [
+          "schicken"
+        ],
+        [
+          "werfen"
+        ]
+      ]
+    },
+    {
+      "latin": "domina",
+      "meanings": [
+        [
+          "Herrin"
+        ]
+      ]
+    },
+    {
+      "latin": "iubere",
+      "meanings": [
+        [
+          "befehlen"
+        ],
+        [
+          "anordnen"
+        ]
+      ]
+    },
+    {
+      "latin": "paulo",
+      "meanings": [
+        [
+          "(um) ein wenig"
+        ]
+      ]
+    },
+    {
+      "latin": "portare",
+      "meanings": [
+        [
+          "tragen"
+        ],
+        [
+          "bringen"
+        ]
+      ]
+    },
+    {
+      "latin": "velle",
+      "meanings": [
+        [
+          "wollen"
+        ]
+      ]
+    },
+    {
+      "latin": "convivium",
+      "meanings": [
+        [
+          "Gastmahl"
+        ],
+        [
+          "Gelage"
+        ]
+      ]
+    },
+    {
+      "latin": "consilium",
+      "meanings": [
+        [
+          "Beratung"
+        ],
+        [
+          "Beschluss"
+        ],
+        [
+          "Plan"
+        ],
+        [
+          "Rat"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,1 +1,63 @@
-# latinio
+# Latinio · erste Version 0.1.0
+
+Private Latein-Lernapp für iPhone, iPad und Desktop. Installierbare, statische PWA, vorbereitet für GitHub Pages. Keine kostenpflichtigen Laufzeitbibliotheken, keine KI-API und kein Apple-Entwicklerabo erforderlich.
+
+## Enthalten
+
+- 46 Vokabeln von den zwei bereitgestellten Fotos in der Sammlung „Lektion 1–10“.
+- Ausschließlich Latein → Deutsch. Alle angegebenen Nomenformen werden angezeigt.
+- Eine Bedeutung pro Antwortfeld; weitere Felder über Plus. Die Zahl der erwarteten Bedeutungen bleibt verborgen.
+- Vollständig richtig, teilweise richtig (bestanden), falsch; falsche Zusatzbedeutungen werden markiert.
+- Optionale Klammerteile; akzeptierte Synonyme innerhalb eines Bedeutungsfeldes mit `/`.
+- Vorsichtige Tippfehlererkennung: ab fünf Zeichen genau ein Editierfehler oder eine benachbarte Vertauschung, nur bei einer eindeutigen Bedeutungsgruppe. Keine automatische semantische KI-Bewertung. Beide manuellen Korrekturrichtungen verfügbar.
+- Lernplan mit wachsenden Abständen (1, 3, 7, 14, 30, 60, 90 Tage). Teilwissen: 1 Tag; Fehler: 12 Stunden. Fällige Wörter vor neuen Wörtern. Freies Üben aller ausgewählten Wörter.
+- Fehler und Teilwissen einmal am Ende derselben Runde wiederholen. Der erste Fehler bleibt im Lernplan; keine endlose Wiederholungsschleife.
+- Vokabeln im Test bearbeiten; die aktuelle Bewertung wird danach neu berechnet. Sammlungen und Wörter anlegen, bearbeiten und löschen.
+- JSON-Import mit Vorschau, Prüfung und Erkennung von Dubletten innerhalb der Importdatei. Ein bereits vorhandenes Paket wird nicht überschrieben. Gleiche Wörter in verschiedenen Paketen dürfen vorkommen.
+- Tagesziel, Hell-/Dunkel-/Systemmodus. Lokale Datenbank, Wiederaufnahme unterbrochener Runden, PWA-Offline-Dateien.
+- Automatisches Hochladen von Änderungen nach Google, Versionsstatus, bewusster Download neuer Cloud-Stände und Konfliktauswahl.
+
+## Start und Veröffentlichung
+
+Siehe **ANLEITUNG.html** für die Einrichtung von GitHub Pages und Google Apps Script. `index.html` muss über HTTPS ausgeliefert werden; Doppelklick auf eine lokale Datei ersetzt kein Website-Hosting. Alle Pfade sind relativ und funktionieren auch unter einem GitHub-Projektpfad.
+
+Für lokale Entwicklung genügt ein statischer HTTP-Server. Das Projekt braucht keinen Build-Schritt. Syntax-/Logikprüfung: `npm test` (Node.js 20 oder neuer, ohne Installation).
+
+## Datenversionen: bestätigter Stand und ausstehende Änderungen
+
+**App-Version** (0.1.0) und **Datenversion** (v1, v2, v3 …) sind verschieden. Datenversionen sind ganze Zahlen, keine Dezimalzahlen. Das vermeidet die Verwechslung zwischen 0.10 und 0.1.
+
+Die Cloud vergibt für jede erfolgreich geschriebene Änderung unter einer Sperre genau eine fortlaufende Version. Jeder lokale Vorgang hat zusätzlich eine UUID, eine Gerätekennung und einen lokalen Zähler. Ein Gerät zeigt z. B. „Bestätigt v50, 2 lokale Änderungen“. Erst nach bestätigtem Upload zeigt es v52. Bei einem nicht erreichten Server darf keine neue Cloud-Version behauptet werden.
+
+Beim Öffnen, Wieder-online-Gehen und während geöffneter App etwa jede Minute wird geprüft. Nach Änderungen wird kurz gebündelt hochgeladen. Vor jedem Upload prüft der Server die erwartete Basisversion. Bei Abweichung schreibt er nichts. Die App fordert zum Laden der neueren Cloud-Version auf. Unterschiedliche Einträge werden zusammengeführt; Bearbeitungen desselben Eintrags müssen ausgewählt werden. Wiederholte Übertragungen derselben Änderungs-ID werden nur einmal gespeichert.
+
+Antworten werden beim Prüfen lokal samt Bewertung gespeichert. Korrekturen ändern dieselbe Bewertung; die Versionshistorie bewahrt die Operationen. Beim Weitergehen wird der Rundencursor lokal gespeichert. Noch ungeprüfte Texte und die aktuelle Navigation sind Bedienzustand, keine neue Cloud-Datenversion. Beim bewussten Pausieren bleiben auch die Eingabefelder lokal erhalten. Runden werden pro Gerät fortgesetzt; beantwortete Wörter, Lernstand und abgeschlossene Runden werden synchronisiert.
+
+Cloud-Übertragung läuft parallel zur Oberfläche, solange der Browser sie ausführt. Nach Sperren/Schließen des iPhones kann sie unterbrochen sein. Die Warteschlange bleibt in IndexedDB und wird erneut gesendet. „Alles hochgeladen“ erscheint erst nach einer Serverbestätigung. Auf einem neuen Gerät sind Skript-Adresse und privater Verbindungsschlüssel einmal nötig; keine Vokabeldatei muss manuell importiert werden.
+
+## Google-Teil
+
+`google/Code.gs`, `google/Bridge.html` und `google/appsscript.json` werden in einem an eine private Google-Tabelle gebundenen Apps-Script-Projekt verwendet. Das Skript erstellt das Blatt „Änderungen“. Das Journal enthält jede Datenänderung mit Versionsnummer; daraus rekonstruiert der Server den Stand. Werte in der Tabelle nicht manuell überschreiben. Eine Änderung am Lernmaterial erfolgt über die App.
+
+Die öffentliche Skript-Web-App ist durch einen langen privaten Verbindungsschlüssel geschützt. Der Server speichert dessen SHA-256-Hash in ScriptProperties; der Klartextschlüssel liegt nur auf den gekoppelten Geräten. Herkunft und zufällige Kanal-ID schützen die Nachrichtenbrücke. Keine Schlüssel in GitHub, URL-Abfrageparametern oder Quelltext eintragen. Das Skript verwendet eine iframe-Nachrichtenbrücke und `google.script.run`, um Cross-Origin-Fetch-Probleme zu vermeiden.
+
+Die Einrichtung erzeugt bei erneuter Ausführung einen neuen Schlüssel; die Geräte müssen danach den neuen Schlüssel erhalten. Die bestehenden Daten bleiben bestehen. Ein Wechsel zu einer anderen Cloud-Adresse bei bereits bestätigten Daten wird absichtlich nicht automatisch ausgeführt.
+
+## Aufbau für spätere Erweiterungen
+
+| Datei | Aufgabe |
+| --- | --- |
+| `app/vocabulary.js` | Originale Sammlung |
+| `app/core.js` | Antwortprüfung, Wiederholungsplan, Import, Datenkonflikte |
+| `app/store.js` | IndexedDB und lokale Änderungswarteschlange |
+| `app/sync.js` | Nachrichtenbrücke und Synchronisierung |
+| `app/main.js` | Oberfläche und Bedienabläufe |
+| `app/style.css` | Helles/dunkles, responsives Design |
+| `google/` | Privates Google-Backend |
+| `tests/` | Gezielte Logik- und Backendtests |
+
+Neue Übungsarten können auf denselben Daten- und Synchronisierungsmechanismen aufbauen. Bei zukünftigen Änderungen die App-Version und den Cache-Namen in `sw.js` erhöhen. Ein neuer Service Worker wird nach Schließen der alten App-Ansichten aktiv. App-Datenbank und Lernstände werden bei normalen Quellcodeupdates nicht gelöscht.
+
+## Prüfstand dieser Lieferung
+
+Die automatisierten Prüfungen decken Antwortbewertung, Klammern, Tippfehlerkorrektur, Wiederholungsabstände, Import und die Google-Versionslogik mit nachgebildeten Google-Diensten ab. Sie ersetzen keine Prüfung am echten iPhone und keine Live-Prüfung des bereitgestellten Google-Skripts. Die Cloud-Verbindung ist erst nach Einrichtung und erfolgreichem Abgleich tatsächlich aktiv. Ohne Konfiguration zeigt die App ausdrücklich „Cloud noch nicht verbunden“ und speichert lokal.
