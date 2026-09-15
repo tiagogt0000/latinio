@@ -65,3 +65,9 @@ Die automatisierten Prüfungen decken Antwortbewertung, Klammern, Tippfehlerkorr
 ## Update 0.1.1
 
 Beim Start und bei Rückkehr in die App sperrt ein zentraler Cloud-Dialog die Bedienung, bis der Abgleich abgeschlossen ist. Ein neuerer Stand muss zuerst geladen werden. Bei einem Verbindungsfehler stehen „Erneut versuchen“ und „Offline fortfahren“ zur Verfügung. Ohne eingerichtete Cloud bleibt die Einrichtung zugänglich. Das Google-Skript und das Datenformat bleiben unverändert.
+
+## Update 0.1.2
+
+Einstellungen bieten eine explizite Suche und Aktivierung von App-Updates. Der Service Worker ersetzt nur den App-Cache; IndexedDB und Cloud-Zugang bleiben erhalten. Neue Versionen müssen weiterhin eine neue Cache-Kennung und APP_VERSION erhalten.
+
+Antworten werden direkt grün/rot markiert. Fehlende Bedeutungen erscheinen als Lösungsfelder, falsche Antworten durchgestrichen mit einer möglichen Lösung. Die Rückmeldung bleibt kompakt; manuelle Anerkennung eines Tippfehlers und Bearbeitung der Vokabel bleiben verfügbar. Lernbewertung und Wiederholungsplan ändern sich nicht.

@@ -21,3 +21,15 @@ body.cloud-blocked{overflow:hidden}
 .gate-actions{display:grid;gap:14px;margin-top:25px}
 .cloud-gate .conflict{text-align:left}
 @media(max-width:600px){.cloud-gate{padding:27px 22px}.cloud-gate h2{font-size:1.45rem}}
+
+.graded-answer{border:2px solid;border-radius:13px;padding:12px 14px;margin-bottom:10px;overflow-wrap:anywhere}
+.graded-answer.correct{border-color:var(--green);background:var(--green-soft);color:var(--green-dark)}
+.graded-answer.incorrect{border-color:var(--red);background:var(--red-soft);color:var(--red)}
+.graded-content{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:25px;font-weight:700}
+.answer-mark{flex:none;font-size:1.1rem}.answer-solution{display:inline-flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.answer-solution .small,.missing-label{font-size:.75rem;font-weight:500}.missing-label{margin-left:auto}
+.typo-link{display:block;border:0;background:transparent;color:inherit;font-size:.76rem;text-decoration:underline;text-underline-offset:3px;min-height:36px;margin:4px 0 -5px auto;padding:6px 0}
+.compact-feedback{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;margin-top:16px}
+.compact-feedback h2{font-size:.95rem;margin:0}.compact-feedback .icon-button{flex:none;color:inherit}
+.test-footer.compact-footer{border:0;margin-top:12px;padding-top:0}
+.update-message{margin:14px 0;font-size:.9rem}[data-app-updates]>.small{margin:12px 0}
