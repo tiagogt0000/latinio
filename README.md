@@ -79,3 +79,7 @@ Falsche Antworten werden mit den Bedeutungen anderer aktiver Vokabeln verglichen
 Nach einer Vokabelrunde wird bei fälligen Paaren aus der Runde eine Zuordnungsrunde mit zwei bis vier Wörtern angeboten. Richtige Runden verlängern die Abstände auf 1, 3, 7, 14 und 30 Tage; Fehler führen nach 12 Stunden zur nächsten Wiederholung. Manuelles Üben ist jederzeit möglich. Abgebrochene Zuordnungsrunden zählen nicht als Erfolg.
 
 Paare und einzelne Trainingsresultate werden als getrennte, typisierte Datensätze im bestehenden settings-Bereich synchronisiert; general bleibt unverändert. Das Google-Skript braucht kein Update. Die laufende Zuordnungsrunde wird lokal gespeichert, abgeschlossene Resultate werden synchronisiert.
+
+## Update 0.2.1
+
+Der Bearbeitungsstift im Test bietet jetzt Verwechslungsgefahr und Vokabeleintrag als separate Aktionen. Bei der Verwechslung ist das aktuelle Wort vorausgewählt; die laufende Aufgabe bleibt erhalten. Sanfte Animationen begleiten Navigation, Dialoge, Feedback und Karten; reduzierte Bewegung schaltet sie ab. Das neue App-Symbol greift das kleine l und den Stern des Schriftzugs auf, mit eigenen Apple-Touch- und Manifest-Dateien.

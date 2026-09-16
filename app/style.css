@@ -33,3 +33,17 @@
 .match-card.chosen{border-color:var(--purple);background:var(--purple-soft)}.match-card.matched{border-color:var(--green);background:var(--green-soft);color:var(--green-dark);opacity:.7}
 .match-card.mismatch{border-color:var(--red);background:var(--red-soft)}.match-message{margin:22px 0 10px;min-height:3em;font-weight:700}
 .match-message~.button{margin-top:20px}@media(max-width:600px){.match-grid{gap:10px}.match-card{font-size:.85rem;padding:12px 8px}.confusion-toolbar>.button{width:100%}}
+
+/* Short entrance animations; reduced-motion preferences are respected below. */
+.word-tools{display:grid;gap:16px;margin-top:24px}
+@keyframes latinio-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes latinio-fade{from{opacity:0}to{opacity:1}}
+@keyframes latinio-pop{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.content,.result-shell,.match-grid{animation:latinio-rise .24s ease-out both}
+.modal-overlay{animation:latinio-fade .16s ease-out both}.modal{animation:latinio-rise .24s cubic-bezier(.2,.8,.2,1) both}
+.test-content:has(#answers input){animation:latinio-rise .2s ease-out both}
+.compact-feedback,.confusion-suggestion{animation:latinio-rise .22s ease-out both}
+.graded-answer{animation:latinio-pop .2s ease-out both}
+.button,.icon-button,.chip,.nav-item,.match-card{transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .15s}
+.match-card:active:not(:disabled),.icon-button:active,.chip:active{transform:scale(.97)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}

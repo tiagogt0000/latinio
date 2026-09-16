@@ -32,6 +32,18 @@ test('Correct matching consumes one card per side; failures do not consume cards
  passed.selected='a';assert.equal(matchRound(passed,'b').doneRight.length,1);
 });
 function dataWithPair(){const d=data();add(d,'a','b');return d;}
+test('In-test confusion manager preselects the current word and preserves the ongoing answer',async()=>{
+ const store={data:data(),doc:{session:{cursor:3,answers:['schicken'],feedback:{grade:'wrong'}}},async commit(changes){this.data=applyOps(this.data,changes.map(([entity,key,value])=>({entity,key,value})));}};
+ const before=structuredClone(store.doc.session);let html='',navigation=0;
+ const ui=confusionUI({store,sync:{schedule:()=>{}},h:String,showModal:s=>html=s,closeModal:()=>{},notify:()=>{},go:()=>navigation++,render:()=>{}});
+ await ui.handle({dataset:{action:'confusion-manage',id:'a'}});
+ assert.match(html,/id="confusion-a" disabled/);assert.match(html,/<option value="a">portare<\/option>/);
+ assert.doesNotMatch(html,/data-action="confusion-practice"/);
+ const original=globalThis.document;globalThis.document={querySelector:selector=>({value:selector==='#confusion-a'?'a':'b'})};
+ try{await ui.handle({dataset:{action:'confusion-manual'}});}finally{globalThis.document=original;}
+ assert.equal(pairs(store.data).length,1);assert.deepEqual(store.doc.session,before);assert.equal(navigation,0);
+ assert.match(html,/id="confusion-a" disabled/);assert.match(html,/mittere/);
+});
 test('UI confirmation persists pairs; matching saves a separate result; skipping does not grade',async()=>{
  const store={data:data(),doc:{session:{cursor:0}},async commit(changes){this.data=applyOps(this.data,changes.map(([entity,key,value])=>({entity,key,value})));},async update(fn){this.doc=fn(this.doc);}};
  let screen='',scheduled=0;

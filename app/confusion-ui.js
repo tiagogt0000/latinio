@@ -1,14 +1,15 @@
-import {uid} from './core.js';
 import {pairs,pairId,suggestions,makeRound,matchRound} from './confusions.js';
 export function confusionUI({store,sync,h,showModal,closeModal,notify,go,render}){
   const d=()=>store.data;
   function prompt(word,feedback,session){
     return suggestions(word,feedback,d()).filter(x=>!session.confusionDismissed?.includes(session.cursor+':'+x.word.id)).map(x=>`<aside class="confusion-suggestion"><p>Meintest du bei „${h(x.answer)}“ vielleicht <strong>${h(x.word.latin)}</strong>?</p><div class="button-row"><button type="button" class="text-button" data-action="confusion-add" data-a="${h(word.id)}" data-b="${h(x.word.id)}">Ja, als Verwechslung merken</button><button type="button" class="text-button" data-action="confusion-dismiss" data-id="${h(x.word.id)}">Nein</button></div></aside>`).join('');
   }
-  function manager(){
+  let contextWord=null;
+  function manager(wordId=null){
+    contextWord=d().words[wordId]?wordId:null;
     const data=d(),words=Object.values(data.words).filter(w=>data.collections[w.collectionId]).sort((a,b)=>a.latin.localeCompare(b.latin));
     const options='<option value="">Vokabel auswählen …</option>'+words.map(w=>`<option value="${h(w.id)}">${h(w.latin)} · ${h(data.collections[w.collectionId].name)}</option>`).join('');
-    showModal(`<h2 id="modal-title">Verwechslungsgefahr</h2><p class="muted">Merke dir Wörter, die du auseinanderhalten möchtest. Du kannst mehrere Paare anlegen.</p><div class="confusion-picker"><label>Erstes Wort<select id="confusion-a">${options}</select></label><label>Zweites Wort<select id="confusion-b">${options}</select></label><button class="button primary" data-action="confusion-manual">Paar hinzufügen</button></div><div class="confusion-pairs">${pairs(data).map(p=>`<div class="confusion-pair"><span><strong>${h(data.words[p.wordIds[0]].latin)}</strong> ↔ <strong>${h(data.words[p.wordIds[1]].latin)}</strong></span><button class="text-button" data-action="confusion-delete" data-id="${h(p.id)}" aria-label="Verwechslung entfernen">Entfernen</button></div>`).join('')||'<p class="muted">Noch keine Verwechslungen gespeichert.</p>'}</div><button class="button secondary wide" data-action="confusion-practice" ${!pairs(data).length?'disabled':''}>Verwechslungen üben</button>`);
+    showModal(`<h2 id="modal-title">Verwechslungsgefahr</h2><p class="muted">Merke dir Wörter, die du auseinanderhalten möchtest. Du kannst mehrere Paare anlegen.</p><div class="confusion-picker"><label>Erstes Wort<select id="confusion-a" ${contextWord?'disabled':''}>${contextWord?`<option value="${h(contextWord)}">${h(data.words[contextWord].latin)}</option>`:options}</select></label><label>Verwechselt mit<select id="confusion-b">${options}</select></label><button class="button primary" data-action="confusion-manual">Paar hinzufügen</button></div><div class="confusion-pairs">${pairs(data).filter(p=>!contextWord||p.wordIds.includes(contextWord)).map(p=>`<div class="confusion-pair"><span><strong>${h(data.words[p.wordIds[0]].latin)}</strong> ↔ <strong>${h(data.words[p.wordIds[1]].latin)}</strong></span><button class="text-button" data-action="confusion-delete" data-id="${h(p.id)}" aria-label="Verwechslung entfernen">Entfernen</button></div>`).join('')||'<p class="muted">Noch keine passenden Verwechslungen gespeichert.</p>'}</div>${contextWord?'<button class="button secondary wide" data-action="close-modal">Zurück zur Aufgabe / Liste</button>':`<button class="button secondary wide" data-action="confusion-practice" ${!pairs(data).length?'disabled':''}>Verwechslungen üben</button>`}`);
   }
   async function add(a,b){
     if(!a||!b||a===b)throw Error('Wähle zwei verschiedene Vokabeln.');
@@ -29,11 +30,11 @@ export function confusionUI({store,sync,h,showModal,closeModal,notify,go,render}
   }
   async function handle(button){
     const action=button.dataset.action;if(!action.startsWith('confusion-'))return false;
-    if(action==='confusion-manage')manager();
+    if(action==='confusion-manage')manager(button.dataset.id);
     if(action==='confusion-add'){await add(button.dataset.a,button.dataset.b);render();}
     if(action==='confusion-dismiss'){await store.update(doc=>{const s=doc.session;s.confusionDismissed??=[];s.confusionDismissed.push(s.cursor+':'+button.dataset.id);return doc;});render();}
-    if(action==='confusion-manual'){await add(document.querySelector('#confusion-a').value,document.querySelector('#confusion-b').value);manager();}
-    if(action==='confusion-delete'){await store.commit([['settings',button.dataset.id,null]]);sync.schedule();manager();}
+    if(action==='confusion-manual'){await add(document.querySelector('#confusion-a').value,document.querySelector('#confusion-b').value);render();manager(contextWord);}
+    if(action==='confusion-delete'){await store.commit([['settings',button.dataset.id,null]]);sync.schedule();render();manager(contextWord);}
     if(action==='confusion-practice'){if(!await offer(null,'collections',true))notify('Lege zuerst ein Verwechslungspaar an.');}
     if(action==='confusion-card'){
       await store.update(doc=>{let r=doc.matchRound;if(!r)return doc;const id=button.dataset.id;
