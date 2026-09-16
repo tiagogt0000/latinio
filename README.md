@@ -83,3 +83,7 @@ Paare und einzelne Trainingsresultate werden als getrennte, typisierte Datensät
 ## Update 0.2.1
 
 Der Bearbeitungsstift im Test bietet jetzt Verwechslungsgefahr und Vokabeleintrag als separate Aktionen. Bei der Verwechslung ist das aktuelle Wort vorausgewählt; die laufende Aufgabe bleibt erhalten. Sanfte Animationen begleiten Navigation, Dialoge, Feedback und Karten; reduzierte Bewegung schaltet sie ab. Das neue App-Symbol greift das kleine l und den Stern des Schriftzugs auf, mit eigenen Apple-Touch- und Manifest-Dateien.
+
+## Update 0.2.2
+
+Deutsche Antwortfelder erlauben wieder die geräteeigene Autokorrektur und Rechtschreibprüfung. Nach jeder Auswertung erscheint unter der Lateinkarte eine zweite Karte mit allen deutschen Übersetzungen, durch Kommas getrennt. Die Antwortzeilen zeigen nur noch die eigenen Eingaben; falsche bleiben durchgestrichen. Zusätzliche Lösungs- oder Fehlte-Felder entfallen.

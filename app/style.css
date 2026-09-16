@@ -47,3 +47,5 @@
 .button,.icon-button,.chip,.nav-item,.match-card{transition:background-color .18s,border-color .18s,color .18s,box-shadow .18s,transform .15s}
 .match-card:active:not(:disabled),.icon-button:active,.chip:active{transform:scale(.97)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.translation-card{animation:latinio-rise .22s ease-out both}
