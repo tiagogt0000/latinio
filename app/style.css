@@ -20,3 +20,16 @@
 .compact-feedback h2{font-size:.95rem;margin:0}.compact-feedback .icon-button{flex:none;color:inherit}
 .test-footer.compact-footer{border:0;margin-top:12px;padding-top:0}
 .update-message{margin:14px 0;font-size:.9rem}[data-app-updates]>.small{margin:12px 0}
+
+.confusion-toolbar{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.confusion-suggestion{background:var(--purple-soft);border:1px solid var(--purple);border-radius:13px;padding:12px 15px;margin-top:12px;font-size:.88rem}
+.confusion-suggestion .button-row{gap:8px 20px}.confusion-suggestion .text-button{font-size:.8rem}
+.confusion-picker{display:grid;gap:16px;margin:20px 0}.confusion-picker select{width:100%}
+.confusion-pairs{margin:20px 0;max-height:35dvh;overflow:auto}
+.confusion-pair{display:flex;gap:12px;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding:10px 0;font-size:.9rem}
+.match-help{margin:18px 0 24px;font-size:.9rem}.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.match-grid section{display:flex;flex-direction:column;gap:12px;min-width:0}.match-grid h2{font-size:.95rem;color:var(--muted)}
+.match-card{min-height:94px;flex:1;width:100%;padding:15px 10px;border:2px solid var(--border);border-bottom-width:4px;border-radius:15px;background:var(--surface);color:var(--text);font-weight:700;font-size:.95rem;overflow-wrap:anywhere}
+.match-card.chosen{border-color:var(--purple);background:var(--purple-soft)}.match-card.matched{border-color:var(--green);background:var(--green-soft);color:var(--green-dark);opacity:.7}
+.match-card.mismatch{border-color:var(--red);background:var(--red-soft)}.match-message{margin:22px 0 10px;min-height:3em;font-weight:700}
+.match-message~.button{margin-top:20px}@media(max-width:600px){.match-grid{gap:10px}.match-card{font-size:.85rem;padding:12px 8px}.confusion-toolbar>.button{width:100%}}

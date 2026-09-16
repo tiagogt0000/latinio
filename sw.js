@@ -1,5 +1,5 @@
-const CACHE='latinio-shell-0.1.3';
-const SHELL=['./','./index.html','./app/main.js','./app/feedback.js','./app/updates.js','./app/core.js','./app/store.js','./app/sync.js','./app/vocabulary.js','./app/style.css','./icon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
+const CACHE='latinio-shell-0.2.0';
+const SHELL=['./','./index.html','./app/main.js','./app/confusions.js','./app/confusion-ui.js','./app/feedback.js','./app/updates.js','./app/core.js','./app/store.js','./app/sync.js','./app/vocabulary.js','./app/style.css','./icon.svg','./icon-192.png','./icon-512.png','./manifest.webmanifest'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL.map(url=>new Request(url,{cache:'reload'}))))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('latinio-shell-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',event=>{

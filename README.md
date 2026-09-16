@@ -71,3 +71,11 @@ Beim Start und bei Rückkehr in die App sperrt ein zentraler Cloud-Dialog die Be
 Einstellungen bieten eine explizite Suche und Aktivierung von App-Updates. Der Service Worker ersetzt nur den App-Cache; IndexedDB und Cloud-Zugang bleiben erhalten. Neue Versionen müssen weiterhin eine neue Cache-Kennung und APP_VERSION erhalten.
 
 Antworten werden direkt grün/rot markiert. Fehlende Bedeutungen erscheinen als Lösungsfelder, falsche Antworten durchgestrichen mit einer möglichen Lösung. Die Rückmeldung bleibt kompakt; manuelle Anerkennung eines Tippfehlers und Bearbeitung der Vokabel bleiben verfügbar. Lernbewertung und Wiederholungsplan ändern sich nicht.
+
+## Update 0.2.0 – Verwechslungen
+
+Falsche Antworten werden mit den Bedeutungen anderer aktiver Vokabeln verglichen (inklusive optionaler Klammern). Erst nach Bestätigung wird ein Wortpaar gespeichert. Unter Sammlungen lassen sich Paare manuell anlegen, entfernen und üben.
+
+Nach einer Vokabelrunde wird bei fälligen Paaren aus der Runde eine Zuordnungsrunde mit zwei bis vier Wörtern angeboten. Richtige Runden verlängern die Abstände auf 1, 3, 7, 14 und 30 Tage; Fehler führen nach 12 Stunden zur nächsten Wiederholung. Manuelles Üben ist jederzeit möglich. Abgebrochene Zuordnungsrunden zählen nicht als Erfolg.
+
+Paare und einzelne Trainingsresultate werden als getrennte, typisierte Datensätze im bestehenden settings-Bereich synchronisiert; general bleibt unverändert. Das Google-Skript braucht kein Update. Die laufende Zuordnungsrunde wird lokal gespeichert, abgeschlossene Resultate werden synchronisiert.
