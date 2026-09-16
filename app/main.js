@@ -1,14 +1,13 @@
 import {uid,clone,normalize,evaluate,progressFor,chooseWords,parseImport} from './core.js';
 import {Store} from './store.js';
 import {Sync} from './sync.js';
-import {StartupGate} from './startup-gate.js';
 import {answerFeedback} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
 const updates=new AppUpdates(navigator.serviceWorker);
 const h=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',book:'<path d="M12 6c-3-3-7-3-10-2v15c4-1 7 0 10 2 3-2 6-3 10-2V4c-3-1-7-1-10 2zM12 6v15"/>',settings:'<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM9 3l-1 3-3 1-2 3 2 2-1 3 3 3 3-1 2 3 3-1 1-3 3-1 2-3-2-2 1-3-3-3-3 1-2-3z"/>',cloud:'<path d="M7 18H6a4 4 0 0 1-.5-8A7 7 0 0 1 19 9a4.5 4.5 0 0 1-1 9h-1M12 20V11m-3 3 3-3 3 3"/>',check:'<path d="m5 12 4 4L19 6"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>',edit:'<path d="m14 5 5 5M4 20l5-1L21 7a2 2 0 0 0-4-4L5 15z"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12z"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',award:'<circle cx="12" cy="8" r="6"/><path d="m8 13-2 9 6-3 6 3-2-9"/>',repeat:'<path d="M3 7h13a5 5 0 0 1 5 5M7 3 3 7l4 4M21 17H8a5 5 0 0 1-5-5m14 1 4 4-4 4"/>',search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',upload:'<path d="M12 16V4m-5 5 5-5 5 5M4 16v5h16v-5"/>',bolt:'<path d="m13 2-9 12h7l-1 8 10-13h-8z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>'};
 const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.book}</svg>`;
-let store,sync,gate,screen='learn',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false;
+let store,sync,screen='learn',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
 const data=()=>store.data;
 const prefs=()=>({theme:'system',daily:10,typos:true,...data().settings.general});
@@ -35,10 +34,10 @@ function updateView(){const busy=['checking','installing'].includes(updates.stat
 updates.addEventListener('change',()=>{const area=document.querySelector('[data-app-updates]');if(area)area.innerHTML=updateView();});
 function settingsView(){const p=prefs();return `<div class="page-heading"><div><div class="eyebrow">SO LERNST DU</div><h1>Einstellungen</h1><p class="muted">Dein Tempo. Deine App.</p></div></div><div class="settings-grid"><section class="card" data-app-updates>${updateView()}</section><section class="card"><h2>Dein Training</h2><label class="setting-row"><span><strong>Tagesziel</strong><small>Neue Wörter und fällige Wiederholungen</small></span><select id="daily">${[5,10,15,20,30].map(n=>`<option value="${n}" ${p.daily===n?'selected':''}>${n} Wörter</option>`).join('')}</select></label><label class="setting-row"><span><strong>Tippfehler tolerieren</strong><small>Einen kleinen Schreibfehler erkennen.<br>Du kannst jede Bewertung korrigieren.</small></span><input class="switch" id="typos" type="checkbox" ${p.typos?'checked':''}></label><div class="setting-row vertical"><span><strong>Darstellung</strong><small>Hell, dunkel oder wie dein Gerät</small></span><div class="theme-options">${[['light','sun','Hell'],['dark','moon','Dunkel'],['system','settings','Automatisch']].map(([id,i,label])=>`<button class="chip ${p.theme===id?'selected':''}" data-action="theme" data-id="${id}">${icon(i)} ${label}</button>`).join('')}</div></div></section><section class="card"><h2>Vokabeln verwalten</h2><p class="muted">Neue Listen kommen als eigene Sammlung dazu. Dein bisheriger Lernstand bleibt erhalten.</p><button class="button secondary wide" data-action="import">${icon('upload')} Sammlung importieren</button><button class="text-button" data-action="download-example">Beispiel für das Importformat</button><div class="divider"></div><h3>Auf deinem iPhone</h3><p class="muted">Öffne die Website in Safari und wähle im Teilen-Menü „Zum Home-Bildschirm“. Nach dem ersten vollständigen Laden kannst du auch offline üben.</p></section><section class="card cloud-settings"><div class="section-top"><h2>Cloud & Versionen</h2><span class="tag">GOOGLE TABELLEN</span></div><div data-sync-details>${syncDetails()}</div><div class="button-row"><button class="button secondary" data-action="sync-now" ${!sync.configured?'disabled':''}>${icon('repeat')} Jetzt abgleichen</button>${sync.remote?'<button class="button primary" data-action="remote">Cloud-Version ansehen</button>':''}</div><details ${!sync.configured?'open':''}><summary>Google-Verbindung einrichten</summary><p class="muted">Trage die Adresse deines bereitgestellten Google-Skripts und deinen privaten Verbindungsschlüssel ein. Auf jedem Gerät einmal.</p><form id="cloud-form"><label>Google-Skript-Adresse<input type="url" name="url" placeholder="https://script.google.com/macros/s/…/exec" value="${h(store.doc.config.url)}" required autocomplete="off"></label><label>Privater Verbindungsschlüssel<input type="password" name="token" value="${h(store.doc.config.token)}" minlength="32" required autocomplete="off"></label><button class="button primary" type="submit">Speichern & verbinden</button></form><p class="small muted">Die Einrichtung ist in der Datei <a href="./ANLEITUNG.html" target="_blank" rel="noopener">Anleitung</a> beschrieben. Verbindungsschlüssel bleiben auf diesem Gerät.</p></details><p class="small muted">Neue Cloud-Stände lädst du bewusst. Doppelte Bearbeitungen werden verglichen. Jede bestätigte Änderung erhält eine eigene, fortlaufende Versionsnummer.</p></section></div><p class="small muted app-version">Latinio ${APP_VERSION} · Immer Latein → Deutsch</p>`;}
 function showModal(content){const previous=document.activeElement;modalCleanup?.();modalRoot.innerHTML=`<div class="modal-overlay"><section role="dialog" aria-modal="true" class="modal" aria-labelledby="modal-title"><button class="icon-button modal-close" data-action="close-modal" aria-label="Schließen">${icon('close')}</button>${content}</section></div>`;
-  const listener=e=>{if(gate?.blocked)return;if(e.key==='Escape')closeModal();if(e.key==='Tab'){const nodes=[...modalRoot.querySelectorAll('button,input,select,textarea,a[href]')].filter(n=>!n.disabled);const first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};document.addEventListener('keydown',listener);modalCleanup=()=>{document.removeEventListener('keydown',listener);previous?.focus();};modalRoot.querySelector('input,select,button')?.focus();}
+  const listener=e=>{if(e.key==='Escape')closeModal();if(e.key==='Tab'){const nodes=[...modalRoot.querySelectorAll('button,input,select,textarea,a[href]')].filter(n=>!n.disabled);const first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};document.addEventListener('keydown',listener);modalCleanup=()=>{document.removeEventListener('keydown',listener);previous?.focus();};modalRoot.querySelector('input,select,button')?.focus();}
 function closeModal(){modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;}
 function remoteContent(){const comparison=sync.compare();const conflicts=comparison.conflicts;return `<span class="stat-icon purple">${icon('cloud')}</span><h2 id="modal-title">Eine neuere Version ist da.</h2><p>Auf diesem Gerät: <strong>v${store.doc.base}</strong><br>In deiner Cloud: <strong>v${sync.remote.version}</strong></p><p class="muted">${store.doc.pending.filter(o=>!o.bootstrap).length?'Deine ausstehenden Änderungen bleiben erhalten. Bearbeitungen derselben Angabe vergleichst du unten.':'Lade den aktuellen Stand, um hier weiterzulernen.'}</p><form id="remote-form">${conflicts.map((c,i)=>`<div class="conflict"><h3>${h(conflictName(c.local))}</h3><p><strong>Dieses Gerät:</strong> ${h(conflictValue(c.local.value))}</p><p><strong>Cloud:</strong> ${h(conflictValue(c.remote.value))}</p><label>Welche Fassung soll bleiben?<select name="c${i}" data-conflict="${h(c.key)}" required><option value="">Bitte wählen</option><option value="local">Dieses Gerät</option><option value="cloud">Cloud</option></select></label></div>`).join('')}<button type="submit" class="button primary wide">${icon('download')} Cloud-Version laden${conflicts.length?' & zusammenführen':''}</button></form>`;}
-function remoteModal(){if(!sync.remote)return;if(gate?.blocked)return;showModal(remoteContent());}
+function remoteModal(){if(!sync.remote)return;showModal(remoteContent());}
 function conflictName(op){return op.value?.latin||op.value?.name||data().words[op.key]?.latin||'Geänderte Angabe';}
 function conflictValue(value){if(value===null)return 'Gelöscht';if(value.latin)return value.latin+' – '+value.meanings.map(g=>g.join(' / ')).join(', ');if(value.name)return value.name;if(value.grade)return 'Bewertung: '+value.grade;return JSON.stringify(value);}
 function wordModal(id){const d=data(),word=d.words[id]||{id:uid(),collectionId:collectionFilter!=='all'?collectionFilter:Object.keys(d.collections)[0],latin:'',meanings:[['']]};if(!word.collectionId){notify('Lege zuerst eine Sammlung an.');return;}
@@ -47,7 +46,7 @@ function meaningInput(value=''){return `<div class="meaning-input"><input name="
 function importModal(){showModal(`<h2 id="modal-title">Eine neue Sammlung</h2><p class="muted">Wähle die Importdatei, die du hier im Chat bekommen hast. Vor dem Speichern siehst du eine Vorschau.</p><label class="file-drop">${icon('upload')}<strong>JSON-Datei auswählen</strong><input type="file" id="import-file" accept=".json,application/json"></label><div id="import-preview"></div>`);}
 let importCandidate=null;
 async function start(mode='smart'){
- if(gate?.blocked)return;
+ 
  if(sync.remote){remoteModal();return;}
  if(store.doc.session&&!store.doc.session.finished){screen='test';render();return;}
  if(!selected.length){notify('Wähle mindestens eine Sammlung aus.');return;}
@@ -76,13 +75,10 @@ async function next(){const {session,item,word}=current();if(!session)return;
 function renderResult(){const s=store.doc.session;if(!s){screen='learn';render();return;}const reviews=Object.values(data().reviews).filter(r=>r.id.startsWith(s.id+'-')&&!r.repeat);app.innerHTML=`<main class="result-shell"><div data-sync>${statusMarkup()}</div><span class="result-award">${icon('award')}</span><div class="eyebrow">RUNDE GESCHAFFT</div><h1>Ein Stück mehr<br>im Kopf.</h1><p class="muted">${s.originalLength} Vokabeln geübt. Dein Fortschritt ist lokal gespeichert.</p><div class="result-stats">${[['full','Ganz gewusst'],['partial','Teilweise gewusst'],['wrong','Wiederholen']].map(([grade,label])=>`<div class="${grade}"><strong>${reviews.filter(r=>r.grade===grade).length}</strong><span>${label}</span></div>`).join('')}</div><p class="small muted">Die erste Antwort zählt für den Lernplan. Wiederholungen festigen das Wort, ohne den ersten Fehler zu löschen.</p><button class="button primary wide" data-action="finish">Zur Übersicht ${icon('arrow')}</button></main>`;}
 async function changePrefs(changes){await store.commit([['settings','general',{...prefs(),...changes}]]);sync.schedule();render();}
 async function actions(event){const button=event.target.closest('[data-action]');if(!button)return;event.preventDefault();const action=button.dataset.action,id=button.dataset.id;
- if(gate?.blocked&&!button.closest('#cloud-gate'))return;
  if(working)return;working=true;
  try{switch(action){
  case 'check-update':await updates.check();break;
  case 'apply-update':await updates.apply();break;
- case 'gate-retry':gate.begin();break;
- case 'gate-offline':gate.continueOffline();notify('Du arbeitest mit dem lokalen Stand.');break;
  case 'nav':screen=button.dataset.screen;closeModal();render();break;
  case 'start':await start();break;
  case 'start-all':await start('all');break;
@@ -120,7 +116,7 @@ document.addEventListener('change',async event=>{const el=event.target;try{
  if(el.id==='typos')await changePrefs({typos:el.checked});
  if(el.id==='import-file'&&el.files[0]){if(el.files[0].size>3000000)throw Error('Bitte eine Datei unter 3 MB auswählen.');importCandidate=parseImport(JSON.parse(await el.files[0].text()),data());const x=importCandidate;document.querySelector('#import-preview').innerHTML=`<h3>${h(x.collection.name)}</h3><p>${x.words.length} Vokabeln${x.skipped?` · ${x.skipped} doppelte Einträge übersprungen`:''}</p><ul>${x.words.slice(0,4).map(w=>`<li><strong>${h(w.latin)}</strong> – ${h(w.meanings.map(g=>g[0]).join(', '))}</li>`).join('')}</ul><button class="button primary wide" data-action="confirm-import">Sammlung importieren</button>`;}
  }catch(error){importCandidate=null;notify(error.message);}});
-document.addEventListener('submit',async event=>{event.preventDefault();if(gate?.blocked&&!event.target.closest('#cloud-gate'))return;if(working)return;working=true;const form=event.target;const fd=new FormData(form);try{
+document.addEventListener('submit',async event=>{event.preventDefault();if(working)return;working=true;const form=event.target;const fd=new FormData(form);try{
  if(form.id==='answer-form')await checkAnswer();
  if(form.id==='word-form'){
   const word={id:form.dataset.id,collectionId:fd.get('collectionId'),latin:fd.get('latin').trim(),meanings:fd.getAll('meaning').map(v=>v.split('/').map(x=>x.trim()).filter(Boolean)).filter(g=>g.length)};
@@ -133,36 +129,17 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(gate?
   if(token.length<32)throw Error('Der Verbindungsschlüssel muss mindestens 32 Zeichen haben.');
   if(sync.busy)throw Error('Bitte warte, bis der laufende Abgleich abgeschlossen ist.');
   if(store.doc.base>0&&store.doc.config.url!==url)throw Error('Ein Wechsel zu einer anderen Cloud braucht eine gesonderte Datenübernahme. Deine bisherige Verbindung bleibt bestehen.');
-  await store.update(doc=>{doc.config={url,token};return doc;});sync.remote=null;render();gate.begin();
+  await store.update(doc=>{doc.config={url,token};return doc;});sync.remote=null;render();sync.schedule(0);
  }
  if(form.id==='remote-form'){
   const choices={};form.querySelectorAll('[data-conflict]').forEach(el=>choices[el.dataset.conflict]=el.value);form.querySelector('button').disabled=true;await sync.accept(choices);closeModal();render();notify('Cloud-Version geladen.');
  }
- }catch(error){if(form.id==='remote-form'&&gate?.blocked)gate.fail(error.message);notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;}});
-const gateDialog=document.createElement('dialog');
-gateDialog.id='cloud-gate';gateDialog.className='cloud-gate';
-gateDialog.setAttribute('aria-labelledby','gate-title');
-gateDialog.addEventListener('cancel',event=>event.preventDefault());
-gateDialog.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();}});
-document.body.append(gateDialog);
-function renderGate(){
- if(!gate.blocked){if(gateDialog.open)gateDialog.close();document.body.classList.remove('cloud-blocked');return;}
- const state=gate.state;
- if(state==='newer'){
-  gateDialog.innerHTML=remoteContent().replace('id="modal-title"','id="gate-title"');
- }else{
-  const failed=state==='error';
-  gateDialog.innerHTML=`<div class="gate-cloud ${failed?'orange':'green'}">${icon('cloud')}</div><h2 id="gate-title" tabindex="-1">${failed?'Verbindung zur Cloud fehlgeschlagen':state==='loading'?'Cloud-Stand wird geladen':'Cloud-Stand wird geprüft'}</h2><p class="muted" role="status">${h(gate.message)}</p>${failed?`<div class="gate-actions"><button class="button primary wide" data-action="gate-retry">${icon('repeat')} Erneut versuchen</button><button class="button secondary wide" data-action="gate-offline">Offline fortfahren</button></div><p class="small muted">Offline nutzt du deinen zuletzt gespeicherten Stand. Änderungen bleiben auf diesem Gerät gespeichert und werden bei bestehender Verbindung wieder abgeglichen.</p>`:'<div class="indeterminate" role="progressbar" aria-label="Cloud-Abgleich läuft"></div><p class="small muted">Einen Moment – gleich kannst du weiterlernen.</p>'}`;
- }
- document.body.classList.add('cloud-blocked');
- if(!gateDialog.open)gateDialog.showModal();
- gateDialog.querySelector('select,button,#gate-title')?.focus();
-}
+ }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;}});
 async function boot(){try{
- store=await new Store().open();await store.seed();sync=new Sync(store);gate=new StartupGate(sync);gate.addEventListener('change',renderGate);store.addEventListener('change',updateStatus);store.addEventListener('external',()=>{if(screen==='test'){screen='learn';notify('Ein anderer Tab hat den Stand geändert. Du kannst die gespeicherte Runde fortsetzen.');}render();});sync.addEventListener('change',updateStatus);sync.addEventListener('remote',()=>{if(gate.blocked)return;if(screen!=='test'&&!modalRoot.children.length)remoteModal();else notify('Eine neuere Cloud-Version wartet unter Einstellungen.');});
- matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);render();gate.begin();
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)gate.begin();});
- window.addEventListener('pageshow',event=>{if(event.persisted)gate.begin();});
+ store=await new Store().open();await store.seed();sync=new Sync(store);store.addEventListener('change',updateStatus);store.addEventListener('external',()=>{if(screen==='test'){screen='learn';notify('Ein anderer Tab hat den Stand geändert. Du kannst die gespeicherte Runde fortsetzen.');}render();});sync.addEventListener('change',updateStatus);sync.addEventListener('remote',()=>{if(screen!=='test'&&!modalRoot.children.length)remoteModal();else notify('Eine neuere Cloud-Version wartet unter Einstellungen.');});
+ matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);render();sync.schedule(0);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync.schedule(0);});
+ window.addEventListener('pageshow',event=>{if(event.persisted)sync.schedule(0);});
  setInterval(()=>{if(!document.hidden)sync.schedule(0);},60000);
  if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>notify('Offline-Bereitstellung noch nicht möglich. Online kannst du weiterlernen.'));
  }catch(error){app.innerHTML=`<main class="boot"><h1>Lokales Speichern ist nicht verfügbar.</h1><p>Öffne Latinio über seine Website-Adresse in einem normalen Safari-Tab.</p><p class="muted">${h(error.message)}</p></main>`;}}
