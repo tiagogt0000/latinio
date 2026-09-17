@@ -54,22 +54,35 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
 }
 export function progressFor(wordId, reviews) {
   const events=Object.values(reviews).filter(r=>r.wordId===wordId).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
-  let streak=0,due=0,level='new';
+  let streak=0,due=0,lastReviewedAt=0,level='new';
   for(const r of events){
     if(r.repeat)continue;
+    lastReviewedAt=r.at;
     if(r.grade==='full'){streak++;due=r.at+Math.min(90,[1,3,7,14,30,60,90][Math.min(streak-1,6)])*86400000;level=streak>=3?'known':'learning';}
     else {streak=0;due=r.at+(r.grade==='partial'?1:.5)*86400000;level='learning';}
   }
-  return {streak,due,level,seen:events.length};
+  return {streak,due,level,seen:events.length,lastReviewedAt};
 }
 export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Date.now()) {
   const words=Object.values(data.words).filter(w=>data.collections[w.collectionId]&&collectionIds.includes(w.collectionId));
   const shuffled=words.map(w=>({w,p:progressFor(w.id,data.reviews),random:Math.random()}));
   if(mode==='all')return shuffled.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
-  return shuffled.filter(x=>!x.p.seen||x.p.due<=now).sort((a,b)=>{
+  const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;
+  if(mode==='learning')return shuffled.filter(x=>x.p.level!=='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
+  if(mode==='refresh')return shuffled.filter(x=>x.p.level==='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
+  const due=shuffled.filter(x=>!x.p.seen||x.p.due<=now).sort((a,b)=>{
     const rank=x=>x.p.seen?0:1;
     return rank(a)-rank(b)||a.p.due-b.p.due||a.random-b.random;
-  }).slice(0,limit).map(x=>x.w.id);
+  });
+  const chosen=due.slice(0,limit);
+  // Besides scheduled reviews, mix in one secure word per local calendar day.
+  const dayStart=new Date(now);dayStart.setHours(0,0,0,0);
+  const known=shuffled.filter(x=>x.p.level==='known');
+  if(limit>0&&!chosen.some(x=>x.p.level==='known')&&!known.some(x=>x.p.lastReviewedAt>=dayStart.getTime())){
+    const extra=known.filter(x=>x.p.lastReviewedAt<dayStart.getTime()).sort(oldest)[0];
+    if(extra){if(chosen.length>=limit)chosen.pop();chosen.push(extra);}
+  }
+  return chosen.map(x=>x.w.id);
 }
 export function rebase(shadow, remoteOps, pending, choices={}) {
   const acknowledged=new Set(remoteOps.map(o=>o.id));

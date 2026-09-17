@@ -87,3 +87,7 @@ Der Bearbeitungsstift im Test bietet jetzt Verwechslungsgefahr und Vokabeleintra
 ## Update 0.2.2
 
 Deutsche Antwortfelder erlauben wieder die geräteeigene Autokorrektur und Rechtschreibprüfung. Nach jeder Auswertung erscheint unter der Lateinkarte eine zweite Karte mit allen deutschen Übersetzungen, durch Kommas getrennt. Die Antwortzeilen zeigen nur noch die eigenen Eingaben; falsche bleiben durchgestrichen. Zusätzliche Lösungs- oder Fehlte-Felder entfallen.
+
+## Update 0.2.3
+
+Nach den geplanten Aufgaben bietet das Training unbegrenztes Weiterüben: alle ausgewählten Vokabeln, nur noch nicht sichere Wörter oder sichere Wörter auffrischen. Das Tagesziel ist keine Sperre. Auffrischen ist auch direkt auf der Startseite verfügbar. Auswahl und Ergebnisse verwenden die bestehende Bewertungshistorie; beim gezielten Üben kommen die am längsten nicht abgefragten Wörter zuerst. Das normale Training mischt zusätzlich zu fälligen Wiederholungen täglich ein sicheres Wort ein, sofern heute noch keines aus der Auswahl wiederholt wurde.
