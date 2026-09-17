@@ -51,3 +51,17 @@ test('Repeated A to B changes get unique deliveries and safe edits apply automat
  let data=d;for(let i=0;i<3;i++){const r=incomingChanges(data);data=applyOps(data,r.changes.map(([entity,key,value])=>({entity,key,value})));}
  assert.equal(Object.values(data.words)[0].latin,'B');assert.equal(Object.keys(data.settings).length,0);
 });
+test('Read-only requests proceed during a writer lock; mutations still require exclusivity',()=>{
+ const h=harness();friend(h);const lock=h.ctx.LockService.getScriptLock();assert.equal(lock.tryLock(),true);
+ assert.equal(h.request({action:'profiles'}).profiles.length,1);
+ assert.equal(h.request({action:'shareList'}).shares.length,0);
+ assert.equal(h.request({action:'check'}).version,0);
+ assert.equal(h.request({action:'pull',since:0}).version,0);
+ assert.throws(()=>h.request({action:'profileCreate',name:'Blocked',email:'b@school.de'}),/speichert gerade/);lock.releaseLock();
+});
+test('Sharing 100 words batches snapshots and journal writes instead of per-word spreadsheet operations',()=>{
+ const {h,f}=setup();for(let i=0;i<100;i++)push(h,'words','bulk'+i,{id:'bulk'+i,collectionId:'c',latin:'verbum'+i,meanings:[['Wort']]});
+ const before=h.metrics.writes;h.request({action:'shareCreate',profileId:f.id,collectionId:'c'});
+ assert.ok(h.metrics.writes-before<=7,`Expected bounded writes, got ${h.metrics.writes-before}`);
+ assert.equal(Object.keys(h.request({action:'pull',since:0,token:f.token}).data.words).length,101);
+});

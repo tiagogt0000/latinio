@@ -9,23 +9,34 @@ function setupMultiuser(){
   ['_LatinioProfiles','_LatinioSessions','_LatinioShares'].forEach(metaSheet_);
   ui.alert('Mehrbenutzer-Zugang eingerichtet. Die bestehende Web-App jetzt als neue Version bereitstellen.');
 }
-function metaSheet_(name){
+var requestSheets_=Object.create(null);
+function metaSheet_(name,readOnly){
+  if(requestSheets_[name])return requestSheets_[name];
   const book=SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEET_ID'));
   let sheet=book.getSheetByName(name);
+  if(!sheet&&readOnly)return null;
   if(!sheet){sheet=book.insertSheet(name);sheet.getRange(1,1,1,2).setValues([['Schlüssel','Daten (JSON)']]);}
-  return sheet;
+  requestSheets_[name]=sheet;return sheet;
 }
 function records_(name){
-  const sheet=metaSheet_(name),data=Object.create(null),last=sheet.getLastRow();
+  const sheet=metaSheet_(name,true),data=Object.create(null);if(!sheet)return data;const last=sheet.getLastRow();
   if(last>1)sheet.getRange(2,1,last-1,2).getValues().forEach(function(row){data[row[0]]=JSON.parse(row[1]);});
   return data;
 }
-function saveRecord_(name,key,value){
-  const sheet=metaSheet_(name),json=JSON.stringify(value);if(json.length>45000)throw new Error('Datensatz zu groß.');
-  const last=sheet.getLastRow();
+function saveRecord_(name,key,value){saveRecords_(name,[[key,value]]);}
+function saveRecords_(name,entries){
+  if(!entries.length)return;
+  const sheet=metaSheet_(name),last=sheet.getLastRow();
   const keys=last>1?sheet.getRange(2,1,last-1,1).getValues():[];
-  let index=keys.findIndex(function(row){return row[0]===key;});
-  sheet.getRange(index<0?last+1:index+2,1,1,2).setValues([[key,json]]);
+  const positions=new Map(keys.map(function(row,i){return [row[0],i+2];}));
+  let next=last+1;const updates=new Map();
+  entries.forEach(function(entry){
+    const json=JSON.stringify(entry[1]);if(json.length>45000)throw new Error('Datensatz zu groß.');
+    if(!positions.has(entry[0]))positions.set(entry[0],next++);
+    updates.set(positions.get(entry[0]),[entry[0],json]);
+  });
+  const sorted=Array.from(updates).sort(function(a,b){return a[0]-b[0];});
+  for(let i=0;i<sorted.length;){const start=sorted[i][0],values=[sorted[i++][1]];while(i<sorted.length&&sorted[i][0]===start+values.length)values.push(sorted[i++][1]);sheet.getRange(start,1,values.length,2).setValues(values);}
 }
 function login_(request){
   const props=PropertiesService.getScriptProperties();let profile;
@@ -107,7 +118,7 @@ function accountApi_(request,identity){
     }
     // Prepare per-word snapshots before appending. Deterministic operation IDs make retries safe.
     const words=Object.values(data.words).filter(function(w){return w.collectionId===collection.id;});
-    words.forEach(function(w){const key=id+'_'+w.id;if(!records[key])saveRecord_('_LatinioShares',key,{kind:'entry',shareId:id,sourceId:w.id,source:w});});
+    saveRecords_('_LatinioShares',words.filter(function(w){return !records[id+'_'+w.id];}).map(function(w){return [id+'_'+w.id,{kind:'entry',shareId:id,sourceId:w.id,source:w}];}));
     const entries=Object.values(records_('_LatinioShares')).filter(function(e){return e.kind==='entry'&&e.shareId===id;});
     const changes=[{id:'init_'+share.targetId,entity:'collections',key:share.targetId,value:{id:share.targetId,name:share.collection.name}}];
     entries.forEach(function(e){const w=mapWord_(e.source,share);changes.push({id:'init_'+w.id,entity:'words',key:w.id,value:w});});
@@ -130,7 +141,8 @@ function accountApi_(request,identity){
     });
     // Recipients first; a retry deduplicates delivery even if saving the baseline fails.
     serverWrite_(share.profileId,changes);
-    selected.forEach(function(c){if(c.entity==='collections'){share.collection=c.source;share.revision=(share.revision||0)+1;saveRecord_('_LatinioShares',share.id,share);}else saveRecord_('_LatinioShares',share.id+'_'+c.key,{kind:'entry',shareId:share.id,sourceId:c.key,source:c.source,revision:((records[share.id+'_'+c.key]||{}).revision||0)+1});});
+    const baselines=selected.map(function(c){if(c.entity==='collections'){share.collection=c.source;share.revision=(share.revision||0)+1;return [share.id,share];}return [share.id+'_'+c.key,{kind:'entry',shareId:share.id,sourceId:c.key,source:c.source,revision:((records[share.id+'_'+c.key]||{}).revision||0)+1}];});
+    saveRecords_('_LatinioShares',baselines);
     return {sent:changes.length};
   }
   throw new Error('Unbekannte Verwaltungsaktion.');

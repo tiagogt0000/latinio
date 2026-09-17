@@ -14,7 +14,7 @@ let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',c
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
 const isAdmin=()=>profile?.role==='admin';
 const data=()=>store.data;
-function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match'].includes(screen)&&!sync.busy&&!store.doc.pending.length&&(!store.doc.session||store.doc.session.finished)&&!store.doc.matchRound)void updates.apply();}
+function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length&&(!store.doc.session||store.doc.session.finished)&&!store.doc.matchRound)void updates.apply();}
 async function showResult(){if(!isAdmin())await cloudWait.run('Fortschritt wird hochgeladen …');screen='result';render();}
 async function backgroundSync(){if(isAdmin()){sync.schedule(0);return;}if(working||cloudWait?.blocked||['test','match'].includes(screen)||modalRoot.children.length){sync.schedule(0);return;}try{await settleSync(sync,store);if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{} }
 
