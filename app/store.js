@@ -1,10 +1,12 @@
 import {uid,clone,emptyData,applyOps} from './core.js';
 import {collection,vocabulary} from './vocabulary.js';
 export class Store extends EventTarget {
-  async open(){
-    this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open('latinio-v1',1);r.onupgradeneeded=()=>r.result.createObjectStore('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+  async open(profileId='admin'){
+    this.profileId=profileId;
+    const dbName=profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
+    this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open(dbName,1);r.onupgradeneeded=()=>r.result.createObjectStore('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
     await this.update(current=>current||{schema:1,device:uid(),seq:0,base:0,shadow:emptyData(),pending:[],session:null,config:{url:'',token:''},lastSync:null,seeded:false});
-    this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates'):null;
+    this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates-'+profileId):null;
     if(this.channel)this.channel.onmessage=async()=>{await this.read();this.dispatchEvent(new Event('external'));};
     return this;
   }
@@ -17,14 +19,15 @@ export class Store extends EventTarget {
     this.doc=value;this.channel?.postMessage('updated');this.dispatchEvent(new Event('change'));return value;
   }
   get data(){return applyOps(this.doc.shadow,this.doc.pending);}
-  async seed(){if(this.doc.seeded)return;await this.update(doc=>{
+  close(){this.channel?.close();this.db?.close();}
+  async seed(){if(this.profileId!=='admin'||this.doc.seeded)return;await this.update(doc=>{
     if(doc.seeded)return doc;
     const data=applyOps(doc.shadow,doc.pending);
     if(!Object.keys(data.collections).length){for(const [entity,key,value] of [['collections',collection.id,collection],...vocabulary.map(w=>['words',w.id,w])]){doc.seq++;doc.pending.push({id:uid(),entity,key,value,device:doc.device,seq:doc.seq,at:Date.now(),bootstrap:true});}}
     doc.seeded=true;return doc;
   });}
-  async commit(changes,session=undefined){return this.update(doc=>{
+  async commit(changes,session=undefined){const previous=this.data;const result=await this.update(doc=>{
     for(const [entity,key,value]of changes){doc.seq++;doc.pending.push({id:uid(),entity,key,value:clone(value),device:doc.device,seq:doc.seq,at:Date.now()});}
     if(session!==undefined)doc.session=clone(session);return doc;
-  });}
+  });this.dispatchEvent(new CustomEvent('commit',{detail:{changes,previous}}));return result;}
 }

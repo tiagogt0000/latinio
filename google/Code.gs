@@ -1,9 +1,9 @@
-/** Latinio 0.1.0 – an eine private Google-Tabelle gebundenes Apps Script.
+/** Latinio 1.0.0 – an eine private Google-Tabelle gebundenes Apps Script.
  * Geheimnisse werden ausschließlich in ScriptProperties gespeichert.
  * Die Änderungstabelle ist ein fortlaufendes Journal, keine zu überschreibende Momentaufnahme.
  */
 function onOpen() {
-  SpreadsheetApp.getUi().createMenu('Latinio').addItem('Cloud-Verbindung einrichten', 'setupLatinio').addToUi();
+  SpreadsheetApp.getUi().createMenu('Latinio').addItem('Mehrbenutzer-Update einrichten', 'setupMultiuser').addItem('Cloud-Verbindung einrichten', 'setupLatinio').addToUi();
 }
 function setupLatinio() {
   const ui=SpreadsheetApp.getUi();
@@ -27,11 +27,15 @@ function doGet(e) {
   return template.evaluate().setTitle('Latinio Cloud').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 function latinioApi(request) {
-  authorize_(request);
   const lock=LockService.getScriptLock();
   if(!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
-    const sheet=ensureLog_();
+    if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
+    if(request.action==='login')return login_(request);
+    const identity=authorize_(request);
+    if(request.action==='whoami')return {profile:identity,apiVersion:2};
+    if(['profiles','profileCreate','shareList','shareCreate','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity);
+    const sheet=ensureLog_(identity.id);
     const lastRow=sheet.getLastRow();
     const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
     if(request.action==='check')return {version:version};
@@ -61,17 +65,23 @@ function latinioApi(request) {
 }
 function hash_(value){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,value,Utilities.Charset.UTF_8).map(function(b){return ('0'+((b+256)%256).toString(16)).slice(-2);}).join('');}
 function authorize_(request){
-  const expected=PropertiesService.getScriptProperties().getProperty('TOKEN_HASH');
-  if(!expected||!request||typeof request.token!=='string'||request.token.length<32||request.token.length>200)throw new Error('Der Verbindungsschlüssel stimmt nicht.');
-  const actual=hash_(request.token);let different=expected.length^actual.length;
-  for(let i=0;i<actual.length;i++)different|=actual.charCodeAt(i)^(expected.charCodeAt(i)||0);
-  if(different)throw new Error('Der Verbindungsschlüssel stimmt nicht.');
+  const props=PropertiesService.getScriptProperties();
+  if(!request||typeof request.token!=='string'||request.token.length<32||request.token.length>200)throw new Error('Bitte erneut anmelden.');
+  const hashed=hash_(request.token),expected=props.getProperty('TOKEN_HASH');
+  if(expected&&hashed===expected)return {id:'admin',role:'admin',name:'Admin'};
+  const session=records_('_LatinioSessions')[hashed];
+  if(!session||session.expires<Date.now())throw new Error('Bitte erneut anmelden.');
+  if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin'};
+  const profile=records_('_LatinioProfiles')[session.profileId];
+  if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
+  return {id:profile.id,role:'student',name:profile.name,email:profile.email};
 }
-function ensureLog_(){
+function ensureLog_(profileId){
   const id=PropertiesService.getScriptProperties().getProperty('SHEET_ID');if(!id)throw new Error('Cloud noch nicht eingerichtet.');
   const book=SpreadsheetApp.openById(id);
-  let sheet=book.getSheetByName('Änderungen');
-  if(!sheet){sheet=book.insertSheet('Änderungen');sheet.getRange(1,1,1,5).setValues([['Version','Änderung-ID','Gespeichert am','Gerät','Daten (JSON)']]);sheet.setFrozenRows(1);sheet.getRange(1,1,1,5).setFontWeight('bold').setBackground('#59b923').setFontColor('#ffffff');sheet.setColumnWidths(1,4,160);sheet.setColumnWidth(5,600);}
+  const tab=!profileId||profileId==='admin'?'Änderungen':'Lernen_'+profileId;
+  let sheet=book.getSheetByName(tab);
+  if(!sheet){sheet=book.insertSheet(tab);sheet.getRange(1,1,1,5).setValues([['Version','Änderung-ID','Gespeichert am','Gerät','Daten (JSON)']]);sheet.setFrozenRows(1);sheet.getRange(1,1,1,5).setFontWeight('bold').setBackground('#59b923').setFontColor('#ffffff');sheet.setColumnWidths(1,4,160);sheet.setColumnWidth(5,600);}
   return sheet;
 }
 function replay_(log){const data={collections:{},words:{},reviews:{},sessions:{},settings:{}};log.forEach(function(row){apply_(data,row.op);});return data;}

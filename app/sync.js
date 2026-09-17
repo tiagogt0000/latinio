@@ -40,7 +40,8 @@ export class Sync extends EventTarget {
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
     return this.bridge.request(action,payload);
   }
-  async run(){
+  run(){if(this.inFlight)return this.inFlight;this.inFlight=this.performRun().finally(()=>{this.inFlight=null;});return this.inFlight;}
+  async performRun(){
     if(this.busy||this.remote)return;
     if(!this.configured){this.set('unconfigured','Cloud noch nicht verbunden');return;}
     if(!navigator.onLine){this.set('offline','Offline · lokal gespeichert');return;}
