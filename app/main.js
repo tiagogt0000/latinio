@@ -1,3 +1,4 @@
+import {classroomView,classroomResults} from './classroom.js';
 import {uid,clone,normalize,evaluate,progressFor,chooseWords,parseImport} from './core.js';
 import {confusionUI} from './confusion-ui.js';
 import {openAccount,signOut,accountCard} from './accounts.js';
@@ -10,7 +11,7 @@ const updates=new AppUpdates(navigator.serviceWorker);
 const h=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={home:'<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>',book:'<path d="M12 6c-3-3-7-3-10-2v15c4-1 7 0 10 2 3-2 6-3 10-2V4c-3-1-7-1-10 2zM12 6v15"/>',settings:'<path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM9 3l-1 3-3 1-2 3 2 2-1 3 3 3 3-1 2 3 3-1 1-3 3-1 2-3-2-2 1-3-3-3-3 1-2-3z"/>',cloud:'<path d="M7 18H6a4 4 0 0 1-.5-8A7 7 0 0 1 19 9a4.5 4.5 0 0 1-1 9h-1M12 20V11m-3 3 3-3 3 3"/>',check:'<path d="m5 12 4 4L19 6"/>',arrow:'<path d="M5 12h14m-5-5 5 5-5 5"/>',plus:'<path d="M12 5v14M5 12h14"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>',edit:'<path d="m14 5 5 5M4 20l5-1L21 7a2 2 0 0 0-4-4L5 15z"/>',trash:'<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 1v2m0 18v2M1 12h2m18 0h2M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"/>',moon:'<path d="M20 15A9 9 0 0 1 9 3a9 9 0 1 0 11 12z"/>',target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',award:'<circle cx="12" cy="8" r="6"/><path d="m8 13-2 9 6-3 6 3-2-9"/>',repeat:'<path d="M3 7h13a5 5 0 0 1 5 5M7 3 3 7l4 4M21 17H8a5 5 0 0 1-5-5m14 1 4 4-4 4"/>',search:'<circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/>',download:'<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>',upload:'<path d="M12 16V4m-5 5 5-5 5 5M4 16v5h16v-5"/>',bolt:'<path d="m13 2-9 12h7l-1 8 10-13h-8z"/>',info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/>'};
 const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name]||icons.book}</svg>`;
-let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false;
+let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
 const isAdmin=()=>profile?.role==='admin';
 const data=()=>store.data;
@@ -22,12 +23,12 @@ const prefs=()=>({theme:'system',daily:10,typos:true,...data().settings.general}
 const activeWords=()=>Object.values(data().words).filter(w=>data().collections[w.collectionId]);
 function notify(message){const el=document.querySelector('#toast');el.textContent=message;el.classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('visible'),4500);}
 function theme(){const p=prefs();document.documentElement.dataset.theme=p.theme==='system'?(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p.theme;}
-function nav(){return `<nav aria-label="Hauptmenü">${[['learn','home','Lernen'],['collections','book','Sammlungen'],['settings','settings','Einstellungen']].map(([id,i,label])=>`<button data-action="nav" data-screen="${id}" class="nav-item ${screen===id?'active':''}" ${screen===id?'aria-current="page"':''}>${icon(i)}<span>${label}</span></button>`).join('')}</nav>`;}
+function nav(){return `<nav aria-label="Hauptmenü">${[['learn','home','Lernen'],['collections','book','Sammlungen'],['classroom','search','Unterricht'],['settings','settings','Einstellungen']].map(([id,i,label])=>`<button data-action="nav" data-screen="${id}" class="nav-item ${screen===id?'active':''}" ${screen===id?'aria-current="page"':''}>${icon(i)}<span>${label}</span></button>`).join('')}</nav>`;}
 function todayCount(){const today=new Date().toLocaleDateString('sv');return Object.values(data().reviews).filter(r=>!r.repeat&&new Date(r.at).toLocaleDateString('sv')===today).length;}
 function statusMarkup(){const doc=store.doc;const label=sync.message;return `<button class="sync-indicator ${sync.status}" data-action="sync-info" title="${h(label)}">${icon('cloud',sync.busy?'pulse':'')}<span>${h(label)}</span></button>`;}
 function updateStatus(){setTimeout(autoUpdate,0);document.querySelectorAll('[data-sync]').forEach(el=>el.innerHTML=statusMarkup());const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
 function render(){theme();if(screen==='match'){app.innerHTML=confusions.view();return;}if(screen==='test'){renderTest();return;}if(screen==='result'){renderResult();return;}
-  app.innerHTML=`<aside class="sidebar"><a class="brand" href="#" data-action="nav" data-screen="learn">latinio<span>✦</span></a>${nav()}<div class="sidebar-foot"><div class="language-tag">LA <span>→</span> DE</div><p>Ein bisschen Latein.<br>Jeden Tag.</p><span class="muted small">App ${APP_VERSION}</span></div></aside><div class="workspace"><header class="topbar"><span class="mobile-brand brand">latinio<span>✦</span></span><span class="desktop-only muted">Dein Lateintraining</span><div data-sync>${statusMarkup()}</div></header><main class="content">${screen==='learn'?learnView():screen==='collections'?collectionsView():settingsView()}</main></div><div class="mobile-nav">${nav()}</div>`;
+  app.innerHTML=`<aside class="sidebar"><a class="brand" href="#" data-action="nav" data-screen="learn">latinio<span>✦</span></a>${nav()}<div class="sidebar-foot"><div class="language-tag">LA <span>→</span> DE</div><p>Ein bisschen Latein.<br>Jeden Tag.</p><span class="muted small">App ${APP_VERSION}</span></div></aside><div class="workspace"><header class="topbar"><span class="mobile-brand brand">latinio<span>✦</span></span><span class="desktop-only muted">Dein Lateintraining</span><div data-sync>${statusMarkup()}</div></header><main class="content">${screen==='learn'?learnView():screen==='collections'?collectionsView():screen==='classroom'?classroomView(data(),classroomQuery,h):settingsView()}</main></div><div class="mobile-nav">${nav()}</div>`;
 }
 function learnView(){const d=data(),words=activeWords();const known=words.filter(w=>progressFor(w.id,d.reviews).level==='known').length;const due=words.filter(w=>{const p=progressFor(w.id,d.reviews);return p.seen&&p.due<=Date.now();}).length;const count=todayCount(),goal=prefs().daily;selected=selected.filter(id=>d.collections[id]);if(!selected.length)selected=Object.keys(d.collections);
  return `<div class="page-heading"><div><div class="eyebrow">DEIN SMARTES TRAINING</div><h1>Hallo ${h(isAdmin()?'Tiago':profile.name)}!</h1><p class="muted">Kleine Schritte. Immer mehr im Kopf.</p></div><div class="daily-badge">${icon('bolt')}<strong>${count}</strong><span>heute</span></div></div>
@@ -130,7 +131,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:[{latin:'exemplum',meanings:[['Beispiel']]}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download='latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
  }}catch(error){notify(error.message);}finally{working=false;void sharing?.afterAction();autoUpdate();}}
 document.addEventListener('click',actions);
-document.addEventListener('input',event=>{if(event.target.id==='search'){search=event.target.value;document.querySelector('#word-list').innerHTML=wordRows();}});
+document.addEventListener('input',event=>{if(event.target.id==='classroom-search'){classroomQuery=event.target.value;document.querySelector('#classroom-results').innerHTML=classroomResults(data(),classroomQuery,h);}if(event.target.id==='search'){search=event.target.value;document.querySelector('#word-list').innerHTML=wordRows();}});
 document.addEventListener('change',async event=>{const el=event.target;try{
  if(el.dataset.select){selected=[...document.querySelectorAll('[data-select]:checked')].map(e=>e.dataset.select);}
  if(el.id==='daily')await changePrefs({daily:Number(el.value)});
@@ -152,7 +153,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();autoUpdate();}});
 async function boot(){try{
  ({store,profile}=await openAccount(app));await store.seed();sync=new Sync(store);
- sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render});
+ sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection:id=>{collectionFilter=id;screen='collections';closeModal();render();}});
  cloudWait=cloudGate({sync,store});
  confusions=confusionUI({store,sync,h,showModal,closeModal,notify,go:target=>{if(target==='result')void showResult();else{screen=target;render();}},render});
  if(store.doc.matchRound)screen='match';

@@ -65,3 +65,34 @@ test('Sharing 100 words batches snapshots and journal writes instead of per-word
  assert.ok(h.metrics.writes-before<=7,`Expected bounded writes, got ${h.metrics.writes-before}`);
  assert.equal(Object.keys(h.request({action:'pull',since:0,token:f.token}).data.words).length,101);
 });
+test('Admin sees recipient edits and independent collections, without receiving learning records',()=>{
+ const {h,f}=setup();const {share}=h.request({action:'shareCreate',profileId:f.id,collectionId:'c'});
+ const word=Object.values(h.request({action:'pull',since:0,token:f.token}).data.words)[0];
+ push(h,'words',word.id,{...word,meanings:[['Felix eigene Bedeutung']]},f.token);
+ push(h,'collections','own',{id:'own',name:'Eigene Sammlung'},f.token);
+ const result=h.request({action:'profileCollections',profileId:f.id});
+ assert.equal(result.collections.own.name,'Eigene Sammlung');assert.equal(result.comparisons[0].changed,true);
+ assert.equal(result.comparisons[0].previous.meanings[0][0],'Stimme');assert.equal(result.comparisons[0].current.meanings[0][0],'Felix eigene Bedeutung');
+ assert.equal(result.reviews,undefined);
+ for(const action of ['profileCollections','profileDelete','shareRevoke'])assert.throws(()=>h.request({action,token:f.token,profileId:f.id,shareId:share.id}),/Admin/);
+});
+test('Revoking a share preserves the editable copy and prevents further sends; resharing preserves edits',()=>{
+ const {h,f}=setup();const {share}=h.request({action:'shareCreate',profileId:f.id,collectionId:'c'});
+ const word=Object.values(h.request({action:'pull',since:0,token:f.token}).data.words)[0];push(h,'words',word.id,{...word,latin:'Meine Version'},f.token);
+ const version=h.request({action:'check',token:f.token}).version;
+ h.request({action:'shareRevoke',shareId:share.id});assert.equal(h.request({action:'shareList'}).shares.length,0);
+ assert.throws(()=>h.request({action:'shareSend',shareId:share.id,keys:['w']}),/beendet/);
+ assert.equal(h.request({action:'check',token:f.token}).version,version);
+ assert.equal(h.request({action:'shareCreate',profileId:f.id,collectionId:'c'}).restored,true);
+ assert.equal(h.request({action:'pull',since:0,token:f.token}).data.words[word.id].latin,'Meine Version');
+});
+test('Deleting a profile blocks its existing sessions and email login while preserving other profiles',()=>{
+ const {h,f}=setup(),other=friend(h,'other@example.org');h.request({action:'shareCreate',profileId:f.id,collectionId:'c'});
+ h.request({action:'profileDelete',profileId:f.id});
+ assert.equal(h.request({action:'profiles'}).profiles.length,1);assert.equal(h.request({action:'shareList'}).shares.length,0);
+ assert.throws(()=>h.request({action:'login',email:'felix@schule.de'}),/freigeschaltet/);
+ assert.throws(()=>h.request({action:'check',token:f.token}),/freigeschaltet/);
+ assert.equal(h.request({action:'check',token:other.token}).version,0);
+ const replacement=friend(h);assert.notEqual(replacement.id,f.id);assert.equal(h.request({action:'check',token:replacement.token}).version,0);
+ assert.throws(()=>h.request({action:'profileDelete',profileId:'admin'}),/nicht gefunden/);
+});
