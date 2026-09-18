@@ -23,12 +23,27 @@ test('Refresh is unlimited, includes only secure words and rotates by last revie
  assert.ok(!chooseWords(d,['c'],10,'refresh',now).includes('recent'));
  assert.ok(chooseWords(d,['c'],10,'learning',now).includes('recent'));
 });
-test('Smart training adds one daily refresher, remembers it and eventually finishes',()=>{
+test('Smart training remains available after the daily target and rotates mastered words',()=>{
  const d=fixture();delete d.words.new;delete d.words.learning;
- assert.deepEqual(chooseWords(d,['c'],10,'smart',now),['secure']);
+ assert.deepEqual(chooseWords(d,['c'],1,'smart',now),['secure']);
  d.reviews.today={id:'today',wordId:'secure',grade:'full',at:now,repeat:false};
- assert.deepEqual(chooseWords(d,['c'],10,'smart',now),[]);
- assert.deepEqual(chooseWords(d,['c'],10,'smart',now+day),['recent']);
+ assert.deepEqual(chooseWords(d,['c'],1,'smart',now),['recent']);
+ d.reviews.again={id:'again',wordId:'recent',grade:'full',at:now+1,repeat:false};
+ assert.equal(chooseWords(d,['c'],10,'smart',now+2).length,2);
+});
+test('Smart rounds mix learning with spaced refreshers and defer freshly reviewed secure words',()=>{
+ const d=emptyData();d.collections.c={id:'c'};
+ for(let i=0;i<30;i++)d.words['n'+i]={id:'n'+i,collectionId:'c'};
+ for(let i=0;i<10;i++){
+  const id='k'+i;d.words[id]={id,collectionId:'c'};
+  for(let j=0;j<3;j++)d.reviews[id+j]={id:id+j,wordId:id,grade:'full',at:now-10*day+j*1000,repeat:false};
+ }
+ const first=chooseWords(d,['c'],20,'smart',now);
+ assert.equal(first.length,20);assert.equal(new Set(first).size,20);assert.equal(first.filter(id=>id.startsWith('k')).length,4);
+ first.forEach(id=>{d.reviews['today'+id]={id:'today'+id,wordId:id,grade:'full',at:now,repeat:false};});
+ const second=chooseWords(d,['c'],20,'smart',now+1);
+ assert.equal(second.length,20);assert.ok(second.filter(id=>id.startsWith('k')).every(id=>!first.includes(id)));
+ assert.equal(second.filter(id=>id.startsWith('n')&&!first.includes(id)).length,14);
 });
 test('Scheduled secure reviews still return and all modes respect selected collections',()=>{
  const d=fixture();assert.ok(chooseWords(d,['c'],10,'smart',now+10*day).includes('secure'));

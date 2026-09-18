@@ -39,7 +39,7 @@ test('Wiederholung am Rundenende löscht den ersten Fehler nicht',()=>{
 test('Sichere Wörter erhalten wachsende Abstände; Auswahl respektiert Sammlungen',()=>{
  const d=emptyData();d.collections[collection.id]=collection;d.words[vocabulary[0].id]=vocabulary[0];d.words[vocabulary[1].id]=vocabulary[1];
  d.reviews.a={id:'a',wordId:vocabulary[0].id,grade:'full',at:1000,repeat:false};
- assert.deepEqual(chooseWords(d,[collection.id],10,'smart',2000),[vocabulary[1].id]);
+ assert.deepEqual(chooseWords(d,[collection.id],1,'smart',2000),[vocabulary[1].id]);
  assert.deepEqual(chooseWords(d,['other'],10,'all',2000),[]);
  const rs={};for(let i=0;i<3;i++)rs[i]={id:String(i),wordId:'x',grade:'full',at:i*1e9,repeat:false};
  assert.equal(progressFor('x',rs).level,'known');

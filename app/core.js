@@ -70,19 +70,27 @@ export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Dat
   const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;
   if(mode==='learning')return shuffled.filter(x=>x.p.level!=='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
   if(mode==='refresh')return shuffled.filter(x=>x.p.level==='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
-  const due=shuffled.filter(x=>!x.p.seen||x.p.due<=now).sort((a,b)=>{
-    const rank=x=>x.p.seen?0:1;
-    return rank(a)-rank(b)||a.p.due-b.p.due||a.random-b.random;
+  // Unlimited rounds: due learning words, unseen words, then the least recently practiced.
+  const count=Math.max(0,Math.floor(limit));
+  const learning=shuffled.filter(x=>x.p.level!=='known').sort((a,b)=>{
+    const rank=x=>!x.p.seen?1:x.p.due<=now?0:2;
+    return rank(a)-rank(b)||oldest(a,b);
   });
-  const chosen=due.slice(0,limit);
-  // Besides scheduled reviews, mix in one secure word per local calendar day.
-  const dayStart=new Date(now);dayStart.setHours(0,0,0,0);
-  const known=shuffled.filter(x=>x.p.level==='known');
-  if(limit>0&&!chosen.some(x=>x.p.level==='known')&&!known.some(x=>x.p.lastReviewedAt>=dayStart.getTime())){
-    const extra=known.filter(x=>x.p.lastReviewedAt<dayStart.getTime()).sort(oldest)[0];
-    if(extra){if(chosen.length>=limit)chosen.pop();chosen.push(extra);}
+  const known=shuffled.filter(x=>x.p.level==='known').sort((a,b)=>{
+    const rank=x=>x.p.due<=now?0:1;
+    return rank(a)-rank(b)||oldest(a,b);
+  });
+  // Reserve about one fifth for spaced refreshers; don't force a just-reviewed secure word.
+  const refreshers=known.filter(x=>x.p.due<=now||now-x.p.lastReviewedAt>=3*86400000);
+  const quota=learning.length?Math.min(Math.floor(count/5),refreshers.length):0;
+  const chosen=learning.slice(0,count-quota);
+  chosen.push(...refreshers.slice(0,Math.min(quota,count-chosen.length)));
+  // Small or fully mastered decks still support another round, rotating oldest words first.
+  for(const item of [...learning,...known]){
+    if(chosen.length>=count)break;
+    if(!chosen.includes(item))chosen.push(item);
   }
-  return chosen.map(x=>x.w.id);
+  return chosen.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
 }
 export function rebase(shadow, remoteOps, pending, choices={}) {
   const acknowledged=new Set(remoteOps.map(o=>o.id));
