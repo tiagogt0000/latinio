@@ -1,3 +1,4 @@
+import {collectionActive} from './collection-learning.js';
 export const uid = () => globalThis.crypto.randomUUID();
 export const clone = value => structuredClone(value);
 export const emptyData = () => ({collections:{}, words:{}, reviews:{}, sessions:{}, settings:{}});
@@ -58,13 +59,13 @@ export function progressFor(wordId, reviews) {
   for(const r of events){
     if(r.repeat)continue;
     lastReviewedAt=r.at;
-    if(r.grade==='full'){streak++;due=r.at+Math.min(90,[1,3,7,14,30,60,90][Math.min(streak-1,6)])*86400000;level=streak>=3?'known':'learning';}
+    if(r.grade==='full'){streak=r.manualKnown||r.mode?.startsWith('inactive-')?Math.max(3,streak+1):streak+1;due=r.at+Math.min(90,[1,3,7,14,30,60,90][Math.min(streak-1,6)])*86400000;level=streak>=3?'known':'learning';}
     else {streak=0;due=r.at+(r.grade==='partial'?1:.5)*86400000;level='learning';}
   }
   return {streak,due,level,seen:events.length,lastReviewedAt};
 }
 export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Date.now()) {
-  const words=Object.values(data.words).filter(w=>data.collections[w.collectionId]&&collectionIds.includes(w.collectionId));
+  const words=Object.values(data.words).filter(w=>collectionActive(data,w.collectionId)&&collectionIds.includes(w.collectionId));
   const shuffled=words.map(w=>({w,p:progressFor(w.id,data.reviews),random:Math.random()}));
   if(mode==='all')return shuffled.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
   const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;
@@ -113,9 +114,10 @@ export function parseImport(input, existing) {
   let skipped=0;const seen=new Set();const words=[];
   for(const item of input.words){
     if(typeof item.latin!=='string'||!item.latin.trim()||!Array.isArray(item.meanings)||!item.meanings.length||item.meanings.some(g=>!Array.isArray(g)||!g.length||g.some(s=>typeof s!=='string'||!s.trim()||s.length>300)))throw Error('Ein Eintrag braucht ein lateinisches Wort und mindestens eine deutsche Bedeutung.');
+    if(item.forms!==undefined&&(!Array.isArray(item.forms)||item.forms.length>300||item.forms.some(f=>typeof f!=='string'||!f.trim()||f.length>100)))throw Error('Suchformen müssen eine Liste mit höchstens 300 kurzen Texten sein.');
     const key=normalize(item.latin);
     if(seen.has(key)){skipped++;continue;}seen.add(key);
-    words.push({id:uid(),collectionId,latin:item.latin.trim().slice(0,200),meanings:item.meanings});
+    words.push({id:uid(),collectionId,latin:item.latin.trim().slice(0,200),meanings:item.meanings,...(item.forms?{forms:[...new Set(item.forms.map(f=>f.trim()))]}:{})});
   }
   return {collection:{id:collectionId,name:input.name.trim().slice(0,100)},words,skipped};
 }

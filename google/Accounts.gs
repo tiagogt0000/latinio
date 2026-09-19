@@ -80,7 +80,7 @@ function serverWrite_(profileId,changes){
 }
 function shareId_(profileId,collectionId){return 'sh_'+hash_(profileId+':'+collectionId).slice(0,32);}
 function targetId_(shareId,wordId){return 'w_'+hash_(shareId+':'+wordId).slice(0,32);}
-function mapWord_(word,share){return word?{id:targetId_(share.id,word.id),collectionId:share.targetId,latin:word.latin,meanings:word.meanings}:null;}
+function mapWord_(word,share){return word?{id:targetId_(share.id,word.id),collectionId:share.targetId,latin:word.latin,meanings:word.meanings,...(word.forms?{forms:word.forms}:{})}:null;}
 function shareChanges_(share){
   const data=readState_('admin').data,records=records_('_LatinioShares'),changes=[];
   const collection=data.collections[share.sourceId]||null;

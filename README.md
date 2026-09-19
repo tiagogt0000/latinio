@@ -1,4 +1,14 @@
-# Latinio · erste Version 0.1.0
+# Latinio · Version 1.2.0
+
+## Neu: aktive Sammlungen und Auffrischungscheck
+
+Unter Sammlungen steuert jeder Nutzer seine eigene Aktiv-Auswahl. Bestehende Sammlungen sind zunächst aktiv. Inaktive bleiben im Unterricht und in der Verwaltung sichtbar, fehlen aber in Home, Smart/Alle/Lernen/Auffrischen und automatischen Verwechslungsrunden. Die Auswahl synchronisiert als persönliche Einstellung und wird nicht geteilt.
+
+Das ⋯-Menü bietet „Kann ich schon“ und einen vollständigen Auffrischungscheck. Manuelles Markieren erhält die Historie und zählt nicht als heute trainierte Antwort. Der Check fragt jedes Wort einmal. Nicht vollständig gewusste Wörter aus inaktiven Sammlungen sammeln sich in „Inaktive Vokabeln auffrischen“. Eine spätere vollständige erste Antwort entfernt sie; Wiederholungen innerhalb derselben Runde löschen den ursprünglichen Fehler nicht. Reaktivierte Sammlungen gehen zurück ins normale Training.
+
+JSON-Wörter dürfen optional `"forms": ["vocem", "vocibus"]` enthalten. Diese Such-Aliasse bleiben im Training verborgen und lassen sich im Vokabeleditor pflegen. Zusätzlich liefert eine begrenzte Offline-Heuristik mögliche gebeugte Formen. Sie ist keine vollständige Morphologie oder kontextabhängige Übersetzung; die Anzeige nennt weiterhin die gespeicherten Grundbedeutungen. Grammatische Grundlage: [Allen & Greenough, Konjugationen](https://dcc.dickinson.edu/grammar/latin/four-conjugations) und [Deklination](https://dcc.dickinson.edu/grammar/latin/rules-noun-declension).
+
+Die Lernfunktionen funktionieren mit dem bestehenden Mehrbenutzer-Backend. Damit explizite Such-Aliasse auch beim Teilen an andere Nutzer übertragen werden, `google/Accounts.gs` ersetzen und die vorhandene Apps-Script-Bereitstellung als neue Version veröffentlichen. Kein neuer Schlüssel und keine erneute Einrichtung erforderlich.
 
 Private Latein-Lernapp für iPhone, iPad und Desktop. Installierbare, statische PWA, vorbereitet für GitHub Pages. Keine kostenpflichtigen Laufzeitbibliotheken, keine KI-API und kein Apple-Entwicklerabo erforderlich.
 

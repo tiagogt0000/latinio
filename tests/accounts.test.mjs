@@ -7,6 +7,15 @@ let seq=0;
 function push(h,entity,key,value,token){const base=h.request({action:'check',...(token?{token}:{})}).version;return h.request({action:'push',base,ops:[{id:'op_'+(++seq),entity,key,value,at:Date.now(),seq,device:'test'}],...(token?{token}:{})});}
 function friend(h,email='felix@schule.de'){const {profile}=h.request({action:'profileCreate',name:'Felix',email});return {...h.request({action:'login',email}),id:profile.id};}
 function setup(){const h=harness(),f=friend(h);push(h,'collections','c',{id:'c',name:'Lektion 1'});push(h,'words','w',{id:'w',collectionId:'c',latin:'vox, vocis',meanings:[['Stimme']]});return {h,f};}
+test('Sharing carries hidden search forms but never personal activity or learning flags',()=>{
+ const {h,f}=setup();push(h,'words','w',{id:'w',collectionId:'c',latin:'vox, vocis',meanings:[['Stimme']],forms:['vocem','vocibus']});
+ push(h,'settings','collection-active_c',{kind:'collectionActivity',active:false});
+ push(h,'reviews','known',{id:'known',wordId:'w',at:1,grade:'full',manualKnown:true});
+ h.request({action:'shareCreate',profileId:f.id,collectionId:'c'});
+ const data=h.request({action:'pull',since:0,token:f.token}).data;
+ assert.deepEqual(Array.from(Object.values(data.words)[0].forms),['vocem','vocibus']);
+ assert.equal(Object.keys(data.settings).length,0);assert.equal(Object.keys(data.reviews).length,0);
+});
 test('Email login is allowlisted, case insensitive; PIN is validated and throttled server side',()=>{
  const h=harness();assert.throws(()=>h.request({action:'login',email:'unknown@schule.de'}),/freigeschaltet/);friend(h);
  assert.equal(h.request({action:'login',email:' FELIX@SCHULE.DE '}).profile.role,'student');

@@ -1,3 +1,4 @@
+import {collectionActive} from './collection-learning.js';
 import {normalize,variants,uid} from './core.js';
 export function pairId(a,b){
   let hash=14695981039346656037n;
@@ -20,7 +21,7 @@ export function pairDue(pair,data){
   return due;
 }
 export function makeRound(data,wordIds=null,force=false,now=Date.now()){
-  const candidates=pairs(data).filter(p=>(!wordIds||p.wordIds.some(id=>wordIds.includes(id)))&&(force||pairDue(p,data)<=now)).sort((a,b)=>pairDue(a,data)-pairDue(b,data)||a.id.localeCompare(b.id));
+  const candidates=pairs(data).filter(p=>(force||p.wordIds.every(id=>collectionActive(data,data.words[id].collectionId)))&&(!wordIds||p.wordIds.some(id=>wordIds.includes(id)))&&(force||pairDue(p,data)<=now)).sort((a,b)=>pairDue(a,data)-pairDue(b,data)||a.id.localeCompare(b.id));
   const ids=new Set(),chosen=[];
   for(const p of candidates){if(new Set([...ids,...p.wordIds]).size>4)continue;p.wordIds.forEach(id=>ids.add(id));chosen.push(p.id);}
   if(!chosen.length)return null;
