@@ -38,7 +38,13 @@ export class Sync extends EventTarget {
   async request(action,payload){
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
-    return this.bridge.request(action,payload);
+    try{return await this.bridge.request(action,payload);}catch(error){
+      // A long-lived Apps Script iframe may still point at the previous deployment.
+      // Retry only an unknown-action rejection: the server has not performed it.
+      if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
+      this.bridge.destroy();this.bridge=new GoogleBridge(config.url,config.token);
+      return this.bridge.request(action,payload);
+    }
   }
   run(){if(this.inFlight)return this.inFlight;this.inFlight=this.performRun().finally(()=>{this.inFlight=null;});return this.inFlight;}
   async performRun(){

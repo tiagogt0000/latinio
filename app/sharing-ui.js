@@ -1,10 +1,10 @@
-import {incoming} from './multiuser-sync.js';
+import {incoming,settleSync} from './multiuser-sync.js';
 export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection}){
   let shares=store.doc.adminDirectory?.shares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false;
   let pending=0,directoryEpoch=0;
   let loaded=!!store.doc.adminDirectory;
   async function remember(){await store.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
-  const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Bitte das neue Google-Skript bereitstellen, um diese Funktion zu nutzen.':String(e.message||e).replace(/^Error:\s*/, '');
+  const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
   function shareRows(){return shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><div class="profile-controls"><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>';}
@@ -18,8 +18,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     }
   });
   async function flush(){
-    await sync.run();
-    if(sync.remote)throw Error('Bitte zuerst den neueren Cloud-Stand unter Einstellungen laden.');
+    await settleSync(sync,store);
     if(sync.status!=='synced'||store.doc.pending.length)throw Error('Deine Änderungen müssen zuerst vollständig hochgeladen sein. Bitte gleich erneut versuchen.');
   }
   function profiles(fetch=true){
@@ -84,7 +83,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     const items=incoming(store.data);
     showModal(`<h2 id="modal-title">Vokabeländerungen</h2><p class="muted">Diese Einträge unterscheiden sich von deiner eigenen Fassung. Du entscheidest, was du übernehmen möchtest.</p>${items.map(item=>{const current=store.data[item.entity]?.[item.key];const text=v=>v?(v.latin?v.latin+' – '+v.meanings.flat().join(', '):v.name):'Gelöscht';return `<section class="conflict"><h3>${h(item.label)}</h3><p><strong>Bei dir:</strong> ${h(text(current))}</p><p><strong>Vorschlag:</strong> ${h(text(item.value))}</p><div class="button-row"><button class="button secondary" data-action="incoming-keep" data-id="${h(item.id)}">Meine Fassung behalten</button><button class="button primary" data-action="incoming-accept" data-id="${h(item.id)}">Übernehmen</button></div></section>`;}).join('')||'<p>Alles erledigt.</p>'}`);
   }
-  function toolbar(){const count=incoming(store.data).length;return `${admin?'<button class="button secondary" data-action="share-panel">Sammlungen teilen</button>':''}${count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:''}`;}
+  function toolbar(){const count=incoming(store.data).length;return `${admin?'<button class="button secondary" data-action="share-panel">Teilen verwalten</button>':''}${count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:''}`;}
   async function handle(button){
     const action=button.dataset.action,id=button.dataset.id;
     if(action==='profile-view'){profileView(id);return true;}

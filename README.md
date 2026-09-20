@@ -1,4 +1,14 @@
-# Latinio · Version 1.3.1
+# Latinio · Version 1.4.0
+
+## 1.4.0 · Sammlungsübersicht und automatischer Cloud-Abgleich
+
+Die Sammlungsübersicht besteht aus allgemeiner Suche und numerisch sortierter Lektionsliste mit Aktiv-Schaltern und Bearbeitungsstiften. Keine separate Gesamtwortliste oder Werkzeugbox. Der Stift öffnet die Sammlung zum Bearbeiten, Hinzufügen, Umbenennen und Löschen. „Neu“ erstellt eine Sammlung; Import bleibt in Einstellungen. Teilen und Verwechslungen verwalten stehen direkt unter der Liste.
+
+Darstellung fest auf Grün, weich/rund und großzügig; keine Darstellungs-Auswahl mehr. Hell/Dunkel folgt dem Gerät. Frühere Farb-/Dichte-Einstellungen werden ignoriert, Lernpräferenzen bleiben erhalten.
+
+Admin und Schüler laden Cloud-Stände automatisch. Eine transparente Vollbild-Ladeansicht mit persönlicher Begrüßung, Hintergrundunschärfe und reduzierbarer Animation ersetzt den Kasten. Die Kopfzeile zeigt keine Cloud-Version. Versionsdetails bleiben in Admin-Einstellungen. Offline-Start und Offline-Fortfahren nach Fehler bleiben verfügbar. Gleichzeitige Abgleiche werden zusammengefasst; lokale ausstehende Änderungen bleiben beim Zusammenführen erhalten.
+
+Bei unbekannten Verwaltungsaktionen verbindet sich die App einmal neu. Falls die bereitgestellte Google-Version die Aktion nicht unterstützt, ist das Update nach [google/UPDATE.md](google/UPDATE.md) nötig. Die aktive externe Bereitstellung konnte hier nicht direkt geprüft oder aktualisiert werden. Die Freigabe- und Profilfunktionen werden gegen die im Repository vorhandenen Skripte getestet.
 
 ## 1.3.1 · vereinfachte Navigation
 

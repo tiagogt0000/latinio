@@ -103,3 +103,23 @@ input:focus,select:focus{border-color:var(--accent)}
 @media(max-width:600px){.section-tabs{display:grid;grid-template-columns:1fr 1fr}.section-tabs .chip{white-space:normal}.list-toolbar>label{flex:1;min-width:0}.refresh-row .button-row{gap:4px}.compact-panel{margin-bottom:12px}.settings-grid{display:flex;flex-direction:column}.settings-grid>.card{width:100%}}
 
 .refresh-manager>p{margin-top:16px}.refresh-actions{display:grid;gap:10px;margin:16px 0}.refresh-actions .button{width:100%;margin:0}.refresh-row>summary{overflow-wrap:anywhere}.refresh-row>summary .small{font-weight:400}.refresh-manager>.button{width:100%}.refresh-row .compact-panel{margin-top:12px}.refresh-row .collection-activity{min-height:44px}
+
+/* One collection list; management opens from its edit button. */
+.collection-search{margin:0 0 16px}.collection-footer{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.collection-footer>.button{flex:1 1 180px}.collection-learning .setting-row{gap:12px}
+#collection-search-results:empty{display:none}#collection-search-results:not(:empty){margin-bottom:18px}
+.cloud-wait{position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0;background:transparent;color:var(--text);padding:24px;overflow:auto;box-shadow:none;outline:none}
+.cloud-wait[open]{display:grid;place-items:center}
+.cloud-wait::backdrop{background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+.cloud-welcome{width:min(100%,480px);text-align:center;animation:cloud-enter .5s cubic-bezier(.2,.8,.2,1) both}
+.cloud-welcome h1{font-size:clamp(2rem,7vw,3rem);margin:0 0 12px}
+.cloud-intro{font-size:1.1rem;color:var(--muted)}.cloud-welcome [data-cloud-stage]{font-size:.9rem;color:var(--muted)}
+.cloud-orbit{display:flex;justify-content:center;gap:10px;margin:32px 0}
+.cloud-orbit i{width:10px;height:10px;border-radius:50%;background:var(--green);animation:cloud-dot 1.2s ease-in-out infinite}
+.cloud-orbit i:nth-child(2){animation-delay:.16s}.cloud-orbit i:nth-child(3){animation-delay:.32s}
+.cloud-wait.leaving .cloud-welcome{animation:cloud-leave .18s ease-in both}
+.cloud-welcome .word-tools{margin-top:24px}
+@keyframes cloud-enter{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cloud-leave{to{opacity:0;transform:translateY(18px)}}
+@keyframes cloud-dot{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-8px)}}
+@media(prefers-reduced-motion:reduce){.cloud-welcome,.cloud-orbit i,.cloud-wait.leaving .cloud-welcome{animation:none!important}}
