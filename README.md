@@ -1,4 +1,10 @@
-# Latinio · Version 1.4.1
+# Latinio · Version 1.5.0
+
+## 1.5.0 · Auffrisch-Sammlungen und zuverlässigere Updates
+
+Kompaktmodus entfernt; Verwaltungsknöpfe bleiben nebeneinander. Beide Sammlungstypen verwenden dieselbe Bearbeitungsseite: zentrierte Titelzeile, Namensstift, Hinzufügen, Suche und Lernstand. Auffrisch-Wörter lassen sich direkt entfernen, ohne Originalwörter zu löschen. Anlegen und Hinzufügen führen über Lektionsauswahl zur manuellen Auswahl oder zum erklärten Testmodus.
+
+Updates werden beim Start, bei Rückkehr, erneuter Verbindung und jede Minute geprüft. Eine ungecachte Versionsdatei verhindert falsche Aktuell-Meldungen bei noch laufender Bereitstellung. Installierte Worker und Änderungen aus anderen Tabs werden erkannt. Automatisches Neuladen wartet auf sichere Ansichten ohne offene Bearbeitungsfenster und ausstehende Cloud-Änderungen; gespeicherte pausierte Runden bleiben erhalten. Kein Google-Skript-Update nötig.
 
 ## 1.4.1 · einheitliche Listen und Kompaktmodus
 

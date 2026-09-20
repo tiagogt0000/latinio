@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {evaluate} from '../app/core.js';
 import fs from 'node:fs';
 import {answerFeedback,translationCard} from '../app/feedback.js';
-import {AppUpdates,waitForInstallation} from '../app/updates.js';
+import {AppUpdates,APP_VERSION,waitForInstallation,workerVersion} from '../app/updates.js';
 
 test('Feedback marks only submitted answers and escapes input',()=>{
   const result=evaluate({meanings:[['führen'],['tragen'],['ausführen']]},['führen','<script>'],false);
@@ -25,7 +25,7 @@ test('Accepted typos need no explanation; blank answers do not create solution f
 Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});
 test('Update check distinguishes available, current and failed network checks',async()=>{
   const registration={waiting:null,installing:null,async update(){}};
-  const manager=new AppUpdates({getRegistration:async()=>registration});
+  const manager=new AppUpdates({getRegistration:async()=>registration},async()=>APP_VERSION);
   await manager.check();assert.equal(manager.state,'current');
   registration.waiting={};await manager.check();assert.equal(manager.state,'available');
   registration.waiting=null;registration.update=async()=>{throw Error('Keine Verbindung');};
@@ -62,4 +62,29 @@ test('German answer inputs allow keyboard correction for initial and added field
  assert.match(input,/lang="de"/);assert.match(input,/autocorrect="on"/);assert.match(input,/spellcheck="true"/);
  assert.match(input,/autocomplete="on"/);assert.doesNotMatch(input,/autocorrect="off"|spellcheck="false"/);
  assert.match(main,/translationCard\(word,feedback\)/);
+});
+
+test('Deployment mismatch is not reported as current',async()=>{
+ const registration={update:async()=>{},active:null};
+ const manager=new AppUpdates({getRegistration:async()=>registration},async()=> '99.0.0');
+ await manager.check();assert.equal(manager.state,'error');assert.match(manager.message,/bereitgestellt/);
+});
+test('Already activated update in another tab requires reloading the stale page',async()=>{
+ const registration={update:async()=>{},active:{postMessage(message,ports){assert.equal(message.type,'GET_VERSION');ports[0].postMessage({version:'99.0.0'});}}};
+ const manager=new AppUpdates({getRegistration:async()=>registration},async()=> '99.0.0');
+ await manager.check();assert.equal(manager.state,'available');assert.equal(manager.reloadReady,true);
+ let reloads=0;globalThis.location={reload:()=>reloads++};await manager.apply();assert.equal(reloads,1);
+});
+test('Downloaded updates remain available offline and updatefound detects installation',async()=>{
+ navigator.onLine=false;
+ const registration=new EventTarget();registration.waiting={};
+ const manager=new AppUpdates({getRegistration:async()=>registration},async()=>{throw Error('should not fetch');});
+ await manager.check();assert.equal(manager.state,'available');navigator.onLine=true;
+ registration.waiting=null;const worker=new EventTarget();worker.state='installing';registration.installing=worker;
+ manager.set('current','');registration.dispatchEvent(new Event('updatefound'));
+ worker.state='installed';registration.waiting=worker;worker.dispatchEvent(new Event('statechange'));
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(manager.state,'available');
+});
+test('Old workers without version support time out safely',async()=>{
+ assert.equal(await workerVersion({postMessage(){}},5),null);
 });

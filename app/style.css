@@ -88,16 +88,6 @@ input:focus,select:focus{border-color:var(--accent)}
 .theme-options{flex-wrap:wrap}
 .theme-options>label{flex:1 1 160px}
 .collection-learning .setting-row{padding:8px 0}
-:root[data-density=compact] .content{padding-top:20px}
-:root[data-density=compact] .page-heading{margin-bottom:18px}
-:root[data-density=compact] .card{padding:18px}
-:root[data-density=compact] .training-card{padding:24px}
-:root[data-density=compact] .training-card h2{font-size:1.8rem}
-:root[data-density=compact] .word-row{padding:12px 8px;gap:10px}
-:root[data-density=compact] .setting-row{padding-top:12px;padding-bottom:12px}
-:root[data-density=compact] .settings-grid{gap:12px;align-items:start}
-:root[data-density=compact] .modal{padding:24px}
-:root[data-density=compact] .button{min-height:44px;padding:10px 16px}
 :root[data-design=minimal] .card,:root[data-design=minimal] .training-card,:root[data-design=minimal] .modal{border-radius:10px;box-shadow:none}
 :root[data-design=minimal] .button,:root[data-design=minimal] .chip,:root[data-design=minimal] .nav-item{border-radius:8px;box-shadow:none}
 @media(max-width:600px){.section-tabs{display:grid;grid-template-columns:1fr 1fr}.section-tabs .chip{white-space:normal}.list-toolbar>label{flex:1;min-width:0}.refresh-row .button-row{gap:4px}.compact-panel{margin-bottom:12px}.settings-grid{display:flex;flex-direction:column}.settings-grid>.card{width:100%}}
@@ -128,30 +118,25 @@ input:focus,select:focus{border-color:var(--accent)}
 .collection-list-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
 .collection-list-toolbar .text-button{font:inherit;font-size:.84rem;font-weight:700;white-space:nowrap;padding:10px 0;min-height:44px}
 .collection-list-toolbar .collection-new{margin-left:auto;text-align:right}
-:root[data-density=compact] [data-compact-hide]{display:none!important}
-:root[data-density=compact] .content{padding:14px 16px}
-:root[data-density=compact] .topbar{min-height:48px;height:auto;padding-top:8px;padding-bottom:8px}
-:root[data-density=compact] .page-heading{margin-bottom:12px;gap:10px}
-:root[data-density=compact] h1{font-size:1.5rem}
-:root[data-density=compact] h2{font-size:1.15rem}
-:root[data-density=compact] .card{padding:12px;border-radius:16px}
-:root[data-density=compact] .training-card{padding:16px}
-:root[data-density=compact] .training-card h2{font-size:1.5rem}
-:root[data-density=compact] .learning-grid,:root[data-density=compact] .primary-column,:root[data-density=compact] .secondary-column{gap:12px}
-:root[data-density=compact] .setting-row{padding:6px 0;gap:8px}
-:root[data-density=compact] .collection-search{margin-bottom:10px}
-:root[data-density=compact] .section-tabs{margin-bottom:10px}
-:root[data-density=compact] .collection-footer{margin-top:10px;gap:8px}
-:root[data-density=compact] .word-row{padding:8px;gap:8px}
-:root[data-density=compact] .modal{padding:20px}
-:root[data-density=compact] .modal h2{margin-bottom:12px}
-:root[data-density=compact] .modal>p{margin:8px 0}
-:root[data-density=compact] .test-shell{padding-top:16px}
-:root[data-density=compact] .test-content{margin-top:16px}
-:root[data-density=compact] .latin-word{padding:16px;margin-bottom:12px;font-size:1.6rem}
-:root[data-density=compact] .answer-row{margin-bottom:8px}
-:root[data-density=compact] .test-footer{padding-top:12px}
-:root[data-density=compact] .sidebar{padding-top:20px}
-:root[data-density=compact] .sidebar>.brand{margin-bottom:24px}
-:root[data-density=compact] .sidebar-foot>p{display:none}
 @media(max-width:380px){.collection-list-toolbar{gap:8px}.collection-list-toolbar .text-button{font-size:.78rem}}
+
+/* Collection editors share a centered title/action row. */
+.collection-detail-heading{align-items:center;gap:12px}
+.collection-title{display:flex;align-items:center;gap:8px;min-width:0}
+.collection-title h1{margin:0;overflow-wrap:anywhere}
+.collection-title .icon-button{flex-shrink:0}
+.collection-detail-heading>.button{margin:0;flex-shrink:0}
+.collection-footer{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.collection-footer>.button{min-width:0;margin:0;white-space:normal;padding:10px;font-size:.84rem}
+.refresh-test-choice{display:flex;align-items:flex-start;gap:10px}
+.refresh-test-choice>.button{flex:1}
+.test-explanation{flex:0 0 44px}
+.test-explanation summary{display:grid;place-items:center;cursor:pointer;list-style:none;border:1px solid var(--border);border-radius:50%;width:44px;height:44px;font-weight:700}
+.test-explanation summary::-webkit-details-marker{display:none}
+.test-explanation[open]{flex:1}
+.test-explanation p{font-size:.85rem;line-height:1.5}
+@media(max-width:600px){.collection-detail-heading{flex-direction:row;align-items:center}.collection-detail-heading h1{font-size:1.4rem}.collection-detail-heading>.button{font-size:.8rem;padding:10px;max-width:46%}}
+
+/* Keep learning status visible on phones as well. */
+@media(min-width:601px) and (max-width:1150px){.word-row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto auto}.word-row>.word-level{display:inline-flex}}
+@media(max-width:600px){.word-row>.word-level{display:inline-flex;grid-column:1;grid-row:3;justify-self:start;font-size:.72rem}.word-row>.icon-button{grid-row:1/4}}
