@@ -1,4 +1,8 @@
-# Latinio · Version 1.3.0
+# Latinio · Version 1.3.1
+
+## 1.3.1 · vereinfachte Navigation
+
+Lektionen enthalten in der Aktiv-Auswahl nur Schalter, keine Drei-Punkte-Menüs oder Auffrisch-Aktionen. Im Reiter „Auffrischen“ zuerst eine benannte, leere Sammlung anlegen. Jede Sammlung lässt sich öffnen und bietet manuelle Wortauswahl, einen Test über gewählte Lektionen sowie das Üben gesammelter Wörter. Tests merken sich ihre Ziel-Sammlung bis zur Ergebnisübernahme. Verwaltung liegt in einem Untermenü. Hilfstexte sind gekürzt. Bestehende Daten bleiben erhalten; kein Backend-Update nötig.
 
 ## Neu: kompakte Verwaltung und eigene Auffrisch-Sammlungen
 

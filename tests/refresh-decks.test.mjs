@@ -5,12 +5,18 @@ import vm from 'node:vm';
 import {emptyData,chooseWords,applyOps} from '../app/core.js';
 import {sortedCollections,refreshDecks,trainingDecks,wordsForDecks,deckMembers,pendingMembers,saveDeck,checkResultWords,wordEnabled} from '../app/refresh-decks.js';
 import {collectionActive,forgottenWords,inactiveQueue} from '../app/collection-learning.js';
-import {refreshEditor,refreshList,checkPicker} from '../app/refresh-ui.js';
+import {refreshCreate,refreshEditor,refreshList,checkPicker} from '../app/refresh-ui.js';
 import {lookupWords} from '../app/classroom.js';
 import {harness} from './google-harness.mjs';
 const h=x=>String(x).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');
 function fixture(){const d=emptyData();for(const n of [10,2,1]){d.collections['c'+n]={id:'c'+n,name:'Lektion '+n};d.words['w'+n]={id:'w'+n,collectionId:'c'+n,latin:'vox'+n,meanings:[['Stimme']]};d.settings['collection-active_c'+n]={active:false};}return d;}
 function deck(d,ids=['w1','w2'],at=10){const r=saveDeck(d,null,'refresh_r','Auffrischen 1–2',ids,at);d.settings[r.id]=r;return r;}
+test('Refresh workflow starts with a named empty deck and binds checks/results to that deck',()=>{
+ const d=fixture();const r=deck(d,[]);assert.equal(deckMembers(d,r).length,0);assert.match(refreshCreate(),/id="refresh-create-form"/);assert.doesNotMatch(refreshCreate(),/name="word"/);
+ const list=refreshList(d,h);assert.match(list,/data-action="refresh-new"/);assert.doesNotMatch(list,/Kann ich sie noch/);assert.match(list,/Vokabeln manuell hinzufügen/);
+ assert.match(checkPicker(d,h,r.id),/data-target="refresh_r"/);
+ const editor=refreshEditor(d,{id:r.id,selected:['w1'],merge:true},h);assert.match(editor,/data-id="refresh_r"/);assert.doesNotMatch(editor,/name="target"/);assert.match(editor,/value="w1" checked/);
+});
 test('Numeric ordering everywhere uses 1, 2, 10',()=>{const d=fixture();assert.deepEqual(sortedCollections(d).map(c=>c.name),['Lektion 1','Lektion 2','Lektion 10']);const html=checkPicker(d,h);assert.ok(html.indexOf('Lektion 2')<html.indexOf('Lektion 10'));});
 test('Reference decks train inactive originals once and never duplicate lookup entries',()=>{const d=fixture();const r=deck(d);assert.deepEqual(chooseWords(d,[r.id],10,'all').sort(),['w1','w2']);assert.equal(lookupWords(d,'Stimme').length,3);d.settings['collection-active_c1'].active=true;assert.equal(chooseWords(d,['c1',r.id],10,'all').filter(id=>id==='w1').length,1);assert.equal(Object.keys(d.words).length,3);assert.equal(Object.keys(d.collections).length,3);});
 test('Correct initial answers after addition complete a word; repeats cannot hide errors',()=>{const d=fixture(),r=deck(d);d.reviews.old={id:'old',wordId:'w1',at:5,grade:'full'};assert.equal(pendingMembers(d,r).length,2);d.reviews.bad={id:'bad',wordId:'w1',at:11,grade:'partial'};d.reviews.repeat={id:'repeat',wordId:'w1',at:12,grade:'full',repeat:true};assert.equal(pendingMembers(d,r).length,2);d.reviews.good={id:'good',wordId:'w1',at:13,grade:'full'};assert.deepEqual(pendingMembers(d,r).map(m=>m.wordId),['w2']);assert.equal(wordEnabled(d,'w1'),true);assert.deepEqual(wordsForDecks(d,[r.id]).map(w=>w.id),['w2']);});

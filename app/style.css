@@ -101,3 +101,5 @@ input:focus,select:focus{border-color:var(--accent)}
 :root[data-design=minimal] .card,:root[data-design=minimal] .training-card,:root[data-design=minimal] .modal{border-radius:10px;box-shadow:none}
 :root[data-design=minimal] .button,:root[data-design=minimal] .chip,:root[data-design=minimal] .nav-item{border-radius:8px;box-shadow:none}
 @media(max-width:600px){.section-tabs{display:grid;grid-template-columns:1fr 1fr}.section-tabs .chip{white-space:normal}.list-toolbar>label{flex:1;min-width:0}.refresh-row .button-row{gap:4px}.compact-panel{margin-bottom:12px}.settings-grid{display:flex;flex-direction:column}.settings-grid>.card{width:100%}}
+
+.refresh-manager>p{margin-top:16px}.refresh-actions{display:grid;gap:10px;margin:16px 0}.refresh-actions .button{width:100%;margin:0}.refresh-row>summary{overflow-wrap:anywhere}.refresh-row>summary .small{font-weight:400}.refresh-manager>.button{width:100%}.refresh-row .compact-panel{margin-top:12px}.refresh-row .collection-activity{min-height:44px}

@@ -1,4 +1,4 @@
-export const APP_VERSION='1.3.0';
+export const APP_VERSION='1.3.1';
 export function waitForInstallation(worker,timeout=45000){
   return new Promise((resolve,reject)=>{
     const finish=error=>{clearTimeout(timer);worker.removeEventListener('statechange',check);error?reject(error):resolve();};
