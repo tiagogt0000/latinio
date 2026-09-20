@@ -123,3 +123,35 @@ input:focus,select:focus{border-color:var(--accent)}
 @keyframes cloud-leave{to{opacity:0;transform:translateY(18px)}}
 @keyframes cloud-dot{0%,80%,100%{opacity:.35;transform:translateY(0)}40%{opacity:1;transform:translateY(-8px)}}
 @media(prefers-reduced-motion:reduce){.cloud-welcome,.cloud-orbit i,.cloud-wait.leaving .cloud-welcome{animation:none!important}}
+
+/* Shared collection controls and optional dense layout. */
+.collection-list-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.collection-list-toolbar .text-button{font:inherit;font-size:.84rem;font-weight:700;white-space:nowrap;padding:10px 0;min-height:44px}
+.collection-list-toolbar .collection-new{margin-left:auto;text-align:right}
+:root[data-density=compact] [data-compact-hide]{display:none!important}
+:root[data-density=compact] .content{padding:14px 16px}
+:root[data-density=compact] .topbar{min-height:48px;height:auto;padding-top:8px;padding-bottom:8px}
+:root[data-density=compact] .page-heading{margin-bottom:12px;gap:10px}
+:root[data-density=compact] h1{font-size:1.5rem}
+:root[data-density=compact] h2{font-size:1.15rem}
+:root[data-density=compact] .card{padding:12px;border-radius:16px}
+:root[data-density=compact] .training-card{padding:16px}
+:root[data-density=compact] .training-card h2{font-size:1.5rem}
+:root[data-density=compact] .learning-grid,:root[data-density=compact] .primary-column,:root[data-density=compact] .secondary-column{gap:12px}
+:root[data-density=compact] .setting-row{padding:6px 0;gap:8px}
+:root[data-density=compact] .collection-search{margin-bottom:10px}
+:root[data-density=compact] .section-tabs{margin-bottom:10px}
+:root[data-density=compact] .collection-footer{margin-top:10px;gap:8px}
+:root[data-density=compact] .word-row{padding:8px;gap:8px}
+:root[data-density=compact] .modal{padding:20px}
+:root[data-density=compact] .modal h2{margin-bottom:12px}
+:root[data-density=compact] .modal>p{margin:8px 0}
+:root[data-density=compact] .test-shell{padding-top:16px}
+:root[data-density=compact] .test-content{margin-top:16px}
+:root[data-density=compact] .latin-word{padding:16px;margin-bottom:12px;font-size:1.6rem}
+:root[data-density=compact] .answer-row{margin-bottom:8px}
+:root[data-density=compact] .test-footer{padding-top:12px}
+:root[data-density=compact] .sidebar{padding-top:20px}
+:root[data-density=compact] .sidebar>.brand{margin-bottom:24px}
+:root[data-density=compact] .sidebar-foot>p{display:none}
+@media(max-width:380px){.collection-list-toolbar{gap:8px}.collection-list-toolbar .text-button{font-size:.78rem}}

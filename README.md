@@ -1,4 +1,8 @@
-# Latinio · Version 1.4.0
+# Latinio · Version 1.4.1
+
+## 1.4.1 · einheitliche Listen und Kompaktmodus
+
+Lektionen und Auffrisch-Sammlungen verwenden dieselben Zeilen mit Name, Aktiv-Schalter und Bearbeitungsstift. Auffrisch-Werkzeuge liegen hinter dem Stift. In beiden Listen steht „Neue Sammlung“ rechts neben „Alle ein / Alle aus“, im gleichen Textstil. Der neue Kompaktmodus in Einstellungen reduziert Abstände und Überschriftengrößen und blendet gezielt optionale Hilfstexte aus. Bewertungen, Fehlermeldungen und Eingabefelder bleiben sichtbar. Die Einstellung synchronisiert pro Profil; Standard bleibt großzügig. Kein Google-Skript-Update erforderlich.
 
 ## 1.4.0 · Sammlungsübersicht und automatischer Cloud-Abgleich
 

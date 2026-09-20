@@ -12,7 +12,7 @@ export function lookupWords(data,query){
   return {word,rank};
  }).filter(x=>x.rank<99).sort((a,b)=>a.rank-b.rank||a.word.latin.localeCompare(b.word.latin,'la')).map(x=>x.word);
 }
-export function classroomView(data,query,h){return `<div class="page-heading"><div><div class="eyebrow">SCHNELL NACHSCHLAGEN</div><h1>Unterricht</h1><p class="muted"></p></div></div><section class="card"><label for="classroom-search">Lateinisches Wort oder deutsche Bedeutung</label><input id="classroom-search" type="search" value="${h(query)}" placeholder="Zum Beispiel vox, vocis oder Stimme" autocomplete="off" autocapitalize="none" spellcheck="false" style="width:100%;margin-top:12px"><p class="small muted">Alle Lektionen · auch offline.</p></section><section id="classroom-results" class="lookup-results" aria-live="polite">${classroomResults(data,query,h)}</section>`;}
+export function classroomView(data,query,h){return `<div class="page-heading"><div><div class="eyebrow">SCHNELL NACHSCHLAGEN</div><h1>Unterricht</h1><p class="muted"></p></div></div><section class="card"><label for="classroom-search">Lateinisches Wort oder deutsche Bedeutung</label><input id="classroom-search" type="search" value="${h(query)}" placeholder="Zum Beispiel vox, vocis oder Stimme" autocomplete="off" autocapitalize="none" spellcheck="false" style="width:100%;margin-top:12px"><p class="small muted" data-compact-hide>Alle Lektionen · auch offline.</p></section><section id="classroom-results" class="lookup-results" aria-live="polite">${classroomResults(data,query,h)}</section>`;}
 export function classroomResults(data,query,h){
  if(!query.trim())return '<p class="muted">Wort eingeben.</p>';
  const words=lookupWords(data,query);
