@@ -1,3 +1,4 @@
+import {wordsForDecks} from './refresh-decks.js';
 import {collectionActive} from './collection-learning.js';
 export const uid = () => globalThis.crypto.randomUUID();
 export const clone = value => structuredClone(value);
@@ -65,7 +66,7 @@ export function progressFor(wordId, reviews) {
   return {streak,due,level,seen:events.length,lastReviewedAt};
 }
 export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Date.now()) {
-  const words=Object.values(data.words).filter(w=>collectionActive(data,w.collectionId)&&collectionIds.includes(w.collectionId));
+  const words=wordsForDecks(data,collectionIds);
   const shuffled=words.map(w=>({w,p:progressFor(w.id,data.reviews),random:Math.random()}));
   if(mode==='all')return shuffled.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
   const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;

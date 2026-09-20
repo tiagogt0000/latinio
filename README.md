@@ -1,4 +1,16 @@
-# Latinio · Version 1.2.0
+# Latinio · Version 1.3.0
+
+## Neu: kompakte Verwaltung und eigene Auffrisch-Sammlungen
+
+- Numerische Lektionssortierung (1, 2, 10), einklappbare Aktiv-Auswahl und Werkzeuge, Sammlungs-Dropdown und begrenzte Listenhöhe statt langer Chip-Liste.
+- Eigener Reiter „Auffrisch-Sammlungen“. Persönliche Listen speichern nur Wort-IDs und Aufnahmezeitpunkte in den synchronisierten Einstellungen. Originale werden weder kopiert noch in Unterricht/Sammlungssuche verdoppelt. Änderungen am Original gelten auch in der Übungsliste; gelöschte Originale werden ausgefiltert.
+- Auffrischungschecks für eine oder mehrere Lektionen sowie bestehende Auffrisch-Sammlungen. Danach Ziel-Liste wählen oder neu benennen; Fehler/Teilwissen sind vorausgewählt, weitere Wörter frei hinzufügbar. Bisherige unsichere Wörter lassen sich übernehmen.
+- Aktivierte Auffrisch-Sammlungen erscheinen im normalen Training, auch wenn ihre Originallektion inaktiv ist. Mehrfach enthaltene Wort-IDs kommen nur einmal in die Runde. Vollständig richtige erste Antworten nach Aufnahme erledigen ein Wort; Rundenwiederholungen löschen den ersten Fehler nicht. „Erneut üben“ startet einen neuen Durchgang, ohne die Lernhistorie zu löschen.
+- Manuell hinzufügen, Mitgliedschaft bearbeiten, umbenennen, aktivieren/deaktivieren und Listen löschen. Originalwörter und Lernstände bleiben beim Löschen der Liste erhalten.
+- Grün, Ozeanblau, Violett und Beere; weiches oder schlichtes Design; kompakte oder großzügige Abstände. Einstellungen bleiben je Profil synchronisiert. Bewertungsfarben bleiben unabhängig vom Farbthema.
+- Kein Apps-Script-Update für 1.3.0 nötig. Push-Erinnerungen bleiben zurückgestellt: verlässlicher Versand bei geschlossener App benötigt zusätzliche serverseitige Web-Push-Infrastruktur ([WebKit](https://webkit.org/blog/13878/web-push-for-web-apps-on-ios-and-ipados/)).
+
+Validierung: 73 automatisierte Tests; Syntax und Offline-Manifest geprüft. Die lokale visuelle Browserprüfung wurde durch ERR_BLOCKED_BY_CLIENT verhindert.
 
 ## Neu: aktive Sammlungen und Auffrischungscheck
 

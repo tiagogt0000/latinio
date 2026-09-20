@@ -1,3 +1,4 @@
+import {deckMembers} from './refresh-decks.js';
 export const activityKey=id=>'collection-active_'+id;
 export const collectionActive=(data,id)=>!!data.collections[id]&&data.settings[activityKey(id)]?.active!==false;
 export function forgottenWords(data){
@@ -13,6 +14,7 @@ export function forgottenWords(data){
   }).sort((a,b)=>latest.get(a.id).at-latest.get(b.id).at||a.id.localeCompare(b.id));
 }
 export function inactiveQueue(data,ids,mode,limit){
-  const words=mode==='inactive-practice'?forgottenWords(data):Object.values(data.words).filter(w=>data.collections[w.collectionId]&&ids.includes(w.collectionId));
+  const memberIds=new Set(ids.flatMap(id=>data.settings[id]?.kind==='refreshDeck'?deckMembers(data,data.settings[id]).map(m=>m.wordId):[]));
+  const words=mode==='inactive-practice'?forgottenWords(data):Object.values(data.words).filter(w=>data.collections[w.collectionId]&&(ids.includes(w.collectionId)||memberIds.has(w.id)));
   return (mode==='inactive-practice'?words.slice(0,limit):words).map(w=>w.id);
 }

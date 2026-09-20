@@ -56,3 +56,48 @@
 .lookup-results{display:grid;gap:14px;margin-top:22px}.lookup-word{display:grid;gap:10px}.profile-controls{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 22px}.user-collection{margin-top:24px}.user-vocab{padding:14px 0;border-bottom:1px solid var(--border)}.user-vocab p{margin-top:6px}@media(max-width:760px){.mobile-nav .nav-item{font-size:11px;padding-inline:4px;min-width:0}}
 
 .collection-learning {margin-bottom:24px}.collection-activity {display:flex;align-items:center;justify-content:space-between;gap:16px;flex:1;min-width:0}.collection-activity strong {overflow-wrap:anywhere}.collection-learning .setting-row {gap:12px}.collection-learning .wide {margin-top:18px}
+
+/* Compact navigation, bounded managers, and personal appearance. */
+:root{--accent:var(--green);--accent-dark:var(--green-dark);--accent-soft:var(--green-soft)}
+:root[data-accent=blue]{--accent:#2467bd;--accent-dark:#194a88;--accent-soft:#eaf2fc}
+:root[data-accent=violet]{--accent:#7850b9;--accent-dark:#553387;--accent-soft:#f2ebfb}
+:root[data-accent=rose]{--accent:#b63868;--accent-dark:#872249;--accent-soft:#fcebf1}
+:root[data-theme=dark][data-accent=blue]{--accent:#80b5ff;--accent-dark:#a8cdff;--accent-soft:#182e49}
+:root[data-theme=dark][data-accent=violet]{--accent:#bc9aef;--accent-dark:#d3b9fa;--accent-soft:#302143}
+:root[data-theme=dark][data-accent=rose]{--accent:#f29bb8;--accent-dark:#ffc1d4;--accent-soft:#442331}
+.brand,.brand span{color:var(--accent)}
+.button.primary{background:var(--accent);border-color:var(--accent-dark);box-shadow:0 3px 0 var(--accent-dark)}
+:root[data-theme=dark] .button.primary{color:#17212b}
+.nav-item.active,.chip.selected{background:var(--accent-soft);color:var(--accent-dark);border-color:var(--accent)}
+input[type=checkbox]{accent-color:var(--accent)}
+.switch:checked{background:var(--accent);border-color:var(--accent)}
+input:focus,select:focus{border-color:var(--accent)}
+.compact-panel>summary,.deck-picker>summary{cursor:pointer;min-height:44px;display:list-item;align-content:center;font-weight:750}
+.compact-panel[open]>summary{margin-bottom:14px}
+.compact-panel:not([open]){padding-top:8px!important;padding-bottom:8px!important}
+.bounded-list{max-height:45dvh;overflow-y:auto;overscroll-behavior:contain;padding:4px}
+.vocabulary-scroll{max-height:50dvh;margin-top:14px}
+.section-tabs{margin-bottom:16px;flex-wrap:wrap}
+.refresh-row{padding:14px 0;border-bottom:1px solid var(--border)}
+.refresh-row strong{overflow-wrap:anywhere}
+.refresh-row .button-row{margin-top:8px;flex-wrap:wrap}
+.refresh-word-picker small{display:block;font-weight:400;color:var(--muted)}
+.refresh-word-picker [hidden]{display:none!important}
+#refresh-word-search{width:100%;margin:12px 0}
+#refresh-selected-count{margin:12px 0}
+.theme-options{flex-wrap:wrap}
+.theme-options>label{flex:1 1 160px}
+.collection-learning .setting-row{padding:8px 0}
+:root[data-density=compact] .content{padding-top:20px}
+:root[data-density=compact] .page-heading{margin-bottom:18px}
+:root[data-density=compact] .card{padding:18px}
+:root[data-density=compact] .training-card{padding:24px}
+:root[data-density=compact] .training-card h2{font-size:1.8rem}
+:root[data-density=compact] .word-row{padding:12px 8px;gap:10px}
+:root[data-density=compact] .setting-row{padding-top:12px;padding-bottom:12px}
+:root[data-density=compact] .settings-grid{gap:12px;align-items:start}
+:root[data-density=compact] .modal{padding:24px}
+:root[data-density=compact] .button{min-height:44px;padding:10px 16px}
+:root[data-design=minimal] .card,:root[data-design=minimal] .training-card,:root[data-design=minimal] .modal{border-radius:10px;box-shadow:none}
+:root[data-design=minimal] .button,:root[data-design=minimal] .chip,:root[data-design=minimal] .nav-item{border-radius:8px;box-shadow:none}
+@media(max-width:600px){.section-tabs{display:grid;grid-template-columns:1fr 1fr}.section-tabs .chip{white-space:normal}.list-toolbar>label{flex:1;min-width:0}.refresh-row .button-row{gap:4px}.compact-panel{margin-bottom:12px}.settings-grid{display:flex;flex-direction:column}.settings-grid>.card{width:100%}}
