@@ -1,4 +1,10 @@
-# Latinio · Version 1.5.0
+# Latinio · Version 1.6.0
+
+## 1.6.0 · Gemeinsam teilen und Empfang bestätigen
+
+Mehrere Lektionen auswählen und gemeinsam an ein Profil teilen. Die Serveroperation bündelt Tabellenzugriffe und kann ohne doppelte Kopien erneut ausgeführt werden. Neue Freigaben erscheinen nach dem Cloud-Abgleich auf derselben milchigen Vollbildfläche. Weiter speichert eine eigene Lesebestätigung im Nutzerjournal, auch für andere Geräte. Die Verwaltung kann eine neue Benachrichtigung für ausgewählte bestehende Freigaben senden, ohne Inhalte zu überschreiben. Bei fehlgeschlagenem Upload bleibt die Bestätigung lokal für den nächsten Abgleich gespeichert.
+
+Für Mehrfachfreigaben und erneute Benachrichtigungen müssen **Code.gs und Accounts.gs ersetzt und als neue Version der bestehenden Bereitstellung veröffentlicht werden**. PIN-Einrichtung nicht erneut ausführen.
 
 ## 1.5.0 · Auffrisch-Sammlungen und zuverlässigere Updates
 

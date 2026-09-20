@@ -1,3 +1,4 @@
+import {sortedCollections} from './refresh-decks.js';
 import {incoming,settleSync} from './multiuser-sync.js';
 export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection}){
   let shares=store.doc.adminDirectory?.shares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false;
@@ -7,7 +8,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
-  function shareRows(){return shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><div class="profile-controls"><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>';}
+  function shareRows(){return people.filter(p=>shares.some(s=>s.profileId===p.id)).map(p=>`<button class="button secondary wide" data-action="share-notify" data-id="${h(p.id)}">${h(p.name)} erneut benachrichtigen</button>`).join('')+ (shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><div class="profile-controls"><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>');}
   const admin=profile.role==='admin';
   async function refresh(){if(admin){shares=(await sync.request('shareList')).shares;loaded=true;await remember();}return shares;}
   store.addEventListener('commit',event=>{
@@ -29,7 +30,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     void sync.request('profiles').then(async result=>{if(epoch!==directoryEpoch)return;people=result.profiles;await remember();if(root.isConnected)root.innerHTML=profileRows();status(message,'Aktuell');}).catch(e=>status(message,errorText(e)));
   }
   function panel(fetch=true){
-    showModal(`<h2 id="modal-title">Sammlungen teilen</h2><p class="muted">Die gewählte Sammlung wird als eigene, bearbeitbare Kopie geteilt. Dein Lernstand bleibt privat.</p><form id="share-create"><label>Sammlung<select name="collectionId" required><option value="">Bitte auswählen</option>${Object.values(store.data.collections).map(c=>`<option value="${h(c.id)}">${h(c.name)}</option>`).join('')}</select></label><label>Empfänger<select name="profileId" required><option value="">Bitte auswählen</option>${people.map(p=>`<option value="${h(p.id)}">${h(p.name)}</option>`).join('')}</select></label><button class="button primary wide" ${!people.length?'disabled':''}>Diese Sammlung teilen</button><p role="status" class="small muted" data-save-status></p></form><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben und Profile werden im Hintergrund geladen …':''}</p><h3>Bisher geteilt</h3><div data-share-list>${shareRows()}</div>`);
+    showModal(`<h2 id="modal-title">Sammlungen teilen</h2><form id="share-create"><fieldset class="share-picker"><legend>Sammlungen</legend><div class="button-row"><button type="button" class="text-button" data-action="share-select-all">Alle auswählen</button><button type="button" class="text-button" data-action="share-select-none">Keine</button></div><div class="bounded-list">${sortedCollections(store.data).map(c=>`<label class="collection-check"><input type="checkbox" name="collectionId" value="${h(c.id)}"><span>${h(c.name)}</span></label>`).join('')}</div></fieldset><label>Empfänger<select name="profileId" required><option value="">Bitte auswählen</option>${people.map(p=>`<option value="${h(p.id)}">${h(p.name)}</option>`).join('')}</select></label><button type="submit" class="button primary wide" ${!people.length?'disabled':''}>Ausgewählte Sammlungen teilen</button><p role="status" class="small muted" data-save-status></p></form><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben und Profile werden im Hintergrund geladen …':''}</p><h3>Bisher geteilt</h3><div data-share-list>${shareRows()}</div>`);
     if(!fetch)return;
     const epoch=directoryEpoch;
     const form=document.querySelector('#share-create'),message=document.querySelector('[data-directory-status]'),list=document.querySelector('[data-share-list]');
@@ -38,7 +39,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
       if(!form.isConnected)return;
       const select=form.elements.profileId,value=select.value;
       select.innerHTML='<option value="">Bitte auswählen</option>'+people.map(p=>`<option value="${h(p.id)}">${h(p.name)}</option>`).join('');select.value=value;
-      if(!form.dataset.saving)form.querySelector('button').disabled=!people.length;
+      if(!form.dataset.saving)form.querySelector('button[type=submit]').disabled=!people.length;
       list.innerHTML=shareRows();status(message,'Aktuell');
     }).catch(e=>status(message,errorText(e)));
   }
@@ -86,6 +87,10 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
   function toolbar(){const count=incoming(store.data).length;return `${admin?'<button class="button secondary" data-action="share-panel">Teilen verwalten</button>':''}${count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:''}`;}
   async function handle(button){
     const action=button.dataset.action,id=button.dataset.id;
+    if(action==='share-select-all'||action==='share-select-none'){document.querySelectorAll('#share-create input[name=collectionId]').forEach(el=>el.checked=action==='share-select-all');return true;}
+    if(action==='share-notify'){
+      showModal(`<h2 id="modal-title">Erneut benachrichtigen</h2><form id="share-notify-form" data-id="${h(id)}"><div class="bounded-list">${shares.filter(s=>s.profileId===id).map(s=>`<label class="collection-check"><input type="checkbox" name="shareId" value="${h(s.id)}" checked><span>${h(s.collection?.name||'Sammlung')}</span></label>`).join('')}</div><button type="submit" class="button primary wide">Benachrichtigung senden</button><p role="status" data-save-status></p></form>`);return true;
+    }
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}
@@ -106,7 +111,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     return false;
   }
   async function submit(form){
-    if(!['profile-create','share-create','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-create','share-create','share-notify-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
@@ -125,9 +130,16 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
           directoryEpoch++;people=people.filter(p=>p.id!==result.profile.id);people.push(result.profile);await remember();
           if(form.isConnected)profiles(false);notify('Profil angelegt.');
         }else if(form.id==='share-create'){
-          await flush();const result=await sync.request('shareCreate',{collectionId:fd.get('collectionId'),profileId:fd.get('profileId')});
-          directoryEpoch++;shares=shares.filter(s=>s.id!==result.share.id);shares.push(result.share);loaded=true;await remember();
-          if(form.isConnected)panel(false);notify(result.restored?'Freigabe wieder aktiviert. Die Nutzerkopie bleibt erhalten.':result.already?'Bereits geteilt.':'Sammlung geteilt.');
+          const collectionIds=fd.getAll('collectionId');if(!collectionIds.length)throw Error('Wähle mindestens eine Sammlung.');
+          if(!fd.get('profileId'))throw Error('Wähle einen Empfänger.');
+          await flush();const result=await sync.request('shareCreateMany',{collectionIds,profileId:fd.get('profileId')});
+          directoryEpoch++;for(const item of result.results){shares=shares.filter(s=>s.id!==item.share.id);shares.push(item.share);}loaded=true;await remember();
+          if(form.isConnected)panel(false);notify(`${result.results.length} Sammlungen freigegeben.`);
+        }else if(form.id==='share-notify-form'){
+          const shareIds=fd.getAll('shareId');if(!shareIds.length)throw Error('Wähle mindestens eine Sammlung.');
+          form.dataset.requestId ||= crypto.randomUUID();
+          await sync.request('shareNotify',{profileId:form.dataset.id,shareIds,requestId:form.dataset.requestId});
+          if(form.isConnected)panel(false);notify('Benachrichtigung gesendet.');
         }else{
           const keys=fd.getAll('change');if(!keys.length)throw Error('Wähle mindestens eine Änderung.');
           await flush();const result=await sync.request('shareSend',{shareId:form.dataset.id,keys});

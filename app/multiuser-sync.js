@@ -1,3 +1,9 @@
+export function unreadShareNotices(data){return Object.values(data.settings).filter(n=>n?.kind==='shareNotice'&&!data.settings['read_'+n.id]).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));}
+export function noticeCollections(notices){return [...new Map(notices.flatMap(n=>n.collections||[]).map(c=>[c.id,c])).values()].sort((a,b)=>a.name.localeCompare(b.name,'de',{numeric:true}));}
+export async function acknowledgeShareNotices(store,sync,notices){
+ if(notices.length)await store.commit(notices.map(n=>['settings','read_'+n.id,{kind:'shareNoticeRead',noticeId:n.id,at:Date.now()}]));
+ await settleSync(sync,store);
+}
 // Incoming shared edits are independent of regular progress synchronization.
 export function incoming(data){return Object.values(data.settings).filter(x=>x?.kind==='incomingShare').sort((a,b)=>(a.order??a.at)-(b.order??b.at)||a.id.localeCompare(b.id));}
 export function incomingChanges(data){
@@ -49,7 +55,19 @@ export function cloudGate({sync,store,name='du',onReady}){
    if(!navigator.onLine)return;
    showLoading(label);dialog.showModal();sync.addEventListener('change',status);
    while(true){
-    try{await settleSync(sync,store);break;}
+    try{
+     await settleSync(sync,store);
+     while(unreadShareNotices(store.data).length){
+      const notices=unreadShareNotices(store.data),collections=noticeCollections(notices);
+      dialog.innerHTML='<div class="cloud-welcome share-welcome"><h1 id="cloud-greeting">Neue Sammlungen für dich</h1><p>Diese Sammlungen wurden mit dir geteilt:</p><ul class="shared-notice-list"></ul><button class="button primary wide" data-choice="continue">Weiter</button><p role="status" class="small muted"></p></div>';
+      const list=dialog.querySelector('ul');
+      for(const c of collections){const li=document.createElement('li');li.textContent=c.name;list.append(li);}
+      await new Promise(resolve=>{dialog.onclick=e=>{if(e.target.closest('[data-choice="continue"]'))resolve();};});dialog.onclick=null;
+      dialog.querySelector('button').disabled=true;dialog.querySelector('[role="status"]').textContent='Bestätigung wird gespeichert …';
+      await acknowledgeShareNotices(store,sync,notices);
+     }
+     break;
+    }
     catch(error){
      dialog.innerHTML='<div class="cloud-welcome"><h1 id="cloud-greeting">Verbindung unterbrochen</h1><p role="status"></p><div class="word-tools"><button class="button primary" data-choice="retry">Erneut versuchen</button><button class="button secondary" data-choice="offline">Offline fortfahren</button></div></div>';
      dialog.querySelector('p').textContent=error.message;

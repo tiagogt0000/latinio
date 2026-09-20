@@ -94,6 +94,10 @@ function shareChanges_(share){
   });
   return changes;
 }
+function shareNotice_(profileId,shares,deliveryId){
+  const id='notice_'+hash_(deliveryId).slice(0,40);
+  serverWrite_(profileId,[{id:id,entity:'settings',key:id,value:{kind:'shareNotice',id:id,at:Date.now(),collections:shares.map(function(s){return {id:s.targetId,name:s.collection?s.collection.name:'Sammlung'};})}}]);
+}
 function accountApi_(request,identity){
   if(request.action==='logout'){saveRecord_('_LatinioSessions',hash_(request.token),{profileId:identity.id,expires:0});return {ok:true};}
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
@@ -122,6 +126,44 @@ function accountApi_(request,identity){
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     const profile={id:'p_'+Utilities.getUuid().replace(/-/g,''),name:name,email:email,active:true};
     saveRecord_('_LatinioProfiles',profile.id,profile);return {profile:profile};
+  }
+  if(request.action==='shareCreateMany'){
+    if(!Array.isArray(request.collectionIds)||!request.collectionIds.length||request.collectionIds.length>50)throw new Error('Bitte 1 bis 50 Sammlungen auswählen.');
+    const ids=Array.from(new Set(request.collectionIds)),profile=records_('_LatinioProfiles')[request.profileId],data=readState_('admin',true).data;
+    if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    if(ids.some(function(id){return typeof id!=='string'||!data.collections[id];}))throw new Error('Sammlungen zuerst hochladen.');
+    const records=records_('_LatinioShares'),snapshots=[],results=[],changes=[];
+    ids.forEach(function(sourceId){
+      const collection=data.collections[sourceId],id=shareId_(profile.id,sourceId);
+      let share=records[id];const already=!!(share&&share.ready),restored=!!(already&&share.revoked);
+      if(!share){share={id:id,kind:'share',profileId:profile.id,profileName:profile.name,sourceId:sourceId,targetId:'c_'+id,collection:collection,ready:false};snapshots.push([id,share]);}
+      if(!already){
+        Object.values(data.words).filter(function(w){return w.collectionId===sourceId;}).forEach(function(w){
+          const key=id+'_'+w.id;if(!records[key]){records[key]={kind:'entry',shareId:id,sourceId:w.id,source:w};snapshots.push([key,records[key]]);}
+        });
+        changes.push({id:'init_'+share.targetId,entity:'collections',key:share.targetId,value:{id:share.targetId,name:share.collection.name}});
+        Object.values(records).filter(function(e){return e.kind==='entry'&&e.shareId===id;}).forEach(function(e){const w=mapWord_(e.source,share);if(w)changes.push({id:'init_'+w.id,entity:'words',key:w.id,value:w});});
+      }
+      const noticeId='notice_'+hash_('initial:'+id).slice(0,40);
+      changes.push({id:noticeId,entity:'settings',key:noticeId,value:{kind:'shareNotice',id:noticeId,at:Date.now(),collections:[{id:share.targetId,name:share.collection.name}]}});
+      results.push({share:share,already:already,restored:restored});
+    });
+    // Three batched writes, irrespective of the number of lessons. Retries
+    // reuse snapshots and deterministic operation IDs without replacing user edits.
+    snapshots.sort(function(a,b){return Number(b[1].kind==='share')-Number(a[1].kind==='share');});
+    saveRecords_('_LatinioShares',snapshots);
+    serverWrite_(profile.id,changes);
+    saveRecords_('_LatinioShares',results.filter(function(r){return !r.already||r.restored;}).map(function(r){r.share.ready=true;r.share.revoked=false;return [r.share.id,r.share];}));
+    return {results:results};
+  }
+  if(request.action==='shareNotify'){
+    if(!Array.isArray(request.shareIds)||!request.shareIds.length||request.shareIds.length>50||typeof request.requestId!=='string'||!/^[a-zA-Z0-9_-]{8,100}$/.test(request.requestId))throw new Error('Sammlungen und gültige Benachrichtigung auswählen.');
+    const profile=records_('_LatinioProfiles')[request.profileId],records=records_('_LatinioShares');
+    if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    const shares=Array.from(new Set(request.shareIds)).map(function(id){return records[id];});
+    if(shares.some(function(s){return !s||s.kind!=='share'||!s.ready||s.revoked||s.profileId!==profile.id;}))throw new Error('Diese Freigabe ist beendet oder gehört zu einem anderen Nutzer.');
+    shareNotice_(profile.id,shares,'reminder:'+profile.id+':'+request.requestId);
+    return {ok:true};
   }
   const records=records_('_LatinioShares');
   if(request.action==='shareList')return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&s.ready&&!s.revoked;})};

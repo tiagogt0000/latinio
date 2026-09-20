@@ -6,7 +6,7 @@ import {uid,clone,normalize,evaluate,progressFor,chooseWords,parseImport} from '
 import {confusionUI} from './confusion-ui.js';
 import {openAccount,signOut,accountCard} from './accounts.js';
 import {sharingUI} from './sharing-ui.js';
-import {cloudGate,settleSync} from './multiuser-sync.js';
+import {cloudGate,settleSync,unreadShareNotices} from './multiuser-sync.js';
 import {Sync} from './sync.js';
 import {answerFeedback,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
@@ -22,7 +22,7 @@ const isAdmin=()=>profile?.role==='admin';
 const data=()=>store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
 async function showResult(){await cloudWait.run('Fortschritt wird hochgeladen …');screen='result';render();}
-async function backgroundSync(){if(working||cloudWait?.blocked||['test','match'].includes(screen)||modalRoot.children.length){sync.schedule(0);return;}try{await settleSync(sync,store);if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{} }
+async function backgroundSync(){if(working||cloudWait?.blocked||['test','match'].includes(screen)||modalRoot.children.length){sync.schedule(0);return;}try{await settleSync(sync,store);if(unreadShareNotices(data()).length&&!working&&!modalRoot.children.length&&!['test','match'].includes(screen))await loadCloud();if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{} }
 
 const prefs=()=>({daily:10,typos:true,...data().settings.general,theme:'system',accent:'green',density:'comfortable',design:'rounded'});
 const allWords=()=>Object.values(data().words).filter(w=>data().collections[w.collectionId]);

@@ -140,3 +140,9 @@ input:focus,select:focus{border-color:var(--accent)}
 /* Keep learning status visible on phones as well. */
 @media(min-width:601px) and (max-width:1150px){.word-row{grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) auto auto}.word-row>.word-level{display:inline-flex}}
 @media(max-width:600px){.word-row>.word-level{display:inline-flex;grid-column:1;grid-row:3;justify-self:start;font-size:.72rem}.word-row>.icon-button{grid-row:1/4}}
+
+.share-picker{border:0;padding:0;margin:0 0 20px;min-width:0}
+.share-picker legend{font-weight:700}.share-picker .button-row{margin-bottom:4px}
+.shared-notice-list{list-style:none;margin:24px 0;padding:0;max-height:40dvh;overflow:auto}
+.shared-notice-list li{padding:10px;border-bottom:1px solid var(--border);font-weight:700;overflow-wrap:anywhere}
+.share-welcome h1{font-size:clamp(1.6rem,6vw,2.5rem)}

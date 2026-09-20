@@ -9,8 +9,8 @@ test('Concurrent automatic sync callers share one download and preserve local ch
  const a=settleSync(sync,store),b=settleSync(sync,store);assert.equal(a,b);release();await Promise.all([a,b]);assert.equal(accepted,1);assert.equal(runs,2);
 });
 function gateFixture(name){
- const nodes=new Map(),dialog={open:false,innerHTML:'',onclick:null,classList:{add(){},remove(){}},setAttribute(){},addEventListener(){},querySelector(key){if(!nodes.has(key))nodes.set(key,{textContent:''});return nodes.get(key);},showModal(){this.open=true;},close(){this.open=false;}};
- globalThis.document={createElement:()=>dialog,body:{append(){}}};
+ const nodes=new Map(),dialog={open:false,innerHTML:'',onclick:null,classList:{add(){},remove(){}},setAttribute(){},addEventListener(){},querySelector(key){if(!nodes.has(key))nodes.set(key,{textContent:'',children:[],append(node){this.children.push(node);}});return nodes.get(key);},showModal(){this.open=true;},close(){this.open=false;}};
+ globalThis.document={createElement:tag=>tag==='dialog'?dialog:{textContent:''},body:{append(){}}};
  const store={doc:{pending:[]},data:emptyData()},sync=new EventTarget();sync.status='synced';sync.run=async()=>{};
  return {dialog,nodes,store,sync,gate:cloudGate({sync,store,name})};
 }
@@ -40,4 +40,16 @@ test('Personal changes survive incoming edits and nonempty collection deletion r
  d.settings.i={kind:'incomingShare',id:'i',entity:'words',key:'w',collectionId:'c',previous:{latin:'alt'},value:{latin:'neu'},at:1};
  d.settings.j={kind:'incomingShare',id:'j',entity:'collections',key:'c',previous:d.collections.c,value:null,at:2};
  const r=incomingChanges(d);assert.equal(r.changes.length,0);assert.equal(r.conflicts.length,2);assert.equal(d.words.w.latin,'mein Wort');
+});
+
+test('Cloud blur stays open until notices are confirmed and the acknowledgement reaches the server',async()=>{
+ const x=gateFixture('Felix');x.store.data.settings.n={id:'n',kind:'shareNotice',at:1,collections:[{id:'c',name:'Lektion 1'}]};
+ let uploading=false,release;const original=x.sync.run;
+ x.store.commit=async edits=>{for(const [e,k,v] of edits)x.store.data[e][k]=v;x.store.doc.pending=[1];uploading=true;};
+ x.sync.run=async()=>{if(uploading){await new Promise(resolve=>release=resolve);uploading=false;x.store.doc.pending=[];}else await original();};
+ const run=x.gate.run();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(x.dialog.open,true);assert.match(x.dialog.innerHTML,/Neue Sammlungen/);assert.equal(x.nodes.get('ul').children[0].textContent,'Lektion 1');assert.equal(x.store.data.settings.read_n,undefined);
+ x.dialog.onclick({target:{closest:()=>({})}});await new Promise(resolve=>setImmediate(resolve));assert.equal(x.dialog.open,true);assert.equal(x.gate.blocked,true);assert.equal(x.nodes.get('button').disabled,true);
+ release();await run;assert.equal(x.dialog.open,false);assert.equal(x.store.data.settings.read_n.noticeId,'n');
+ await x.gate.run();assert.doesNotMatch(x.dialog.innerHTML,/Neue Sammlungen/);
 });
