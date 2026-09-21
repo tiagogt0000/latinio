@@ -1,0 +1,9 @@
+{
+  "format":"wordlo-refresh",
+  "schema":1,
+  "id":"beispiel-auffrischen",
+  "name":"Beispiel · Auswahl vom Papier",
+  "words":[
+    {"id":"beispiel-flat", "english":[{"answers":["flat"],"region":"UK"},{"answers":["apartment"],"region":"US"}],"german":[{"answers":["Wohnung"]}]}
+  ]
+}

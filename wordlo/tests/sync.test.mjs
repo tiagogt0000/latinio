@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {emptyData,applyOps} from '../app/core.js';
+globalThis.window={addEventListener(){}};
+Object.defineProperty(globalThis.navigator,'onLine',{value:true,configurable:true});
+const {Sync}=await import('../app/sync.js');
+const op=(id,key,name,device='a')=>({id,key,entity:'collections',value:{id:key,name},device,at:1,seq:1});
+function store(pending=[]){return {doc:{base:0,shadow:emptyData(),pending,config:{url:'url',token:'key'}},get data(){return applyOps(this.doc.shadow,this.doc.pending);},async update(fn){this.doc=fn(this.doc);return this.doc;}};}
+test('Sync retries a version race then merges independent remote and local edits',async()=>{const local=op('local-op','local','Local'),remote=op('remote-op','remote','Remote','b'),s=store([local]),sync=new Sync(s);let conflict=true,version=0,ops=[],data=emptyData();sync.request=async(action,payload)=>{
+ if(action==='pull')return {app:'wordlo',version,ops:ops.filter((o,i)=>i+1>payload.since),data};
+ if(conflict){conflict=false;version=1;ops=[remote];data=applyOps(data,[remote]);return {conflict:true,version};}
+ assert.equal(payload.base,1);data=applyOps(data,payload.ops);ops.push(...payload.ops);version+=payload.ops.length;return {version,data,accepted:payload.ops.map(x=>x.id)};
+ };await sync.run();assert.equal(sync.status,'synced');assert.equal(s.doc.pending.length,0);assert.equal(s.data.collections.local.name,'Local');assert.equal(s.data.collections.remote.name,'Remote');});
+test('A network failure retains the local outbox',async()=>{const s=store([op('op1','local','Local')]),sync=new Sync(s);sync.request=async()=>{throw Error('offline');};await sync.run();assert.equal(sync.status,'error');assert.equal(s.doc.pending.length,1);});
+test('Edits made while a batch is uploading remain pending and upload next',async()=>{const first=op('op1','first','First'),second=op('op2','second','Second'),s=store([first]),sync=new Sync(s);let version=0,ops=[],data=emptyData(),pushes=0;sync.request=async(action,payload)=>{if(action==='pull')return {app:'wordlo',version,ops:ops.slice(payload.since),data};pushes++;if(pushes===1)s.doc.pending.push(second);ops.push(...payload.ops);data=applyOps(data,payload.ops);version=ops.length;return {version,data,accepted:payload.ops.map(x=>x.id)};};await sync.run();assert.equal(pushes,2);assert.equal(s.doc.pending.length,0);assert.ok(s.data.collections.second);});
+test('Conflicting edits pause without discarding either version',async()=>{const local=op('local','same','Local'),remote=op('remote','same','Remote','b'),s=store([local]),sync=new Sync(s);sync.request=async()=>({app:'wordlo',version:1,ops:[remote],data:applyOps(emptyData(),[remote])});await sync.run();assert.equal(sync.status,'conflict');assert.equal(sync.conflicts.length,1);assert.equal(s.doc.pending.length,1);assert.equal(s.data.collections.same.name,'Local');});

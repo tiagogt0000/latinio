@@ -1,0 +1,11 @@
+{
+  "format": "wordlo-collection",
+  "schema": 1,
+  "id": "beispiel-sammlung",
+  "name": "Beispiel · Durch eigene Buchvokabeln ersetzen",
+  "words": [
+    {"id":"beispiel-flat", "english":[{"answers":["flat"],"region":"UK"},{"answers":["apartment"],"region":"US"}],"german":[{"answers":["Wohnung"]}]},
+    {"id":"beispiel-begin", "english":[{"answers":["begin"]}],"german":[{"answers":["beginnen","anfangen"]}]},
+    {"id":"beispiel-kind", "english":[{"answers":["kind"]}],"german":[{"answers":["freundlich"]},{"answers":["Art"]}],"context":{"de":"Buchbeispiel mit zwei Bedeutungen"}}
+  ]
+}
