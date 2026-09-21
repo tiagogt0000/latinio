@@ -1,4 +1,8 @@
-# Latinio · Version 1.6.1
+# Latinio · Version 1.6.2
+
+## 1.6.2 · Bedeutungsauswahl im Auffrischtest
+
+Vor dem Test lässt sich wählen, ob eine richtige Bedeutung reicht oder alle Bedeutungen erforderlich sind. Die Auswahl bleibt in der gespeicherten Runde erhalten und bestimmt Lernstand und Vorauswahl unsicherer Wörter. Standard bleibt „Alle Bedeutungen erforderlich“. Kein Google-Skript-Update nötig.
 
 ## 1.6.1 · Freigaben beim Empfänger prüfen
 

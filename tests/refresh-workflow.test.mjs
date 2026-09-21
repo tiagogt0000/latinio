@@ -4,14 +4,14 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {emptyData,normalize,progressFor} from '../app/core.js';
 import {saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks} from '../app/refresh-decks.js';
-import {refreshCreate,checkPicker,refreshMethod,refreshEditor} from '../app/refresh-ui.js';
+import {refreshCreate,checkPicker,refreshMethod,refreshTestOptions,refreshEditor} from '../app/refresh-ui.js';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 function harness(){
  const d=emptyData();d.collections.a={id:'a',name:'Lektion 1'};d.collections.b={id:'b',name:'Lektion 2'};
  d.words.x={id:'x',collectionId:'a',latin:'vox',meanings:[['Stimme']]};d.words.y={id:'y',collectionId:'b',latin:'rex',meanings:[['König']]};
  const listeners={},state={html:'',messages:[],started:null};
  class FormData{constructor(form){this.values=form.values;}get(k){return this.values[k]??null;}getAll(k){const v=this.values[k];return v===undefined?[]:Array.isArray(v)?v:[v];}}
- const ctx=vm.createContext({console,FormData,ready:true,working:false,cloudWait:{blocked:false},refreshFlow:null,collectionTab:'refresh',collectionFilter:'all',screen:'collections',search:'',data:()=>d,saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks,refreshCreate,checkPicker,refreshMethod,refreshEditor,normalize,progressFor,allWords:()=>Object.values(d.words),icon:()=>'',h:x=>String(x??''),uid:()=> 'new',store:{doc:{},async commit(ops){for(const [entity,id,value] of ops){if(value===null)delete d[entity][id];else d[entity][id]=value;}}},sync:{schedule(){}},sharing:{handle:async()=>false,submit:async()=>false,afterAction(){}},confusions:{handle:async()=>false},showModal:html=>state.html=html,closeModal:()=>state.html='',render(){},notify:m=>state.messages.push(m),autoUpdate(){},confirm:()=>true,document:{addEventListener:(type,fn)=>listeners[type]=fn},start:async(...args)=>state.started=args});
+ const ctx=vm.createContext({console,FormData,ready:true,working:false,cloudWait:{blocked:false},refreshFlow:null,collectionTab:'refresh',collectionFilter:'all',screen:'collections',search:'',data:()=>d,saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks,refreshCreate,checkPicker,refreshMethod,refreshTestOptions,refreshEditor,normalize,progressFor,allWords:()=>Object.values(d.words),icon:()=>'',h:x=>String(x??''),uid:()=> 'new',store:{doc:{},async commit(ops){for(const [entity,id,value] of ops){if(value===null)delete d[entity][id];else d[entity][id]=value;}}},sync:{schedule(){}},sharing:{handle:async()=>false,submit:async()=>false,afterAction(){}},confusions:{handle:async()=>false},showModal:html=>state.html=html,closeModal:()=>state.html='',render(){},notify:m=>state.messages.push(m),autoUpdate(){},confirm:()=>true,document:{addEventListener:(type,fn)=>listeners[type]=fn},start:async(...args)=>state.started=args});
  vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',actions);")),ctx);
  vm.runInContext(source.slice(source.indexOf("document.addEventListener('submit',"),source.indexOf('async function loadCloud(')),ctx);
  vm.runInContext(source.split('\n').filter(l=>l.startsWith('function collectionDetailView(')||l.startsWith('function wordRows(')).join('\n'),ctx);
@@ -33,7 +33,7 @@ test('Create, pick lessons, select words, rename and remove preserve source voca
 test('Adding with test mode retains the exact target and selected lessons',async()=>{
  const t=harness();t.d.settings.r=saveDeck(t.d,null,'r','Wiederholung',['y'],1);
  await t.action('check-picker','r');await t.submit('check-picker-form',{lesson:['a','b']},{target:'r'});
- await t.action('refresh-select-test');assert.deepEqual(JSON.parse(JSON.stringify(t.state.started)),['inactive-check',['a','b'],'r']);
+ await t.action('refresh-select-test');assert.match(t.state.html,/Eine Bedeutung reicht/);assert.match(t.state.html,/Alle Bedeutungen erforderlich/);assert.equal(t.state.started,null);await t.submit('refresh-test-options',{meaningRequirement:'any'});assert.deepEqual(JSON.parse(JSON.stringify(t.state.started)),['inactive-check',['a','b'],'r','any']);
  await t.action('refresh-select-back');assert.match(t.state.html,/value="a" checked/);assert.match(t.state.html,/value="b" checked/);
  await t.submit('refresh-form',{word:['x'],name:'Wiederholung'},{id:'r',merge:'true'});assert.deepEqual(t.d.settings.r.members.map(m=>m.wordId),['y','x']);
 });
@@ -49,5 +49,6 @@ test('Starting a selected refresher never silently resumes an unrelated paused t
  const d=emptyData();d.words.x={id:'x',collectionId:'a'};d.collections.a={id:'a'};
  const ctx=vm.createContext({store:{doc:{session:{finished:false,mode:'inactive-check'}},async update(fn){this.doc=fn(this.doc);}},data:()=>d,cloudWait:{run:async()=>{}},prefs:()=>({daily:10}),confirm:()=>true,notify(){},inactiveQueue:()=>['x'],uid:()=> 'new-session',closeModal(){},render(){},screen:'learn',Date});
  vm.runInContext(source.slice(source.indexOf("async function start("),source.indexOf('function current(')),ctx);
- await ctx.start('inactive-check',['a'],'refresh_target');assert.equal(ctx.store.doc.session.refreshTarget,'refresh_target');assert.equal(ctx.store.doc.session.id,'new-session');
+ await ctx.start('inactive-check',['a'],'refresh_target');assert.equal(ctx.store.doc.session.refreshTarget,'refresh_target');assert.equal(ctx.store.doc.session.id,'new-session');assert.equal(ctx.store.doc.session.meaningRequirement,'all');
+ await ctx.start('inactive-check',['a'],'refresh_target','any');assert.equal(JSON.parse(JSON.stringify(ctx.store.doc.session)).meaningRequirement,'any');
 });

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {evaluate,emptyData,applyOps,progressFor,chooseWords,rebase,parseImport} from '../app/core.js';
+import {evaluateSession,evaluate,emptyData,applyOps,progressFor,chooseWords,rebase,parseImport} from '../app/core.js';
 import {vocabulary,collection} from '../app/vocabulary.js';
 const get=latin=>vocabulary.find(w=>w.latin===latin);
 test('46 echte Vokabeln; Nomenformen und optionale Klammern bleiben erhalten',()=>{
@@ -72,4 +72,21 @@ test('Ein frisches Gerät bringt aus der Cloud gelöschte Startvokabeln nicht zu
  const deletion=op('delete','a',null,'iphone');
  const merged=rebase(emptyData(),[deletion],[bootstrap]);
  assert.equal(merged.pending.length,0);assert.equal(merged.data.words.a,undefined);
+});
+
+test('Auffrischtest: eine oder alle Bedeutungen bestimmen den sicheren Lernstand',()=>{
+ const word={meanings:[['sprechen','reden'],['sagen']]};
+ const any={mode:'inactive-check',meaningRequirement:'any'};
+ const all={mode:'inactive-check',meaningRequirement:'all'};
+ assert.equal(evaluateSession(word,['reden'],true,{},any).grade,'full');
+ assert.equal(evaluateSession(word,['reden'],true,{},all).grade,'partial');
+ assert.equal(evaluateSession(word,['reden','sagen'],true,{},all).grade,'full');
+ assert.equal(evaluateSession(word,['falsch'],true,{},any).grade,'wrong');
+ assert.equal(evaluateSession(word,[''],true,{},any).grade,'wrong');
+ assert.equal(evaluateSession(word,['reden'],true,{0:'wrong'},any).grade,'wrong');
+ assert.equal(evaluateSession(word,['falsch'],true,{0:0},any).grade,'full');
+ assert.equal(evaluateSession(word,['reden'],true,{}, {...any,mode:'smart'}).grade,'partial');
+ assert.equal(evaluateSession(word,['reden'],true,{}, {mode:'inactive-check'}).grade,'partial');
+ const review={id:'test-0',wordId:'x',mode:'inactive-check',at:1000,grade:evaluateSession(word,['reden'],true,{},any).grade};
+ assert.equal(progressFor('x',{review}).level,'known');
 });

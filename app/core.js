@@ -54,6 +54,12 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
   const wrong=rows.some(r=>r.kind==='wrong');
   return {rows,missing,grade:wrong||!seen.size?'wrong':missing.length?'partial':'full'};
 }
+export function evaluateSession(word,answers,allowTypos=true,overrides={},session={}) {
+  const result=evaluate(word,answers,allowTypos,overrides);
+  const any=session.mode==='inactive-check'&&session.meaningRequirement==='any';
+  if(any&&result.rows.some(row=>row.group>=0))result.grade='full';
+  return {...result,meaningRequirement:any?'any':'all'};
+}
 export function progressFor(wordId, reviews) {
   const events=Object.values(reviews).filter(r=>r.wordId===wordId).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
   let streak=0,due=0,lastReviewedAt=0,level='new';
