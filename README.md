@@ -1,4 +1,10 @@
-# Latinio · Version 1.6.0
+# Latinio · Version 1.6.1
+
+## 1.6.1 · Freigaben beim Empfänger prüfen
+
+Die Freigabeliste prüft nun das tatsächliche Empfängerjournal und zeigt fehlende Kopien oder die vorhandene Wortanzahl an. Unvollständige Freigabeeinträge bleiben für die Reparatur sichtbar. Erneutes Teilen stellt fehlende Sammlungen aus den Freigabe-Snapshots wieder her. Die explizite Aktion „Übertragung prüfen / reparieren“ ergänzt auch entfernte Wörter; bereits vorhandene Bearbeitungen und Lernstände bleiben erhalten.
+
+Die App lädt beim Start, bei Rückkehr und manuellem Abgleich einen vollständigen Cloud-Stand und prüft die Profilzuordnung vor der Übertragung. Ein identischer Versionszähler verhindert dadurch nicht mehr die Korrektur eines veralteten lokalen Snapshots. Code.gs und Accounts.gs erneut bereitstellen. 99 Tests bestehen; der konkrete Cloud-Stand des betroffenen Nutzers konnte nicht live geprüft werden.
 
 ## 1.6.0 · Gemeinsam teilen und Empfang bestätigen
 

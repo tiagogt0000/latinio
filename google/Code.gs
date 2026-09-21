@@ -36,7 +36,7 @@ function latinioApi(request) {
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
     if(request.action==='whoami')return {profile:identity,apiVersion:2};
-    if(['profiles','profileCreate','profileDelete','profileCollections','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity);
+    if(['profiles','profileCreate','profileDelete','profileCollections','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity);
     const sheet=ensureLog_(identity.id,readOnly);
     const lastRow=sheet?sheet.getLastRow():0;
     const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;

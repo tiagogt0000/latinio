@@ -171,7 +171,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'confirm-import':{if(!importCandidate)break;const x=importCandidate;await store.commit([['collections',x.collection.id,x.collection],...x.words.map(w=>['words',w.id,w])]);importCandidate=null;closeModal();screen='collections';collectionTab='lessons';collectionFilter=x.collection.id;sync.schedule();render();notify(`${x.words.length} Vokabeln importiert.`);break;}
  case 'theme':await changePrefs({theme:id});break;
  case 'sync-info':screen='settings';render();break;
- case 'sync-now':await cloudWait.run('Wir gleichen alles ab.');render();break;
+ case 'sync-now':sync.lastFullSync=0;await cloudWait.run('Wir gleichen alles ab.');render();break;
  case 'remote':await cloudWait.run('Wir gleichen alles ab.');render();break;
  case 'close-modal':closeModal();break;
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download='latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
@@ -216,7 +216,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
   const choices={};form.querySelectorAll('[data-conflict]').forEach(el=>choices[el.dataset.conflict]=el.value);form.querySelector('button').disabled=true;await sync.accept(choices);closeModal();render();notify('Cloud-Version geladen.');
  }
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();autoUpdate();}});
-async function loadCloud(){if(screen==='test'&&store.doc.session&&!store.doc.session.feedback){const answers=readAnswers();await store.update(doc=>{if(doc.session&&!doc.session.feedback)doc.session.answers=answers;return doc;});}await cloudWait.run('Wir bereiten alles vor.');if(!modalRoot.children.length)render();}
+async function loadCloud(){sync.lastFullSync=0;if(screen==='test'&&store.doc.session&&!store.doc.session.feedback){const answers=readAnswers();await store.update(doc=>{if(doc.session&&!doc.session.feedback)doc.session.answers=answers;return doc;});}await cloudWait.run('Wir bereiten alles vor.');if(!modalRoot.children.length)render();}
 async function boot(){try{
  ({store,profile}=await openAccount(app));await store.seed();sync=new Sync(store);
  sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});

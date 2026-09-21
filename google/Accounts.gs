@@ -98,6 +98,23 @@ function shareNotice_(profileId,shares,deliveryId){
   const id='notice_'+hash_(deliveryId).slice(0,40);
   serverWrite_(profileId,[{id:id,entity:'settings',key:id,value:{kind:'shareNotice',id:id,at:Date.now(),collections:shares.map(function(s){return {id:s.targetId,name:s.collection?s.collection.name:'Sammlung'};})}}]);
 }
+function shareDelivery_(share,state,records){
+  const collection=state.data.collections[share.targetId],entries=Object.values(records).filter(function(e){return e.kind==='entry'&&e.shareId===share.id&&e.source;});
+  return {present:!!collection,wordCount:Object.values(state.data.words).filter(function(w){return w.collectionId===share.targetId;}).length,missingWords:entries.filter(function(e){return !state.data.words[targetId_(share.id,e.sourceId)];}).length,version:state.version};
+}
+function repairShare_(share){
+  const state=readState_(share.profileId,true),records=records_('_LatinioShares'),changes=[];
+  if(!share.collection)throw new Error('Die geteilte Sammlung wurde gelöscht. Bitte eine vorhandene Sammlung teilen.');
+  const prefix='repair_'+share.id+'_'+state.version+'_';
+  if(!state.data.collections[share.targetId])changes.push({id:prefix+'collection',entity:'collections',key:share.targetId,value:{id:share.targetId,name:share.collection.name}});
+  Object.values(records).filter(function(e){return e.kind==='entry'&&e.shareId===share.id&&e.source;}).forEach(function(e){const word=mapWord_(e.source,share);if(!state.data.words[word.id])changes.push({id:prefix+word.id,entity:'words',key:word.id,value:word});});
+  if(changes.length){
+    const noticeId='notice_'+hash_(prefix).slice(0,40);
+    changes.push({id:noticeId,entity:'settings',key:noticeId,value:{kind:'shareNotice',id:noticeId,at:Date.now(),collections:[{id:share.targetId,name:share.collection.name}]}});
+    serverWrite_(share.profileId,changes);
+  }
+  return {repaired:Math.max(0,changes.length-1),delivery:shareDelivery_(share,readState_(share.profileId,true),records)};
+}
 function accountApi_(request,identity){
   if(request.action==='logout'){saveRecord_('_LatinioSessions',hash_(request.token),{profileId:identity.id,expires:0});return {ok:true};}
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
@@ -154,6 +171,10 @@ function accountApi_(request,identity){
     saveRecords_('_LatinioShares',snapshots);
     serverWrite_(profile.id,changes);
     saveRecords_('_LatinioShares',results.filter(function(r){return !r.already||r.restored;}).map(function(r){r.share.ready=true;r.share.revoked=false;return [r.share.id,r.share];}));
+    const received=readState_(profile.id,true);
+    results.forEach(function(r){if(!received.data.collections[r.share.targetId])r.repair=repairShare_(r.share);});
+    const verified=readState_(profile.id,true),saved=records_('_LatinioShares');
+    results.forEach(function(r){r.share.delivery=shareDelivery_(r.share,verified,saved);if(!r.share.delivery.present)throw new Error('Die Sammlung fehlt beim Empfänger. Bitte Übertragung reparieren.');});
     return {results:results};
   }
   if(request.action==='shareNotify'){
@@ -166,12 +187,15 @@ function accountApi_(request,identity){
     return {ok:true};
   }
   const records=records_('_LatinioShares');
-  if(request.action==='shareList')return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&s.ready&&!s.revoked;})};
+  if(request.action==='shareList'){
+    const states=Object.create(null);
+    return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&!s.revoked;}).map(function(s){if(!states[s.profileId])states[s.profileId]=readState_(s.profileId,true);return Object.assign({},s,{delivery:shareDelivery_(s,states[s.profileId],records)});})};
+  }
   if(request.action==='shareCreate'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const data=readState_('admin').data,collection=data.collections[request.collectionId];if(!collection)throw new Error('Sammlung zuerst hochladen.');
     const id=shareId_(profile.id,collection.id);let share=records[id];
-    if(share&&share.ready){const restored=!!share.revoked;if(restored){share.revoked=false;saveRecord_('_LatinioShares',share.id,share);}return {share:share,already:true,restored:restored};}
+    if(share&&share.ready){const restored=!!share.revoked;if(restored){share.revoked=false;saveRecord_('_LatinioShares',share.id,share);}if(!readState_(profile.id,true).data.collections[share.targetId])repairShare_(share);return {share:share,already:true,restored:restored};}
     if(!share){
       share={id:id,kind:'share',profileId:profile.id,profileName:profile.name,sourceId:collection.id,targetId:'c_'+id,collection:collection,ready:false};
       saveRecord_('_LatinioShares',id,share);
@@ -183,6 +207,12 @@ function accountApi_(request,identity){
     const changes=[{id:'init_'+share.targetId,entity:'collections',key:share.targetId,value:{id:share.targetId,name:share.collection.name}}];
     entries.forEach(function(e){const w=mapWord_(e.source,share);changes.push({id:'init_'+w.id,entity:'words',key:w.id,value:w});});
     serverWrite_(profile.id,changes);share.ready=true;saveRecord_('_LatinioShares',id,share);return {share:share};
+  }
+  if(request.action==='shareRepair'){
+    let target=records[request.shareId];
+    if(!target||target.kind!=='share'||target.revoked||!records_('_LatinioProfiles')[target.profileId]?.active)throw new Error('Freigabe nicht gefunden oder beendet.');
+    if(!target.ready)target=accountApi_({action:'shareCreate',profileId:target.profileId,collectionId:target.sourceId},identity).share;
+    const result=repairShare_(target);return Object.assign(result,{share:Object.assign({},target,{delivery:result.delivery})});
   }
   const share=records[request.shareId];if(!share||share.kind!=='share'||!share.ready)throw new Error('Freigabe nicht gefunden.');
   if(request.action==='shareRevoke'){share.revoked=true;saveRecord_('_LatinioShares',share.id,share);return {ok:true};}

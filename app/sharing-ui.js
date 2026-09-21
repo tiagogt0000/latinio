@@ -8,7 +8,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
-  function shareRows(){return people.filter(p=>shares.some(s=>s.profileId===p.id)).map(p=>`<button class="button secondary wide" data-action="share-notify" data-id="${h(p.id)}">${h(p.name)} erneut benachrichtigen</button>`).join('')+ (shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><div class="profile-controls"><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>');}
+  function shareRows(){return people.filter(p=>shares.some(s=>s.profileId===p.id)).map(p=>`<button class="button secondary wide" data-action="share-notify" data-id="${h(p.id)}">${h(p.name)} erneut benachrichtigen</button>`).join('')+ (shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><p class="small muted">${s.delivery?(s.delivery.present?'In der Empfänger-Cloud: '+s.delivery.wordCount+' Wörter'+(s.delivery.missingWords?' · '+s.delivery.missingWords+' entfernte oder fehlende Einträge':''):'Sammlung fehlt in der Empfänger-Cloud'):'Empfang noch nicht geprüft – Google-Skript aktualisieren'}</p><div class="profile-controls"><button class="text-button" data-action="share-repair" data-id="${h(s.id)}">Übertragung prüfen / reparieren</button><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>');}
   const admin=profile.role==='admin';
   async function refresh(){if(admin){shares=(await sync.request('shareList')).shares;loaded=true;await remember();}return shares;}
   store.addEventListener('commit',event=>{
@@ -91,6 +91,9 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     if(action==='share-notify'){
       showModal(`<h2 id="modal-title">Erneut benachrichtigen</h2><form id="share-notify-form" data-id="${h(id)}"><div class="bounded-list">${shares.filter(s=>s.profileId===id).map(s=>`<label class="collection-check"><input type="checkbox" name="shareId" value="${h(s.id)}" checked><span>${h(s.collection?.name||'Sammlung')}</span></label>`).join('')}</div><button type="submit" class="button primary wide">Benachrichtigung senden</button><p role="status" data-save-status></p></form>`);return true;
     }
+    if(action==='share-repair'){
+      showModal(`<h2 id="modal-title">Übertragung reparieren</h2><p>Fehlende Einträge werden aus der zuletzt geteilten Fassung ergänzt. Auch beim Nutzer gelöschte Einträge kommen zurück. Vorhandene Bearbeitungen und Lernstände bleiben erhalten.</p><form id="share-repair-form" data-id="${h(id)}"><button type="submit" class="button primary wide">Prüfen und reparieren</button><p role="status" data-save-status></p></form>`);return true;
+    }
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}
@@ -111,7 +114,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     return false;
   }
   async function submit(form){
-    if(!['profile-create','share-create','share-notify-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-create','share-create','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
@@ -134,7 +137,11 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
           if(!fd.get('profileId'))throw Error('Wähle einen Empfänger.');
           await flush();const result=await sync.request('shareCreateMany',{collectionIds,profileId:fd.get('profileId')});
           directoryEpoch++;for(const item of result.results){shares=shares.filter(s=>s.id!==item.share.id);shares.push(item.share);}loaded=true;await remember();
-          if(form.isConnected)panel(false);notify(`${result.results.length} Sammlungen freigegeben.`);
+          if(form.isConnected)panel(false);notify(result.results.every(r=>r.share.delivery?.present)?`${result.results.length} Sammlungen in der Empfänger-Cloud bestätigt.`:'Freigabe gespeichert. Empfang noch nicht geprüft – bitte Google-Skript aktualisieren.');
+        }else if(form.id==='share-repair-form'){
+          const result=await sync.request('shareRepair',{shareId:form.dataset.id});
+          directoryEpoch++;shares=shares.filter(s=>s.id!==result.share.id);shares.push(result.share);await remember();
+          if(form.isConnected)panel(false);notify(result.repaired?'Fehlende Einträge ergänzt. Empfänger-App neu öffnen.':'Sammlung ist in der Empfänger-Cloud vorhanden. Empfänger-App neu öffnen.');
         }else if(form.id==='share-notify-form'){
           const shareIds=fd.getAll('shareId');if(!shareIds.length)throw Error('Wähle mindestens eine Sammlung.');
           form.dataset.requestId ||= crypto.randomUUID();

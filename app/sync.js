@@ -28,7 +28,7 @@ export class GoogleBridge {
   destroy(){window.removeEventListener('message',this.listener);this.frame?.remove();this.connected=false;this.connecting=null;this.target=null;for(const cb of this.callbacks.values()){clearTimeout(cb.timer);cb.reject(Error('Verbindung wurde geändert.'));}this.callbacks.clear();}
 }
 export class Sync extends EventTarget {
-  constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';
+  constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';this.lastFullSync=0;
     window.addEventListener('online',()=>this.schedule(0));
     window.addEventListener('offline',()=>this.set('offline','Offline · lokal gespeichert'));
   }
@@ -54,9 +54,11 @@ export class Sync extends EventTarget {
     this.busy=true;
     try{
       this.set('checking','Cloud-Version wird geprüft …');
+      const full=Date.now()-this.lastFullSync>300000;
+      if(full&&this.store.profileId){const identity=await this.request('whoami');if(identity.profile?.id!==this.store.profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte abmelden und mit der richtigen E-Mail erneut anmelden.');}
       const meta=await this.request('check');this.cloudVersion=meta.version;
       if(meta.version<this.store.doc.base)throw Error('Die Cloud ist älter als der bestätigte Gerätestand. Kein automatisches Überschreiben.');
-      if(meta.version>this.store.doc.base){await this.fetchRemote();return;}
+      if(meta.version>this.store.doc.base||full){await this.fetchRemote(full);return;}
       while(this.store.doc.pending.length){
         const ops=this.store.doc.pending.slice(0,200),base=this.store.doc.base;
         this.set('uploading',`Fortschritt wird hochgeladen · ${this.store.doc.pending.length} Änderungen`);
@@ -71,8 +73,8 @@ export class Sync extends EventTarget {
     }catch(e){this.set('error',e.message);}
     finally{this.busy=false;}
   }
-  async fetchRemote(){
-    this.remote=await this.request('pull',{since:this.store.doc.base});this.cloudVersion=this.remote.version;
+  async fetchRemote(full=false){
+    this.remote=await this.request('pull',{since:full?0:this.store.doc.base});this.remoteFull=full;this.cloudVersion=this.remote.version;
     this.set('newer',`Neuere Cloud-Version · v${this.remote.version}`);this.dispatchEvent(new Event('remote'));
   }
   compare(choices={}){return rebase(this.remote.data,this.remote.ops,this.store.doc.pending,choices);}
@@ -85,6 +87,6 @@ export class Sync extends EventTarget {
       if(latest.conflicts.length)throw Error('Es gibt inzwischen weitere lokale Änderungen. Bitte erneut vergleichen.');
       doc.shadow=latest.shadow;doc.pending=latest.pending;doc.base=remote.version;doc.lastSync=Date.now();doc.seeded=true;return doc;
     });
-    this.remote=null;this.set('synced',`Cloud-Version v${remote.version} geladen`);this.schedule(0);
+    if(this.remoteFull)this.lastFullSync=Date.now();this.remoteFull=false;this.remote=null;this.set('synced',`Cloud-Version v${remote.version} geladen`);this.schedule(0);
   }
 }
