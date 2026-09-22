@@ -19,8 +19,7 @@ export class Store extends EventTarget {
   get data(){return applyOps(this.doc.shadow,this.doc.pending);}
   close(){this.channel?.close();this.db?.close();}
   async commit(changes,session=undefined){const previous=this.data;const result=await this.update(doc=>{
-    for(const [entity,key,value]of changes){doc.seq++;doc.pending.push({id:uid(),entity,key,value:clone(value),device:doc.device,seq:doc.seq,at:Date.now()});}
+    for(const [entity,key,value]of changes){doc.seq++;const op={id:uid(),entity,key,value:clone(value),device:doc.device,seq:doc.seq,at:Date.now()};if(JSON.stringify(op).length>45000)throw Error('Ein Eintrag ist für Google zu groß. Bitte auf mehrere kleinere Sammlungen oder Vokabeleinträge verteilen.');doc.pending.push(op);}
     if(session!==undefined)doc.session=clone(session);return doc;
   });this.dispatchEvent(new CustomEvent('commit',{detail:{changes,previous}}));return result;}
 }
-

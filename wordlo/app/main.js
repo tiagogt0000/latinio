@@ -188,7 +188,7 @@ document.addEventListener('click',async e=>{
       case 'sync':await sync.run();if(screen==='settings')render();break;
       case 'conflicts':conflictsDialog();break;
       case 'check-update':await checkUpdate(true);break;
-      case 'update':if(store.doc.session&&!store.doc.session.finished)throw Error('Bitte beende oder pausiere deine Runde vor dem Update.');updateReady?.postMessage({type:'ACTIVATE'});if(!updateReady)location.reload();break;
+      case 'update':if(screen==='round')throw Error('Bitte beende oder pausiere deine Runde vor dem Update.');updateReady?.postMessage({type:'ACTIVATE'});if(!updateReady)location.reload();break;
     }
   }catch(e){error(e.message);}finally{busy=false;}
 });
