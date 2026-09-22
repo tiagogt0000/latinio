@@ -1,5 +1,6 @@
+import {rateRefresh,refreshCardView,bindRefreshSwipe,finishRefresh} from './refresh-cards.js';
 import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,saveDeck,checkResultWords} from './refresh-decks.js';
-import {refreshList,refreshMethod,refreshTestOptions,collectionRow,collectionToolbar,refreshCreate,checkPicker,refreshEditor} from './refresh-ui.js';
+import {refreshList,refreshMethod,collectionRow,collectionToolbar,refreshCreate,checkPicker,refreshEditor} from './refresh-ui.js';
 import {activityKey,collectionActive,forgottenWords,inactiveQueue} from './collection-learning.js';
 import {classroomView,classroomResults} from './classroom.js';
 import {uid,clone,normalize,evaluateSession,progressFor,chooseWords,parseImport} from './core.js';
@@ -21,7 +22,7 @@ const app=document.querySelector('#app'),modalRoot=document.querySelector('#moda
 const isAdmin=()=>profile?.role==='admin';
 const data=()=>store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
-async function showResult(){await cloudWait.run('Fortschritt wird hochgeladen …');screen='result';render();}
+async function showResult(){const saved=store.doc.session;if(saved?.mode==='inactive-check'&&saved.finished&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}await cloudWait.run('Fortschritt wird hochgeladen …');screen='result';render();}
 async function backgroundSync(){if(working||cloudWait?.blocked||['test','match'].includes(screen)||modalRoot.children.length){sync.schedule(0);return;}try{await settleSync(sync,store);if(unreadShareNotices(data()).length&&!working&&!modalRoot.children.length&&!['test','match'].includes(screen))await loadCloud();if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{} }
 
 const prefs=()=>({daily:10,typos:true,...data().settings.general,theme:'system',accent:'green',density:'comfortable',design:'rounded'});
@@ -80,7 +81,7 @@ function trainingOptions(){
  const known=words.length-learning;
  showModal(`<h2 id="modal-title">Mehr Optionen</h2><p class="muted">Für deine Trainingsauswahl.</p><div class="word-tools"><button class="button secondary wide" data-action="start-refresh" ${!known?'disabled':''}>Auffrischen · ${known} sichere Wörter</button><button class="button secondary wide" data-action="start-learning" ${!learning?'disabled':''}>Noch unsichere Wörter üben · ${learning}</button><button class="button secondary wide" data-action="start-all" ${!words.length?'disabled':''}>Alle ausgewählten Vokabeln üben · ${words.length}</button></div>`);
 }
-async function start(mode='smart',ids=selected,refreshTarget=null,meaningRequirement='all'){
+async function start(mode='smart',ids=selected,refreshTarget=null){
  
  await cloudWait.run('Wir bereiten alles vor.');
  // A different device may have deactivated a collection since this round began.
@@ -99,11 +100,12 @@ async function start(mode='smart',ids=selected,refreshTarget=null,meaningRequire
  const queue=mode.startsWith('inactive-')?inactiveQueue(data(),ids,mode,prefs().daily):chooseWords(data(),ids,prefs().daily,mode);
  if(!queue.length){notify(mode==='refresh'?'In dieser Auswahl sind noch keine sicheren Vokabeln zum Auffrischen.':mode==='learning'?'Diese Vokabeln sind schon sicher. Nutze Auffrischen oder wiederhole alle.':'In dieser Auswahl sind keine Vokabeln.');return;}
  closeModal();
- const session={id:uid(),mode,sourceIds:ids,refreshTarget,meaningRequirement:mode==='inactive-check'&&meaningRequirement==='any'?'any':'all',queue:queue.map(wordId=>({wordId,repeat:false})),cursor:0,originalLength:queue.length,answers:[''],feedback:null,overrides:{},startedAt:Date.now(),finished:false};
+ const session={id:uid(),mode,sourceIds:ids,refreshTarget,cardFlipped:false,queue:queue.map(wordId=>({wordId,repeat:false})),cursor:0,originalLength:queue.length,answers:[''],feedback:null,overrides:{},startedAt:Date.now(),finished:false};
  await store.update(doc=>{doc.session=session;return doc;});screen='test';render();
 }
 function current(){const session=store.doc.session;if(!session)return {};const item=session.queue[session.cursor];return {session,item,word:data().words[item?.wordId]};}
 function renderTest(){const {session,item,word}=current();if(!session){screen='learn';render();return;}if(!word){app.innerHTML=`<main class="test-shell"><h1>Diese Vokabel wurde gelöscht.</h1><button class="button primary" data-action="next">Weiter</button></main>`;return;}
+ if(session.mode==='inactive-check'){app.innerHTML=refreshCardView(session,word,h,icon);const cursor=session.cursor;bindRefreshSwipe(app.querySelector('.refresh-card'),known=>{void actions({preventDefault(){},target:{closest:()=>({dataset:{action:known?'refresh-card-known':'refresh-card-wrong',cursor:String(cursor)}})}});});return;}
  const feedback=session.feedback;const pct=Math.round(session.cursor/session.queue.length*100);
  app.innerHTML=`<main class="test-shell"><header class="test-top"><button class="icon-button" data-action="pause" aria-label="Runde pausieren">${icon('close')}</button><div class="test-progress"><div style="width:${pct}%"></div></div><span class="small muted">${session.cursor+1} / ${session.queue.length}</span></header><div class="test-content"><div class="eyebrow">${item.repeat?'NOCH EINMAL FESTIGEN':'LATEIN → DEUTSCH'}</div><div class="test-title"><h1>Was bedeutet …</h1><button class="icon-button" data-action="edit-word" data-id="${h(word.id)}" aria-label="Vokabel bearbeiten">${icon('edit')}</button></div>${session.mode==='inactive-check'?`<p class="small muted">${session.meaningRequirement==='any'?'Eine Bedeutung reicht':'Alle Bedeutungen erforderlich'}</p>`:''}<div class="latin-word" lang="la">${h(word.latin)}</div>${translationCard(word,feedback)}${!feedback?'<p class="muted test-help" data-compact-hide>Schreibe die Bedeutungen auf, die du kennst.</p>':''}<form id="answer-form"><div id="answers">${feedback?answerFeedback(feedback):session.answers.map((a,i)=>answerInput(a,i,false)).join('')}</div>${!feedback?`<button type="button" class="add-answer" data-action="add-answer">${icon('plus')} Weitere Bedeutung</button>`:''}<div class="test-feedback">${feedback?feedbackView(word,feedback)+confusions.prompt(word,feedback,session):''}</div><footer class="test-footer ${feedback?'compact-footer':''}">${feedback?`<button class="button primary wide" type="button" data-action="next">Weiter ${icon('arrow')}</button>`:`<button class="text-button" type="button" data-action="dont-know">Weiß ich noch nicht</button><button class="button primary" type="submit">Prüfen ${icon('check')}</button>`}</footer></form></div></main>`;
  if(!feedback)document.querySelector('#answers input')?.focus({preventScroll:true});
@@ -115,11 +117,13 @@ function readAnswers(){return [...document.querySelectorAll('#answers input')].m
 async function checkAnswer(skip=false){const {session,word,item}=current();if(!word||session.feedback)return;session.answers=readAnswers();if(skip)session.answers=[''];session.overrides={};session.feedback=evaluateSession(word,session.answers,prefs().typos,{},session);const review={id:session.id+'-'+session.cursor,wordId:word.id,grade:session.feedback.grade,at:Date.now(),repeat:item.repeat,mode:session.mode||'smart',meaningRequirement:session.meaningRequirement||'all',answers:session.answers};await store.commit([['reviews',review.id,review]],session);sync.schedule();render();}
 async function reevaluate(){const {session,word}=current();if(!session.feedback||!word)return;session.feedback=evaluateSession(word,session.answers,prefs().typos,session.overrides,session);const key=session.id+'-'+session.cursor;const review={...data().reviews[key],grade:session.feedback.grade,answers:session.answers};await store.commit([['reviews',key,review]],session);sync.schedule();render();}
 async function next(){const {session,item,word}=current();if(!session)return;
+ if(session.mode==='inactive-check'){await rateCard(false);return;}
  if(word&&!session.feedback)return;
  if(session.feedback&&session.feedback.grade!=='full'&&!item.repeat&&session.mode!=='inactive-check')session.queue.push({wordId:item.wordId,repeat:true});
  session.cursor++;session.answers=[''];session.feedback=null;session.overrides={};
  if(session.cursor>=session.queue.length){session.finished=true;await store.commit([['sessions',session.id,{id:session.id,at:Date.now(),count:session.originalLength}]],session);sync.schedule(0);if(!session.mode?.startsWith('inactive-')&&await confusions.offer(session.queue.map(x=>x.wordId)))return;await showResult();return;}else await store.update(doc=>{doc.session=session;return doc;});render();}
-function renderResult(){const s=store.doc.session;if(!s){screen='learn';render();return;}const reviews=Object.values(data().reviews).filter(r=>r.id.startsWith(s.id+'-')&&!r.repeat);app.innerHTML=`<main class="result-shell"><div data-sync>${statusMarkup()}</div><span class="result-award">${icon('award')}</span><div class="eyebrow">RUNDE GESCHAFFT</div><h1>Ein Stück mehr<br>im Kopf.</h1><p class="muted">${s.originalLength} Vokabeln geübt. Gespeichert.</p><div class="result-stats">${[['full',s.meaningRequirement==='any'?'Sicher erkannt':'Ganz gewusst'],['partial','Teilweise gewusst'],['wrong','Wiederholen']].map(([grade,label])=>`<div class="${grade}"><strong>${reviews.filter(r=>r.grade===grade).length}</strong><span>${label}</span></div>`).join('')}</div>${s.mode?.startsWith('inactive-')?`<p class="muted">Unsichere Wörter übernehmen?</p>`:''}<p class="small muted" data-compact-hide>Die erste Antwort zählt.</p>${s.mode==='inactive-check'?`<button class="button secondary wide" data-action="refresh-save-result">Wörter in Auffrisch-Sammlung speichern</button>`:''}<button class="button primary wide" data-action="finish">Zur Übersicht ${icon('arrow')}</button></main>`;}
+async function rateCard(known){const transition=rateRefresh(data(),store.doc.session,known);if(!transition)return;await store.commit(transition.ops,transition.session);sync.schedule(0);if(transition.session.finished)await showResult();else render();}
+function renderResult(){const s=store.doc.session;if(!s){screen='learn';render();return;}const reviews=Object.values(data().reviews).filter(r=>r.id.startsWith(s.id+'-')&&!r.repeat);app.innerHTML=`<main class="result-shell"><div data-sync>${statusMarkup()}</div><span class="result-award">${icon('award')}</span><div class="eyebrow">RUNDE GESCHAFFT</div><h1>Ein Stück mehr<br>im Kopf.</h1><p class="muted">${s.originalLength} Vokabeln geübt. Gespeichert.</p><div class="result-stats">${[['full',s.mode==='inactive-check'?'Gewusst':'Ganz gewusst'],['partial','Teilweise gewusst'],['wrong','Wiederholen']].map(([grade,label])=>`<div class="${grade}"><strong>${reviews.filter(r=>r.grade===grade).length}</strong><span>${label}</span></div>`).join('')}</div>${s.mode==='inactive-check'?`<p class="muted">${s.refreshSavedCount??0} nicht gewusste Wörter automatisch in „${h(data().settings[s.refreshTarget]?.name||'Auffrisch-Sammlung')}“ gespeichert.</p>`:''}<p class="small muted" data-compact-hide>Die erste Antwort zählt.</p><button class="button primary wide" data-action="finish">Zur Übersicht ${icon('arrow')}</button></main>`;}
 async function changePrefs(changes){await store.commit([['settings','general',{...prefs(),...changes}]]);sync.schedule();render();}
 async function actions(event){const button=event.target.closest('[data-action]');if(!button)return;event.preventDefault();const action=button.dataset.action,id=button.dataset.id;
  if(!ready||working||cloudWait?.blocked)return;working=true;
@@ -130,12 +134,12 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'check-picker':refreshFlow={target:id,sourceIds:[]};showModal(checkPicker(data(),h,id));break;
  case 'refresh-select-back':showModal(checkPicker(data(),h,refreshFlow.target,refreshFlow.sourceIds));break;
  case 'refresh-select-manual':showModal(refreshEditor(data(),{id:refreshFlow.target,merge:true,sourceIds:refreshFlow.sourceIds},h));break;
- case 'refresh-select-test':showModal(refreshTestOptions());break;
- case 'refresh-test-back':showModal(refreshMethod());break;
+ case 'refresh-select-test':await start('inactive-check',refreshFlow.sourceIds,refreshFlow.target);break;
+ case 'refresh-card-flip':{const {session}=current();if(session?.mode!=='inactive-check'||session.finished)break;await store.update(doc=>{doc.session.cardFlipped=!doc.session.cardFlipped;return doc;});render();break;}
+ case 'refresh-card-known':case 'refresh-card-wrong':if(String(current().session?.cursor)===button.dataset.cursor)await rateCard(action==='refresh-card-known');break;
  case 'refresh-remove-word':{const deck=data().settings[collectionFilter];if(deck?.kind!=='refreshDeck')break;await store.commit([['settings',deck.id,{...deck,members:deck.members.filter(m=>m.wordId!==id)}]]);sync.schedule();render();break;}
  case 'refresh-tools':collectionFilter=id;search='';screen='collection-detail';render();break;
  case 'refresh-activity-all':{const active=button.dataset.active==='true';const edits=refreshDecks(data()).filter(d=>(d.active!==false)!==active).map(d=>['settings',d.id,{...d,active}]);if(edits.length)await store.commit(edits);sync.schedule();render();break;}
- case 'refresh-save-result':{const session=store.doc.session;const names=(session.sourceIds||[]).map(id=>(data().collections[id]?.name||data().settings[id]?.name)).filter(Boolean);showModal(refreshEditor(data(),{id:data().settings[session.refreshTarget]?.kind==='refreshDeck'?session.refreshTarget:'',selected:checkResultWords(data(),session),sourceIds:session.sourceIds,merge:true,name:('Auffrischen '+names.join(', ')).slice(0,100)},h));break;}
  case 'refresh-add-word':showModal(refreshEditor(data(),{selected:[id],merge:true},h));break;
  case 'refresh-legacy':showModal(refreshEditor(data(),{selected:forgottenWords(data()).map(w=>w.id),merge:true,name:'Bisherige Auffrisch-Wörter'},h));break;
  case 'refresh-check':await start('inactive-check',[id]);break;
@@ -151,7 +155,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'start-all':await start('all');break;
  case 'start-learning':await start('learning');break;
  case 'start-refresh':await start('refresh');break;
- case 'pause':{const {session}=current();if(!session.feedback)session.answers=readAnswers();await store.update(doc=>{doc.session=session;return doc;});screen='learn';render();break;}
+ case 'pause':{const {session}=current();if(session.mode!=='inactive-check'&&!session.feedback)session.answers=readAnswers();await store.update(doc=>{doc.session=session;return doc;});screen='learn';render();break;}
  case 'finish':await store.update(doc=>{doc.session=null;return doc;});screen='learn';render();break;
  case 'next':await next();break;
  case 'dont-know':await checkAnswer(true);break;
@@ -194,7 +198,6 @@ document.addEventListener('change',async event=>{const el=event.target;try{
  }catch(error){importCandidate=null;notify(error.message);}});
 document.addEventListener('submit',async event=>{event.preventDefault();if(!ready||working||cloudWait?.blocked)return;working=true;const form=event.target;const fd=new FormData(form);try{
  if(await sharing.submit(form))return;
- if(form.id==='refresh-test-options'){if(!refreshFlow?.sourceIds?.length)throw Error('Bitte zuerst Lektionen auswählen.');await start('inactive-check',refreshFlow.sourceIds,refreshFlow.target,fd.get('meaningRequirement')==='any'?'any':'all');}
  if(form.id==='check-picker-form'){const ids=fd.getAll('lesson');if(!ids.length)throw Error('Wähle mindestens eine Lektion aus.');refreshFlow={target:form.dataset.target,sourceIds:ids};showModal(refreshMethod());}
  if(form.id==='refresh-create-form'){const id='refresh_'+uid();const deck=saveDeck(data(),null,id,String(fd.get('name')||''),[]);await store.commit([['settings',id,deck]]);collectionTab='refresh';collectionFilter=id;search='';screen='collection-detail';closeModal();sync.schedule();render();refreshFlow={target:id,sourceIds:[]};showModal(checkPicker(data(),h,id));}
  if(form.id==='refresh-form'){
@@ -232,7 +235,7 @@ async function boot(){try{
  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
  render();await cloudWait.run('Wir bereiten alles vor.');ready=true;render();
  async function resume(){if(!ready)return;await loadCloud();void updates.check();}
- document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&!store.doc.session?.feedback){const answers=readAnswers();void store.update(doc=>{if(doc.session)doc.session.answers=answers;return doc;});}}else void resume();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&store.doc.session?.mode!=='inactive-check'&&!store.doc.session?.feedback){const answers=readAnswers();void store.update(doc=>{if(doc.session)doc.session.answers=answers;return doc;});}}else void resume();});
  window.addEventListener('pageshow',event=>{if(event.persisted)void resume();});
  setInterval(()=>{if(!document.hidden){void backgroundSync();void updates.check();autoUpdate();}},60000);
  window.addEventListener('online',()=>{void updates.check();void resume();});

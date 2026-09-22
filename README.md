@@ -1,4 +1,8 @@
-# Latinio · Version 1.6.2
+# Latinio · Version 1.7.0
+
+## 1.7.0 · Auffrischtest mit Karteikarten
+
+Karte antippen, alle Bedeutungen ansehen und selbst bewerten: rechts gewusst, links nicht gewusst. Alternativ sind beide Bewertungen als Knöpfe verfügbar. Keine Bedeutungsauswahl und keine Texteingabe mehr im Auffrischtest. Die letzte Bewertung, das Rundenende und die Übernahme nicht gewusster Wörter in die gewählte Auffrisch-Sammlung werden gemeinsam lokal gespeichert und mit der Cloud synchronisiert. Bestehende Mitglieder bleiben erhalten. Kein Google-Skript-Update nötig.
 
 ## 1.6.2 · Bedeutungsauswahl im Auffrischtest
 
