@@ -8,7 +8,7 @@ import {uid,clone,normalize,evaluateSession,progressFor,chooseWords,parseImport}
 import {confusionUI} from './confusion-ui.js';
 import {openAccount,signOut,accountCard} from './accounts.js';
 import {sharingUI} from './sharing-ui.js';
-import {cloudGate,settleSync,unreadShareNotices} from './multiuser-sync.js';
+import {cloudGate,settleSync} from './multiuser-sync.js';
 import {Sync} from './sync.js';
 import {answerFeedback,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
@@ -23,8 +23,8 @@ const app=document.querySelector('#app'),modalRoot=document.querySelector('#moda
 const isAdmin=()=>profile?.role==='admin';
 const data=()=>store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
-async function showResult(){const saved=store.doc.session;if(saved?.mode==='inactive-check'&&saved.finished&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}await cloudWait.run('Fortschritt wird hochgeladen …');screen='result';render();}
-async function backgroundSync(){if(working||cloudWait?.blocked||['test','match'].includes(screen)||modalRoot.children.length){sync.schedule(0);return;}try{await settleSync(sync,store);if(unreadShareNotices(data()).length&&!working&&!modalRoot.children.length&&!['test','match'].includes(screen))await loadCloud();if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{} }
+async function showResult(){const saved=store.doc.session;if(saved?.mode==='inactive-check'&&saved.finished&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}screen='result';render();void backgroundSync();}
+async function backgroundSync(){if(!ready||cloudWait?.blocked)return;try{await settleSync(sync,store);if(!working&&!modalRoot.children.length&&!['test','match'].includes(screen))render();}catch{}finally{updateStatus();}}
 
 const prefs=()=>({daily:10,typos:true,...data().settings.general,theme:'system',accent:'green',density:'comfortable',design:'rounded'});
 const allWords=()=>Object.values(data().words).filter(w=>data().collections[w.collectionId]);
@@ -84,7 +84,7 @@ function trainingOptions(){
 }
 async function start(mode='smart',ids=selected,refreshTarget=null){
  
- await cloudWait.run('Wir bereiten alles vor.');
+ void backgroundSync();
  // A different device may have deactivated a collection since this round began.
  const saved=store.doc.session;
  if(saved&&!saved.finished&&!saved.mode?.startsWith('inactive-')&&saved.queue.slice(saved.cursor).some(x=>!wordEnabled(data(),x.wordId))){
@@ -124,7 +124,7 @@ async function next(){const {session,item,word}=current();if(!session)return;
  session.cursor++;session.answers=[''];session.feedback=null;session.overrides={};
  if(session.cursor>=session.queue.length){session.finished=true;await store.commit([['sessions',session.id,{id:session.id,at:Date.now(),count:session.originalLength}]],session);sync.schedule(0);if(!session.mode?.startsWith('inactive-')&&await confusions.offer(session.queue.map(x=>x.wordId)))return;await showResult();return;}else await store.update(doc=>{doc.session=session;return doc;});render();}
 async function rateCard(known){const transition=rateRefresh(data(),store.doc.session,known);if(!transition)return;await store.commit(transition.ops,transition.session);sync.schedule(0);if(transition.session.finished)await showResult();else render();}
-function renderResult(){const s=store.doc.session;if(!s){screen='learn';render();return;}const reviews=Object.values(data().reviews).filter(r=>r.id.startsWith(s.id+'-')&&!r.repeat);app.innerHTML=`<main class="result-shell"><div data-sync>${statusMarkup()}</div><span class="result-award">${icon('award')}</span><div class="eyebrow">RUNDE GESCHAFFT</div><h1>Ein Stück mehr<br>im Kopf.</h1><p class="muted">${s.originalLength} Vokabeln geübt. Gespeichert.</p><div class="result-stats">${[['full',s.mode==='inactive-check'?'Gewusst':'Ganz gewusst'],['partial','Teilweise gewusst'],['wrong','Wiederholen']].map(([grade,label])=>`<div class="${grade}"><strong>${reviews.filter(r=>r.grade===grade).length}</strong><span>${label}</span></div>`).join('')}</div>${s.mode==='inactive-check'?`<p class="muted">${s.refreshSavedCount??0} nicht gewusste Wörter automatisch in „${h(data().settings[s.refreshTarget]?.name||'Auffrisch-Sammlung')}“ gespeichert.</p>`:''}<p class="small muted" data-compact-hide>Die erste Antwort zählt.</p><button class="button primary wide" data-action="finish">Zur Übersicht ${icon('arrow')}</button></main>`;}
+function renderResult(){const s=store.doc.session;if(!s){screen='learn';render();return;}const reviews=Object.values(data().reviews).filter(r=>r.id.startsWith(s.id+'-')&&!r.repeat);app.innerHTML=`<main class="result-shell"><div data-sync>${statusMarkup()}</div><span class="result-award">${icon('award')}</span><div class="eyebrow">RUNDE GESCHAFFT</div><h1>Ein Stück mehr<br>im Kopf.</h1><p class="muted">${s.originalLength} Vokabeln geübt. Auf diesem Gerät gespeichert.</p><div class="result-stats">${[['full',s.mode==='inactive-check'?'Gewusst':'Ganz gewusst'],['partial','Teilweise gewusst'],['wrong','Wiederholen']].map(([grade,label])=>`<div class="${grade}"><strong>${reviews.filter(r=>r.grade===grade).length}</strong><span>${label}</span></div>`).join('')}</div>${s.mode==='inactive-check'?`<p class="muted">${s.refreshSavedCount??0} nicht gewusste Wörter automatisch in „${h(data().settings[s.refreshTarget]?.name||'Auffrisch-Sammlung')}“ gespeichert.</p>`:''}<p class="small muted" data-compact-hide>Die erste Antwort zählt.</p><button class="button primary wide" data-action="finish">Zur Übersicht ${icon('arrow')}</button></main>`;}
 async function changePrefs(changes){await store.commit([['settings','general',{...prefs(),...changes}]]);sync.schedule();render();}
 async function actions(event){const button=event.target.closest('[data-action]');if(!button)return;event.preventDefault();const action=button.dataset.action,id=button.dataset.id;
  if(!ready||working||cloudWait?.blocked)return;working=true;
@@ -177,8 +177,8 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'confirm-import':{if(!importCandidate)break;const x=importCandidate;await store.commit(importChanges(x));importCandidate=null;closeModal();screen='collections';collectionTab=x.deck?'refresh':'lessons';collectionFilter=x.deck?.id||x.collection.id;sync.schedule();render();notify(`${x.deck?x.deck.members.length:x.words.length} Vokabeln importiert.`);break;}
  case 'theme':await changePrefs({theme:id});break;
  case 'sync-info':screen='settings';render();break;
- case 'sync-now':sync.lastFullSync=0;await cloudWait.run('Wir gleichen alles ab.');render();break;
- case 'remote':await cloudWait.run('Wir gleichen alles ab.');render();break;
+ case 'sync-now':void loadCloud();break;
+ case 'remote':void loadCloud();break;
  case 'close-modal':closeModal();break;
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download='latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
  }}catch(error){notify(error.message);}finally{working=false;void sharing?.afterAction();autoUpdate();}}
@@ -222,7 +222,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
   const choices={};form.querySelectorAll('[data-conflict]').forEach(el=>choices[el.dataset.conflict]=el.value);form.querySelector('button').disabled=true;await sync.accept(choices);closeModal();render();notify('Cloud-Version geladen.');
  }
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();autoUpdate();}});
-async function loadCloud(){sync.lastFullSync=0;if(screen==='test'&&store.doc.session&&!store.doc.session.feedback){const answers=readAnswers();await store.update(doc=>{if(doc.session&&!doc.session.feedback)doc.session.answers=answers;return doc;});}await cloudWait.run('Wir bereiten alles vor.');if(!modalRoot.children.length)render();}
+async function loadCloud(){sync.lastFullSync=0;await backgroundSync();}
 async function boot(){try{
  ({store,profile}=await openAccount(app));await store.seed();sync=new Sync(store);
  sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});

@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.0
+# Latinio · Version 1.8.1
+
+## 1.8.1 · Cloud-Abgleich ohne Unterbrechung
+
+Die große Cloud-Anzeige erscheint nur beim initialen Öffnen der App, für alle Profile. Teststart, Ergebnisse, Rückkehr aus dem Hintergrund, manuelle und automatische Abgleiche blockieren nicht mehr. Ergebnisse werden sofort nach lokalem Speichern angezeigt; Uploadstatus bleibt klein und Weiter nutzbar. Laufende Tests werden durch einen Cloud-Abgleich nicht neu gerendert, ungesendete Texteingaben bleiben sichtbar. Neue Freigabebenachrichtigungen erscheinen beim nächsten App-Start. Kein neues Google-Skript-Update erforderlich.
 
 ## 1.8.0 · Auffrisch-Import und einfaches Aktivitätsprotokoll
 
