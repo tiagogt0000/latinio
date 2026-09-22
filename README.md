@@ -1,4 +1,12 @@
-# Latinio · Version 1.7.0
+# Latinio · Version 1.8.0
+
+## 1.8.0 · Auffrisch-Import und einfaches Aktivitätsprotokoll
+
+`latinio-refresh` (schema 1, name, words mit latin und meanings) wird direkt als Auffrisch-Sammlung importiert. Eindeutige bestehende Wörter werden ohne Fortschrittsverlust verknüpft. Fehlende Wörter erhalten eine interne, nicht als normale Lektion angezeigte Quelle. Mehrdeutige Originaltreffer werden abgelehnt.
+
+Unter Einstellungen → Profile verwalten → Aktivitätsprotokoll sieht nur das Admin-Profil allgemeine Aktionen mit Gerätezeit (Anzeige Europe/Berlin): Öffnen/Rückkehr, Rundenstart, Pause, Abschluss, Vokabel-/Sammlungsbearbeitung und Lerneinstellungen. Keine Wörter, Antworten oder Ergebnisse im Protokoll. Sichtbarer Hinweis für Schüler. Öffnen wird innerhalb von fünf Minuten zusammengefasst. Keine Dauer-/Live-Anwesenheitsmessung. Nur neue Aktivitäten ab dieser Version; Offline-Ereignisse werden später synchronisiert. Ansicht: letzte 90 Tage, höchstens 200 Ereignisse. Ereignisse sind Teil des bestehenden dauerhaften Änderungsjournals; diese Ansichtsgrenze löscht das Journal nicht. Ein Kontozugriff lässt nicht sicher erkennen, welche Person das Konto verwendet hat.
+
+Für die Admin-Abfrage **Code.gs und Accounts.gs ersetzen und die bestehende Google-Bereitstellung als neue Version veröffentlichen**. Setup/PIN nicht erneut ausführen. Der JSON-Import benötigt kein Backend-Update. Wordlo bleibt unverändert.
 
 ## 1.7.0 · Auffrischtest mit Karteikarten
 

@@ -1,5 +1,6 @@
 import {uid,clone,emptyData,applyOps} from './core.js';
 import {collection,vocabulary} from './vocabulary.js';
+import {activityKinds,activityLabels} from './activity.js';
 export class Store extends EventTarget {
   async open(profileId='admin'){
     this.profileId=profileId;
@@ -26,8 +27,10 @@ export class Store extends EventTarget {
     if(!Object.keys(data.collections).length){for(const [entity,key,value] of [['collections',collection.id,collection],...vocabulary.map(w=>['words',w.id,w])]){doc.seq++;doc.pending.push({id:uid(),entity,key,value,device:doc.device,seq:doc.seq,at:Date.now(),bootstrap:true});}}
     doc.seeded=true;return doc;
   });}
+  async recordActivity(action){if(this.profileId==='admin'||!activityLabels[action])return;await this.update(doc=>{const at=Date.now();if(action==='opened'&&at-(doc.lastActivityOpen||0)<300000)return doc;if(action==='opened')doc.lastActivityOpen=at;const id='activity_'+uid();doc.seq++;doc.pending.push({id:uid(),entity:'settings',key:id,value:{kind:'activityEvent',id,action,at},device:doc.device,seq:doc.seq,at});return doc;});}
   async commit(changes,session=undefined){const previous=this.data;const result=await this.update(doc=>{
     for(const [entity,key,value]of changes){doc.seq++;doc.pending.push({id:uid(),entity,key,value:clone(value),device:doc.device,seq:doc.seq,at:Date.now()});}
+    if(this.profileId!=='admin')for(const action of activityKinds(changes,previous)){const id='activity_'+uid(),at=Date.now();doc.seq++;doc.pending.push({id:uid(),entity:'settings',key:id,value:{kind:'activityEvent',id,action,at},device:doc.device,seq:doc.seq,at});}
     if(session!==undefined)doc.session=clone(session);return doc;
   });this.dispatchEvent(new CustomEvent('commit',{detail:{changes,previous}}));return result;}
 }

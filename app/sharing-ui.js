@@ -1,3 +1,4 @@
+import {activityRows} from './activity.js';
 import {sortedCollections} from './refresh-decks.js';
 import {incoming,settleSync} from './multiuser-sync.js';
 export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection}){
@@ -7,7 +8,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
   async function remember(){await store.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
-  function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
+  function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitätsprotokoll</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
   function shareRows(){return people.filter(p=>shares.some(s=>s.profileId===p.id)).map(p=>`<button class="button secondary wide" data-action="share-notify" data-id="${h(p.id)}">${h(p.name)} erneut benachrichtigen</button>`).join('')+ (shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><p class="small muted">${s.delivery?(s.delivery.present?'In der Empfänger-Cloud: '+s.delivery.wordCount+' Wörter'+(s.delivery.missingWords?' · '+s.delivery.missingWords+' entfernte oder fehlende Einträge':''):'Sammlung fehlt in der Empfänger-Cloud'):'Empfang noch nicht geprüft – Google-Skript aktualisieren'}</p><div class="profile-controls"><button class="text-button" data-action="share-repair" data-id="${h(s.id)}">Übertragung prüfen / reparieren</button><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>');}
   const admin=profile.role==='admin';
   async function refresh(){if(admin){shares=(await sync.request('shareList')).shares;loaded=true;await remember();}return shares;}
@@ -75,6 +76,12 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
       root.innerHTML=`<p><strong>${h(result.profile.name)}</strong></p><p class="small muted">Zuletzt hochgeladener Stand · v${result.version}. Noch nicht synchronisierte Änderungen auf dem Gerät sind hier nicht sichtbar.</p>${rows||'<p>Noch keine Sammlungen vorhanden.</p>'}${absent.length?'<p class="muted">Eine zuvor geteilte Sammlung wurde beim Nutzer gelöscht.</p>':''}`;
     }).catch(e=>{if(root.isConnected)root.textContent=errorText(e);});
   }
+  function profileActivity(id){
+    const person=people.find(p=>p.id===id);
+    showModal(`<h2 id="modal-title">Aktivitätsprotokoll · ${h(person?.name||'Schüler')}</h2><p class="small muted">Letzte 90 Tage · maximal 200 Einträge · deutsche Zeit (Europe/Berlin). Gerätezeit; offline erfasste Aktionen erscheinen erst nach dem Abgleich. Keine Anwesenheitsdauer und kein Nachweis durchgehender Arbeit.</p><div data-activity-list role="status">Wird geladen …</div><button class="text-button" data-action="profile-activity" data-id="${h(id)}">Aktualisieren</button>`);
+    const root=document.querySelector('[data-activity-list]');
+    void sync.request('profileActivity',{profileId:id}).then(result=>{if(root.isConnected)root.innerHTML=result.events.length?`<ol class="activity-list">${activityRows(result.events,h)}</ol>${result.truncated?'<p>Nur die neuesten 200 Einträge werden angezeigt.</p>':''}`:'Noch keine Aktivitäten aufgezeichnet. Die Aufzeichnung beginnt mit dieser App-Version; ältere Aktivitäten werden nicht nachträglich rekonstruiert.';}).catch(e=>{if(root.isConnected)root.textContent=errorText(e);});
+  }
   function confirmRemoval(action,id){
     const deleting=action==='profile-delete';
     const name=deleting?people.find(p=>p.id===id)?.name:shares.find(s=>s.id===id)?.collection?.name;
@@ -94,6 +101,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     if(action==='share-repair'){
       showModal(`<h2 id="modal-title">Übertragung reparieren</h2><p>Fehlende Einträge werden aus der zuletzt geteilten Fassung ergänzt. Auch beim Nutzer gelöschte Einträge kommen zurück. Vorhandene Bearbeitungen und Lernstände bleiben erhalten.</p><form id="share-repair-form" data-id="${h(id)}"><button type="submit" class="button primary wide">Prüfen und reparieren</button><p role="status" data-save-status></p></form>`);return true;
     }
+    if(action==='profile-activity'){if(!admin)return true;profileActivity(id);return true;}
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}

@@ -1,6 +1,6 @@
 import {deckMembers} from './refresh-decks.js';
 export const activityKey=id=>'collection-active_'+id;
-export const collectionActive=(data,id)=>!!data.collections[id]&&data.settings[activityKey(id)]?.active!==false;
+export const collectionActive=(data,id)=>!!data.collections[id]&&!data.collections[id].refreshSource&&data.settings[activityKey(id)]?.active!==false;
 export function forgottenWords(data){
   const latest=new Map();
   for(const r of Object.values(data.reviews)){

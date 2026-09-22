@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {emptyData} from '../app/core.js';
+import {parseCollectionFile,importChanges} from '../app/refresh-import.js';
+import {vocabulary,collection} from '../app/vocabulary.js';
+import {sortedCollections,trainingDecks,wordsForDecks} from '../app/refresh-decks.js';
+const file={format:'latinio-refresh',schema:1,name:'Lektion 1–10',words:vocabulary.map(({latin,meanings})=>({latin,meanings}))};
+test('Original 46-word refresh file links originals without copies or changed progress',()=>{const d=emptyData();d.collections[collection.id]=collection;for(const w of vocabulary)d.words[w.id]=w;d.reviews.r={id:'r',wordId:vocabulary[0].id,grade:'full',at:1};const x=parseCollectionFile(file,d);assert.equal(x.linked,46);assert.equal(x.words.length,0);assert.equal(x.collection,null);assert.equal(x.deck.members.length,46);assert.equal(importChanges(x).length,1);assert.equal(d.reviews.r.grade,'full');});
+test('Missing vocabulary is imported into refresh only and available for training',()=>{const d=emptyData(),x=parseCollectionFile(file,d);for(const [e,k,v] of importChanges(x))d[e][k]=v;assert.equal(sortedCollections(d).length,0);assert.equal(trainingDecks(d).length,1);assert.equal(wordsForDecks(d,[x.deck.id]).length,46);assert.equal(x.deck.members.length,46);});
+test('Ambiguous matches reject rather than guess; malformed input rejected; normal import unchanged',()=>{const d=emptyData();d.collections.c={id:'c'};d.words.a={id:'a',collectionId:'c',...file.words[0]};d.words.b={...d.words.a,id:'b'};assert.throws(()=>parseCollectionFile(file,d),/Mehrere/);assert.throws(()=>parseCollectionFile({...file,words:[{latin:'x',meanings:[]}]},d));const normal=parseCollectionFile({...file,format:'latinio-collection'},emptyData());assert.equal(normal.words.length,46);assert.equal(normal.deck,undefined);});

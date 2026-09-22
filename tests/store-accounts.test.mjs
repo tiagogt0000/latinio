@@ -6,6 +6,15 @@ function databaseMock(){
  const databases=new Map();
  return {databases,open(name){const request={};queueMicrotask(()=>{const fresh=!databases.has(name);if(fresh)databases.set(name,new Map());const values=databases.get(name);request.result={close(){},createObjectStore(){},transaction(){const tx={};tx.objectStore=()=>({get(key){const r={};queueMicrotask(()=>{r.result=structuredClone(values.get(key));r.onsuccess?.();queueMicrotask(()=>tx.oncomplete?.());});return r;},put(value,key){values.set(key,structuredClone(value));}});return tx;}};if(fresh)request.onupgradeneeded?.();request.onsuccess?.();});return request;}};
 }
+test('Student activity persists offline, throttles duplicate opens and contains no word data',async()=>{
+ globalThis.indexedDB=databaseMock();const student=await new Store().open('activity-student');
+ await student.recordActivity('opened');await student.recordActivity('opened');
+ await student.commit([['words','w',{id:'w',collectionId:'c',latin:'secret',meanings:[['hidden']]}]]);
+ const events=Object.values(student.data.settings).filter(x=>x.kind==='activityEvent');
+ assert.deepEqual(events.map(e=>e.action),['opened','words']);assert.doesNotMatch(JSON.stringify(events),/secret|hidden/);
+ student.close();const again=await new Store().open('activity-student');assert.equal(Object.values(again.data.settings).length,2);again.close();
+ const admin=await new Store().open('admin');await admin.recordActivity('opened');assert.equal(admin.doc.pending.length,0);admin.close();
+});
 test('Existing admin database is retained; student seed and edits cannot alter it',async()=>{
  globalThis.indexedDB=databaseMock();
  const shadow=emptyData();shadow.collections.old={id:'old',name:'Mein alter Stand'};shadow.reviews.r={id:'r',wordId:'w',grade:'full',at:10};

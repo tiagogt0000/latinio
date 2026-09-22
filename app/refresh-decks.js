@@ -1,5 +1,5 @@
 const collator=new Intl.Collator('de',{numeric:true,sensitivity:'base'});
-export const sortedCollections=data=>Object.values(data.collections).sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
+export const sortedCollections=data=>Object.values(data.collections).filter(c=>!c.refreshSource).sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
 export const refreshDecks=data=>Object.values(data.settings).filter(x=>x?.kind==='refreshDeck').sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
 export function deckMembers(data,deck){return (deck?.members||[]).filter(m=>data.words[m.wordId]&&data.collections[data.words[m.wordId].collectionId]);}
 export function pendingMembers(data,deck){

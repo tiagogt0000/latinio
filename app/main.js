@@ -1,3 +1,4 @@
+import {parseCollectionFile,importChanges} from './refresh-import.js';
 import {rateRefresh,refreshCardView,bindRefreshSwipe,finishRefresh} from './refresh-cards.js';
 import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,saveDeck,checkResultWords} from './refresh-decks.js';
 import {refreshList,refreshMethod,collectionRow,collectionToolbar,refreshCreate,checkPicker,refreshEditor} from './refresh-ui.js';
@@ -35,7 +36,7 @@ function todayCount(){const today=new Date().toLocaleDateString('sv');return Obj
 function statusMarkup(){const doc=store.doc;const label=({checking:'Cloud wird geprüft',loading:'Cloud wird geladen',uploading:'Wird gespeichert',synced:'Gespeichert',newer:'Cloud wird geladen',offline:'Offline',error:'Verbindung prüfen'})[sync.status]||'Cloud';return `<button class="sync-indicator ${sync.status}" data-action="sync-info" title="${h(label)}">${icon('cloud',sync.busy?'pulse':'')}<span>${h(label)}</span></button>`;}
 function updateStatus(){setTimeout(autoUpdate,0);document.querySelectorAll('[data-sync]').forEach(el=>el.innerHTML=statusMarkup());const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
 function render(){theme();if(screen==='match'){app.innerHTML=confusions.view();return;}if(screen==='test'){renderTest();return;}if(screen==='result'){renderResult();return;}
-  app.innerHTML=`<aside class="sidebar"><a class="brand" href="#" data-action="nav" data-screen="learn">latinio<span>✦</span></a>${nav()}<div class="sidebar-foot"><div class="language-tag">LA <span>→</span> DE</div><p>Ein bisschen Latein.<br>Jeden Tag.</p><span class="muted small">App ${APP_VERSION}</span></div></aside><div class="workspace"><header class="topbar"><span class="mobile-brand brand">latinio<span>✦</span></span><span class="desktop-only muted">Dein Lateintraining</span></header><main class="content">${screen==='learn'?learnView():screen==='collections'?collectionsView():screen==='collection-detail'?collectionDetailView():screen==='classroom'?classroomView(data(),classroomQuery,h):settingsView()}</main></div><div class="mobile-nav">${nav()}</div>`;
+  app.innerHTML=`<aside class="sidebar"><a class="brand" href="#" data-action="nav" data-screen="learn">latinio<span>✦</span></a>${nav()}<div class="sidebar-foot"><div class="language-tag">LA <span>→</span> DE</div><p>Ein bisschen Latein.<br>Jeden Tag.</p><span class="muted small">App ${APP_VERSION}</span></div></aside><div class="workspace"><header class="topbar"><span class="mobile-brand brand">latinio<span>✦</span></span><span class="desktop-only muted">Dein Lateintraining</span></header><main class="content">${!isAdmin()?'<p class="small muted">Aktivitätsprotokoll für deine Lehrkraft aktiv: Uhrzeit und allgemeine Aktionen, keine Wörter oder Antworten. Details unter Einstellungen.</p>':''}${screen==='learn'?learnView():screen==='collections'?collectionsView():screen==='collection-detail'?collectionDetailView():screen==='classroom'?classroomView(data(),classroomQuery,h):settingsView()}</main></div><div class="mobile-nav">${nav()}</div>`;
  app.querySelectorAll('details[data-panel]').forEach(el=>{el.open=openPanels.has(el.dataset.panel);});
 }
 function learnView(){const d=data(),words=activeWords();const known=words.filter(w=>progressFor(w.id,d.reviews).level==='known').length;const due=words.filter(w=>{const p=progressFor(w.id,d.reviews);return p.seen&&p.due<=Date.now();}).length;const count=todayCount(),goal=prefs().daily;const decks=trainingDecks(d).filter(x=>x.active);selected=selected.filter(id=>decks.some(x=>x.id===id));if(!selected.length)selected=decks.map(x=>x.id);
@@ -71,9 +72,9 @@ function remoteModal(){if(!sync.remote)return;showModal(remoteContent());}
 function conflictName(op){return op.value?.latin||op.value?.name||data().words[op.key]?.latin||'Geänderte Angabe';}
 function conflictValue(value){if(value===null)return 'Gelöscht';if(value.latin)return value.latin+' – '+value.meanings.map(g=>g.join(' / ')).join(', ');if(value.name)return value.name;if(value.grade)return 'Bewertung: '+value.grade;return JSON.stringify(value);}
 function wordModal(id){const d=data(),word=d.words[id]||{id:uid(),collectionId:collectionFilter!=='all'?collectionFilter:Object.keys(d.collections)[0],latin:'',meanings:[['']]};if(!word.collectionId){notify('Lege zuerst eine Sammlung an.');return;}
- showModal(`<h2 id="modal-title">${id?'Vokabel bearbeiten':'Neue Vokabel'}</h2><form id="word-form" data-id="${h(word.id)}"><label>Sammlung<select name="collectionId">${sortedCollections(d).map(c=>`<option value="${h(c.id)}" ${word.collectionId===c.id?'selected':''}>${h(c.name)}</option>`).join('')}</select></label><label>Latein · alle angezeigten Formen<input name="latin" required maxlength="200" value="${h(word.latin)}" placeholder="vox, vocis"></label><label>Deutsche Bedeutungen</label><div id="meaning-inputs">${word.meanings.map(g=>meaningInput(g.join(' / '))).join('')}</div><button type="button" class="text-button" data-action="add-meaning">${icon('plus')} Bedeutung hinzufügen</button><p class="small muted" data-compact-hide>Eine Bedeutung pro Feld. Alternativen mit / trennen.</p><details><summary>Zusätzliche Suchformen (optional)</summary><label>Nur für den Vokabelsucher, mit Komma trennen<input name="forms" value="${h((word.forms||[]).join(', '))}" maxlength="10000" placeholder="z. B. vocem, voces, vocibus"></label></details><div class="button-row"><button type="submit" class="button primary">Speichern</button>${id?`<button type="button" class="button danger" data-action="delete-word" data-id="${h(id)}">${icon('trash')} Löschen</button>`:''}</div></form>`);}
+ showModal(`<h2 id="modal-title">${id?'Vokabel bearbeiten':'Neue Vokabel'}</h2><form id="word-form" data-id="${h(word.id)}"><label>Sammlung<select name="collectionId">${[...sortedCollections(d),...(d.collections[word.collectionId]?.refreshSource?[d.collections[word.collectionId]]:[])].map(c=>`<option value="${h(c.id)}" ${word.collectionId===c.id?'selected':''}>${h(c.name)}</option>`).join('')}</select></label><label>Latein · alle angezeigten Formen<input name="latin" required maxlength="200" value="${h(word.latin)}" placeholder="vox, vocis"></label><label>Deutsche Bedeutungen</label><div id="meaning-inputs">${word.meanings.map(g=>meaningInput(g.join(' / '))).join('')}</div><button type="button" class="text-button" data-action="add-meaning">${icon('plus')} Bedeutung hinzufügen</button><p class="small muted" data-compact-hide>Eine Bedeutung pro Feld. Alternativen mit / trennen.</p><details><summary>Zusätzliche Suchformen (optional)</summary><label>Nur für den Vokabelsucher, mit Komma trennen<input name="forms" value="${h((word.forms||[]).join(', '))}" maxlength="10000" placeholder="z. B. vocem, voces, vocibus"></label></details><div class="button-row"><button type="submit" class="button primary">Speichern</button>${id?`<button type="button" class="button danger" data-action="delete-word" data-id="${h(id)}">${icon('trash')} Löschen</button>`:''}</div></form>`);}
 function meaningInput(value=''){return `<div class="meaning-input"><input name="meaning" value="${h(value)}" required maxlength="300" aria-label="Deutsche Bedeutung"><button type="button" class="icon-button" data-action="remove-meaning" aria-label="Bedeutung entfernen">${icon('close')}</button></div>`;}
-function importModal(){showModal(`<h2 id="modal-title">Eine neue Sammlung</h2><p class="muted" data-compact-hide>JSON-Datei auswählen.</p><label class="file-drop">${icon('upload')}<strong>JSON-Datei auswählen</strong><input type="file" id="import-file" accept=".json,application/json"></label><div id="import-preview"></div>`);}
+function importModal(){showModal(`<h2 id="modal-title">Eine neue Sammlung</h2><p class="muted" data-compact-hide>Normale Sammlung oder Auffrisch-Datei auswählen. Das Dateiformat bestimmt den Zielbereich.</p><label class="file-drop">${icon('upload')}<strong>JSON-Datei auswählen</strong><input type="file" id="import-file" accept=".json,application/json"></label><div id="import-preview"></div>`);}
 let importCandidate=null;
 function trainingOptions(){
  const words=wordsForDecks(data(),selected);
@@ -101,7 +102,7 @@ async function start(mode='smart',ids=selected,refreshTarget=null){
  if(!queue.length){notify(mode==='refresh'?'In dieser Auswahl sind noch keine sicheren Vokabeln zum Auffrischen.':mode==='learning'?'Diese Vokabeln sind schon sicher. Nutze Auffrischen oder wiederhole alle.':'In dieser Auswahl sind keine Vokabeln.');return;}
  closeModal();
  const session={id:uid(),mode,sourceIds:ids,refreshTarget,cardFlipped:false,queue:queue.map(wordId=>({wordId,repeat:false})),cursor:0,originalLength:queue.length,answers:[''],feedback:null,overrides:{},startedAt:Date.now(),finished:false};
- await store.update(doc=>{doc.session=session;return doc;});screen='test';render();
+ await store.update(doc=>{doc.session=session;return doc;});await store.recordActivity?.('started');sync.schedule();screen='test';render();
 }
 function current(){const session=store.doc.session;if(!session)return {};const item=session.queue[session.cursor];return {session,item,word:data().words[item?.wordId]};}
 function renderTest(){const {session,item,word}=current();if(!session){screen='learn';render();return;}if(!word){app.innerHTML=`<main class="test-shell"><h1>Diese Vokabel wurde gelöscht.</h1><button class="button primary" data-action="next">Weiter</button></main>`;return;}
@@ -144,7 +145,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'refresh-legacy':showModal(refreshEditor(data(),{selected:forgottenWords(data()).map(w=>w.id),merge:true,name:'Bisherige Auffrisch-Wörter'},h));break;
  case 'refresh-check':await start('inactive-check',[id]);break;
  case 'refresh-delete':{if(!confirm('Auffrisch-Sammlung löschen? Die Originalwörter und Lernstände bleiben erhalten.'))break;await store.commit([['settings',id,null]]);closeModal();screen='collections';collectionTab='refresh';collectionFilter='all';sync.schedule();render();break;}
- case 'activity-all':await setActivity(Object.keys(data().collections),button.dataset.active==='true');break;
+ case 'activity-all':await setActivity(sortedCollections(data()).map(c=>c.id),button.dataset.active==='true');break;
  case 'inactive-practice':await start('inactive-practice',[]);break;
  case 'account-logout':signOut();break;
  case 'check-update':await updates.check();break;
@@ -155,7 +156,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'start-all':await start('all');break;
  case 'start-learning':await start('learning');break;
  case 'start-refresh':await start('refresh');break;
- case 'pause':{const {session}=current();if(session.mode!=='inactive-check'&&!session.feedback)session.answers=readAnswers();await store.update(doc=>{doc.session=session;return doc;});screen='learn';render();break;}
+ case 'pause':{const {session}=current();if(session.mode!=='inactive-check'&&!session.feedback)session.answers=readAnswers();await store.update(doc=>{doc.session=session;return doc;});await store.recordActivity?.('paused');sync.schedule();screen='learn';render();break;}
  case 'finish':await store.update(doc=>{doc.session=null;return doc;});screen='learn';render();break;
  case 'next':await next();break;
  case 'dont-know':await checkAnswer(true);break;
@@ -173,7 +174,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'delete-collection':showModal(`<h2 id="modal-title">Sammlung löschen?</h2><p>„${h(data().collections[id].name)}“ und ihre Vokabeln werden auf allen verbundenen Geräten entfernt, sobald sie synchronisiert sind.</p><button class="button danger wide" data-action="confirm-delete-collection" data-id="${h(id)}">Sammlung löschen</button>`);break;
  case 'confirm-delete-collection':{const words=Object.values(data().words).filter(w=>w.collectionId===id);await store.commit([['collections',id,null],...words.map(w=>['words',w.id,null])]);collectionFilter='all';screen='collections';closeModal();sync.schedule();render();break;}
  case 'import':importModal();break;
- case 'confirm-import':{if(!importCandidate)break;const x=importCandidate;await store.commit([['collections',x.collection.id,x.collection],...x.words.map(w=>['words',w.id,w])]);importCandidate=null;closeModal();screen='collections';collectionTab='lessons';collectionFilter=x.collection.id;sync.schedule();render();notify(`${x.words.length} Vokabeln importiert.`);break;}
+ case 'confirm-import':{if(!importCandidate)break;const x=importCandidate;await store.commit(importChanges(x));importCandidate=null;closeModal();screen='collections';collectionTab=x.deck?'refresh':'lessons';collectionFilter=x.deck?.id||x.collection.id;sync.schedule();render();notify(`${x.deck?x.deck.members.length:x.words.length} Vokabeln importiert.`);break;}
  case 'theme':await changePrefs({theme:id});break;
  case 'sync-info':screen='settings';render();break;
  case 'sync-now':sync.lastFullSync=0;await cloudWait.run('Wir gleichen alles ab.');render();break;
@@ -194,7 +195,7 @@ document.addEventListener('change',async event=>{const el=event.target;try{
  if(el.dataset.select){selected=[...document.querySelectorAll('[data-select]:checked')].map(e=>e.dataset.select);}
  if(el.id==='daily')await changePrefs({daily:Number(el.value)});
  if(el.id==='typos')await changePrefs({typos:el.checked});
- if(el.id==='import-file'&&el.files[0]){if(el.files[0].size>3000000)throw Error('Bitte eine Datei unter 3 MB auswählen.');importCandidate=parseImport(JSON.parse(await el.files[0].text()),data());const x=importCandidate;document.querySelector('#import-preview').innerHTML=`<h3>${h(x.collection.name)}</h3><p>${x.words.length} Vokabeln${x.skipped?` · ${x.skipped} doppelte Einträge übersprungen`:''}</p><ul>${x.words.slice(0,4).map(w=>`<li><strong>${h(w.latin)}</strong> – ${h(w.meanings.map(g=>g[0]).join(', '))}</li>`).join('')}</ul><button class="button primary wide" data-action="confirm-import">Sammlung importieren</button>`;}
+ if(el.id==='import-file'&&el.files[0]){if(el.files[0].size>3000000)throw Error('Bitte eine Datei unter 3 MB auswählen.');importCandidate=parseCollectionFile(JSON.parse(await el.files[0].text()),data());const x=importCandidate;document.querySelector('#import-preview').innerHTML=`<h3>${h(x.deck?.name||x.collection.name)}</h3><p>${x.deck?x.deck.members.length:x.words.length} Vokabeln${x.skipped?` · ${x.skipped} doppelte Einträge übersprungen`:''}${x.deck?` · Auffrisch-Sammlung · ${x.linked} vorhandene Wörter verknüpft`:''}</p><ul>${(x.previewWords||x.words).slice(0,4).map(w=>`<li><strong>${h(w.latin)}</strong> – ${h(w.meanings.map(g=>g[0]).join(', '))}</li>`).join('')}</ul><button class="button primary wide" data-action="confirm-import">Sammlung importieren</button>`;}
  }catch(error){importCandidate=null;notify(error.message);}});
 document.addEventListener('submit',async event=>{event.preventDefault();if(!ready||working||cloudWait?.blocked)return;working=true;const form=event.target;const fd=new FormData(form);try{
  if(await sharing.submit(form))return;
@@ -233,8 +234,8 @@ async function boot(){try{
  sync.addEventListener('change',updateStatus);
  sync.addEventListener('remote',()=>{if(!cloudWait.blocked)void loadCloud();});
  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
- render();await cloudWait.run('Wir bereiten alles vor.');ready=true;render();
- async function resume(){if(!ready)return;await loadCloud();void updates.check();}
+ render();await cloudWait.run('Wir bereiten alles vor.');ready=true;render();await store.recordActivity('opened');sync.schedule();
+ async function resume(){if(!ready||document.hidden)return;await store.recordActivity('opened');await loadCloud();void updates.check();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&store.doc.session?.mode!=='inactive-check'&&!store.doc.session?.feedback){const answers=readAnswers();void store.update(doc=>{if(doc.session)doc.session.answers=answers;return doc;});}}else void resume();});
  window.addEventListener('pageshow',event=>{if(event.persisted)void resume();});
  setInterval(()=>{if(!document.hidden){void backgroundSync();void updates.check();autoUpdate();}},60000);
