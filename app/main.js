@@ -1,5 +1,7 @@
 import {parseCollectionFile,importChanges} from './refresh-import.js';
 import {rateRefresh,refreshCardView,bindRefreshSwipe,finishRefresh} from './refresh-cards.js';
+import {installKeyboardSupport} from './keyboard.js';
+import {enqueueFailedWord} from './training-queue.js';
 import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,saveDeck,checkResultWords} from './refresh-decks.js';
 import {refreshList,refreshMethod,collectionRow,collectionToolbar,refreshCreate,checkPicker,refreshEditor} from './refresh-ui.js';
 import {activityKey,collectionActive,forgottenWords,inactiveQueue} from './collection-learning.js';
@@ -120,7 +122,7 @@ async function reevaluate(){const {session,word}=current();if(!session.feedback|
 async function next(){const {session,item,word}=current();if(!session)return;
  if(session.mode==='inactive-check'){await rateCard(false);return;}
  if(word&&!session.feedback)return;
- if(session.feedback&&session.feedback.grade!=='full'&&!item.repeat&&session.mode!=='inactive-check')session.queue.push({wordId:item.wordId,repeat:true});
+ if(session.feedback)enqueueFailedWord(session,item);
  session.cursor++;session.answers=[''];session.feedback=null;session.overrides={};
  if(session.cursor>=session.queue.length){session.finished=true;await store.commit([['sessions',session.id,{id:session.id,at:Date.now(),count:session.originalLength}]],session);sync.schedule(0);if(!session.mode?.startsWith('inactive-')&&await confusions.offer(session.queue.map(x=>x.wordId)))return;await showResult();return;}else await store.update(doc=>{doc.session=session;return doc;});render();}
 async function rateCard(known){const transition=rateRefresh(data(),store.doc.session,known);if(!transition)return;await store.commit(transition.ops,transition.session);sync.schedule(0);if(transition.session.finished)await showResult();else render();}
@@ -183,6 +185,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download='latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
  }}catch(error){notify(error.message);}finally{working=false;void sharing?.afterAction();autoUpdate();}}
 document.addEventListener('click',actions);
+installKeyboardSupport({root:document,active:()=>ready&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&screen==='test'&&current().session?.mode!=='inactive-check',session:()=>current().session,submit:()=>document.querySelector('#answer-form')?.requestSubmit?.(),next:()=>document.querySelector('#answer-form [data-action="next"]')?.click(),addField:()=>document.querySelector('#answer-form [data-action="add-answer"]')?.click()});
 document.addEventListener('toggle',event=>{const el=event.target;if(el.dataset?.panel&&el.isConnected){if(el.open)openPanels.add(el.dataset.panel);else openPanels.delete(el.dataset.panel);}},true);
 document.addEventListener('input',event=>{if(event.target.id==='refresh-word-search'){const q=normalize(event.target.value);document.querySelectorAll('[data-refresh-word-row]').forEach(row=>row.hidden=!normalize(row.textContent).includes(q));}if(event.target.id==='classroom-search'){classroomQuery=event.target.value;document.querySelector('#classroom-results').innerHTML=classroomResults(data(),classroomQuery,h);}if(event.target.id==='search'){search=event.target.value;const results=document.querySelector('#collection-search-results');if(results)results.innerHTML=search.trim()?wordRows('all',search):'';else document.querySelector('#word-list').innerHTML=wordRows();}});
 document.addEventListener('change',async event=>{const el=event.target;try{

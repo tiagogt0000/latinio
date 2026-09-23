@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.3
+# Latinio · Version 1.8.4
+
+## 1.8.4 · Tastatursteuerung und zuverlässige Wiederholung
+
+In Textübungen springt die Pfeiltaste ↓ zum nächsten Antwortfeld; Enter prüft die Antwort und nach der Rückmeldung geht Enter weiter. Falsche oder teilweise richtige Wörter werden so lange erneut eingereiht, bis sie vollständig richtig sind. Auffrisch-Karteikarten bleiben von diesen Tastaturaktionen unberührt. Kein Backend-Update nötig.
 
 ## 1.8.3 · Auffrisch-Sammlungen im Smart-Training
 
