@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.4
+# Latinio · Version 1.8.5
+
+## 1.8.5 · Auffrisch-Status und Antwortfelder
+
+Die Optionen „Unsichere üben“ und „Auffrischen“ verwenden für ausgewählte Auffrisch-Sammlungen denselben Sammlungs-Lernstand wie die Kennzeichnung „Sicher“/„Offen“. Ein sicheres Wort wird nicht mehr als unsicher gezählt. Das Plus zum Hinzufügen eines Antwortfelds wird im Test direkt und ohne verzögerte Aktionsweiterleitung verarbeitet, damit es auch bei geöffneter Bildschirmtastatur zuverlässig reagiert.
 
 ## 1.8.4 · Tastatursteuerung und zuverlässige Wiederholung
 

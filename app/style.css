@@ -151,3 +151,4 @@ input:focus,select:focus{border-color:var(--accent)}
 .refresh-card-meanings{font-size:1.3rem;line-height:1.6}
 .refresh-card-actions{display:flex;gap:12px}.refresh-card-actions>*{flex:1;min-width:0}
 @media(prefers-reduced-motion:reduce){.refresh-card{transition:none}}
+:is(.add-answer){position:relative;z-index:2;touch-action:manipulation}

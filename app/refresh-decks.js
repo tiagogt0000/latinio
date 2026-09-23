@@ -8,6 +8,13 @@ export function pendingMembers(data,deck){
  for(const r of Object.values(data.reviews)){if(r.repeat)continue;const p=latest.get(r.wordId);if(!p||r.at>p.at||(r.at===p.at&&r.id>p.id))latest.set(r.wordId,r);}
  return deckMembers(data,deck).filter(m=>{const r=latest.get(m.wordId);return !r||r.at<=m.addedAt||r.grade!=='full';});
 }
+export function selectedDeckPending(data,wordId,ids){
+ const selected=new Set(ids);
+ const decks=refreshDecks(data).filter(deck=>selected.has(deck.id)&&deck.active!==false&&deckMembers(data,deck).some(member=>member.wordId===wordId));
+ if(!decks.length)return null;
+ const pending=new Set(decks.flatMap(deck=>pendingMembers(data,deck).map(member=>member.wordId)));
+ return pending.has(wordId);
+}
 export function trainingDecks(data){return [...sortedCollections(data).map(c=>({...c,active:data.settings['collection-active_'+c.id]?.active!==false})),...refreshDecks(data).map(d=>({...d,active:d.active!==false}))];}
 export function wordEnabled(data,id){const w=data.words[id],source=w&&data.collections[w.collectionId];return !!source&&(source.refreshSource?sourceActive(data,source):data.settings['collection-active_'+source.id]?.active!==false||refreshDecks(data).some(d=>d.active!==false&&deckMembers(data,d).some(m=>m.wordId===id)));}
 export function wordsForDecks(data,ids){

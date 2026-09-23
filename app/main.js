@@ -1,8 +1,9 @@
 import {parseCollectionFile,importChanges} from './refresh-import.js';
 import {rateRefresh,refreshCardView,bindRefreshSwipe,finishRefresh} from './refresh-cards.js';
 import {installKeyboardSupport} from './keyboard.js';
+import {appendAnswerField} from './answer-fields.js';
 import {enqueueFailedWord} from './training-queue.js';
-import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,saveDeck,checkResultWords} from './refresh-decks.js';
+import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,selectedDeckPending,saveDeck,checkResultWords} from './refresh-decks.js';
 import {refreshList,refreshMethod,collectionRow,collectionToolbar,refreshCreate,checkPicker,refreshEditor} from './refresh-ui.js';
 import {activityKey,collectionActive,forgottenWords,inactiveQueue} from './collection-learning.js';
 import {classroomView,classroomResults} from './classroom.js';
@@ -80,7 +81,7 @@ function importModal(){showModal(`<h2 id="modal-title">Eine neue Sammlung</h2><p
 let importCandidate=null;
 function trainingOptions(){
  const words=wordsForDecks(data(),selected);
- const learning=words.filter(w=>progressFor(w.id,data().reviews).level!=='known').length;
+ const learning=words.filter(w=>{const pending=selectedDeckPending(data(),w.id,selected);return (pending===null?progressFor(w.id,data().reviews).level!=='known':pending);}).length;
  const known=words.length-learning;
  showModal(`<h2 id="modal-title">Mehr Optionen</h2><p class="muted">Für deine Trainingsauswahl.</p><div class="word-tools"><button class="button secondary wide" data-action="start-refresh" ${!known?'disabled':''}>Auffrischen · ${known} sichere Wörter</button><button class="button secondary wide" data-action="start-learning" ${!learning?'disabled':''}>Noch unsichere Wörter üben · ${learning}</button><button class="button secondary wide" data-action="start-all" ${!words.length?'disabled':''}>Alle ausgewählten Vokabeln üben · ${words.length}</button></div>`);
 }
@@ -162,7 +163,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'finish':await store.update(doc=>{doc.session=null;return doc;});screen='learn';render();break;
  case 'next':await next();break;
  case 'dont-know':await checkAnswer(true);break;
- case 'add-answer':{const el=document.querySelector('#answers');el.insertAdjacentHTML('beforeend',answerInput('',el.children.length,false));el.lastElementChild.querySelector('input').focus();break;}
+ case 'add-answer':appendAnswerField(document,answerInput);break;
  case 'remove-answer':button.closest('.answer-row').remove();break;
  case 'accept-typo':{const {word}=current();showModal(`<h2 id="modal-title">Welche Bedeutung meintest du?</h2><p class="muted">Passende Bedeutung auswählen.</p>${word.meanings.map((g,i)=>`<button class="button secondary wide meaning-choice" data-action="confirm-typo" data-index="${h(button.dataset.index)}" data-group="${i}">${h(g[0])}</button>`).join('')}`);break;}
  case 'confirm-typo':{const {session}=current();session.overrides[button.dataset.index]=Number(button.dataset.group);closeModal();await reevaluate();break;}
@@ -184,6 +185,12 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'close-modal':closeModal();break;
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download='latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
  }}catch(error){notify(error.message);}finally{working=false;void sharing?.afterAction();autoUpdate();}}
+document.addEventListener('click',event=>{
+ const button=event.target.closest?.('[data-action="add-answer"]');
+ if(!button||!ready||working||cloudWait?.blocked||screen!=='test'||current().session?.feedback)return;
+ event.preventDefault();event.stopImmediatePropagation();
+ appendAnswerField(document,answerInput);
+},true);
 document.addEventListener('click',actions);
 installKeyboardSupport({root:document,active:()=>ready&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&screen==='test'&&current().session?.mode!=='inactive-check',session:()=>current().session,submit:()=>document.querySelector('#answer-form')?.requestSubmit?.(),next:()=>document.querySelector('#answer-form [data-action="next"]')?.click(),addField:()=>document.querySelector('#answer-form [data-action="add-answer"]')?.click()});
 document.addEventListener('toggle',event=>{const el=event.target;if(el.dataset?.panel&&el.isConnected){if(el.open)openPanels.add(el.dataset.panel);else openPanels.delete(el.dataset.panel);}},true);

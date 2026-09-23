@@ -1,4 +1,4 @@
-import {wordsForDecks} from './refresh-decks.js';
+import {wordsForDecks,selectedDeckPending} from './refresh-decks.js';
 import {collectionActive} from './collection-learning.js';
 export const uid = () => globalThis.crypto.randomUUID();
 export const clone = value => structuredClone(value);
@@ -73,18 +73,18 @@ export function progressFor(wordId, reviews) {
 }
 export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Date.now()) {
   const words=wordsForDecks(data,collectionIds);
-  const shuffled=words.map(w=>({w,p:progressFor(w.id,data.reviews),random:Math.random()}));
+  const shuffled=words.map(w=>{const p=progressFor(w.id,data.reviews),deckPending=selectedDeckPending(data,w.id,collectionIds);return {w,p,level:deckPending===null?p.level:deckPending?'learning':'known',random:Math.random()};});
   if(mode==='all')return shuffled.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
   const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;
-  if(mode==='learning')return shuffled.filter(x=>x.p.level!=='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
-  if(mode==='refresh')return shuffled.filter(x=>x.p.level==='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
+  if(mode==='learning')return shuffled.filter(x=>x.level!=='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
+  if(mode==='refresh')return shuffled.filter(x=>x.level==='known').sort(oldest).slice(0,limit).map(x=>x.w.id);
   // Unlimited rounds: due learning words, unseen words, then the least recently practiced.
   const count=Math.max(0,Math.floor(limit));
-  const learning=shuffled.filter(x=>x.p.level!=='known').sort((a,b)=>{
+  const learning=shuffled.filter(x=>x.level!=='known').sort((a,b)=>{
     const rank=x=>!x.p.seen?1:x.p.due<=now?0:2;
     return rank(a)-rank(b)||oldest(a,b);
   });
-  const known=shuffled.filter(x=>x.p.level==='known').sort((a,b)=>{
+  const known=shuffled.filter(x=>x.level==='known').sort((a,b)=>{
     const rank=x=>x.p.due<=now?0:1;
     return rank(a)-rank(b)||oldest(a,b);
   });
