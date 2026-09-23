@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.2
+# Latinio · Version 1.8.3
+
+## 1.8.3 · Auffrisch-Sammlungen im Smart-Training
+
+Eine aktive und ausgewählte Auffrisch-Sammlung liefert genau ihre eingetragenen Wörter fürs Smart-Training – auch wenn die ursprünglichen Lektionen inaktiv sind und Wörter bereits als gewusst markiert wurden. Wörter anderer, nicht ausgewählter Lektionen kommen nicht hinzu. Normale Sammlungen bleiben weiterhin auf aktive Lektionen beschränkt. Kein Google-Skript-Update nötig.
 
 ## 1.8.2 · Inaktive Ursprungslektionen aus Smart-Training ausschließen
 
