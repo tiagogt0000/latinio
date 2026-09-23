@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.1
+# Latinio · Version 1.8.2
+
+## 1.8.2 · Inaktive Ursprungslektionen aus Smart-Training ausschließen
+
+Auffrisch-Sammlungen fügen beim normalen Smart-Training keine Wörter hinzu, deren ursprüngliche Lektion deaktiviert ist. Wird die ursprüngliche Lektion aktiviert, kann das Wort wieder trainiert werden. Auffrischtest, Sammlungsinhalt und Lernstand bleiben unverändert. Regressionstest mit 40 aktiven und 120 inaktiven Wörtern. Kein Google-Skript-Update nötig.
 
 ## 1.8.1 · Cloud-Abgleich ohne Unterbrechung
 

@@ -1,6 +1,7 @@
 const collator=new Intl.Collator('de',{numeric:true,sensitivity:'base'});
 export const sortedCollections=data=>Object.values(data.collections).filter(c=>!c.refreshSource).sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
 export const refreshDecks=data=>Object.values(data.settings).filter(x=>x?.kind==='refreshDeck').sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
+const sourceActive=(data,collection)=>!!collection&&data.settings['collection-active_'+collection.id]?.active!==false;
 export function deckMembers(data,deck){return (deck?.members||[]).filter(m=>data.words[m.wordId]&&data.collections[data.words[m.wordId].collectionId]);}
 export function pendingMembers(data,deck){
  const latest=new Map();
@@ -8,11 +9,13 @@ export function pendingMembers(data,deck){
  return deckMembers(data,deck).filter(m=>{const r=latest.get(m.wordId);return !r||r.at<=m.addedAt||r.grade!=='full';});
 }
 export function trainingDecks(data){return [...sortedCollections(data).map(c=>({...c,active:data.settings['collection-active_'+c.id]?.active!==false})),...refreshDecks(data).map(d=>({...d,active:d.active!==false}))];}
-export function wordEnabled(data,id){const w=data.words[id];if(!w||!data.collections[w.collectionId])return false;return data.settings['collection-active_'+w.collectionId]?.active!==false||refreshDecks(data).some(d=>d.active!==false&&deckMembers(data,d).some(m=>m.wordId===id));}
+export function wordEnabled(data,id){const w=data.words[id],source=w&&data.collections[w.collectionId];return sourceActive(data,source)&&!source.refreshSource&&data.settings['collection-active_'+source.id]?.active!==false||!!source?.refreshSource&&sourceActive(data,source)&&refreshDecks(data).some(d=>d.active!==false&&deckMembers(data,d).some(m=>m.wordId===id));}
 export function wordsForDecks(data,ids){
  const chosen=new Set(ids),wordIds=new Set();
  for(const w of Object.values(data.words))if(data.collections[w.collectionId]&&chosen.has(w.collectionId)&&data.settings['collection-active_'+w.collectionId]?.active!==false)wordIds.add(w.id);
- for(const d of refreshDecks(data))if(chosen.has(d.id)&&d.active!==false)for(const m of pendingMembers(data,d))wordIds.add(m.wordId);
+ // A refresher selects an additional set of words; it must never reactivate an
+ // inactive source lesson for ordinary smart training.
+ for(const d of refreshDecks(data))if(chosen.has(d.id)&&d.active!==false)for(const m of pendingMembers(data,d)){const w=data.words[m.wordId],source=w&&data.collections[w.collectionId];if(sourceActive(data,source)&&(!source.refreshSource||d.members.some(member=>member.wordId===m.wordId)))wordIds.add(m.wordId);}
  return [...wordIds].map(id=>data.words[id]);
 }
 export function saveDeck(data,existing,id,name,wordIds,now=Date.now()){
