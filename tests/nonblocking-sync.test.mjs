@@ -18,7 +18,7 @@ test('Cloud return during a test never rerenders or reads away typed answers',as
  let rendered=0,checked=0;
  const ctx=vm.createContext({ready:true,working:false,cloudWait:{blocked:false},screen:'test',sync:{lastFullSync:123},store:{doc:{session:{answers:['already saved']}}},modalRoot:{children:[]},render(){rendered++;},updateStatus(){},settleSync:async()=>checked++});
  vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function loadCloud(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
- await ctx.loadCloud();assert.equal(checked,1);assert.equal(rendered,0);assert.equal(ctx.sync.lastFullSync,0);assert.deepEqual(ctx.store.doc.session.answers,['already saved']);
+ await ctx.loadCloud();assert.equal(checked,1);assert.equal(rendered,0);assert.equal(ctx.sync.lastFullSync,123);assert.deepEqual(ctx.store.doc.session.answers,['already saved']);
 });
 test('Offline background failure leaves result actions available',async()=>{
  const ctx=vm.createContext({ready:true,working:false,cloudWait:{blocked:false},screen:'result',sync:{},store:{},modalRoot:{children:[]},render(){},updateStatus(){},settleSync:async()=>{throw Error('offline');}});

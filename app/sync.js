@@ -1,4 +1,6 @@
 import {rebase} from './core.js';
+export const FULL_SYNC_INTERVAL=86400000;
+export function needsFullSync(doc,now=Date.now()){const last=Number(doc.lastFullSync)||0;return !last||now-last>FULL_SYNC_INTERVAL;}
 export class GoogleBridge {
   constructor(url,token){this.url=url;this.token=token;this.callbacks=new Map();}
   async connect(){
@@ -28,7 +30,7 @@ export class GoogleBridge {
   destroy(){window.removeEventListener('message',this.listener);this.frame?.remove();this.connected=false;this.connecting=null;this.target=null;for(const cb of this.callbacks.values()){clearTimeout(cb.timer);cb.reject(Error('Verbindung wurde geändert.'));}this.callbacks.clear();}
 }
 export class Sync extends EventTarget {
-  constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';this.lastFullSync=0;
+  constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';this.lastFullSync=Number(store.doc.lastFullSync)||0;
     window.addEventListener('online',()=>this.schedule(0));
     window.addEventListener('offline',()=>this.set('offline','Offline · lokal gespeichert'));
   }
@@ -54,7 +56,9 @@ export class Sync extends EventTarget {
     this.busy=true;
     try{
       this.set('checking','Cloud-Version wird geprüft …');
-      const full=Date.now()-this.lastFullSync>300000;
+      // Reconcile the entire journal once a day. On normal app openings, a
+      // version-only check is enough; download operations only if it changed.
+      const full=needsFullSync(this.store.doc);
       if(full&&this.store.profileId){const identity=await this.request('whoami');if(identity.profile?.id!==this.store.profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte abmelden und mit der richtigen E-Mail erneut anmelden.');}
       const meta=await this.request('check');this.cloudVersion=meta.version;
       if(meta.version<this.store.doc.base)throw Error('Die Cloud ist älter als der bestätigte Gerätestand. Kein automatisches Überschreiben.');
@@ -81,12 +85,12 @@ export class Sync extends EventTarget {
   async accept(choices={}){
     const merged=this.compare(choices);if(merged.conflicts.length)throw Error('Bitte wähle für jede doppelt bearbeitete Angabe den gewünschten Stand.');
     this.set('loading','Cloud-Version wird geladen …');
-    const remote=this.remote;
+    const remote=this.remote,full=this.remoteFull;
     await this.store.update(doc=>{
       const latest=rebase(remote.data,remote.ops,doc.pending,choices);
       if(latest.conflicts.length)throw Error('Es gibt inzwischen weitere lokale Änderungen. Bitte erneut vergleichen.');
-      doc.shadow=latest.shadow;doc.pending=latest.pending;doc.base=remote.version;doc.lastSync=Date.now();doc.seeded=true;return doc;
+      doc.shadow=latest.shadow;doc.pending=latest.pending;doc.base=remote.version;doc.lastSync=Date.now();if(full)doc.lastFullSync=Date.now();doc.seeded=true;return doc;
     });
-    if(this.remoteFull)this.lastFullSync=Date.now();this.remoteFull=false;this.remote=null;this.set('synced',`Cloud-Version v${remote.version} geladen`);this.schedule(0);
+    if(full)this.lastFullSync=this.store.doc.lastFullSync||Date.now();this.remoteFull=false;this.remote=null;this.set('synced',`Cloud-Version v${remote.version} geladen`);this.schedule(0);
   }
 }

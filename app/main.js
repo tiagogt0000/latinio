@@ -78,7 +78,14 @@ function wordModal(id){const d=data(),word=d.words[id]||{id:uid(),collectionId:c
  showModal(`<h2 id="modal-title">${id?'Vokabel bearbeiten':'Neue Vokabel'}</h2><form id="word-form" data-id="${h(word.id)}"><label>Sammlung<select name="collectionId">${[...sortedCollections(d),...(d.collections[word.collectionId]?.refreshSource?[d.collections[word.collectionId]]:[])].map(c=>`<option value="${h(c.id)}" ${word.collectionId===c.id?'selected':''}>${h(c.name)}</option>`).join('')}</select></label><label>Latein · alle angezeigten Formen<input name="latin" required maxlength="200" value="${h(word.latin)}" placeholder="vox, vocis"></label><label>Deutsche Bedeutungen</label><div id="meaning-inputs">${word.meanings.map(g=>meaningInput(g.join(' / '))).join('')}</div><button type="button" class="text-button" data-action="add-meaning">${icon('plus')} Bedeutung hinzufügen</button><p class="small muted" data-compact-hide>Eine Bedeutung pro Feld. Alternativen mit / trennen.</p><details><summary>Zusätzliche Suchformen (optional)</summary><label>Nur für den Vokabelsucher, mit Komma trennen<input name="forms" value="${h((word.forms||[]).join(', '))}" maxlength="10000" placeholder="z. B. vocem, voces, vocibus"></label></details><div class="button-row"><button type="submit" class="button primary">Speichern</button>${id?`<button type="button" class="button danger" data-action="delete-word" data-id="${h(id)}">${icon('trash')} Löschen</button>`:''}</div></form>`);}
 function meaningInput(value=''){return `<div class="meaning-input"><input name="meaning" value="${h(value)}" required maxlength="300" aria-label="Deutsche Bedeutung"><button type="button" class="icon-button" data-action="remove-meaning" aria-label="Bedeutung entfernen">${icon('close')}</button></div>`;}
 function importModal(){showModal(`<h2 id="modal-title">Eine neue Sammlung</h2><p class="muted" data-compact-hide>Normale Sammlung oder Auffrisch-Datei auswählen. Das Dateiformat bestimmt den Zielbereich.</p><label class="file-drop">${icon('upload')}<strong>JSON-Datei auswählen</strong><input type="file" id="import-file" accept=".json,application/json"></label><div id="import-preview"></div>`);}
-let importCandidate=null;
+let importCandidate=null,importRaw=null,importResolutions={};
+function renderImportPreview(){
+ importCandidate=parseCollectionFile(importRaw,data(),importResolutions);const x=importCandidate,deck=!!x.deck;
+ const name=x.deck?.name||x.collection?.name||importRaw?.name||'Sammlung';
+ const count=x.deck?.members.length??x.words.length;
+ const resolutions=(x.unmatched||[]).map(row=>`<div class="import-resolution"><strong>${h(row.latin)}</strong><small class="muted">${h(row.meanings.map(g=>g[0]).join(' · '))}</small><label>Passende vorhandene Vokabel auswählen<select data-import-resolve="${row.index}"><option value="">Zuordnung auswählen …</option>${(row.candidates.length?row.candidates:x.available).map(w=>`<option value="${h(w.id)}">${h(w.latin)} · ${h(w.collection)}</option>`).join('')}${row.candidates.length&&row.candidates.length<x.available.length?'<optgroup label="Alle Vokabeln">'+x.available.filter(w=>!row.candidates.some(c=>c.id===w.id)).map(w=>`<option value="${h(w.id)}">${h(w.latin)} · ${h(w.collection)}</option>`).join('')+'</optgroup>':''}<optgroup label="Kein passendes vorhandenes Wort"><option value="new">Als neue Vokabel aus der Datei übernehmen</option></optgroup></select></label></div>`).join('');
+ document.querySelector('#import-preview').innerHTML=`<h3>${h(name)}</h3><p>${count} Vokabeln${x.skipped?` · ${x.skipped} doppelte Einträge übersprungen`:''}${deck?` · Auffrisch-Sammlung · ${x.linked} vorhandene Wörter verknüpft`:''}</p>${resolutions?`<p class="small">${x.unmatched.length} Vokabel${x.unmatched.length===1?' muss':'n müssen'} noch manuell zugeordnet werden. So bleiben Originalschreibung und Lernstand erhalten.</p>${resolutions}`:''}<ul>${(x.previewWords||x.words).slice(0,4).map(w=>`<li><strong>${h(w.latin)}</strong> – ${h(w.meanings.map(g=>g[0]).join(', '))}</li>`).join('')}</ul><button class="button primary wide" data-action="confirm-import" ${x.unmatched?.length?'disabled':''}>${x.unmatched?.length?'Bitte erst alle Vokabeln zuordnen':'Sammlung importieren'}</button>`;
+}
 function trainingOptions(){
  const words=wordsForDecks(data(),selected);
  const learning=words.filter(w=>{const pending=selectedDeckPending(data(),w.id,selected);return (pending===null?progressFor(w.id,data().reviews).level!=='known':pending);}).length;
@@ -177,7 +184,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'delete-collection':showModal(`<h2 id="modal-title">Sammlung löschen?</h2><p>„${h(data().collections[id].name)}“ und ihre Vokabeln werden auf allen verbundenen Geräten entfernt, sobald sie synchronisiert sind.</p><button class="button danger wide" data-action="confirm-delete-collection" data-id="${h(id)}">Sammlung löschen</button>`);break;
  case 'confirm-delete-collection':{const words=Object.values(data().words).filter(w=>w.collectionId===id);await store.commit([['collections',id,null],...words.map(w=>['words',w.id,null])]);collectionFilter='all';screen='collections';closeModal();sync.schedule();render();break;}
  case 'import':importModal();break;
- case 'confirm-import':{if(!importCandidate)break;const x=importCandidate;await store.commit(importChanges(x));importCandidate=null;closeModal();screen='collections';collectionTab=x.deck?'refresh':'lessons';collectionFilter=x.deck?.id||x.collection.id;sync.schedule();render();notify(`${x.deck?x.deck.members.length:x.words.length} Vokabeln importiert.`);break;}
+ case 'confirm-import':{if(!importCandidate)break;if(importCandidate.unmatched?.length)throw Error('Bitte ordne erst alle angezeigten Vokabeln zu.');const x=importCandidate;await store.commit(importChanges(x));importCandidate=null;importRaw=null;closeModal();screen='collections';collectionTab=x.deck?'refresh':'lessons';collectionFilter=x.deck?.id||x.collection.id;sync.schedule();render();notify(`${x.deck?x.deck.members.length:x.words.length} Vokabeln importiert.`);break;}
  case 'theme':await changePrefs({theme:id});break;
  case 'sync-info':screen='settings';render();break;
  case 'sync-now':void loadCloud();break;
@@ -198,6 +205,7 @@ document.addEventListener('input',event=>{if(event.target.id==='refresh-word-sea
 document.addEventListener('change',async event=>{const el=event.target;try{
  if(el.id==='collection-select'){collectionFilter=el.value;render();}
  
+ if(el.dataset.importResolve!==undefined){importResolutions[el.dataset.importResolve]=el.value;renderImportPreview();return;}
  if(el.dataset.refreshActive){const deck=data().settings[el.dataset.refreshActive];if(deck){await store.commit([['settings',deck.id,{...deck,active:el.checked}]]);sync.schedule();render();}}
  if(el.name==='target'&&el.closest('#refresh-form')){const label=document.querySelector('#refresh-name-label');label.hidden=!!el.value;label.querySelector('input').required=!el.value;}
  if(el.name==='word'&&el.closest('#refresh-form'))document.querySelector('#refresh-selected-count').textContent=document.querySelectorAll('#refresh-form [name=word]:checked').length+' Wörter ausgewählt';
@@ -205,8 +213,8 @@ document.addEventListener('change',async event=>{const el=event.target;try{
  if(el.dataset.select){selected=[...document.querySelectorAll('[data-select]:checked')].map(e=>e.dataset.select);}
  if(el.id==='daily')await changePrefs({daily:Number(el.value)});
  if(el.id==='typos')await changePrefs({typos:el.checked});
- if(el.id==='import-file'&&el.files[0]){if(el.files[0].size>3000000)throw Error('Bitte eine Datei unter 3 MB auswählen.');importCandidate=parseCollectionFile(JSON.parse(await el.files[0].text()),data());const x=importCandidate;document.querySelector('#import-preview').innerHTML=`<h3>${h(x.deck?.name||x.collection.name)}</h3><p>${x.deck?x.deck.members.length:x.words.length} Vokabeln${x.skipped?` · ${x.skipped} doppelte Einträge übersprungen`:''}${x.deck?` · Auffrisch-Sammlung · ${x.linked} vorhandene Wörter verknüpft`:''}</p><ul>${(x.previewWords||x.words).slice(0,4).map(w=>`<li><strong>${h(w.latin)}</strong> – ${h(w.meanings.map(g=>g[0]).join(', '))}</li>`).join('')}</ul><button class="button primary wide" data-action="confirm-import">Sammlung importieren</button>`;}
- }catch(error){importCandidate=null;notify(error.message);}});
+ if(el.id==='import-file'&&el.files[0]){if(el.files[0].size>3000000)throw Error('Bitte eine Datei unter 3 MB auswählen.');importRaw=JSON.parse(await el.files[0].text());importResolutions={};renderImportPreview();}
+ }catch(error){importCandidate=null;importRaw=null;notify(error.message);}});
 document.addEventListener('submit',async event=>{event.preventDefault();if(!ready||working||cloudWait?.blocked)return;working=true;const form=event.target;const fd=new FormData(form);try{
  if(await sharing.submit(form))return;
  if(form.id==='check-picker-form'){const ids=fd.getAll('lesson');if(!ids.length)throw Error('Wähle mindestens eine Lektion aus.');refreshFlow={target:form.dataset.target,sourceIds:ids};showModal(refreshMethod());}
@@ -232,7 +240,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
   const choices={};form.querySelectorAll('[data-conflict]').forEach(el=>choices[el.dataset.conflict]=el.value);form.querySelector('button').disabled=true;await sync.accept(choices);closeModal();render();notify('Cloud-Version geladen.');
  }
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();autoUpdate();}});
-async function loadCloud(){sync.lastFullSync=0;await backgroundSync();}
+async function loadCloud(){await backgroundSync();}
 async function boot(){try{
  ({store,profile}=await openAccount(app));await store.seed();sync=new Sync(store);
  sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});

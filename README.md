@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.5
+# Latinio · Version 1.8.6
+
+## 1.8.6 · Auffrisch-Import ordnet Originale zu und schnellerer Startabgleich
+
+Auffrisch-Imports gleichen Vokabeln anhand des lateinischen Lemmas ab, ignorieren Makrons und vertragen eindeutige kleine Schreibfehler sowie unvollständige Bedeutungslisten. Unsichere Treffer werden vor dem Import einzeln einer vorhandenen Vokabel zugeordnet; nur ausdrücklich ausgewählte neue Vokabeln werden angelegt. Nach erfolgreichem vollständigem Cloud-Abgleich speichert das Gerät den Zeitstempel lokal. Bei weiteren App-Öffnungen prüft es zunächst nur die Versionsnummer und lädt Änderungen nur bei abweichender Version. Eine vollständige Prüfung bleibt täglich vorgesehen. Kein Google-Skript-Update nötig.
 
 ## 1.8.5 · Auffrisch-Status und Antwortfelder
 
