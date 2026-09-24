@@ -1,4 +1,4 @@
-const VERSION='wordlo-1.0.0-final';
+const VERSION='wordlo-1.0.1-cloud-setup';
 const SHELL=['./','./index.html','./app/main.js','./app/core.js','./app/store.js','./app/sync.js','./app/style.css','./icon.svg','./icon-180.png','./icon-192.png','./icon-512.png','./manifest.webmanifest','./EINRICHTUNG.html','./IMPORTFORMAT.md','./examples/sammlung.json','./examples/auffrischen.json','./google/Code.gs','./google/Bridge.html'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(VERSION).then(cache=>cache.addAll(SHELL))));
 self.addEventListener('activate',event=>event.waitUntil((async()=>{for(const key of await caches.keys())if(key.startsWith('wordlo-')&&key!==VERSION)await caches.delete(key);await self.clients.claim();})()));
