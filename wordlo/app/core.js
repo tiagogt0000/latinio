@@ -1,5 +1,5 @@
 export const uid = () => crypto.randomUUID();
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';
 export const entities = ['collections','words','reviews','decks','settings'];
 export const emptyData = () => Object.fromEntries(entities.map(k=>[k,{}]));
 export const clone = value => structuredClone(value);
