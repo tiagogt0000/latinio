@@ -1,4 +1,5 @@
 import {rebase,emptyData,entities,uid} from './core.js';
+export const DEFAULT_URL='https://script.google.com/macros/s/AKfycbwt8e67Zm_pZ_WLFbBOzuDXJoIFDluggwS2HKnAP98yxHQ2oiZRS4J7nRzc07uB6wcDwg/exec';
 export class GoogleBridge {
   constructor(url,token){this.url=url;this.token=token;this.callbacks=new Map();}
   connect(){
@@ -24,10 +25,11 @@ export class GoogleBridge {
 }
 export class Sync extends EventTarget {
   constructor(store){super();this.store=store;this.status='local';this.message='Auf diesem Gerät';this.conflicts=[];window.addEventListener('online',()=>this.schedule(0));}
-  get configured(){return !!this.store.doc.config.url&&!!this.store.doc.config.token;}
+  get configured(){return !!(this.store.doc.config.url||DEFAULT_URL)&&!!this.store.doc.config.token;}
   set(status,message){this.status=status;this.message=message;this.dispatchEvent(new Event('change'));}
   schedule(ms=1000){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
-  async configure(url,token){
+  async configure(url=DEFAULT_URL,token){
+    url=url||DEFAULT_URL;
     if(!/^https:\/\/script\.google\.com\/macros\/s\/[a-zA-Z0-9_-]+\/exec$/.test(url))throw Error('Bitte die Google-Web-App-Adresse mit /exec am Ende verwenden.');
     if(!/^[a-zA-Z0-9_-]{32,200}$/.test(token))throw Error('Bitte den vollständigen privaten Verbindungsschlüssel eingeben.');
     const bridge=new GoogleBridge(url,token);let meta;try{meta=await bridge.request('check');if(meta.app!=='wordlo')throw Error('Diese Verbindung gehört nicht zu Wordlo.');}catch(e){bridge.destroy();throw e;}
@@ -37,7 +39,7 @@ export class Sync extends EventTarget {
       for(const entity of entities)for(const [key,value] of Object.entries(previous[entity])){doc.seq++;doc.pending.push({id:uid(),entity,key,value,device:doc.device,seq:doc.seq,at:Date.now()});}return doc;});
     this.conflicts=[];this.remote=null;await this.run();
   }
-  async request(action,payload={}){const c=this.store.doc.config;if(!this.bridge||this.bridge.url!==c.url||this.bridge.token!==c.token){this.bridge?.destroy();this.bridge=new GoogleBridge(c.url,c.token);}return this.bridge.request(action,payload);}
+  async request(action,payload={}){const c=this.store.doc.config,url=c.url||DEFAULT_URL;if(!this.bridge||this.bridge.url!==url||this.bridge.token!==c.token){this.bridge?.destroy();this.bridge=new GoogleBridge(url,c.token);}return this.bridge.request(action,payload);}
   run(){if(this.inFlight)return this.inFlight;this.inFlight=this.perform().finally(()=>{this.inFlight=null;});return this.inFlight;}
   async perform(){
     if(!this.configured){this.set('local','Auf diesem Gerät');return;}if(!navigator.onLine){this.set('offline','Offline · lokal gespeichert');return;}if(this.conflicts.length){this.set('conflict','Änderungen vergleichen');return;}
