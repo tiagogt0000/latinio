@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.7
+# Latinio · Version 1.8.8
+
+## 1.8.8 · Admin-Modus für schrittweises Lernen und Rundenabbruch
+
+Admins können ausgewählte Sammlungen stufenweise lernen: erst alle Wörter, danach nur die ab drei unsicheren Wörtern übrig gebliebene Gruppe; ein oder zwei unsichere Wörter werden noch im selben Test wiederholt. Aus laufenden Text-, Auffrisch- und Zuordnungsrunden kann man aussteigen; bereits gespeicherte Antworten bleiben erhalten, unvollständige Runden werden beim Ausstieg oder App-Neustart verworfen. Kein Google-Skript-Update erforderlich.
 
 ## 1.8.7 · Bewertungsfehler korrigieren und Sammlungen rückgängig machen
 

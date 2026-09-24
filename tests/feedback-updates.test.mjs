@@ -33,6 +33,12 @@ test('Student-facing profile copy does not disclose the teacher activity log',()
  const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
  assert.doesNotMatch(main,/Aktivitätsprotokoll für deine Lehrkraft aktiv/);
 });
+test('Leaving a round discards its session instead of offering resume later',()=>{
+ const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
+ assert.doesNotMatch(main,/angefangene Runde wird fortgesetzt/);
+ assert.match(main,/case 'pause':await store\.update\(doc=>\{doc\.session=null;doc\.matchRound=null;/);
+ assert.match(main,/if\(store\.doc\.session\|\|store\.doc\.matchRound\)await store\.update\(doc=>\{doc\.session=null;doc\.matchRound=null;/);
+});
 
 Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});
 test('Update check distinguishes available, current and failed network checks',async()=>{

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {evaluateSession,evaluate,emptyData,applyOps,progressFor,chooseWords,rebase,parseImport} from '../app/core.js';
 import {vocabulary,collection} from '../app/vocabulary.js';
+import {progressivePassResult} from '../app/progressive-learning.js';
 const get=latin=>vocabulary.find(w=>w.latin===latin);
 test('46 echte Vokabeln; Nomenformen und optionale Klammern bleiben erhalten',()=>{
  assert.equal(vocabulary.length,46);assert.equal(get('vox, vocis').meanings.length,3);
@@ -95,4 +96,10 @@ test('Auffrischtest: eine oder alle Bedeutungen bestimmen den sicheren Lernstand
  assert.equal(evaluateSession(word,['reden'],true,{}, {mode:'inactive-check'}).grade,'partial');
  const review={id:'test-0',wordId:'x',mode:'inactive-check',at:1000,grade:evaluateSession(word,['reden'],true,{},any).grade};
  assert.equal(progressFor('x',{review}).level,'known');
+});
+test('Schrittweises Lernen staffelt ab drei Fehlern und wiederholt ein oder zwei im selben Test',()=>{
+ assert.deepEqual(progressivePassResult([]),{failed:[],action:'complete'});
+ assert.deepEqual(progressivePassResult(['a']),{failed:['a'],action:'repeat-in-stage'});
+ assert.deepEqual(progressivePassResult(['a','b']),{failed:['a','b'],action:'repeat-in-stage'});
+ assert.deepEqual(progressivePassResult(['a','b','c','c']),{failed:['a','b','c'],action:'next-stage'});
 });

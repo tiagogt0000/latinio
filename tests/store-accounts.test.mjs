@@ -35,3 +35,10 @@ test('Deleted collections remain restorable locally for seven days, then expire'
  const latest=student.doc.deletedCollections[0];await student.update(doc=>{doc.deletedCollections[0].expiresAt=Date.now()-1;return doc;});
  assert.equal((await student.listDeletedCollections()).length,0);await assert.rejects(student.restoreDeletedCollection(latest.id),/nicht mehr/);student.close();
 });
+test('An unfinished training session is local and can be discarded without removing completed reviews',async()=>{
+ globalThis.indexedDB=databaseMock();const student=await new Store().open('round-exit');
+ await student.commit([['reviews','round-1',{id:'round-1',wordId:'w1',grade:'full',at:Date.now()}]]);
+ await student.update(doc=>{doc.session={id:'round',cursor:3,queue:[]};return doc;});
+ await student.update(doc=>{doc.session=null;return doc;});
+ assert.equal(student.doc.session,null);assert.equal(student.data.reviews['round-1'].grade,'full');student.close();
+});
