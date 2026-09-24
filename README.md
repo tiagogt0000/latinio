@@ -1,8 +1,12 @@
-# Latinio · Version 1.8.8
+# Latinio · Version 1.8.9
+
+## 1.8.9 · Kleine Schlussstufen wiederholen im selben Test
+
+Bei schrittweisem Lernen werden Fehler in Stufen mit höchstens vier Wörtern direkt im selben Test wiederholt, damit am Ende keine zusätzliche Minirunde geöffnet werden muss.
 
 ## 1.8.8 · Admin-Modus für schrittweises Lernen und Rundenabbruch
 
-Admins können ausgewählte Sammlungen stufenweise lernen: erst alle Wörter, danach nur die ab drei unsicheren Wörtern übrig gebliebene Gruppe; ein oder zwei unsichere Wörter werden noch im selben Test wiederholt. Aus laufenden Text-, Auffrisch- und Zuordnungsrunden kann man aussteigen; bereits gespeicherte Antworten bleiben erhalten, unvollständige Runden werden beim Ausstieg oder App-Neustart verworfen. Kein Google-Skript-Update erforderlich.
+Admins können ausgewählte Sammlungen stufenweise lernen: erst alle Wörter, dann kleinere Gruppen. Bei höchstens vier Wörtern am Ende werden Fehler im selben Test wiederholt. Aus laufenden Text-, Auffrisch- und Zuordnungsrunden kann man aussteigen; bereits gespeicherte Antworten bleiben erhalten, unvollständige Runden werden beim Ausstieg oder App-Neustart verworfen. Kein Google-Skript-Update erforderlich.
 
 ## 1.8.7 · Bewertungsfehler korrigieren und Sammlungen rückgängig machen
 

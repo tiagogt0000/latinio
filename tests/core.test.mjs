@@ -101,5 +101,7 @@ test('Schrittweises Lernen staffelt ab drei Fehlern und wiederholt ein oder zwei
  assert.deepEqual(progressivePassResult([]),{failed:[],action:'complete'});
  assert.deepEqual(progressivePassResult(['a']),{failed:['a'],action:'repeat-in-stage'});
  assert.deepEqual(progressivePassResult(['a','b']),{failed:['a','b'],action:'repeat-in-stage'});
- assert.deepEqual(progressivePassResult(['a','b','c','c']),{failed:['a','b','c'],action:'next-stage'});
+ assert.deepEqual(progressivePassResult(['a','b','c','c'],10),{failed:['a','b','c'],action:'next-stage'});
+ assert.deepEqual(progressivePassResult(['a','b','c'],4),{failed:['a','b','c'],action:'repeat-in-stage'});
+ assert.deepEqual(progressivePassResult(['a','b'],4),{failed:['a','b'],action:'repeat-in-stage'});
 });
