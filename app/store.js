@@ -2,6 +2,7 @@ import {uid,clone,emptyData,applyOps} from './core.js';
 import {collection,vocabulary} from './vocabulary.js';
 import {activityKinds,activityLabels} from './activity.js';
 export class Store extends EventTarget {
+  static undoWindow=7*24*60*60*1000;
   async open(profileId='admin'){
     this.profileId=profileId;
     const dbName=profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
@@ -28,9 +29,12 @@ export class Store extends EventTarget {
     doc.seeded=true;return doc;
   });}
   async recordActivity(action){if(this.profileId==='admin'||!activityLabels[action])return;await this.update(doc=>{const at=Date.now();if(action==='opened'&&at-(doc.lastActivityOpen||0)<300000)return doc;if(action==='opened')doc.lastActivityOpen=at;const id='activity_'+uid();doc.seq++;doc.pending.push({id:uid(),entity:'settings',key:id,value:{kind:'activityEvent',id,action,at},device:doc.device,seq:doc.seq,at});return doc;});}
-  async commit(changes,session=undefined){const previous=this.data;const result=await this.update(doc=>{
+  async commit(changes,session=undefined){const previous=this.data;const removed=changes.filter(([entity,key,value])=>value===null&&((entity==='collections'&&previous.collections[key])||(entity==='settings'&&previous.settings[key]?.kind==='refreshDeck')));if(removed.length){await this.update(doc=>{const now=Date.now();doc.deletedCollections=(doc.deletedCollections||[]).filter(item=>item.expiresAt>now);for(const [entity,key] of removed){const record=entity==='collections'?previous.collections[key]:previous.settings[key];const ops=[[entity,key,clone(record)]];if(entity==='collections')for(const word of Object.values(previous.words))if(word.collectionId===key)ops.push(['words',word.id,clone(word)]);doc.deletedCollections.push({id:`restore_${entity}_${key}_${now}`,entity,name:record.name||'Sammlung',deletedAt:now,expiresAt:now+Store.undoWindow,ops});}return doc;});}
+  const result=await this.update(doc=>{
     for(const [entity,key,value]of changes){doc.seq++;doc.pending.push({id:uid(),entity,key,value:clone(value),device:doc.device,seq:doc.seq,at:Date.now()});}
     if(this.profileId!=='admin')for(const action of activityKinds(changes,previous)){const id='activity_'+uid(),at=Date.now();doc.seq++;doc.pending.push({id:uid(),entity:'settings',key:id,value:{kind:'activityEvent',id,action,at},device:doc.device,seq:doc.seq,at});}
     if(session!==undefined)doc.session=clone(session);return doc;
   });this.dispatchEvent(new CustomEvent('commit',{detail:{changes,previous}}));return result;}
+  async listDeletedCollections(){let items=[];await this.update(doc=>{const now=Date.now();doc.deletedCollections=(doc.deletedCollections||[]).filter(item=>item.expiresAt>now);items=clone(doc.deletedCollections);return doc;});return items.sort((a,b)=>b.deletedAt-a.deletedAt);}
+  async restoreDeletedCollection(id){const item=(this.doc.deletedCollections||[]).find(entry=>entry.id===id);if(!item||item.expiresAt<=Date.now()){await this.listDeletedCollections();throw Error('Diese Sammlung kann nicht mehr wiederhergestellt werden.');}await this.commit(item.ops);await this.update(doc=>{doc.deletedCollections=(doc.deletedCollections||[]).filter(entry=>entry.id!==id);return doc;});return item;}
 }

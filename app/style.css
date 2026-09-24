@@ -95,7 +95,7 @@ input:focus,select:focus{border-color:var(--accent)}
 .refresh-manager>p{margin-top:16px}.refresh-actions{display:grid;gap:10px;margin:16px 0}.refresh-actions .button{width:100%;margin:0}.refresh-row>summary{overflow-wrap:anywhere}.refresh-row>summary .small{font-weight:400}.refresh-manager>.button{width:100%}.refresh-row .compact-panel{margin-top:12px}.refresh-row .collection-activity{min-height:44px}
 
 /* One collection list; management opens from its edit button. */
-.collection-search{margin:0 0 16px}.collection-footer{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.collection-search{margin:0 0 16px}.collection-footer{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.deleted-collections{margin:0 0 18px;padding:18px}.deleted-collections h2{font-size:1.08rem;margin-bottom:5px}.deleted-collection-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;margin-top:13px;border-top:1px solid var(--border)}.deleted-collection-row>span{display:flex;flex-direction:column;gap:4px;min-width:0}.deleted-collection-row strong{overflow-wrap:anywhere}.deleted-collection-row small{font-size:.78rem;color:var(--muted)}
 .collection-footer>.button{flex:1 1 180px}.collection-learning .setting-row{gap:12px}
 #collection-search-results:empty{display:none}#collection-search-results:not(:empty){margin-bottom:18px}
 .cloud-wait{position:fixed;inset:0;margin:0;width:100vw;height:100dvh;max-width:none;max-height:none;border:0;border-radius:0;background:transparent;color:var(--text);padding:24px;overflow:auto;box-shadow:none;outline:none}

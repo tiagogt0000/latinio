@@ -16,6 +16,12 @@ test('Teilwissen besteht, fehlende Bedeutungen bleiben fällig; falsche Zusätze
  assert.equal(evaluate(get('mittere'),['lassen','lassen']).grade,'partial');
  assert.equal(evaluate(get('mittere'),['']).grade,'wrong');
 });
+test('Alle Bedeutungen in einem Feld werden in beliebiger Reihenfolge automatisch erkannt',()=>{
+ const word={meanings:[['in der Tat'],['Unglück'],['Niederlage']]};
+ assert.equal(evaluate(word,['Niederlage in der Tat Unglück']).grade,'full');
+ assert.equal(evaluate(word,['Unglück in der Tat']).grade,'partial');
+ assert.equal(evaluate(word,['in der Tat Unglück daneben Niederlage']).grade,'wrong');
+});
 test('Tippfehler und beide manuelle Korrekturen beeinflussen die Bewertung',()=>{
  const word=get('soror, sororis');
  assert.equal(evaluate(word,['Schwseter']).rows[0].kind,'typo');

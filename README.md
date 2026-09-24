@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.6
+# Latinio · Version 1.8.7
+
+## 1.8.7 · Bewertungsfehler korrigieren und Sammlungen rückgängig machen
+
+Schüleransichten erwähnen das Aktivitätsprotokoll nicht mehr. Mehrere Bedeutungen in einem Antwortfeld werden erkannt, wenn sie vollständig und ohne zusätzliche Wörter eingetippt sind. Falsche Bewertungen lassen sich über „Auswertungsfehler korrigieren“ einer Bedeutung zuordnen. Gelöschte Lektionen und Auffrisch-Sammlungen bleiben sieben Tage lokal wiederherstellbar; ihre Rückkehr wird als normale Änderung mit der Cloud synchronisiert. Kein Google-Skript-Update erforderlich.
 
 ## 1.8.6 · Auffrisch-Import ordnet Originale zu und schnellerer Startabgleich
 

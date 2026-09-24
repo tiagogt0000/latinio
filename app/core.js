@@ -32,8 +32,31 @@ export function distance(a,b) {
   }
   return d[a.length][b.length];
 }
+function meaningsInAnswer(input,groups){
+  if(!input||!groups.length)return null;
+  const tokens=input.split(' '),candidates=groups.map(group=>group.flatMap(variants).map(value=>value.split(' ')).filter(parts=>parts.length));
+  const memo=new Map();
+  function match(position,used){
+    if(position===tokens.length)return used;
+    const state=`${position}:${used}`;if(memo.has(state))return memo.get(state);
+    let best=null;
+    for(let group=0;group<groups.length;group++){
+      const bit=1n<<BigInt(group);if(used&bit)continue;
+      for(const parts of candidates[group]){
+        if(position+parts.length<=tokens.length&&parts.every((part,i)=>tokens[position+i]===part)){
+          const result=match(position+parts.length,used|bit);
+          if(result!==null&&(best===null||popcount(result)>popcount(best)))best=result;
+        }
+      }
+    }
+    memo.set(state,best);return best;
+  }
+  return match(0,0n);
+}
+function popcount(value){let count=0;while(value){value&=value-1n;count++;}return count;}
 export function evaluate(word, answers, allowTypos=true, overrides={}) {
   const groups=word.meanings.map(g=>g.flatMap(variants));
+  if(answers.length===1&&!Object.hasOwn(overrides,0)){const matched=meaningsInAnswer(normalize(answers[0]),word.meanings);if(matched){const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(({i})=>!(matched&(1n<<BigInt(i))));return {rows:[{index:0,answer:answers[0],kind:missing.length?'partial-combined':'combined',group:0}],missing,grade:missing.length?'partial':'full'};}}
   const seen=new Set();
   const rows=answers.map((answer,index)=>{
     const input=normalize(answer);

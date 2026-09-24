@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {evaluate} from '../app/core.js';
 import fs from 'node:fs';
 import {answerFeedback,translationCard} from '../app/feedback.js';
+import {accountCard} from '../app/accounts.js';
 import {AppUpdates,APP_VERSION,waitForInstallation,workerVersion} from '../app/updates.js';
 
 test('Feedback marks only submitted answers and escapes input',()=>{
@@ -20,6 +21,17 @@ test('Accepted typos need no explanation; blank answers do not create solution f
   assert.equal((html.match(/graded-answer correct/g)||[]).length,2);
   assert.doesNotMatch(html,/Tippfehler|reject-typo|incorrect/);
   assert.equal(answerFeedback(evaluate(word,[''])), '');
+});
+test('Incorrect evaluations offer a general correction action while combined meanings pass automatically',()=>{
+ const wrong=answerFeedback(evaluate({meanings:[['tragen'],['führen']]},['unbekannt']));
+ assert.match(wrong,/Auswertungsfehler korrigieren/);assert.match(wrong,/data-action="correct-evaluation"/);
+ const combined=answerFeedback(evaluate({meanings:[['tragen'],['führen']]},['führen tragen']));
+ assert.match(combined,/class="graded-answer correct"/);assert.doesNotMatch(combined,/Auswertungsfehler korrigieren/);
+});
+test('Student-facing profile copy does not disclose the teacher activity log',()=>{
+ assert.doesNotMatch(accountCard({role:'student',name:'Felix',email:'felix@example.test'}),/Aktivitätsprotokoll|Lehrkraft sieht/);
+ const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
+ assert.doesNotMatch(main,/Aktivitätsprotokoll für deine Lehrkraft aktiv/);
 });
 
 Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});

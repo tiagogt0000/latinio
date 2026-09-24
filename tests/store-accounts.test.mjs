@@ -24,3 +24,14 @@ test('Existing admin database is retained; student seed and edits cannot alter i
  await felix.commit([['collections','own',{id:'own',name:'Felix'}]]);assert.equal(admin.doc.base,47);assert.equal(admin.doc.config.token,'legacy');assert.equal(admin.data.reviews.r.grade,'full');assert.equal(admin.data.collections.own,undefined);
  felix.close();const reopened=await new Store().open('felix');assert.equal(reopened.data.collections.own.name,'Felix');admin.close();reopened.close();
 });
+test('Deleted collections remain restorable locally for seven days, then expire',async()=>{
+ globalThis.indexedDB=databaseMock();const student=await new Store().open('restore-student');
+ await student.commit([['collections','lesson',{id:'lesson',name:'Lektion 1'}],['words','w',{id:'w',collectionId:'lesson',latin:'rosa',meanings:[['Rose']]}]]);
+ await student.commit([['collections','lesson',null],['words','w',null]]);
+ let deleted=await student.listDeletedCollections();assert.equal(deleted.length,1);assert.equal(deleted[0].ops.length,2);
+ const restored=await student.restoreDeletedCollection(deleted[0].id);assert.equal(restored.name,'Lektion 1');assert.equal(student.data.collections.lesson.name,'Lektion 1');assert.equal(student.data.words.w.latin,'rosa');
+ assert.equal((await student.listDeletedCollections()).length,0);
+ await student.commit([['collections','lesson',null],['words','w',null]]);
+ const latest=student.doc.deletedCollections[0];await student.update(doc=>{doc.deletedCollections[0].expiresAt=Date.now()-1;return doc;});
+ assert.equal((await student.listDeletedCollections()).length,0);await assert.rejects(student.restoreDeletedCollection(latest.id),/nicht mehr/);student.close();
+});
