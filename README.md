@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.11
+# Latinio · Version 1.8.12
+
+## 1.8.12 · Mehrere Bedeutungen pro Antwortfeld korrigieren
+
+„Auswertungsfehler korrigieren“ erlaubt nun, für ein Antwortfeld mehrere Bedeutungen gleichzeitig auszuwählen. Die Antwort wird mit allen ausgewählten Bedeutungen neu bewertet; die Auswahl kann später angepasst werden.
 
 ## 1.8.11 · Ältere Auffrisch-Einträge abgleichen
 

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {evaluate} from '../app/core.js';
 import fs from 'node:fs';
-import {answerFeedback,translationCard} from '../app/feedback.js';
+import {answerFeedback,evaluationCorrection,translationCard} from '../app/feedback.js';
 import {accountCard} from '../app/accounts.js';
 import {AppUpdates,APP_VERSION,waitForInstallation,workerVersion} from '../app/updates.js';
 
@@ -27,6 +27,13 @@ test('Incorrect evaluations offer a general correction action while combined mea
  assert.match(wrong,/Auswertungsfehler korrigieren/);assert.match(wrong,/data-action="correct-evaluation"/);
  const combined=answerFeedback(evaluate({meanings:[['tragen'],['führen']]},['führen tragen']));
  assert.match(combined,/class="graded-answer correct"/);assert.doesNotMatch(combined,/Auswertungsfehler korrigieren/);
+});
+test('Evaluation correction lets one answer field count several meanings',()=>{
+ const word={meanings:[['tragen'],['führen'],['ausführen']]};
+ const partial=evaluate(word,['alle in einem Feld'],true,{0:[0,1]});assert.equal(partial.grade,'partial');assert.deepEqual(partial.missing.map(x=>x.i),[2]);assert.deepEqual(partial.rows[0].groups,[0,1]);
+ const full=evaluate(word,['alle in einem Feld'],true,{0:[0,1,2]});assert.equal(full.grade,'full');assert.deepEqual(full.missing,[]);
+ assert.equal(evaluate(word,['falsch'],true,{0:[]}).grade,'wrong');
+ const html=evaluationCorrection(word,0,[0,2]);assert.equal((html.match(/type="checkbox"/g)||[]).length,3);assert.match(html,/value="0" checked/);assert.match(html,/value="2" checked/);assert.match(html,/alle Bedeutungen aus/);
 });
 test('Student-facing profile copy does not disclose the teacher activity log',()=>{
  assert.doesNotMatch(accountCard({role:'student',name:'Felix',email:'felix@example.test'}),/Aktivitätsprotokoll|Lehrkraft sieht/);

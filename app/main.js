@@ -15,7 +15,7 @@ import {openAccount,signOut,accountCard} from './accounts.js';
 import {sharingUI} from './sharing-ui.js';
 import {cloudGate,settleSync} from './multiuser-sync.js';
 import {Sync} from './sync.js';
-import {answerFeedback,translationCard} from './feedback.js';
+import {answerFeedback,evaluationCorrection,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
 const updates=new AppUpdates(navigator.serviceWorker);
 const h=text=>String(text??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -180,8 +180,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'dont-know':await checkAnswer(true);break;
  case 'add-answer':appendAnswerField(document,answerInput);break;
  case 'remove-answer':button.closest('.answer-row').remove();break;
- case 'correct-evaluation':{const {word}=current();showModal(`<h2 id="modal-title">Auswertungsfehler korrigieren</h2><p class="muted">Welche Bedeutung hast du richtig eingegeben?</p>${word.meanings.map((g,i)=>`<button class="button secondary wide meaning-choice" data-action="confirm-evaluation-correction" data-index="${h(button.dataset.index)}" data-group="${i}">${h(g.join(' / '))}</button>`).join('')}`);break;}
- case 'confirm-evaluation-correction':{const {session}=current();session.overrides[button.dataset.index]=Number(button.dataset.group);closeModal();await reevaluate();break;}
+ case 'correct-evaluation':{const {session,word}=current();const index=Number(button.dataset.index);showModal(evaluationCorrection(word,index,session.overrides[index]));break;}
  case 'filter':collectionFilter=id;render();break;
  case 'edit-word':case 'new-word':case 'edit-word-fields':if(screen==='test'&&!store.doc.session.feedback){const answers=readAnswers();await store.update(doc=>{doc.session.answers=answers;return doc;});}if(action==='edit-word'&&screen==='test'){showModal(`<h2 id="modal-title">${h(data().words[id]?.latin)}</h2><div class="word-tools"><button class="button primary wide" data-action="confusion-manage" data-id="${h(id)}">${icon('repeat')} Verwechslungsgefahr einstellen</button><button class="button secondary wide" data-action="refresh-add-word" data-id="${h(id)}">Zur Auffrisch-Sammlung hinzufügen</button><button class="button secondary wide" data-action="edit-word-fields" data-id="${h(id)}">${icon('edit')} Vokabeleintrag bearbeiten</button></div>`);}else wordModal(id);break;
  case 'add-meaning':document.querySelector('#meaning-inputs').insertAdjacentHTML('beforeend',meaningInput());document.querySelector('#meaning-inputs').lastElementChild.querySelector('input').focus();break;
@@ -244,6 +243,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
   else{closeModal();render();if(result.manual||result.removedDuplicates)notify(`${result.manual} manuelle ${result.manual===1?'Zuordnung':'Zuordnungen'} gespeichert${result.removedDuplicates?` · ${result.removedDuplicates} doppelte Einträge entfernt`:''}.`);else notify('Prüfung abgeschlossen.');}
  }
  if(form.id==='answer-form')await checkAnswer();
+ if(form.id==='evaluation-correction-form'){const {session}=current();session.overrides[form.dataset.index]=fd.getAll('group').map(Number);closeModal();await reevaluate();}
  if(form.id==='word-form'){
   const word={...data().words[form.dataset.id],id:form.dataset.id,forms:String(fd.get('forms')||'').split(',').map(f=>f.trim()).filter(Boolean),collectionId:fd.get('collectionId'),latin:fd.get('latin').trim(),meanings:fd.getAll('meaning').map(v=>v.split('/').map(x=>x.trim()).filter(Boolean)).filter(g=>g.length)};
   if(word.forms.length>300||word.forms.some(f=>f.length>100))throw Error('Höchstens 300 Suchformen mit je 100 Zeichen.');

@@ -67,11 +67,16 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
       const candidates=groups.map((g,i)=>({i,dist:Math.min(...g.filter(v=>v.length>=5).map(v=>distance(input,v)))})).filter(g=>g.dist===1);
       if(candidates.length===1){group=candidates[0].i;kind='typo';}
     }
-    const override=overrides[index];
+    const override=overrides[index];let assignedGroups=null;
     if(override==='wrong'){kind='wrong';group=-1;}
     if(Number.isInteger(override)&&override>=0&&override<groups.length){group=override;kind='manual';}
-    if(group>=0){if(seen.has(group))kind='duplicate';seen.add(group);}
-    return {index,answer,kind,group};
+    if(Array.isArray(override)){
+      assignedGroups=[...new Set(override.filter(value=>Number.isInteger(value)&&value>=0&&value<groups.length))];
+      if(assignedGroups.length){group=assignedGroups[0];kind='manual';}else{group=-1;kind='wrong';}
+    }
+    if(group>=0){if(seen.has(group)&&kind!=='manual')kind='duplicate';seen.add(group);}
+    if(assignedGroups)for(const assigned of assignedGroups)seen.add(assigned);
+    return {index,answer,kind,group,...(assignedGroups?{groups:assignedGroups}: {})};
   });
   const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(g=>!seen.has(g.i));
   const wrong=rows.some(r=>r.kind==='wrong');
