@@ -4,14 +4,15 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 import {emptyData,normalize,progressFor} from '../app/core.js';
 import {saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks} from '../app/refresh-decks.js';
-import {refreshCreate,checkPicker,refreshMethod,refreshEditor} from '../app/refresh-ui.js';
+import {legacyRefreshCount,reconcileRefreshDeck} from '../app/refresh-reconcile.js';
+import {refreshCreate,checkPicker,refreshMethod,refreshReconcileEditor,refreshEditor} from '../app/refresh-ui.js';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 function harness(){
  const d=emptyData();d.collections.a={id:'a',name:'Lektion 1'};d.collections.b={id:'b',name:'Lektion 2'};
  d.words.x={id:'x',collectionId:'a',latin:'vox',meanings:[['Stimme']]};d.words.y={id:'y',collectionId:'b',latin:'rex',meanings:[['König']]};
  const listeners={},state={html:'',messages:[],started:null};
  class FormData{constructor(form){this.values=form.values;}get(k){return this.values[k]??null;}getAll(k){const v=this.values[k];return v===undefined?[]:Array.isArray(v)?v:[v];}}
- const ctx=vm.createContext({console,FormData,ready:true,working:false,cloudWait:{blocked:false},refreshFlow:null,collectionTab:'refresh',collectionFilter:'all',screen:'collections',search:'',data:()=>d,saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks,refreshCreate,checkPicker,refreshMethod,refreshEditor,normalize,progressFor,allWords:()=>Object.values(d.words),icon:()=>'',h:x=>String(x??''),uid:()=> 'new',store:{doc:{},async commit(ops){for(const [entity,id,value] of ops){if(value===null)delete d[entity][id];else d[entity][id]=value;}}},sync:{schedule(){}},sharing:{handle:async()=>false,submit:async()=>false,afterAction(){}},confusions:{handle:async()=>false},showModal:html=>state.html=html,closeModal:()=>state.html='',render(){},notify:m=>state.messages.push(m),autoUpdate(){},confirm:()=>true,document:{addEventListener:(type,fn)=>listeners[type]=fn},start:async(...args)=>state.started=args});
+ const ctx=vm.createContext({console,FormData,ready:true,working:false,cloudWait:{blocked:false},refreshFlow:null,collectionTab:'refresh',collectionFilter:'all',screen:'collections',search:'',data:()=>d,saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks,legacyRefreshCount,reconcileRefreshDeck,refreshCreate,checkPicker,refreshMethod,refreshReconcileEditor,refreshEditor,normalize,progressFor,allWords:()=>Object.values(d.words),icon:()=>'',h:x=>String(x??''),uid:()=> 'new',store:{doc:{},async commit(ops){for(const [entity,id,value] of ops){if(value===null)delete d[entity][id];else d[entity][id]=value;}}},sync:{schedule(){}},sharing:{handle:async()=>false,submit:async()=>false,afterAction(){}},confusions:{handle:async()=>false},showModal:html=>state.html=html,closeModal:()=>state.html='',render(){},notify:m=>state.messages.push(m),autoUpdate(){},confirm:()=>true,document:{addEventListener:(type,fn)=>listeners[type]=fn},start:async(...args)=>state.started=args});
  vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',actions);")),ctx);
  vm.runInContext(source.slice(source.indexOf("document.addEventListener('submit',"),source.indexOf('async function loadCloud(')),ctx);
  vm.runInContext(source.split('\n').filter(l=>l.startsWith('function collectionDetailView(')||l.startsWith('function wordRows(')).join('\n'),ctx);

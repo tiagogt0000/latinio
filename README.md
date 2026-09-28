@@ -1,4 +1,8 @@
-# Latinio · Version 1.8.10
+# Latinio · Version 1.8.11
+
+## 1.8.11 · Ältere Auffrisch-Einträge abgleichen
+
+Bestehende Auffrisch-Sammlungen mit alten Vokabelkopien lassen sich bei Bedarf über „Auffrisch-Vokabeln überprüfen“ mit passenden Originalen abgleichen. Eindeutige Treffer werden automatisch verknüpft; mehrdeutige Treffer können manuell zugeordnet werden. Nicht zugeordnete Wörter bleiben erhalten. Der Abgleich läuft nur auf Knopfdruck.
 
 ## 1.8.10 · Enter und Pfeiltasten auf der Tastatur
 
