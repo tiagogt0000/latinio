@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.0
+# Latinio · Version 1.9.2
+
+## 1.9.2 · Wertung vor der Runde wählen und Fehler ohne Wertung nachüben
+
+Vor jeder schriftlichen Runde kann man auswählen, ob eine richtige Bedeutung genügt oder alle Bedeutungen nötig sind. Nach einer falschen oder unvollständigen Antwort öffnet ein Tastendruck auf einer Hardware-Tastatur eine zusätzliche Wiederholung ohne Lernstandsänderung. Enter prüft sie erneut; erst nach einer richtigen Übungsantwort geht es per Enter weiter. Kein Google-Skript-Update erforderlich.
 
 ## 1.9.0 · Englisch als zweites Lernfach
 

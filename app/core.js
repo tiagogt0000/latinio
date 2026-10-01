@@ -84,7 +84,7 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
 }
 export function evaluateSession(word,answers,allowTypos=true,overrides={},session={}) {
   const result=evaluate(word,answers,allowTypos,overrides);
-  const any=session.mode==='inactive-check'&&session.meaningRequirement==='any';
+  const any=session.meaningRequirement==='any';
   if(any&&result.rows.some(row=>row.group>=0))result.grade='full';
   return {...result,meaningRequirement:any?'any':'all'};
 }

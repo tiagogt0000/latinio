@@ -81,10 +81,10 @@ test('Ein frisches Gerät bringt aus der Cloud gelöschte Startvokabeln nicht zu
  assert.equal(merged.pending.length,0);assert.equal(merged.data.words.a,undefined);
 });
 
-test('Auffrischtest: eine oder alle Bedeutungen bestimmen den sicheren Lernstand',()=>{
+test('Eine oder alle Bedeutungen bestimmen die Wertung aller schriftlichen Trainingsarten',()=>{
  const word={meanings:[['sprechen','reden'],['sagen']]};
- const any={mode:'inactive-check',meaningRequirement:'any'};
- const all={mode:'inactive-check',meaningRequirement:'all'};
+ const any={mode:'smart',meaningRequirement:'any'};
+ const all={mode:'progressive',meaningRequirement:'all'};
  assert.equal(evaluateSession(word,['reden'],true,{},any).grade,'full');
  assert.equal(evaluateSession(word,['reden'],true,{},all).grade,'partial');
  assert.equal(evaluateSession(word,['reden','sagen'],true,{},all).grade,'full');
@@ -92,8 +92,6 @@ test('Auffrischtest: eine oder alle Bedeutungen bestimmen den sicheren Lernstand
  assert.equal(evaluateSession(word,[''],true,{},any).grade,'wrong');
  assert.equal(evaluateSession(word,['reden'],true,{0:'wrong'},any).grade,'wrong');
  assert.equal(evaluateSession(word,['falsch'],true,{0:0},any).grade,'full');
- assert.equal(evaluateSession(word,['reden'],true,{}, {...any,mode:'smart'}).grade,'partial');
- assert.equal(evaluateSession(word,['reden'],true,{}, {mode:'inactive-check'}).grade,'partial');
  const review={id:'test-0',wordId:'x',mode:'inactive-check',at:1000,grade:evaluateSession(word,['reden'],true,{},any).grade};
  assert.equal(progressFor('x',{review}).level,'known');
 });
