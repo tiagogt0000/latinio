@@ -28,6 +28,8 @@ function doGet(e) {
 }
 function latinioApi(request) {
   requestSheets_=Object.create(null);
+  const subject=request&&request.subject||'latin';
+  if(subject!=='latin'&&subject!=='english')throw new Error('Unbekanntes Lernfach.');
   const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
@@ -35,9 +37,9 @@ function latinioApi(request) {
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
-    if(request.action==='whoami')return {profile:identity,apiVersion:2};
-    if(['profiles','profileCreate','profileDelete','profileCollections','profileActivity','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity);
-    const sheet=ensureLog_(identity.id,readOnly);
+    if(request.action==='whoami')return {profile:identity,apiVersion:3,subjects:['latin','english']};
+    if(['profiles','profileCreate','profileDelete','profileCollections','profileActivity','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
     const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
     if(request.action==='check')return {version:version};
@@ -78,10 +80,10 @@ function authorize_(request){
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
   return {id:profile.id,role:'student',name:profile.name,email:profile.email};
 }
-function ensureLog_(profileId,readOnly){
+function ensureLog_(profileId,readOnly,subject='latin'){
   const id=PropertiesService.getScriptProperties().getProperty('SHEET_ID');if(!id)throw new Error('Cloud noch nicht eingerichtet.');
   const book=SpreadsheetApp.openById(id);
-  const tab=!profileId||profileId==='admin'?'Änderungen':'Lernen_'+profileId;
+  const tab=subject==='english'?(!profileId||profileId==='admin'?'Englisch_Änderungen':'Englisch_Lernen_'+profileId):(!profileId||profileId==='admin'?'Änderungen':'Lernen_'+profileId);
   let sheet=book.getSheetByName(tab);
   if(!sheet&&readOnly)return null;
   if(!sheet){sheet=book.insertSheet(tab);sheet.getRange(1,1,1,5).setValues([['Version','Änderung-ID','Gespeichert am','Gerät','Daten (JSON)']]);sheet.setFrozenRows(1);sheet.getRange(1,1,1,5).setFontWeight('bold').setBackground('#59b923').setFontColor('#ffffff');sheet.setColumnWidths(1,4,160);sheet.setColumnWidth(5,600);}

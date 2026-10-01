@@ -18,3 +18,15 @@ test('Persisted full reconciliation lets ordinary app openings use only the vers
  assert.equal(needsFullSync(store.doc,now),false);assert.equal(needsFullSync({lastFullSync:now-FULL_SYNC_INTERVAL-1},now),true);assert.equal(needsFullSync({},now),true);
  assert.equal(new Sync(store).lastFullSync,store.doc.lastFullSync);
 });
+test('English refuses old deployments before a check or upload, including after offline work',async()=>{
+ const store={subject:'english',doc:{config:{url:'https://example.test',token:'test'}}},sync=new Sync(store),actions=[];
+ sync.bridge={url:store.doc.config.url,token:'test',request:async action=>{actions.push(action);return {apiVersion:2};},destroy(){}};
+ await assert.rejects(sync.request('push',{base:0,ops:[]}),/aktualisierte Google-Skript/);
+ assert.deepEqual(actions,['whoami']);
+});
+test('English verifies support once per bridge, then passes its subject on every request',async()=>{
+ const store={subject:'english',doc:{config:{url:'https://example.test',token:'test'}}},sync=new Sync(store),requests=[];
+ sync.bridge={url:store.doc.config.url,token:'test',request:async(action,payload)=>{requests.push([action,payload]);return action==='whoami'?{apiVersion:3,subjects:['latin','english']}:{version:0};},destroy(){}};
+ await sync.request('check');await sync.request('pull',{since:0});
+ assert.deepEqual(requests.map(x=>x[0]),['whoami','check','pull']);assert.ok(requests.every(x=>x[1].subject==='english'));
+});

@@ -1,4 +1,6 @@
-# Update für Latinio 1.6.1
+# Google-Skript aktualisieren (Latinio 1.9.0)
+
+Die Englisch-Erweiterung benötigt separate Änderungsjournale und fachgetrennte Freigaben. Kopiere **Code.gs und Accounts.gs** vollständig in das bestehende, an die private Tabelle gebundene Apps-Script-Projekt und veröffentliche dessen vorhandene Web-App-Bereitstellung als neue Version. Die bestehenden Latein-Blätter und Daten werden nicht umbenannt. Englisch erhält erst bei Nutzung eigene Blätter `Englisch_Änderungen` beziehungsweise `Englisch_Lernen_<Profil-ID>`. Keine erneute Einrichtung, kein neuer PIN und keine neue URL. Das bisherige Update-Verfahren steht unten.
 
 Für Empfangsprüfung und Reparatur fehlender Freigaben:
 

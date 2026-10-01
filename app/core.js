@@ -88,8 +88,8 @@ export function evaluateSession(word,answers,allowTypos=true,overrides={},sessio
   if(any&&result.rows.some(row=>row.group>=0))result.grade='full';
   return {...result,meaningRequirement:any?'any':'all'};
 }
-export function progressFor(wordId, reviews) {
-  const events=Object.values(reviews).filter(r=>r.wordId===wordId).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
+export function progressFor(wordId, reviews, direction=null) {
+  const events=Object.values(reviews).filter(r=>r.wordId===wordId&&(!direction||r.direction===direction)).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
   let streak=0,due=0,lastReviewedAt=0,level='new';
   for(const r of events){
     if(r.repeat)continue;

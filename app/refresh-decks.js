@@ -3,16 +3,16 @@ export const sortedCollections=data=>Object.values(data.collections).filter(c=>!
 export const refreshDecks=data=>Object.values(data.settings).filter(x=>x?.kind==='refreshDeck').sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
 const sourceActive=(data,collection)=>!!collection&&data.settings['collection-active_'+collection.id]?.active!==false;
 export function deckMembers(data,deck){return (deck?.members||[]).filter(m=>data.words[m.wordId]&&data.collections[data.words[m.wordId].collectionId]);}
-export function pendingMembers(data,deck){
+export function pendingMembers(data,deck,direction=null){
  const latest=new Map();
- for(const r of Object.values(data.reviews)){if(r.repeat)continue;const p=latest.get(r.wordId);if(!p||r.at>p.at||(r.at===p.at&&r.id>p.id))latest.set(r.wordId,r);}
+ for(const r of Object.values(data.reviews)){if(r.repeat||direction&&r.direction!==direction)continue;const p=latest.get(r.wordId);if(!p||r.at>p.at||(r.at===p.at&&r.id>p.id))latest.set(r.wordId,r);}
  return deckMembers(data,deck).filter(m=>{const r=latest.get(m.wordId);return !r||r.at<=m.addedAt||r.grade!=='full';});
 }
-export function selectedDeckPending(data,wordId,ids){
+export function selectedDeckPending(data,wordId,ids,direction=null){
  const selected=new Set(ids);
- const decks=refreshDecks(data).filter(deck=>selected.has(deck.id)&&deck.active!==false&&deckMembers(data,deck).some(member=>member.wordId===wordId));
+ const decks=refreshDecks(data).filter(deck=>selected.has(deck.id)&&deck.active!==false&&(!direction||!deck.direction||deck.direction==='both'||deck.direction===direction)&&deckMembers(data,deck).some(member=>member.wordId===wordId));
  if(!decks.length)return null;
- const pending=new Set(decks.flatMap(deck=>pendingMembers(data,deck).map(member=>member.wordId)));
+ const pending=new Set(decks.flatMap(deck=>pendingMembers(data,deck,direction).map(member=>member.wordId)));
  return pending.has(wordId);
 }
 export function trainingDecks(data){return [...sortedCollections(data).map(c=>({...c,active:data.settings['collection-active_'+c.id]?.active!==false})),...refreshDecks(data).map(d=>({...d,active:d.active!==false}))];}
@@ -30,6 +30,6 @@ export function saveDeck(data,existing,id,name,wordIds,now=Date.now()){
  const title=name.trim();if(!title||title.length>100)throw Error('Bitte einen Namen mit höchstens 100 Zeichen eingeben.');
  const valid=[...new Set(wordIds)].filter(id=>data.words[id]&&data.collections[data.words[id].collectionId]);
  const before=new Map((existing?.members||[]).map(m=>[m.wordId,m]));
- return {id,kind:'refreshDeck',name:title,active:existing?.active!==false,members:valid.map(wordId=>before.get(wordId)||{wordId,addedAt:now})};
+ return {id,kind:'refreshDeck',name:title,active:existing?.active!==false,...(existing?.direction?{direction:existing.direction}:{}),members:valid.map(wordId=>before.get(wordId)||{wordId,addedAt:now})};
 }
 export function checkResultWords(data,session){return [...new Set(Object.values(data.reviews).filter(r=>r.id.startsWith(session.id+'-')&&!r.repeat&&r.grade!=='full'&&data.words[r.wordId]&&data.collections[data.words[r.wordId].collectionId]).map(r=>r.wordId))];}

@@ -3,12 +3,12 @@ import {collection,vocabulary} from './vocabulary.js';
 import {activityKinds,activityLabels} from './activity.js';
 export class Store extends EventTarget {
   static undoWindow=7*24*60*60*1000;
-  async open(profileId='admin'){
-    this.profileId=profileId;
-    const dbName=profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
+  async open(profileId='admin',subject='latin'){
+    this.profileId=profileId;this.subject=subject;
+    const dbName=subject==='english'?'latinio-english-'+profileId:profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
     this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open(dbName,1);r.onupgradeneeded=()=>r.result.createObjectStore('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
     await this.update(current=>current||{schema:1,device:uid(),seq:0,base:0,shadow:emptyData(),pending:[],session:null,config:{url:'',token:''},lastSync:null,seeded:false});
-    this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates-'+profileId):null;
+    this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates-'+subject+'-'+profileId):null;
     if(this.channel)this.channel.onmessage=async()=>{await this.read();this.dispatchEvent(new Event('external'));};
     return this;
   }
@@ -22,7 +22,7 @@ export class Store extends EventTarget {
   }
   get data(){return applyOps(this.doc.shadow,this.doc.pending);}
   close(){this.channel?.close();this.db?.close();}
-  async seed(){if(this.profileId!=='admin'||this.doc.seeded)return;await this.update(doc=>{
+  async seed(){if(this.subject==='english'||this.profileId!=='admin'||this.doc.seeded)return;await this.update(doc=>{
     if(doc.seeded)return doc;
     const data=applyOps(doc.shadow,doc.pending);
     if(!Object.keys(data.collections).length){for(const [entity,key,value] of [['collections',collection.id,collection],...vocabulary.map(w=>['words',w.id,w])]){doc.seq++;doc.pending.push({id:uid(),entity,key,value,device:doc.device,seq:doc.seq,at:Date.now(),bootstrap:true});}}

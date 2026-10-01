@@ -13,7 +13,7 @@ export function evaluationCorrection(word,index,selected=[]){
  return `<h2 id="modal-title">Auswertungsfehler korrigieren</h2><p class="muted">Wähle alle Bedeutungen aus, die du in dieses Antwortfeld geschrieben hast.</p><form id="evaluation-correction-form" data-index="${index}"><div class="bounded-list">${word.meanings.map((g,i)=>`<label class="collection-check"><input type="checkbox" name="group" value="${i}" ${checked.has(i)?'checked':''}><span>${escape(g.join(' / '))}</span></label>`).join('')}</div><button type="submit" class="button primary wide">Auswahl übernehmen</button></form>`;
 }
 
-export function translationCard(word,feedback){
-  if(!feedback)return '';
-  return `<div class="latin-word translation-card" lang="de" aria-label="Deutsche Übersetzung" aria-live="polite">${word.meanings.flat().map(escape).join(', ')}</div>`;
+export function translationCard(word,feedback,language='de'){
+ if(!feedback)return '';
+ return `<div class="latin-word translation-card" lang="${language}" aria-label="${language==='en'?'Englische':'Deutsche'} Übersetzung" aria-live="polite">${word.meanings.flat().map(escape).join(', ')}</div>`;
 }

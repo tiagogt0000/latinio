@@ -1,4 +1,12 @@
-# Latinio · Version 1.8.12
+# Latinio · Version 1.9.0
+
+## 1.9.0 · Englisch als zweites Lernfach
+
+Das Latinio-Logo öffnet die Fachauswahl. Latein bleibt grün und behält alle bestehenden Daten; Englisch nutzt das gleiche Layout in Rot, einen eigenen lokalen Speicher und eigene Google-Tabellen pro Nutzer. Beim normalen Start wird nur Latein synchronisiert. Englisch wird erst nach der Auswahl geladen. Englische Sammlungen und Freigaben bleiben vom Lateinbereich getrennt.
+
+Englisch lässt sich Englisch → Deutsch, Deutsch → Englisch oder gemischt üben. Lernstände und Wiederholungsfälligkeit werden für jede Richtung separat geführt; gemischte Smart-Runden beginnen mit den schwierigeren beziehungsweise fälligen Richtungen. Auffrisch-Sammlungen können eine oder beide Richtungen testen (bei beiden erscheint jedes Wort zweimal). In englischen Antwortfeldern sind Autokorrektur und Rechtschreibprüfung aus; Fehler werden streng bewertet. Deutsche Antworten behalten die Tippfehlertoleranz. Englisch-JSON kann `english` und `german` verwenden; das bisherige `latin`/`meanings`-Format bleibt ebenfalls lesbar.
+
+**Für die englische Cloud zwingend nötig:** `google/Code.gs` und `google/Accounts.gs` im bestehenden Apps-Script-Projekt ersetzen und die vorhandene Web-App-Bereitstellung als **neue Version** veröffentlichen. Weder PIN-Einrichtung noch neue Web-App-Adresse sind nötig. Solange das alte Skript aktiv ist, verweigert die App englische Cloud-Anfragen vor einem Upload; die lateinische Cloud bleibt unverändert. Wordlo wurde nicht geändert.
 
 ## 1.8.12 · Mehrere Bedeutungen pro Antwortfeld korrigieren
 

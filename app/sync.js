@@ -30,7 +30,7 @@ export class GoogleBridge {
   destroy(){window.removeEventListener('message',this.listener);this.frame?.remove();this.connected=false;this.connecting=null;this.target=null;for(const cb of this.callbacks.values()){clearTimeout(cb.timer);cb.reject(Error('Verbindung wurde geändert.'));}this.callbacks.clear();}
 }
 export class Sync extends EventTarget {
-  constructor(store){super();this.store=store;this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';this.lastFullSync=Number(store.doc.lastFullSync)||0;
+  constructor(store){super();this.store=store;this.subject=store.subject||'latin';this.status='unconfigured';this.cloudVersion=null;this.remote=null;this.busy=false;this.message='Cloud noch nicht verbunden';this.lastFullSync=Number(store.doc.lastFullSync)||0;
     window.addEventListener('online',()=>this.schedule(0));
     window.addEventListener('offline',()=>this.set('offline','Offline · lokal gespeichert'));
   }
@@ -40,12 +40,16 @@ export class Sync extends EventTarget {
   async request(action,payload){
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
-    try{return await this.bridge.request(action,payload);}catch(error){
+    try{
+      if(this.subject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
+      return await this.bridge.request(action,{...payload,subject:this.subject});
+    }catch(error){
       // A long-lived Apps Script iframe may still point at the previous deployment.
       // Retry only an unknown-action rejection: the server has not performed it.
       if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
       this.bridge.destroy();this.bridge=new GoogleBridge(config.url,config.token);
-      return this.bridge.request(action,payload);
+      if(this.subject==='english'){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript.');this.bridge.englishVerified=true;}
+      return this.bridge.request(action,{...payload,subject:this.subject});
     }
   }
   run(){if(this.inFlight)return this.inFlight;this.inFlight=this.performRun().finally(()=>{this.inFlight=null;});return this.inFlight;}

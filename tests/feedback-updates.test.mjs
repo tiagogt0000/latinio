@@ -84,9 +84,9 @@ test('The complete translation is hidden before grading and appears for every ou
 test('German answer inputs allow keyboard correction for initial and added fields',()=>{
  const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
  const input=main.slice(main.indexOf('function answerInput('),main.indexOf('function feedbackView('));
- assert.match(input,/lang="de"/);assert.match(input,/autocorrect="on"/);assert.match(input,/spellcheck="true"/);
- assert.match(input,/autocomplete="on"/);assert.doesNotMatch(input,/autocorrect="off"|spellcheck="false"/);
- assert.match(main,/translationCard\(word,feedback\)/);
+ assert.match(input,/lang="\$\{toEnglish\?'en':'de'\}"/);assert.match(input,/autocorrect="\$\{toEnglish\?'off':'on'\}"/);
+ assert.match(input,/spellcheck="\$\{toEnglish\?'false':'true'\}"/);assert.match(input,/autocomplete="\$\{toEnglish\?'off':'on'\}"/);
+ assert.match(main,/translationCard\(target,feedback,english/);
 });
 
 test('Deployment mismatch is not reported as current',async()=>{

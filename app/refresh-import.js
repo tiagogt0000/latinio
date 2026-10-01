@@ -35,6 +35,7 @@ export function parseCollectionFile(input,data,resolutions={}){
  const collection=words.length?{...parsed.collection,refreshSource:true}:null;
  const next={...data,collections:{...data.collections,...(collection?{[collection.id]:collection}:{})},words:{...data.words,...Object.fromEntries(words.map(w=>[w.id,w]))}};
  const deck=saveDeck(next,null,'refresh_'+uid(),parsed.collection.name,members);
+ if(['both','en-de','de-en'].includes(input.direction))deck.direction=input.direction;
  return {collection,words,deck,linked,previewWords,unmatched,available:available.map(x=>({id:x.id,latin:x.latin,collection:data.collections[x.collectionId].name})),skipped:parsed.skipped};
 }
 export function importChanges(x){return [...(x.collection?[['collections',x.collection.id,x.collection]]:[]),...x.words.map(w=>['words',w.id,w]),...(x.deck?[['settings',x.deck.id,x.deck]]:[])];}
