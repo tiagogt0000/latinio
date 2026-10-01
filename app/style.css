@@ -13,6 +13,10 @@
 :root[data-subject=english][data-theme=dark]{--green:#f17f86;--green-dark:#ffabb0;--green-soft:#3b232b}
 :root[data-subject=english] .training-card{border-color:color-mix(in srgb,var(--green) 35%,var(--surface))}
 :root[data-subject=english] .button.primary{box-shadow:0 4px 0 color-mix(in srgb,var(--green) 75%,#201018)}
+:root[data-subject=english] .graded-answer.correct{border-color:#59b923;background:#f0f9e9;color:#398812}
+:root[data-subject=english][data-theme=dark] .graded-answer.correct{border-color:#83cb5a;background:#263522;color:#a9e28b}
+:root[data-subject=english] .feedback.full{background:#f0f9e9;color:#398812}
+:root[data-subject=english][data-theme=dark] .feedback.full{background:#263522;color:#a9e28b}
 .brand-switch{background:none;border:0;padding:0;text-align:left;line-height:1.2}
 .direction-choice{display:block;margin-top:20px;max-width:410px}
 .direction-choice select{margin-top:7px;width:100%}

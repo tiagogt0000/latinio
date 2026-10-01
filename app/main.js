@@ -19,6 +19,7 @@ import {Store} from './store.js';
 import {englishTasks,directionsFor,answerWord,promptFor,englishImport} from './english.js';
 import {answerFeedback,evaluationCorrection,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
+import {preserveTestDraft} from './app-lifecycle.js';
 const updates=new AppUpdates(navigator.serviceWorker);
 const subject=new URL(location.href).searchParams.get('subject')==='english'?'english':'latin';
 const english=subject==='english';
@@ -285,7 +286,7 @@ async function boot(){try{
  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
  render();await cloudWait.run('Wir bereiten alles vor.');ready=true;render();await store.recordActivity('opened');sync.schedule();
  async function resume(){if(!ready||document.hidden)return;await store.recordActivity('opened');await loadCloud();void updates.check();}
- document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'||screen==='match'||screen==='progressive-summary')void store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});}else void resume();});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&!store.doc.session?.feedback)void preserveTestDraft(store,screen,readAnswers());}else void resume();});
  window.addEventListener('pageshow',event=>{if(event.persisted)void resume();});
  setInterval(()=>{if(!document.hidden){void backgroundSync();void updates.check();autoUpdate();}},60000);
  window.addEventListener('online',()=>{void updates.check();void resume();});
