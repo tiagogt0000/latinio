@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.2
+# Latinio · Version 1.9.3
+
+## 1.9.3 · Zufällige Aufgabenreihenfolge und Satzzeichen ignorieren
+
+Alle Trainingsmodi mischen ihre ausgewählten Aufgaben, einschließlich späterer Stufen und Wiederholungen. Bei der Bewertung sind Satzzeichen wie Komma, Punkt, Auslassungspunkte und Bindestrich optional. Keine Änderung am Google-Skript nötig.
 
 ## 1.9.2 · Wertung vor der Runde wählen und Fehler ohne Wertung nachüben
 

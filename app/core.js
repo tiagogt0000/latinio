@@ -15,6 +15,19 @@ export function applyOps(data, ops) {
 export function normalize(text) {
   return String(text).normalize('NFC').toLocaleLowerCase('de').trim().replace(/ß/g,'ss').replace(/\s+/g,' ');
 }
+export function normalizeAnswer(text) {
+  return normalize(text).replace(/\p{P}+/gu,' ').replace(/\s+/g,' ').trim();
+}
+function answerForms(text) {
+  const value=normalize(text);
+  return [...new Set([normalizeAnswer(value),value.replace(/\p{P}+/gu,'')].filter(Boolean))];
+}
+export function shuffleQueue(items, random=Math.random) {
+  const result=[...items];
+  for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}
+  if(result.length>1&&result.every((item,index)=>item===items[index]))result.push(result.shift());
+  return result;
+}
 export function variants(text) {
   let list = [String(text).trim()];
   for (let count=0; count<8 && list.some(t=>/\([^()]*\)/.test(t)); count++) {
@@ -34,37 +47,43 @@ export function distance(a,b) {
 }
 function meaningsInAnswer(input,groups){
   if(!input||!groups.length)return null;
-  const tokens=input.split(' '),candidates=groups.map(group=>group.flatMap(variants).map(value=>value.split(' ')).filter(parts=>parts.length));
-  const memo=new Map();
-  function match(position,used){
-    if(position===tokens.length)return used;
-    const state=`${position}:${used}`;if(memo.has(state))return memo.get(state);
-    let best=null;
-    for(let group=0;group<groups.length;group++){
-      const bit=1n<<BigInt(group);if(used&bit)continue;
-      for(const parts of candidates[group]){
-        if(position+parts.length<=tokens.length&&parts.every((part,i)=>tokens[position+i]===part)){
-          const result=match(position+parts.length,used|bit);
-          if(result!==null&&(best===null||popcount(result)>popcount(best)))best=result;
+  const inputs=answerForms(input).map(value=>value.split(' ')),candidates=groups.map(group=>group.flatMap(variants).flatMap(answerForms).map(value=>value.split(' ')).filter(parts=>parts.length));
+  let overall=null;
+  for(const tokens of inputs){
+    const memo=new Map();
+    function match(position,used){
+      if(position===tokens.length)return used;
+      const state=`${position}:${used}`;if(memo.has(state))return memo.get(state);
+      let best=null;
+      for(let group=0;group<groups.length;group++){
+        const bit=1n<<BigInt(group);if(used&bit)continue;
+        for(const parts of candidates[group]){
+          if(position+parts.length<=tokens.length&&parts.every((part,i)=>tokens[position+i]===part)){
+            const result=match(position+parts.length,used|bit);
+            if(result!==null&&(best===null||popcount(result)>popcount(best)))best=result;
+          }
         }
       }
+      memo.set(state,best);return best;
     }
-    memo.set(state,best);return best;
+    const result=match(0,0n);
+    if(result!==null&&(overall===null||popcount(result)>popcount(overall)))overall=result;
   }
-  return match(0,0n);
+  return overall;
 }
 function popcount(value){let count=0;while(value){value&=value-1n;count++;}return count;}
 export function evaluate(word, answers, allowTypos=true, overrides={}) {
   const groups=word.meanings.map(g=>g.flatMap(variants));
-  if(answers.length===1&&!Object.hasOwn(overrides,0)){const matched=meaningsInAnswer(normalize(answers[0]),word.meanings);if(matched){const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(({i})=>!(matched&(1n<<BigInt(i))));return {rows:[{index:0,answer:answers[0],kind:missing.length?'partial-combined':'combined',group:0}],missing,grade:missing.length?'partial':'full'};}}
+  if(answers.length===1&&!Object.hasOwn(overrides,0)){const matched=meaningsInAnswer(normalizeAnswer(answers[0]),word.meanings);if(matched){const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(({i})=>!(matched&(1n<<BigInt(i))));return {rows:[{index:0,answer:answers[0],kind:missing.length?'partial-combined':'combined',group:0}],missing,grade:missing.length?'partial':'full'};}}
   const seen=new Set();
   const rows=answers.map((answer,index)=>{
-    const input=normalize(answer);
+    const input=normalizeAnswer(answer);
     if(!input)return {index,answer,kind:'empty',group:-1};
-    let group=groups.findIndex(g=>g.includes(input));
+    const accepted=answerForms(answer);
+    let group=groups.findIndex(g=>g.some(value=>answerForms(value).some(form=>accepted.includes(form))));
     let kind=group>=0?'exact':'wrong';
     if(group<0&&allowTypos&&input.length>=5) {
-      const candidates=groups.map((g,i)=>({i,dist:Math.min(...g.filter(v=>v.length>=5).map(v=>distance(input,v)))})).filter(g=>g.dist===1);
+      const candidates=groups.map((g,i)=>({i,dist:Math.min(...g.flatMap(answerForms).filter(v=>v.length>=5).flatMap(v=>accepted.map(inputForm=>distance(inputForm,v))))})).filter(g=>g.dist===1);
       if(candidates.length===1){group=candidates[0].i;kind='typo';}
     }
     const override=overrides[index];let assignedGroups=null;

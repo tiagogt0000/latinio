@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {evaluateSession,evaluate,emptyData,applyOps,progressFor,chooseWords,rebase,parseImport} from '../app/core.js';
+import {evaluateSession,evaluate,emptyData,applyOps,progressFor,chooseWords,rebase,parseImport,shuffleQueue,normalizeAnswer} from '../app/core.js';
 import {vocabulary,collection} from '../app/vocabulary.js';
 import {progressivePassResult} from '../app/progressive-learning.js';
 const get=latin=>vocabulary.find(w=>w.latin===latin);
@@ -22,6 +22,18 @@ test('Alle Bedeutungen in einem Feld werden in beliebiger Reihenfolge automatisc
  assert.equal(evaluate(word,['Niederlage in der Tat Unglück']).grade,'full');
  assert.equal(evaluate(word,['Unglück in der Tat']).grade,'partial');
  assert.equal(evaluate(word,['in der Tat Unglück daneben Niederlage']).grade,'wrong');
+});
+test('Satzzeichen in Antworten sind optional und stören auch kombinierte Bedeutungen nicht',()=>{
+ const word={meanings:[['hin und her'],['von-bis'],['wirklich, tatsächlich…']]};
+ assert.equal(evaluate(word,['hin und her...','von bis','wirklich tatsächlich']).grade,'full');
+ assert.equal(evaluate({meanings:[['well-known'],['up-to-date']]},['wellknown up to date']).grade,'full');
+ assert.equal(normalizeAnswer('...Wort—mit, Satzzeichen!'),'wort mit satzzeichen');
+});
+test('Every round queue is shuffled without mutating its selected task list',()=>{
+ const entries=['a','b','c','d'];
+ assert.deepEqual(shuffleQueue(entries,()=>0),['b','c','d','a']);
+ assert.deepEqual(entries,['a','b','c','d']);
+ assert.deepEqual(shuffleQueue(['only'],()=>0),['only']);
 });
 test('Tippfehler und beide manuelle Korrekturen beeinflussen die Bewertung',()=>{
  const word=get('soror, sororis');
