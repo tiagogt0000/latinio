@@ -23,6 +23,26 @@ test('Email login is allowlisted, case insensitive; PIN is validated and throttl
  for(let i=0;i<5;i++)assert.throws(()=>h.request({action:'login',admin:true,pin:'0000'}),/stimmt nicht/);
  assert.throws(()=>h.request({action:'login',admin:true,pin:'1234'}),/fünf Minuten/);
 });
+test('Announcements are profile scoped and stay hidden after the recipient marks them read',()=>{
+ const h=harness(),felix=friend(h),other=friend(h,'other@schule.de');
+ const created=h.request({action:'announcementSend',profileId:felix.id,title:'Neue Funktionen',message:'Hallo Felix: Dropdown und bessere Auswertung.'});
+ const id=created.announcement.id;
+ assert.equal(h.request({action:'announcementInbox',token:felix.token}).announcements[0].id,id);
+ assert.equal(h.request({action:'announcementInbox',token:other.token}).announcements.length,0);
+ assert.throws(()=>h.request({action:'announcementSend',token:felix.token,profileId:'all',title:'x',message:'y'}),/Admin/);
+ assert.throws(()=>h.request({action:'announcementList',token:felix.token}),/Admin/);
+ assert.throws(()=>h.request({action:'announcementRead',token:other.token,announcementId:id}),/nicht für dein Profil/);
+ assert.equal(h.request({action:'announcementList'}).announcements[0].recipients[0].readAt,null);
+ assert.equal(h.request({action:'announcementRead',token:felix.token,announcementId:id}).ok,true);
+ assert.equal(h.request({action:'announcementInbox',token:felix.token}).announcements.length,0);
+ assert.ok(h.request({action:'announcementList'}).announcements[0].recipients[0].readAt);
+});
+test('Broadcast announcements only go to profiles active when the message was sent',()=>{
+ const h=harness(),felix=friend(h);h.request({action:'announcementSend',profileId:'all',title:'Info',message:'Text'});
+ const later=friend(h,'later@schule.de');
+ assert.equal(h.request({action:'announcementInbox',token:felix.token}).announcements.length,1);
+ assert.equal(h.request({action:'announcementInbox',token:later.token}).announcements.length,0);
+});
 test('Sessions isolate journals and cannot obtain admin rights through request fields',()=>{
  const {h,f}=setup(),other=friend(h,'andere@schule.de');
  assert.equal(h.request({action:'check',token:f.token,profileId:'admin',role:'admin'}).version,0);

@@ -118,7 +118,29 @@ function repairShare_(share){
 }
 function accountApi_(request,identity,subject='latin'){
   if(request.action==='logout'){saveRecord_('_LatinioSessions',hash_(request.token),{profileId:identity.id,expires:0});return {ok:true};}
+  if(request.action==='announcementInbox'){
+    const records=records_('_LatinioAnnouncements'),reads=records_('_LatinioAnnouncementReads');
+    return {announcements:Object.values(records).filter(function(a){return a&&a.active!==false&&(a.profileId===identity.id||(a.profileId==='all'&&Array.isArray(a.recipientIds)&&a.recipientIds.includes(identity.id)))&&!reads[a.id+'_'+identity.id];}).sort(function(a,b){return a.createdAt-b.createdAt;}).slice(0,20).map(function(a){return {id:a.id,title:a.title,message:a.message,createdAt:a.createdAt};})};
+  }
+  if(request.action==='announcementList'){
+    if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
+    const records=records_('_LatinioAnnouncements'),reads=records_('_LatinioAnnouncementReads'),profiles=records_('_LatinioProfiles');
+    return {announcements:Object.values(records).filter(function(a){return a&&a.id;}).sort(function(a,b){return b.createdAt-a.createdAt;}).slice(0,100).map(function(a){return {id:a.id,title:a.title,message:a.message,createdAt:a.createdAt,profileId:a.profileId,recipients:(a.recipientIds||[]).map(function(id){const p=profiles[id];return {id:id,name:p?p.name:'Entferntes Profil',readAt:reads[a.id+'_'+id]?.readAt||null};})};})};
+  }
+  if(request.action==='announcementRead'){
+    const id=String(request.announcementId||'');if(!/^ann_[a-f0-9]{40}$/.test(id))throw new Error('Ungültige Nachricht.');
+    const announcement=records_('_LatinioAnnouncements')[id];if(!announcement||announcement.active===false||(announcement.profileId!=='all'&&announcement.profileId!==identity.id))throw new Error('Diese Nachricht ist nicht für dein Profil bestimmt.');
+    saveRecord_('_LatinioAnnouncementReads',id+'_'+identity.id,{announcementId:id,profileId:identity.id,readAt:Date.now()});return {ok:true};
+  }
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
+  if(request.action==='announcementSend'){
+    const profileId=String(request.profileId||''),title=String(request.title||'').trim(),message=String(request.message||'').trim();
+    if(!title||title.length>120||!message||message.length>2000)throw new Error('Bitte Titel und Nachricht eingeben (maximal 120 bzw. 2.000 Zeichen).');
+    if(profileId!=='all'&&(!records_('_LatinioProfiles')[profileId]||!records_('_LatinioProfiles')[profileId].active))throw new Error('Aktiven Empfänger auswählen.');
+    const recipients=profileId==='all'?Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}).map(function(p){return p.id;}):[profileId];
+    const id='ann_'+hash_(Utilities.getUuid()+':'+Date.now()+':'+identity.id).slice(0,40),record={id:id,profileId:profileId,recipientIds:recipients,title:title,message:message,createdAt:Date.now(),createdBy:identity.id,active:true};
+    saveRecord_('_LatinioAnnouncements',id,record);return {announcement:record};
+  }
   if(request.action==='profileActivity'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const allowed=['opened','started','paused','finished','words','collections','refresh','settings'],now=Date.now();

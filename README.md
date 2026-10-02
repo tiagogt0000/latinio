@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.3
+# Latinio · Version 1.9.4
+
+## 1.9.4 · Mobile Fachwahl und einmalige Nutzernachrichten
+
+Auf dem Handy wechselt man Latein und Englisch über ein Dropdown rechts in der Kopfzeile. Admins können in der Nutzerverwaltung eine Nachricht an einzelne Profile oder alle aktuell aktiven Profile senden. Empfänger sehen die Nachricht beim nächsten App-Öffnen genau einmal; „Weiter“ speichert den Lesestatus serverseitig. Gesendete Nachrichten und Lesestatus bleiben in der Nutzerverwaltung sichtbar; „Testen“ zeigt eine Vorschau, ohne sie als gelesen zu markieren. Für Nachrichten danach wird kein weiterer Code geändert. Das Google-Apps-Script muss für diese Funktion einmal aktualisiert und neu bereitgestellt werden.
 
 ## 1.9.3 · Zufällige Aufgabenreihenfolge und Satzzeichen ignorieren
 

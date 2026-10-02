@@ -30,7 +30,7 @@ function latinioApi(request) {
   requestSheets_=Object.create(null);
   const subject=request&&request.subject||'latin';
   if(subject!=='latin'&&subject!=='english')throw new Error('Unbekanntes Lernfach.');
-  const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity'].includes(request.action);
+  const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity','announcementInbox','announcementList'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
@@ -38,7 +38,7 @@ function latinioApi(request) {
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
     if(request.action==='whoami')return {profile:identity,apiVersion:3,subjects:['latin','english']};
-    if(['profiles','profileCreate','profileDelete','profileCollections','profileActivity','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(['profiles','profileCreate','profileDelete','profileCollections','profileActivity','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
     const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;

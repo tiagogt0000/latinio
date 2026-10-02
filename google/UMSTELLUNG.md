@@ -1,5 +1,16 @@
 # Umstellung auf Latinio 1.0.0
 
+## Bereits eingerichtete Cloud für Nutzernachrichten aktualisieren
+
+Für die neuen App-Nachrichten muss das bestehende Apps-Script-Projekt einmal erweitert werden. Die bestehende Tabelle, Profile, PIN und Web-App-Adresse bleiben bestehen.
+
+1. In der Google-Tabelle **Erweiterungen → Apps Script** öffnen.
+2. Die Inhalte der vorhandenen `Code.gs` und `Accounts.gs` durch die entsprechenden Dateien aus diesem Repository ersetzen. Andere Dateien wie `Bridge.html` unverändert lassen.
+3. Speichern und **Bereitstellen → Bereitstellungen verwalten → vorhandene Web-App bearbeiten → Neue Version → Bereitstellen** wählen. Vorhandene Ausführungs- und Zugriffseinstellungen beibehalten.
+4. `setupMultiuser` und `setupLatinio` hierfür **nicht** erneut ausführen. Das Skript legt die Nachrichtentabellen bei Bedarf selbst an.
+
+Danach können Admins in der **Nutzerverwaltung** Nachrichten an ein Profil oder alle aktuell aktiven Profile senden, gesendete Hinweise samt Lesestatus einsehen und mit **Testen** eine Vorschau öffnen. Die App fragt Nachrichten beim Öffnen ab; „Weiter“ speichert die Lesebestätigung pro Profil in der Google-Tabelle. Für jede weitere Nachricht ist keine Skriptänderung nötig.
+
 Vorbereitet im Zweig `multiuser-upgrade`. Noch nicht mit `main` zusammenführen: Die bestehende Google-Web-App-Adresse muss zuerst in `app/cloud-config.js` eingetragen und das Backend aktualisiert werden.
 
 ## Vorhandene Cloud weiterverwenden
