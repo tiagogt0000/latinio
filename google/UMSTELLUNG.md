@@ -2,7 +2,7 @@
 
 ## Lernfächer pro Profil freigeben
 
-Damit Latein/Englisch-Freigaben in der Nutzerverwaltung gespeichert und tatsächlich durchgesetzt werden, das bestehende Apps-Script-Projekt einmal aktualisieren:
+Damit Latein/Englisch-Freigaben durchgesetzt werden und das Aktivitätsprotokoll beide Lernfächer bündelt, das bestehende Apps-Script-Projekt einmal aktualisieren:
 
 1. In der Google-Tabelle **Erweiterungen → Apps Script** öffnen.
 2. Die vorhandenen Dateien `Code.gs` und `Accounts.gs` durch `google/Code.gs` und `google/Accounts.gs` aus diesem Repository ersetzen. `Bridge.html` und die übrigen Dateien bleiben unverändert.

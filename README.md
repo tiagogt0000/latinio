@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.7
+# Latinio · Version 1.9.8
+
+## 1.9.8 · Aktivitäten bündeln und Sprache lokal merken
+
+Das Admin-Aktivitätsprotokoll vereint Latein- und Englisch-Ereignisse chronologisch in einer Liste und kennzeichnet pro Eintrag das Lernfach. Die zuletzt geöffnete Sprache wird lokal auf dem Gerät gemerkt und beim nächsten Start wieder geöffnet; sie wird nicht mit der Cloud synchronisiert. Das Google-Skript muss für das gebündelte Aktivitätsprotokoll aktualisiert werden.
 
 ## 1.9.7 · Lernfächer pro Nutzer freigeben
 

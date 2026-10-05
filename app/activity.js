@@ -10,4 +10,4 @@ export function activityKinds(changes,previous){
  }
  return [...kinds];
 }
-export function activityRows(events,h){return events.map(e=>`<li><time>${h(new Date(e.at).toLocaleString('de-DE',{timeZone:'Europe/Berlin',dateStyle:'medium',timeStyle:'short'}))}</time><br>${h(activityLabels[e.action]||'Aktivität')}</li>`).join('');}
+export function activityRows(events,h){return events.map(e=>`<li><time>${h(new Date(e.at).toLocaleString('de-DE',{timeZone:'Europe/Berlin',dateStyle:'medium',timeStyle:'short'}))}</time><br><span class="small muted">${e.subject==='english'?'Englisch':'Latein'}</span> · ${h(activityLabels[e.action]||'Aktivität')}</li>`).join('');}
