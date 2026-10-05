@@ -12,18 +12,18 @@ function startHarness(admin){
  return {ctx,state};
 }
 
-test('Progressive learning starts every word in the selected decks independent of daily target',async()=>{
- const {ctx,state}=startHarness(true);await ctx.start('progressive',['lesson'],null,'all');
+test('Every user can start progressive learning for all selected words independent of daily target',async()=>{
+ const {ctx,state}=startHarness(false);await ctx.start('progressive',['lesson'],null,'all');
  assert.equal(state.mode,'all');assert.equal(state.limit,0);assert.equal(ctx.store.doc.session.mode,'progressive');
  assert.equal(ctx.store.doc.session.originalLength,4);assert.equal(ctx.store.doc.session.stage,1);
 });
 test('A round asks for its meaning threshold and stores the selected rule on that round',async()=>{
- const {ctx,state}=startHarness(true);await ctx.start('progressive',['lesson']);
+ const {ctx,state}=startHarness(false);await ctx.start('progressive',['lesson']);
  assert.equal(ctx.store.doc.session,null);assert.match(state.modal,/round-require-all/);
  await ctx.start('progressive',['lesson'],null,'any');assert.equal(ctx.store.doc.session.meaningRequirement,'any');
 });
 
-test('A student cannot start the admin-only progressive mode',async()=>{
- const {ctx,state}=startHarness(false);await ctx.start('progressive',['lesson'],null,'all');
- assert.equal(ctx.store.doc.session,null);assert.match(state.messages[0],/nur für den Admin/);
+test('The progressive option is shown without an admin role check',()=>{
+ assert.match(source,/data-action="start-progressive"/);
+ assert.doesNotMatch(source,/(?:isAdmin\(\)[^\n]{0,120}Schrittweises Lernen|Schrittweises Lernen[^\n]{0,120}isAdmin\(\))/);
 });

@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.4
+# Latinio · Version 1.9.5
+
+## 1.9.5 · Schrittweises Lernen für alle Nutzer
+
+„Schrittweises Lernen“ ist jetzt für alle Nutzerprofile verfügbar, nicht nur für das Admin-Profil. Auswahl und Ablauf bleiben gleich.
 
 ## 1.9.4 · Mobile Fachwahl und einmalige Nutzernachrichten
 
