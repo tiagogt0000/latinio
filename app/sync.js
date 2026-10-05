@@ -69,12 +69,17 @@ export class Sync extends EventTarget {
       const full=needsFullSync(this.store.doc);
       if(full&&this.store.profileId){const identity=await this.request('whoami');if(identity.profile?.id!==this.store.profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte abmelden und mit der richtigen E-Mail erneut anmelden.');}
       const meta=await this.request('check');this.cloudVersion=meta.version;
-      if(Array.isArray(meta.allowedSubjects)&&this.store.profileId!=='admin'&&!meta.allowedSubjects.includes(this.subject)){
+      if(Array.isArray(meta.allowedSubjects)){
         this.allowedSubjects=meta.allowedSubjects;
+        if(this.store.profileId!=='admin'){
+          await this.store.update(doc=>{doc.profile={...(doc.profile||{}),allowedSubjects:meta.allowedSubjects};return doc;});
+          const event=new Event('subjects-updated');event.allowedSubjects=meta.allowedSubjects;this.dispatchEvent(event);
+        }
+      }
+      if(Array.isArray(meta.allowedSubjects)&&this.store.profileId!=='admin'&&!meta.allowedSubjects.includes(this.subject)){
         this.set('restricted','Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
         const event=new Event('subject-restricted');event.allowedSubjects=meta.allowedSubjects;this.dispatchEvent(event);return;
       }
-      if(Array.isArray(meta.allowedSubjects))this.allowedSubjects=meta.allowedSubjects;
       if(meta.version<this.store.doc.base)throw Error('Die Cloud ist älter als der bestätigte Gerätestand. Kein automatisches Überschreiben.');
       if(meta.version>this.store.doc.base||full){await this.fetchRemote(full);return;}
       while(this.store.doc.pending.length){

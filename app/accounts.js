@@ -7,7 +7,7 @@ export async function openAccount(root){
   let active;try{active=JSON.parse(localStorage.getItem(ACTIVE));}catch{}
   if(active?.id){
     const store=await new Store().open(active.id);
-    if(store.doc.config.token){if(CLOUD_URL)await store.update(doc=>{doc.config.url=CLOUD_URL;return doc;});return {store,profile:active};}
+    if(store.doc.config.token){if(CLOUD_URL)await store.update(doc=>{doc.config.url=CLOUD_URL;return doc;});const saved=store.doc.profile?.id===active.id?store.doc.profile:{};return {store,profile:{...saved,...active}};}
     store.close();
   }
   const legacy=await new Store().open('admin');
@@ -41,4 +41,5 @@ export async function openAccount(root){
   });
 }
 export function signOut(){localStorage.removeItem(ACTIVE);localStorage.setItem(MIGRATED,'1');location.reload();}
+export function updateActiveProfile(profile){localStorage.setItem(ACTIVE,JSON.stringify(profile));}
 export function accountCard(profile){return `<section class="card"><h2>Dein Profil</h2><p>${h(profile.role==='admin'?'Tiago':profile.name)}</p><p class="small muted">${profile.role==='admin'?'Administrator':h(profile.email)}</p>${profile.role==='admin'?'<button class="button secondary wide" data-action="account-profiles">Profile verwalten</button>':''}<div class="divider"></div><button type="button" class="button secondary wide" data-action="account-logout">Abmelden</button><p class="small muted">Lokale Lernstände bleiben auf diesem Gerät erhalten.</p></section>`;}
