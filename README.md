@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.11
+# Latinio · Version 1.9.12
+
+## 1.9.12 · Separater Prädikat-Trainer
+
+Im Latein-Modus gibt es auf der Startseite den eigenen Bereich „Prädikate üben“. Er nimmt separate JSON-Dateien im Format `latinio-predicates` (Schema 1) an, fragt Grundform und Prädikat in zufälliger Reihenfolge ab und speichert die Liste profilbezogen nur lokal auf dem Gerät. Die Prädikate bleiben außerhalb von Sammlungen, Cloud-Sync und Unterrichtssuche.
 
 ## 1.9.11 · Fehler in eigenen Runden wiederholen
 
