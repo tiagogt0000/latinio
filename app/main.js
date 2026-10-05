@@ -34,6 +34,9 @@ const openPanels=new Set();
 let collectionTab='lessons',refreshFlow=null;
 let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
+const isBootSplash=()=>app.querySelector('.boot')?.textContent.includes('Deine Vokabeln werden geladen');
+updates.addEventListener('change',()=>{if(!ready&&isBootSplash()&&updates.state==='available')void updates.apply();});
+if('serviceWorker'in navigator&&location.protocol!=='file:')void navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>{updates.watch(registration);void updates.check();}).catch(()=>{});
 const isAdmin=()=>profile?.role==='admin';
 const subjectAllowed=value=>isAdmin()||!Array.isArray(profile?.allowedSubjects)||profile.allowedSubjects.includes(value);
 const data=()=>store.data;
@@ -324,6 +327,5 @@ async function boot(){try{
  window.addEventListener('pageshow',event=>{if(event.persisted)void resume();});
  setInterval(()=>{if(!document.hidden){void backgroundSync();void updates.check();autoUpdate();}},60000);
  window.addEventListener('online',()=>{void updates.check();void resume();});
- if('serviceWorker'in navigator&&location.protocol!=='file:'){try{const registration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});updates.watch(registration);void updates.check();}catch{notify('Offline-Bereitstellung noch nicht möglich. Online kannst du weiterlernen.');}}
  }catch(error){app.innerHTML=`<main class="boot"><h1>Die App konnte nicht starten.</h1><p>Öffne Latinio über seine Website-Adresse in einem normalen Safari-Tab.</p><p class="muted">${h(error.message)}</p></main>`;}}
 boot();
