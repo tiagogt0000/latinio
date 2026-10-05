@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.8
+# Latinio · Version 1.9.10
+
+## 1.9.10 · Startprobleme beheben
+
+Die App prüft Service-Worker-Updates schon während des Startbildschirms und kann dort einen bereitstehenden Hotfix aktivieren. Hängt die lokale Datenbank beim Öffnen, erscheint nach spätestens zwölf Sekunden ein verständlicher Hinweis statt eines endlosen Ladevorgangs. Bleibt der Startbildschirm aus einem anderen Grund stehen, bietet Latinio nach 20 Sekunden das erneute Laden an. Der Offline-Cache wird für diesen Fix vollständig erneuert.
 
 ## 1.9.8 · Aktivitäten bündeln und Sprache lokal merken
 
