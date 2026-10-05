@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.10
+# Latinio · Version 1.9.11
+
+## 1.9.11 · Fehler in eigenen Runden wiederholen
+
+Fehler bleiben aus der laufenden Runde heraus. Im Ergebnis kann man sie als hervorgehobene nächste Stufe erneut üben; das gilt auch für Smart-Üben und Auffrisch-Karteikarten. Dazu kommen ein rahmenloses Latino-Logo in der mobilen Kopfzeile und gleich hohe geschlossene Einstellungskacheln. Schülerprofile melden ihre höchste App-Version nach dem Start asynchron; sie erscheint im Admin-Aktivitätsprotokoll. `google/Code.gs` und `google/Accounts.gs` benötigen die aktualisierte Bereitstellung.
 
 ## 1.9.10 · Startprobleme beheben
 
