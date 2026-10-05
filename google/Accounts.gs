@@ -132,6 +132,14 @@ function accountApi_(request,identity,subject='latin'){
     const announcement=records_('_LatinioAnnouncements')[id];if(!announcement||announcement.active===false||(announcement.profileId!=='all'&&announcement.profileId!==identity.id))throw new Error('Diese Nachricht ist nicht für dein Profil bestimmt.');
     saveRecord_('_LatinioAnnouncementReads',id+'_'+identity.id,{announcementId:id,profileId:identity.id,readAt:Date.now()});return {ok:true};
   }
+  if(request.action==='profileVersion'){
+    if(identity.role!=='student')throw new Error('Nur Schülerprofile melden ihre App-Version.');
+    const version=String(request.version||'');if(!/^\d{1,4}\.\d{1,4}\.\d{1,4}$/.test(version))throw new Error('Ungültige App-Version.');
+    const profile=records_('_LatinioProfiles')[identity.id];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    function compareVersion_(a,b){const left=String(a||'0').split('.').map(Number),right=String(b||'0').split('.').map(Number);for(let i=0;i<3;i++){if((left[i]||0)!==(right[i]||0))return (left[i]||0)>(right[i]||0)?1:-1;}return 0;}
+    if(!profile.latestAppVersion||compareVersion_(version,profile.latestAppVersion)>=0){profile.latestAppVersion=version;profile.latestAppVersionAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);}
+    return {version:profile.latestAppVersion,reportedAt:profile.latestAppVersionAt||null};
+  }
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
   if(request.action==='announcementSend'){
     const profileId=String(request.profileId||''),title=String(request.title||'').trim(),message=String(request.message||'').trim();
@@ -145,7 +153,7 @@ function accountApi_(request,identity,subject='latin'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const allowed=['opened','started','paused','finished','words','collections','refresh','settings'],now=Date.now();
     const events=['latin','english'].flatMap(function(language){return Object.values(readState_(profile.id,true,language).data.settings).filter(function(v){return v&&v.kind==='activityEvent'&&allowed.includes(v.action)&&Number.isFinite(v.at)&&v.at>=now-90*86400000&&v.at<=now+300000;}).map(function(v){return {at:v.at,action:v.action,subject:language};});}).sort(function(a,b){return b.at-a.at;});
-    return {profile:{id:profile.id,name:profile.name},events:events.slice(0,200),truncated:events.length>200,checkedAt:now};
+    return {profile:{id:profile.id,name:profile.name,latestAppVersion:profile.latestAppVersion||null,latestAppVersionAt:profile.latestAppVersionAt||null},events:events.slice(0,200),truncated:events.length>200,checkedAt:now};
   }
   if(request.action==='profiles')return {profiles:Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}).map(function(p){return Object.assign({},p,{allowedSubjects:normalizeSubjects_(p.allowedSubjects)});})};
   if(request.action==='profileUpdateSubjects'){
