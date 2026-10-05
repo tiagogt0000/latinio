@@ -1,29 +1,26 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import vm from 'node:vm';
+import {failedTasks,createErrorRetry} from '../app/error-retry.js';
 
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
-function startHarness(admin){
- const d={collections:{lesson:{id:'lesson',name:'Lektion 1'}},settings:{},words:{a:{id:'a',collectionId:'lesson'},b:{id:'b',collectionId:'lesson'},c:{id:'c',collectionId:'lesson'},d:{id:'d',collectionId:'lesson'}},reviews:{}};
- const state={messages:[],mode:null,selected:null};
- const ctx=vm.createContext({english:false,pendingStart:null,shuffleQueue:items=>items,startOptionsView:()=>'<input id="round-require-all">',backgroundSync:async()=>{},sync:{schedule(){}},store:{doc:{session:null,matchRound:null},async update(fn){this.doc=fn(this.doc);},async recordActivity(){}},data:()=>d,isAdmin:()=>admin,chooseWords(_data,ids,limit,mode){state.mode=mode;state.limit=limit;return Object.values(d.words).filter(w=>ids.includes(w.collectionId)).map(w=>w.id);},inactiveQueue:()=>[],prefs:()=>({daily:5,meaningRequirement:'all'}),uid:()=> 'progressive-session',notify:m=>state.messages.push(m),showModal:html=>state.modal=html,closeModal(){},render(){},screen:'learn'});
- vm.runInContext(source.slice(source.indexOf('async function start('),source.indexOf('function current(')),ctx);
- return {ctx,state};
-}
 
-test('Every user can start progressive learning for all selected words independent of daily target',async()=>{
- const {ctx,state}=startHarness(false);await ctx.start('progressive',['lesson'],null,'all');
- assert.equal(state.mode,'all');assert.equal(state.limit,0);assert.equal(ctx.store.doc.session.mode,'progressive');
- assert.equal(ctx.store.doc.session.originalLength,4);assert.equal(ctx.store.doc.session.stage,1);
-});
-test('A round asks for its meaning threshold and stores the selected rule on that round',async()=>{
- const {ctx,state}=startHarness(false);await ctx.start('progressive',['lesson']);
- assert.equal(ctx.store.doc.session,null);assert.match(state.modal,/round-require-all/);
- await ctx.start('progressive',['lesson'],null,'any');assert.equal(ctx.store.doc.session.meaningRequirement,'any');
+test('progressive training is replaced by a retry option on the result screen',()=>{
+ assert.doesNotMatch(source,/data-action="start-progressive"|progressive-summary|progressive-next-stage/);
+ assert.match(source,/data-action="retry-errors"/);
 });
 
-test('The progressive option is shown without an admin role check',()=>{
- assert.match(source,/data-action="start-progressive"/);
- assert.doesNotMatch(source,/(?:isAdmin\(\)[^\n]{0,120}Schrittweises Lernen|Schrittweises Lernen[^\n]{0,120}isAdmin\(\))/);
+test('retry sessions include only mistakes from the previous round and advance the stage',()=>{
+ const original={id:'round-1',mode:'all',sourceIds:['lesson'],meaningRequirement:'any',retryStage:1,queue:[{wordId:'known'},{wordId:'missed'}]};
+ const tasks=failedTasks(original,{'round-1-0':{grade:'full'},'round-1-1':{grade:'wrong'}});
+ const retry=createErrorRetry(original,tasks,'round-2',123);
+ assert.deepEqual(retry.queue,[{wordId:'missed',repeat:false}]);
+ assert.equal(retry.retryStage,2);assert.equal(retry.meaningRequirement,'any');assert.equal(retry.startedAt,123);
+});
+
+test('flashcard retries remain flashcards and exclude cards marked known',()=>{
+ const original={id:'refresh-1',mode:'inactive-check',sourceIds:['lesson'],refreshTarget:'deck',retryStage:2,queue:[{wordId:'a'},{wordId:'b'}]};
+ const tasks=failedTasks(original,{'refresh-1-0':{grade:'full'},'refresh-1-1':{grade:'wrong'}});
+ const retry=createErrorRetry(original,tasks,'refresh-2');
+ assert.equal(retry.mode,'inactive-check');assert.equal(retry.retryStage,3);assert.equal(retry.queue[0].wordId,'b');
 });
