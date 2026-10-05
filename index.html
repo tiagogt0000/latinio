@@ -8,5 +8,7 @@
   <link rel="icon" href="./icon.svg?v=0.2.1" type="image/svg+xml"><link rel="apple-touch-icon" sizes="180x180" href="./icon-brand-180.png"><link rel="manifest" href="./manifest.webmanifest">
   <link rel="stylesheet" href="./app/style.css">
 </head>
-<body><div id="app"><main class="boot"><div class="brand">latinio<span>✦</span></div><p>Deine Vokabeln werden geladen …</p></main></div><div id="modal-root"></div><div id="toast" role="status" aria-live="polite"></div><script type="module" src="./app/main.js"></script><noscript>Bitte aktiviere JavaScript, um Latinio zu verwenden.</noscript></body>
+<body><div id="app"><main class="boot"><div class="brand">latinio<span>✦</span></div><p>Deine Vokabeln werden geladen …</p></main></div><div id="modal-root"></div><div id="toast" role="status" aria-live="polite"></div><script>
+(()=>{const app=document.getElementById('app');const stuck=()=>app.querySelector('.boot')?.textContent.includes('Deine Vokabeln werden geladen');const show=()=>{if(!stuck())return;app.innerHTML='<main class="boot"><h1>Latinio startet nicht weiter.</h1><p>Schließe andere Latinio-Fenster und lade die App erneut. Deine gespeicherten Lernstände bleiben erhalten.</p><button class="button primary" onclick="location.reload()">Erneut laden</button></main>';};window.addEventListener('error',()=>{if(stuck())show();},true);setTimeout(show,20000);})();
+</script><script type="module" src="./app/main.js"></script><noscript>Bitte aktiviere JavaScript, um Latinio zu verwenden.</noscript></body>
 </html>
