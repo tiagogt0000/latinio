@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.5
+# Latinio · Version 1.9.6
+
+## 1.9.6 · Sprachwahl auch auf Desktop und iPad
+
+Das Dropdown für Latein und Englisch ist nun auch in der Desktop- und iPad-Ansicht rechts in der Kopfzeile verfügbar.
 
 ## 1.9.5 · Schrittweises Lernen für alle Nutzer
 
