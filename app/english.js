@@ -14,7 +14,7 @@ export function englishTasks(data,ids,mode='smart',limit=10,direction='mixed',no
     return {wordId:word.id,direction:dir,p,level:pending===null?p.level:pending?'learning':'known',random:Math.random()};
   }));
   const oldest=(a,b)=>a.p.lastReviewedAt-b.p.lastReviewedAt||a.p.due-b.p.due||a.random-b.random;
-  if(mode==='all'||mode==='progressive')return tasks.sort((a,b)=>a.random-b.random).map(({wordId,direction})=>({wordId,direction}));
+  if(mode==='all')return tasks.sort((a,b)=>a.random-b.random).map(({wordId,direction})=>({wordId,direction}));
   if(mode==='learning'||mode==='refresh')return tasks.filter(x=>mode==='learning'?x.level!=='known':x.level==='known').sort(oldest).slice(0,limit).map(({wordId,direction})=>({wordId,direction}));
   const rank=x=>x.level!=='known'?(x.p.seen&&x.p.due<=now?0:!x.p.seen?1:2):(x.p.due<=now?3:4);
   return tasks.sort((a,b)=>rank(a)-rank(b)||oldest(a,b)).slice(0,limit).map(({wordId,direction})=>({wordId,direction}));
