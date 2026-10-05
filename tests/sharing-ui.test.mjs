@@ -11,9 +11,9 @@ function setup(){
 }
 test('Profiles open before slow Google request completes; closing prevents stale DOM updates',async()=>{
  const {ui,requests,views,nodes}=setup();const result=await ui.handle({dataset:{action:'account-profiles'}});
- assert.equal(result,true);assert.match(views[0],/Nutzerverwaltung/);assert.equal(requests.length,1);
- const list=nodes.get('.profile-list');list.isConnected=false;requests[0].resolve({profiles:[{id:'p',name:'Felix',email:'test@example.org'}]});
- await new Promise(resolve=>setImmediate(resolve));assert.equal(list.innerHTML,'');assert.equal(views.length,1);
+ assert.equal(result,true);assert.match(views[0],/Nutzerverwaltung/);assert.match(views[0],/name="allowedSubject" value="latin" checked/);assert.match(views[0],/name="allowedSubject" value="english" checked/);assert.equal(requests.length,1);
+ const list=nodes.get('.profile-list');requests[0].resolve({profiles:[{id:'p',name:'Felix',email:'test@example.org',allowedSubjects:['english']}]});
+ await new Promise(resolve=>setImmediate(resolve));assert.match(list.innerHTML,/Lernfächer: Englisch/);assert.match(list.innerHTML,/data-action="profile-subjects"/);assert.equal(views.length,1);
 });
 test('Sharing opens immediately and reports network failures inside the open window',async()=>{
  const {ui,requests,views,nodes}=setup();await ui.handle({dataset:{action:'share-panel'}});

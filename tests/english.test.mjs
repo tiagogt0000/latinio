@@ -33,7 +33,7 @@ test('Google journals, versions, and shares stay separate for English',()=>{
  assert.equal(h.request({action:'push',subject:'english',base:0,ops:[op('english-op','unit')]}).version,1);
  assert.equal(h.request({action:'check'}).version,0);assert.equal(h.request({action:'check',subject:'english'}).version,1);
  assert.equal(h.request({action:'pull',since:0}).data.collections.unit,undefined);
- assert.equal(h.request({action:'whoami'}).apiVersion,3);
+ assert.equal(h.request({action:'whoami'}).apiVersion,4);
  const profile=h.request({action:'profileCreate',name:'Schüler',email:'student@example.org'}).profile;
  assert.equal(h.request({action:'shareCreateMany',subject:'english',profileId:profile.id,collectionIds:['unit']}).results.length,1);
  assert.equal(h.request({action:'shareList'}).shares.length,0);

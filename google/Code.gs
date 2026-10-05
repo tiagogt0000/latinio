@@ -37,12 +37,13 @@ function latinioApi(request) {
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
-    if(request.action==='whoami')return {profile:identity,apiVersion:3,subjects:['latin','english']};
-    if(['profiles','profileCreate','profileDelete','profileCollections','profileActivity','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(request.action==='whoami')return {profile:identity,apiVersion:4,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
+    if(['profiles','profileCreate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
     const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
-    if(request.action==='check')return {version:version};
+    if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects};
     const log=lastRow>1?sheet.getRange(2,1,lastRow-1,5).getValues().map(function(row){return {version:Number(row[0]),op:JSON.parse(row[4])};}):[];
     const data=replay_(log);
     if(request.action==='pull') {
@@ -72,14 +73,15 @@ function authorize_(request){
   const props=PropertiesService.getScriptProperties();
   if(!request||typeof request.token!=='string'||request.token.length<32||request.token.length>200)throw new Error('Bitte erneut anmelden.');
   const hashed=hash_(request.token),expected=props.getProperty('TOKEN_HASH');
-  if(expected&&hashed===expected)return {id:'admin',role:'admin',name:'Admin'};
+  if(expected&&hashed===expected)return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english']};
   const session=records_('_LatinioSessions')[hashed];
   if(!session||session.expires<Date.now())throw new Error('Bitte erneut anmelden.');
-  if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin'};
+  if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english']};
   const profile=records_('_LatinioProfiles')[session.profileId];
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
-  return {id:profile.id,role:'student',name:profile.name,email:profile.email};
+  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects)};
 }
+function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english';}))):['latin','english'];}
 function ensureLog_(profileId,readOnly,subject='latin'){
   const id=PropertiesService.getScriptProperties().getProperty('SHEET_ID');if(!id)throw new Error('Cloud noch nicht eingerichtet.');
   const book=SpreadsheetApp.openById(id);

@@ -300,6 +300,10 @@ async function boot(){try{
  if(english){const latinStore=store,config=latinStore.doc.config;store=await new Store().open(profile.id,'english');await store.update(doc=>{doc.config={...config};doc.profile=profile;doc.seeded=true;return doc;});latinStore.close();}
  await store.seed();await store.listDeletedCollections();if(store.doc.session||store.doc.matchRound)await store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});sync=new Sync(store);
  sharing=sharingUI({store,sync,profile,h,showModal,closeModal,notify,render,openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});
+ sync.addEventListener('subject-restricted',event=>{
+  const allowed=event.allowedSubjects||[];const fallback=allowed.includes(english?'latin':'english')?(english?'latin':'english'):allowed[0];
+  if(fallback){const target=new URL(location.href);target.searchParams.set('subject',fallback);location.replace(target.href);}
+ });
  cloudWait=cloudGate({sync,store,name:isAdmin()?'Tiago':profile.name});
  confusions=confusionUI({store,sync,subject,h,showModal,closeModal,notify,go:target=>{if(target==='result')void showResult();else{screen=target;render();}},render});
  store.addEventListener('change',updateStatus);

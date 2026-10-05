@@ -1,4 +1,8 @@
-# Latinio · Version 1.9.6
+# Latinio · Version 1.9.7
+
+## 1.9.7 · Lernfächer pro Nutzer freigeben
+
+In der Nutzerverwaltung lassen sich Latein und Englisch je Profil einzeln freigeben. Neue Profile erhalten standardmäßig beide Fächer. Die Freigabe wird bei jeder Cloud-Anfrage serverseitig geprüft; ein gesperrtes Fach leitet die App zum erlaubten Fach weiter. Bestehende Profile ohne gespeicherte Auswahl behalten beide Fächer. Erfordert eine neue Bereitstellung von `google/Code.gs` und `google/Accounts.gs`; Details stehen in `google/UMSTELLUNG.md`.
 
 ## 1.9.6 · Sprachwahl auch auf Desktop und iPad
 

@@ -23,6 +23,20 @@ test('Email login is allowlisted, case insensitive; PIN is validated and throttl
  for(let i=0;i<5;i++)assert.throws(()=>h.request({action:'login',admin:true,pin:'0000'}),/stimmt nicht/);
  assert.throws(()=>h.request({action:'login',admin:true,pin:'1234'}),/fünf Minuten/);
 });
+test('Admin can restrict an account to one subject and the server rejects blocked subjects',()=>{
+ const h=harness();const created=h.request({action:'profileCreate',name:'English only',email:'eng@example.org',allowedSubjects:['english']});
+ const user=h.request({action:'login',email:'eng@example.org'});assert.deepEqual(Array.from(user.profile.allowedSubjects),['english']);
+ const english=h.request({action:'check',token:user.token,subject:'english'});assert.deepEqual(Array.from(english.allowedSubjects),['english']);
+ assert.throws(()=>h.request({action:'check',token:user.token,subject:'latin'}),/nicht freigeschaltet/);
+ assert.throws(()=>h.request({action:'pull',token:user.token,subject:'latin',since:0}),/nicht freigeschaltet/);
+ assert.throws(()=>h.request({action:'push',token:user.token,subject:'latin',base:0,ops:[]}),/nicht freigeschaltet/);
+ assert.throws(()=>h.request({action:'profileUpdateSubjects',token:user.token,profileId:created.profile.id,allowedSubjects:['latin']}),/Admin/);
+ const changed=h.request({action:'profileUpdateSubjects',profileId:created.profile.id,allowedSubjects:['latin']});
+ assert.deepEqual(Array.from(changed.profile.allowedSubjects),['latin']);
+ assert.deepEqual(Array.from(h.request({action:'profiles'}).profiles[0].allowedSubjects),['latin']);
+ assert.throws(()=>h.request({action:'check',token:user.token,subject:'english'}),/nicht freigeschaltet/);
+ assert.deepEqual(Array.from(h.request({action:'whoami'}).allowedSubjects),['latin','english']);
+});
 test('Announcements are profile scoped and stay hidden after the recipient marks them read',()=>{
  const h=harness(),felix=friend(h),other=friend(h,'other@schule.de');
  const created=h.request({action:'announcementSend',profileId:felix.id,title:'Neue Funktionen',message:'Hallo Felix: Dropdown und bessere Auswertung.'});

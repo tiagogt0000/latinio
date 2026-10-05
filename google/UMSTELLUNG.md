@@ -1,5 +1,16 @@
 # Umstellung auf Latinio 1.0.0
 
+## Lernfächer pro Profil freigeben
+
+Damit Latein/Englisch-Freigaben in der Nutzerverwaltung gespeichert und tatsächlich durchgesetzt werden, das bestehende Apps-Script-Projekt einmal aktualisieren:
+
+1. In der Google-Tabelle **Erweiterungen → Apps Script** öffnen.
+2. Die vorhandenen Dateien `Code.gs` und `Accounts.gs` durch `google/Code.gs` und `google/Accounts.gs` aus diesem Repository ersetzen. `Bridge.html` und die übrigen Dateien bleiben unverändert.
+3. **Bereitstellen → Bereitstellungen verwalten → vorhandene Web-App bearbeiten → Neue Version → Bereitstellen** wählen und die bisherigen Zugriffseinstellungen beibehalten.
+4. `setupMultiuser` und `setupLatinio` nicht erneut ausführen.
+
+Danach in der App unter **Einstellungen → Profile verwalten** beim Anlegen oder Ändern eines Profils die Lernfächer wählen. Bestehende Profile ohne Auswahl behalten Latein und Englisch. Nutzer mit einem gesperrten Fach werden beim nächsten Online-Abgleich in ihr freigegebenes Fach geleitet. Ohne aktualisiertes Google-Skript blockiert die App das Speichern einer Fachbeschränkung.
+
 ## Bereits eingerichtete Cloud für Nutzernachrichten aktualisieren
 
 Für die neuen App-Nachrichten muss das bestehende Apps-Script-Projekt einmal erweitert werden. Die bestehende Tabelle, Profile, PIN und Web-App-Adresse bleiben bestehen.

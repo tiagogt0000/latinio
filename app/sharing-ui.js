@@ -8,7 +8,10 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
   async function remember(){await store.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
-  function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitätsprotokoll</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
+  function profileRows(){return people.map(p=>`<p><strong>${h(p.name)}</strong><br><span class="small muted">${h(p.email)}</span><br><span class="small muted">Lernfächer: ${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</span></p><div class="profile-controls"><button class="button secondary" data-action="profile-subjects" data-id="${h(p.id)}">Lernfächer ändern</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitätsprotokoll</button><button class="text-button danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div>`).join('')||'<p>Noch keine Freundesprofile angelegt.</p>';}
+  function normalizeSubjects(value){return Array.isArray(value)&&value.length?value.filter(x=>x==='latin'||x==='english'):['latin','english'];}
+  function subjectName(value){return value==='english'?'Englisch':'Latein';}
+  function subjectFields(subjects){const selected=normalizeSubjects(subjects);return `<fieldset class="share-picker"><legend>Lernfächer freigeben</legend><label class="collection-check"><input type="checkbox" name="allowedSubject" value="latin" ${selected.includes('latin')?'checked':''}><span>Latein</span></label><label class="collection-check"><input type="checkbox" name="allowedSubject" value="english" ${selected.includes('english')?'checked':''}><span>Englisch</span></label></fieldset>`;}
   function shareRows(){return people.filter(p=>shares.some(s=>s.profileId===p.id)).map(p=>`<button class="button secondary wide" data-action="share-notify" data-id="${h(p.id)}">${h(p.name)} erneut benachrichtigen</button>`).join('')+ (shares.map(s=>`<div class="conflict"><strong>${h(s.collection?.name||'Gelöschte Sammlung')} → ${h(s.profileName)}</strong><p class="small muted">${s.delivery?(s.delivery.present?'In der Empfänger-Cloud: '+s.delivery.wordCount+' Wörter'+(s.delivery.missingWords?' · '+s.delivery.missingWords+' entfernte oder fehlende Einträge':''):'Sammlung fehlt in der Empfänger-Cloud'):'Empfang noch nicht geprüft – Google-Skript aktualisieren'}</p><div class="profile-controls"><button class="text-button" data-action="share-repair" data-id="${h(s.id)}">Übertragung prüfen / reparieren</button><button class="text-button" data-action="share-changes" data-id="${h(s.id)}">Änderungen auswählen</button><button class="text-button" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="text-button" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung bearbeiten</button><button class="text-button danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></div>`).join('')||'<p class="muted">Noch nichts geteilt.</p>');}
   const admin=profile.role==='admin';
   async function refresh(){if(admin){shares=(await sync.request('shareList')).shares;loaded=true;await remember();}return shares;}
@@ -24,7 +27,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     if(sync.status!=='synced'||store.doc.pending.length)throw Error('Deine Änderungen müssen zuerst vollständig hochgeladen sein. Bitte gleich erneut versuchen.');
   }
   function profiles(fetch=true){
-    showModal(`<h2 id="modal-title">Nutzerverwaltung</h2><div class="word-tools"><button class="button secondary wide" data-action="announcement-compose">Nachricht verfassen</button><button class="button secondary wide" data-action="announcement-history">Gesendete Nachrichten & Lesestatus</button></div><form id="profile-create"><label>Name<input name="name" required maxlength="80" autocomplete="off"></label><label>Schüler-E-Mail<input name="email" type="email" required maxlength="254" autocapitalize="none"></label><button class="button primary wide">Profil anlegen</button><p role="status" class="small muted" data-save-status></p></form><p role="status" class="small muted" data-directory-status>${fetch?'Profile werden im Hintergrund geladen …':''}</p><div class="profile-list">${profileRows()}</div>`);
+    showModal(`<h2 id="modal-title">Nutzerverwaltung</h2><div class="word-tools"><button class="button secondary wide" data-action="announcement-compose">Nachricht verfassen</button><button class="button secondary wide" data-action="announcement-history">Gesendete Nachrichten & Lesestatus</button></div><form id="profile-create"><label>Name<input name="name" required maxlength="80" autocomplete="off"></label><label>Schüler-E-Mail<input name="email" type="email" required maxlength="254" autocapitalize="none"></label>${subjectFields()}<button class="button primary wide">Profil anlegen</button><p role="status" class="small muted" data-save-status></p></form><p role="status" class="small muted" data-directory-status>${fetch?'Profile werden im Hintergrund geladen …':''}</p><div class="profile-list">${profileRows()}</div>`);
     if(!fetch)return;
     const epoch=directoryEpoch;
     const root=document.querySelector('.profile-list'),message=document.querySelector('[data-directory-status]');
@@ -76,6 +79,10 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
       root.innerHTML=`<p><strong>${h(result.profile.name)}</strong></p><p class="small muted">Zuletzt hochgeladener Stand · v${result.version}. Noch nicht synchronisierte Änderungen auf dem Gerät sind hier nicht sichtbar.</p>${rows||'<p>Noch keine Sammlungen vorhanden.</p>'}${absent.length?'<p class="muted">Eine zuvor geteilte Sammlung wurde beim Nutzer gelöscht.</p>':''}`;
     }).catch(e=>{if(root.isConnected)root.textContent=errorText(e);});
   }
+  function profileSubjects(id){
+    const person=people.find(p=>p.id===id);if(!person)return;
+    showModal(`<h2 id="modal-title">Lernfächer · ${h(person.name)}</h2><p class="muted">Nur freigegebene Lernfächer sind für diesen Nutzer verfügbar.</p><form id="profile-subjects-form" data-id="${h(id)}">${subjectFields(person.allowedSubjects)}<button class="button primary wide">Freigabe speichern</button><p role="status" class="small muted" data-save-status></p></form>`);
+  }
   function profileActivity(id){
     const person=people.find(p=>p.id===id);
     showModal(`<h2 id="modal-title">Aktivitätsprotokoll · ${h(person?.name||'Schüler')}</h2><p class="small muted">Letzte 90 Tage · maximal 200 Einträge · deutsche Zeit (Europe/Berlin). Gerätezeit; offline erfasste Aktionen erscheinen erst nach dem Abgleich. Keine Anwesenheitsdauer und kein Nachweis durchgehender Arbeit.</p><div data-activity-list role="status">Wird geladen …</div><button class="text-button" data-action="profile-activity" data-id="${h(id)}">Aktualisieren</button>`);
@@ -102,6 +109,7 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
       showModal(`<h2 id="modal-title">Übertragung reparieren</h2><p>Fehlende Einträge werden aus der zuletzt geteilten Fassung ergänzt. Auch beim Nutzer gelöschte Einträge kommen zurück. Vorhandene Bearbeitungen und Lernstände bleiben erhalten.</p><form id="share-repair-form" data-id="${h(id)}"><button type="submit" class="button primary wide">Prüfen und reparieren</button><p role="status" data-save-status></p></form>`);return true;
     }
     if(action==='profile-activity'){if(!admin)return true;profileActivity(id);return true;}
+    if(action==='profile-subjects'){if(!admin)return true;profileSubjects(id);return true;}
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}
@@ -122,11 +130,11 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
     return false;
   }
   async function submit(form){
-    if(!['profile-create','share-create','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-create','profile-subjects-form','share-create','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
-    status(message,form.id==='profile-create'?'Profil wird angelegt …':'Übertragung läuft. Du kannst dieses Fenster schließen.');
+    status(message,form.id==='profile-create'?'Profil wird angelegt …':form.id==='profile-subjects-form'?'Lernfach-Freigabe wird gespeichert …':'Übertragung läuft. Du kannst dieses Fenster schließen.');
     // Keep navigation responsive while the server confirms the mutation.
     void (async()=>{
       try{
@@ -137,9 +145,14 @@ export function sharingUI({store,sync,profile,h,showModal,closeModal,notify,rend
           await remember();if(form.isConnected){if(deleting)profiles(false);else panel(false);}
           notify(deleting?'Nutzer gelöscht.':'Freigabe beendet.');
         }else if(form.id==='profile-create'){
-          const result=await sync.request('profileCreate',{name:fd.get('name'),email:fd.get('email')});
+          const allowedSubjects=fd.getAll('allowedSubject');if(!allowedSubjects.length)throw Error('Wähle mindestens ein Lernfach aus.');
+          const result=await sync.request('profileCreate',{name:fd.get('name'),email:fd.get('email'),allowedSubjects});
           directoryEpoch++;people=people.filter(p=>p.id!==result.profile.id);people.push(result.profile);await remember();
           if(form.isConnected)profiles(false);notify('Profil angelegt.');
+        }else if(form.id==='profile-subjects-form'){
+          const allowedSubjects=fd.getAll('allowedSubject');if(!allowedSubjects.length)throw Error('Wähle mindestens ein Lernfach aus.');
+          const result=await sync.request('profileUpdateSubjects',{profileId:form.dataset.id,allowedSubjects});
+          directoryEpoch++;people=people.map(p=>p.id===result.profile.id?result.profile:p);await remember();if(form.isConnected)profiles(false);notify('Lernfach-Freigabe gespeichert.');
         }else if(form.id==='share-create'){
           const collectionIds=fd.getAll('collectionId');if(!collectionIds.length)throw Error('Wähle mindestens eine Sammlung.');
           if(!fd.get('profileId'))throw Error('Wähle einen Empfänger.');

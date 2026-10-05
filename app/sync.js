@@ -41,6 +41,10 @@ export class Sync extends EventTarget {
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
     try{
+      if(['profileCreate','profileUpdateSubjects'].includes(action)){
+        const identity=await this.bridge.request('whoami');
+        if(identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
+      }
       if(this.subject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
       return await this.bridge.request(action,{...payload,subject:this.subject});
     }catch(error){
@@ -65,6 +69,12 @@ export class Sync extends EventTarget {
       const full=needsFullSync(this.store.doc);
       if(full&&this.store.profileId){const identity=await this.request('whoami');if(identity.profile?.id!==this.store.profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte abmelden und mit der richtigen E-Mail erneut anmelden.');}
       const meta=await this.request('check');this.cloudVersion=meta.version;
+      if(Array.isArray(meta.allowedSubjects)&&this.store.profileId!=='admin'&&!meta.allowedSubjects.includes(this.subject)){
+        this.allowedSubjects=meta.allowedSubjects;
+        this.set('restricted','Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
+        const event=new Event('subject-restricted');event.allowedSubjects=meta.allowedSubjects;this.dispatchEvent(event);return;
+      }
+      if(Array.isArray(meta.allowedSubjects))this.allowedSubjects=meta.allowedSubjects;
       if(meta.version<this.store.doc.base)throw Error('Die Cloud ist älter als der bestätigte Gerätestand. Kein automatisches Überschreiben.');
       if(meta.version>this.store.doc.base||full){await this.fetchRemote(full);return;}
       while(this.store.doc.pending.length){
