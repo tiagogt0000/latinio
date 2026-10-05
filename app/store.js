@@ -6,7 +6,17 @@ export class Store extends EventTarget {
   async open(profileId='admin',subject='latin'){
     this.profileId=profileId;this.subject=subject;
     const dbName=subject==='english'?'latinio-english-'+profileId:profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
-    this.db=await new Promise((resolve,reject)=>{const r=indexedDB.open(dbName,1);r.onupgradeneeded=()=>r.result.createObjectStore('state');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+    this.db=await new Promise((resolve,reject)=>{
+      let settled=false;
+      const finish=(error,db)=>{if(settled){db?.close();return;}settled=true;clearTimeout(timer);error?reject(error):resolve(db);};
+      const timer=setTimeout(()=>finish(Error('Der lokale Speicher antwortet nicht. Schließe andere Latinio-Fenster und lade die App erneut. Deine gespeicherten Lernstände bleiben erhalten.')),12000);
+      let request;
+      try{request=indexedDB.open(dbName,1);}catch(error){finish(error);return;}
+      request.onupgradeneeded=()=>{if(!request.result.objectStoreNames?.contains?.('state'))request.result.createObjectStore('state');};
+      request.onsuccess=()=>{const db=request.result;db.onversionchange=()=>db.close();finish(null,db);};
+      request.onerror=()=>finish(request.error||Error('Der lokale Speicher konnte nicht geöffnet werden.'));
+      request.onblocked=()=>finish(Error('Der lokale Speicher ist noch in einem anderen Latinio-Fenster geöffnet. Schließe andere Latinio-Fenster und lade die App erneut.'));
+    });
     await this.update(current=>current||{schema:1,device:uid(),seq:0,base:0,shadow:emptyData(),pending:[],session:null,config:{url:'',token:''},lastSync:null,seeded:false});
     this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates-'+subject+'-'+profileId):null;
     if(this.channel)this.channel.onmessage=async()=>{await this.read();this.dispatchEvent(new Event('external'));};
