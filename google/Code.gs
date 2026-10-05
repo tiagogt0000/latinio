@@ -38,7 +38,7 @@ function latinioApi(request) {
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
     if(request.action==='whoami')return {profile:identity,apiVersion:4,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
-    if(['profiles','profileCreate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(['profiles','profileCreate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','logout'].includes(request.action))return accountApi_(request,identity,subject);
     if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
