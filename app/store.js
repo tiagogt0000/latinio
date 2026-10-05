@@ -17,7 +17,11 @@ export class Store extends EventTarget {
       request.onerror=()=>finish(request.error||Error('Der lokale Speicher konnte nicht geöffnet werden.'));
       request.onblocked=()=>finish(Error('Der lokale Speicher ist noch in einem anderen Latinio-Fenster geöffnet. Schließe andere Latinio-Fenster und lade die App erneut.'));
     });
-    await this.update(current=>current||{schema:1,device:uid(),seq:0,base:0,shadow:emptyData(),pending:[],session:null,config:{url:'',token:''},lastSync:null,seeded:false});
+    let initTimer;
+    try{await Promise.race([
+      this.update(current=>current||{schema:1,device:uid(),seq:0,base:0,shadow:emptyData(),pending:[],session:null,config:{url:'',token:''},lastSync:null,seeded:false}),
+      new Promise((_,reject)=>{initTimer=setTimeout(()=>reject(Error('Der lokale Speicher reagiert nicht. Schließe andere Latinio-Fenster und lade die App erneut. Deine gespeicherten Lernstände bleiben erhalten.')),12000);})
+    ]);}catch(error){this.db?.close();throw error;}finally{clearTimeout(initTimer);}
     this.channel=typeof BroadcastChannel!=='undefined'?new BroadcastChannel('latinio-updates-'+subject+'-'+profileId):null;
     if(this.channel)this.channel.onmessage=async()=>{await this.read();this.dispatchEvent(new Event('external'));};
     return this;
