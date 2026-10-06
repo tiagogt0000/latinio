@@ -1,17 +1,15 @@
 import {activityRows} from './activity.js';
 import {sortedCollections} from './refresh-decks.js';
 import {incoming,settleSync} from './multiuser-sync.js';
-export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,notify,render,openCollection}){
-  let shares=store.doc.adminDirectory?.shares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false;
-  let pending=0,directoryEpoch=0,selectedPerson='';
+export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,notify,render,openCollection,openShareSubject}){
+  let shares=store.doc.adminDirectory?.shares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false,newProfileOpen=false;
+  let pending=0,directoryEpoch=0,selectedPerson='',shareStore=store,shareSync=sync,shareSubject=sync.subject||'latin';
   let loaded=!!store.doc.adminDirectory;
-  async function remember(){await store.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
+  async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function profileRows(){
-    const person=people.find(p=>p.id===selectedPerson);
-    const directory=`<div class="people-grid">${people.map(p=>`<button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small></span><span aria-hidden="true">→</span></button>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
-    return directory+(person?`<section class="card person-detail"><div class="section-top"><h3>${h(person.name)}</h3><span class="small muted">${h(person.latestAppVersion?'v'+person.latestAppVersion:'Version noch nicht gemeldet')}</span></div><div class="profile-controls"><button class="button secondary" data-action="admin-person-shares" data-id="${h(person.id)}">Freigaben verwalten</button><button class="button secondary" data-action="profile-subjects" data-id="${h(person.id)}">Lernfächer</button><button class="button secondary" data-action="profile-view" data-id="${h(person.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-activity" data-id="${h(person.id)}">Aktivitäten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(person.id)}">Nutzer löschen</button></div></section>`:'<p class="muted">Wähle einen Nutzer für Freigaben, Lernfächer und Aktivitäten.</p>');
+    return `<div class="people-grid">${people.map(p=>`<section class="person-entry"><button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}" aria-expanded="${p.id===selectedPerson}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small></span><span aria-hidden="true">${p.id===selectedPerson?'⌄':'›'}</span></button>${p.id===selectedPerson?`<div class="person-detail"><div class="small muted">${h(p.latestAppVersion?'Zuletzt gemeldet: v'+p.latestAppVersion:'Version noch nicht gemeldet')}</div><div class="profile-controls"><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitäten</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-edit" data-id="${h(p.id)}">Bearbeiten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div></div>`:''}</section>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
   }
   function normalizeSubjects(value){return Array.isArray(value)&&value.length?value.filter(x=>x==='latin'||x==='english'):['latin','english'];}
   function subjectName(value){return value==='english'?'Englisch':'Latein';}
@@ -35,24 +33,25 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     if(sync.status!=='synced'||store.doc.pending.length)throw Error('Deine Änderungen müssen zuerst vollständig hochgeladen sein. Bitte gleich erneut versuchen.');
   }
   function profiles(fetch=true){
-    showAdmin(`<div class="section-top"><h2>Deine Nutzer</h2><button class="button secondary" data-action="account-profiles">Aktualisieren</button></div><p role="status" class="small muted" data-directory-status>${fetch?'Profile werden geladen …':''}</p><div class="profile-list">${profileRows()}</div><details class="card create-profile"><summary>Neuen Nutzer anlegen</summary><form id="profile-create"><label>Name<input name="name" required maxlength="80" autocomplete="off"></label><label>Schüler-E-Mail<input name="email" type="email" required maxlength="254" autocapitalize="none"></label>${subjectFields()}<button class="button primary">Profil anlegen</button><p role="status" class="small muted" data-save-status></p></form></details>`,'people');
+    showAdmin(`<div class="section-top"><h2>Deine Nutzer</h2><button class="text-button" data-action="profile-new-toggle">＋ Neu</button></div>${newProfileOpen?`<form id="profile-create" class="create-profile"><label>Name<input name="name" required maxlength="80" autocomplete="off"></label><label>Schüler-E-Mail<input name="email" type="email" required maxlength="254" autocapitalize="none"></label>${subjectFields()}<button class="button primary">Profil anlegen</button><p role="status" class="small muted" data-save-status></p></form>`:''}<p role="status" class="small muted" data-directory-status>${fetch?'Profile werden geladen …':''}</p><div class="profile-list">${profileRows()}</div>`,'people');
     if(!fetch)return;
     const epoch=directoryEpoch;
     const root=document.querySelector('.profile-list'),message=document.querySelector('[data-directory-status]');
     void sync.request('profiles').then(async result=>{if(epoch!==directoryEpoch)return;people=result.profiles;await remember();if(root.isConnected)root.innerHTML=profileRows();status(message,'Aktuell');}).catch(e=>status(message,errorText(e)));
   }
+  function accessRows(){
+    const collections=sortedCollections(shareStore.data);
+    return collections.map(c=>{const existing=shares.filter(s=>s.sourceId===c.id&&!s.revoked);const ids=new Set(existing.map(s=>s.profileId));return `<details class="share-entry"><summary>${h(c.name)} <small class="muted">· ${ids.size} Nutzer</small></summary><form id="share-access-form" data-id="${h(c.id)}"><label class="collection-check share-all"><input type="checkbox" data-share-all ${people.length&&ids.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${ids.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Zugriff speichern</button><p role="status" class="small muted" data-save-status></p></form></details>`;}).join('')||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>';
+  }
   function panel(fetch=true){
-    showAdmin(`<h2>Sammlungen freigeben</h2><p class="muted">Freigaben für das aktuelle Lernfach. Wähle einen Nutzer und danach die Sammlungen.</p><form id="share-create"><label>Nutzer<select name="profileId" required><option value="">Bitte auswählen</option>${people.map(p=>`<option value="${h(p.id)}" ${p.id===selectedPerson?'selected':''}>${h(p.name)}</option>`).join('')}</select></label><details class="card share-picker"><summary>Weitere Sammlungen teilen</summary><div class="button-row"><button type="button" class="button secondary" data-action="share-select-all">Alle auswählen</button><button type="button" class="button secondary" data-action="share-select-none">Keine</button></div><div class="bounded-list">${sortedCollections(store.data).map(c=>`<label class="collection-check"><input type="checkbox" name="collectionId" value="${h(c.id)}"><span>${h(c.name)}</span></label>`).join('')}</div><button type="submit" class="button primary" ${!people.length?'disabled':''}>Auswahl teilen</button><p role="status" class="small muted" data-save-status></p></details></form><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben werden geladen …':''}</p><div data-share-list>${shareRows()}</div>`,'shares');
+    showAdmin(`<h2>Sammlungen freigeben</h2><p class="muted">Wähle zuerst ein Lernfach, dann eine Sammlung. Dort kannst du den Zugriff für alle oder einzelne Nutzer festlegen.</p><div class="button-row share-subjects"><button class="chip ${shareSubject==='latin'?'selected':''}" data-action="share-subject" data-id="latin">Latein</button><button class="chip ${shareSubject==='english'?'selected':''}" data-action="share-subject" data-id="english">Englisch</button></div><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben werden geladen …':''}</p><div class="share-collections" data-share-list>${accessRows()}</div>`,'shares');
     if(!fetch)return;
     const epoch=directoryEpoch;
-    const form=document.querySelector('#share-create'),message=document.querySelector('[data-directory-status]'),list=document.querySelector('[data-share-list]');
-    void Promise.all([sync.request('profiles'),sync.request('shareList')]).then(async ([p,s])=>{
+    const form=document.querySelector('[data-share-list]'),message=document.querySelector('[data-directory-status]'),list=document.querySelector('[data-share-list]');
+    void Promise.all([sync.request('profiles'),shareSync.request('shareList')]).then(async ([p,s])=>{
       if(epoch!==directoryEpoch)return;people=p.profiles;shares=s.shares;loaded=true;await remember();
       if(!form.isConnected)return;
-      const select=form.elements.profileId,value=select.value;
-      select.innerHTML='<option value="">Bitte auswählen</option>'+people.map(p=>`<option value="${h(p.id)}">${h(p.name)}</option>`).join('');select.value=value;
-      if(!form.dataset.saving)form.querySelector('button[type=submit]').disabled=!people.length;
-      list.innerHTML=shareRows();status(message,'Aktuell');
+      list.innerHTML=accessRows();status(message,'Aktuell');
     }).catch(e=>status(message,errorText(e)));
   }
   function describe(value){return value?(value.latin?value.latin+' – '+value.meanings.map(g=>g.join(' / ')).join(', '):value.name):'Gelöscht / noch nicht vorhanden';}
@@ -91,6 +90,10 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     const person=people.find(p=>p.id===id);if(!person)return;
     showModal(`<h2 id="modal-title">Lernfächer · ${h(person.name)}</h2><p class="muted">Nur freigegebene Lernfächer sind für diesen Nutzer verfügbar.</p><form id="profile-subjects-form" data-id="${h(id)}">${subjectFields(person.allowedSubjects)}<button class="button primary wide">Freigabe speichern</button><p role="status" class="small muted" data-save-status></p></form>`);
   }
+  function profileEdit(id){
+    const person=people.find(p=>p.id===id);if(!person)return;
+    showModal(`<h2 id="modal-title">Nutzer bearbeiten · ${h(person.name)}</h2><form id="profile-edit-form" data-id="${h(id)}"><label>Name<input name="name" required maxlength="80" value="${h(person.name)}"></label><label>E-Mail<input name="email" type="email" required maxlength="254" value="${h(person.email)}" autocapitalize="none"></label>${subjectFields(person.allowedSubjects)}<button class="button primary wide">Änderungen speichern</button><p role="status" class="small muted" data-save-status></p></form>`);
+  }
   function profileActivity(id){
     const person=people.find(p=>p.id===id);
     showAdmin(`<h2>Aktivitätsprotokoll · ${h(person?.name||'Schüler')}</h2><p class="small muted">Letzte 90 Tage · maximal 200 Einträge · deutsche Zeit (Europe/Berlin). Gerätezeit; offline erfasste Aktionen erscheinen erst nach dem Abgleich. Keine Anwesenheitsdauer und kein Nachweis durchgehender Arbeit.</p><div data-activity-list role="status">Wird geladen …</div><button class="text-button" data-action="profile-activity" data-id="${h(id)}">Aktualisieren</button>`);
@@ -106,10 +109,15 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     const items=incoming(store.data);
     showModal(`<h2 id="modal-title">Vokabeländerungen</h2><p class="muted">Diese Einträge unterscheiden sich von deiner eigenen Fassung. Du entscheidest, was du übernehmen möchtest.</p>${items.map(item=>{const current=store.data[item.entity]?.[item.key];const text=v=>v?(v.latin?v.latin+' – '+v.meanings.flat().join(', '):v.name):'Gelöscht';return `<section class="conflict"><h3>${h(item.label)}</h3><p><strong>Bei dir:</strong> ${h(text(current))}</p><p><strong>Vorschlag:</strong> ${h(text(item.value))}</p><div class="button-row"><button class="button secondary" data-action="incoming-keep" data-id="${h(item.id)}">Meine Fassung behalten</button><button class="button primary" data-action="incoming-accept" data-id="${h(item.id)}">Übernehmen</button></div></section>`;}).join('')||'<p>Alles erledigt.</p>'}`);
   }
-  function toolbar(){const count=incoming(store.data).length;return `${admin?'<button class="button secondary" data-action="share-panel">Teilen verwalten</button>':''}${count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:''}`;}
+  function toolbar(){const count=incoming(store.data).length;return count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:'';}
   async function handle(button){
     const action=button.dataset.action,id=button.dataset.id;
-    if(action==='admin-person'){selectedPerson=id;profiles(false);return true;}
+    if(action==='admin-person'){selectedPerson=selectedPerson===id?'':id;profiles(false);return true;}
+    if(action==='profile-new-toggle'){newProfileOpen=!newProfileOpen;profiles(false);return true;}
+    if(action==='share-subject'){
+      if(id!==shareSubject&&openShareSubject){const context=await openShareSubject(id);shareStore=context.store;shareSync=context.sync;}
+      shareSubject=id;shares=shareStore.doc.adminDirectory?.shares||[];await panel();return true;
+    }
     if(action==='admin-person-shares'){selectedPerson=id;panel();return true;}
     if(action==='share-select-all'||action==='share-select-none'){document.querySelectorAll('#share-create input[name=collectionId]').forEach(el=>el.checked=action==='share-select-all');return true;}
     if(action==='share-notify'){
@@ -120,6 +128,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     }
     if(action==='profile-activity'){if(!admin)return true;profileActivity(id);return true;}
     if(action==='profile-subjects'){if(!admin)return true;profileSubjects(id);return true;}
+    if(action==='profile-edit'){if(!admin)return true;profileEdit(id);return true;}
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}
@@ -140,7 +149,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     return false;
   }
   async function submit(form){
-    if(!['profile-create','profile-subjects-form','share-create','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
@@ -159,6 +168,10 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
           const result=await sync.request('profileCreate',{name:fd.get('name'),email:fd.get('email'),allowedSubjects});
           directoryEpoch++;people=people.filter(p=>p.id!==result.profile.id);people.push(result.profile);await remember();
           if(form.isConnected)profiles(false);notify('Profil angelegt.');
+        }else if(form.id==='profile-edit-form'){
+          const allowedSubjects=fd.getAll('allowedSubject');if(!allowedSubjects.length)throw Error('Wähle mindestens ein Lernfach aus.');
+          const result=await sync.request('profileUpdate',{profileId:form.dataset.id,name:fd.get('name'),email:fd.get('email'),allowedSubjects});
+          directoryEpoch++;people=people.map(p=>p.id===result.profile.id?result.profile:p);selectedPerson=result.profile.id;await remember();closeModal();profiles(false);notify('Nutzer aktualisiert.');
         }else if(form.id==='profile-subjects-form'){
           const allowedSubjects=fd.getAll('allowedSubject');if(!allowedSubjects.length)throw Error('Wähle mindestens ein Lernfach aus.');
           const result=await sync.request('profileUpdateSubjects',{profileId:form.dataset.id,allowedSubjects});
@@ -169,6 +182,12 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
           await flush();const result=await sync.request('shareCreateMany',{collectionIds,profileId:fd.get('profileId')});
           directoryEpoch++;for(const item of result.results){shares=shares.filter(s=>s.id!==item.share.id);shares.push(item.share);}loaded=true;await remember();
           if(form.isConnected)panel(false);notify(result.results.every(r=>r.share.delivery?.present)?`${result.results.length} Sammlungen in der Empfänger-Cloud bestätigt.`:'Freigabe gespeichert. Empfang noch nicht geprüft – bitte Google-Skript aktualisieren.');
+        }else if(form.id==='share-access-form'){
+          const collectionId=form.dataset.id,selectedIds=fd.getAll('recipient'),existing=shares.filter(s=>s.sourceId===collectionId&&!s.revoked),currentIds=new Set(existing.map(s=>s.profileId));
+          await settleSync(shareSync,shareStore);
+          for(const profileId of selectedIds){if(!currentIds.has(profileId)){const result=await shareSync.request('shareCreateMany',{collectionIds:[collectionId],profileId});for(const item of result.results){shares=shares.filter(s=>s.id!==item.share.id);shares.push(item.share);}currentIds.add(profileId);}}
+          for(const item of existing){if(!selectedIds.includes(item.profileId)){await shareSync.request('shareRevoke',{shareId:item.id});shares=shares.filter(s=>s.id!==item.id);}}
+          await remember();if(form.isConnected)panel(false);notify('Sammlungszugriff gespeichert.');
         }else if(form.id==='share-repair-form'){
           const result=await sync.request('shareRepair',{shareId:form.dataset.id});
           directoryEpoch++;shares=shares.filter(s=>s.id!==result.share.id);shares.push(result.share);await remember();
@@ -188,6 +207,6 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     })();
     return true;
   }
-  function change(el){if(el.name!=='profileId'||!el.closest('#share-create'))return false;selectedPerson=el.value;const list=document.querySelector('[data-share-list]');if(list)list.innerHTML=shareRows();return true;}
+  function change(el){if(el.matches?.('[data-share-all]')){const form=el.closest('#share-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.name==='recipient'&&el.closest('#share-access-form')){const form=el.closest('#share-access-form'),all=form.querySelector('[data-share-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}return false;}
   return {handle,submit,toolbar,afterAction,refresh,change,get busy(){return pending>0;}};
 }

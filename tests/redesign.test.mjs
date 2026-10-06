@@ -55,3 +55,9 @@ test('shared buttons have breathing room and equal space inside action rows',()=
  assert.match(css,/align-items:stretch;column-gap:14px;row-gap:12px/);
  assert.match(css,/\.button \.icon,\.text-button \.icon,\.chip \.icon\{flex:none\}/);
 });
+test('refresh collections do not duplicate the JSON import action and collection search is centered',()=>{
+ const refresh=fs.readFileSync(new URL('../app/refresh-ui.js',import.meta.url),'utf8'),css=fs.readFileSync(new URL('../app/style.css',import.meta.url),'utf8');
+ assert.doesNotMatch(refresh,/Auffrisch-JSON importieren/);
+ assert.match(css,/\.collection-search input\{text-align:center\}/);
+ assert.match(css,/\.collection-list-toolbar \.text-button[^}]*border:0/);
+});

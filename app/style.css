@@ -342,3 +342,21 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
  .word-tools>.button,.button-row>.button,.profile-controls>.button,.collection-footer>.button{flex:1 1 100%;width:100%}
  .settings-actions>.button,.settings-actions>.text-button{width:100%}
 }
+.collection-search input{text-align:center}
+.collection-list-toolbar .text-button,.collection-footer>.text-button{border:0!important;background:transparent!important;box-shadow:none!important}
+.collection-list-toolbar .text-button{padding-inline:4px}
+.people-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+.person-entry{min-width:0}
+.person-entry .person-card{width:100%;border-radius:var(--panel-radius)}
+.person-entry:has(.person-detail) .person-card{border-radius:var(--panel-radius) var(--panel-radius) 0 0}
+.person-detail{margin:0 0 8px;padding:16px 18px;border:1px solid var(--border);border-top:0;border-radius:0 0 var(--panel-radius) var(--panel-radius);background:var(--surface);animation:person-expand .2s ease-out both}
+.person-detail .profile-controls{margin-top:12px}
+.create-profile{margin:0 0 20px;padding:18px;border:0;border-bottom:1px solid var(--border);animation:person-expand .2s ease-out both}
+.create-profile label{margin-block:12px}
+.share-subjects{margin-block:18px}
+.share-collections{display:grid;gap:10px}
+.share-entry form{display:grid;gap:6px;margin-top:14px;animation:person-expand .2s ease-out both}
+.share-entry form>.button{margin-top:10px}
+.share-all{border-bottom:1px solid var(--border);padding-bottom:10px}
+@keyframes person-expand{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.person-detail,.create-profile,.share-entry form{animation:none}}

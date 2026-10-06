@@ -41,7 +41,7 @@ export class Sync extends EventTarget {
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
     try{
-      if(['profileCreate','profileUpdateSubjects'].includes(action)){
+      if(['profileCreate','profileUpdate','profileUpdateSubjects'].includes(action)){
         const identity=await this.bridge.request('whoami');
         if(identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
       }

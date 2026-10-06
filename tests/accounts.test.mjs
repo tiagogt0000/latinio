@@ -37,6 +37,14 @@ test('Admin can restrict an account to one subject and the server rejects blocke
  assert.throws(()=>h.request({action:'check',token:user.token,subject:'english'}),/nicht freigeschaltet/);
  assert.deepEqual(Array.from(h.request({action:'whoami'}).allowedSubjects),['latin','english']);
 });
+test('Admin can edit a user name, email and permitted subjects with validation',()=>{
+ const h=harness(),created=h.request({action:'profileCreate',name:'Felix',email:'felix@example.org'});
+ const changed=h.request({action:'profileUpdate',profileId:created.profile.id,name:'Felix M.',email:'felix.new@example.org',allowedSubjects:['english']});
+ assert.equal(changed.profile.name,'Felix M.');assert.equal(changed.profile.email,'felix.new@example.org');assert.deepEqual(Array.from(changed.profile.allowedSubjects),['english']);
+ assert.equal(h.request({action:'profiles'}).profiles[0].email,'felix.new@example.org');
+ const student=h.request({action:'login',email:'felix.new@example.org'});assert.throws(()=>h.request({action:'profileUpdate',token:student.token,profileId:created.profile.id,name:'X',email:'bad',allowedSubjects:['latin']}),/Admin/);
+ assert.throws(()=>h.request({action:'profileUpdate',profileId:created.profile.id,name:'X',email:'not-an-email',allowedSubjects:['latin']}),/gültige E-Mail/);
+});
 test('Announcements are profile scoped and stay hidden after the recipient marks them read',()=>{
  const h=harness(),felix=friend(h),other=friend(h,'other@schule.de');
  const created=h.request({action:'announcementSend',profileId:felix.id,title:'Neue Funktionen',message:'Hallo Felix: Dropdown und bessere Auswertung.'});
