@@ -174,3 +174,123 @@ input:focus,select:focus{border-color:var(--accent)}
 .predicate-practice{margin-top:26px;border-color:color-mix(in srgb,var(--green) 34%,var(--border));background:linear-gradient(135deg,var(--surface),var(--green-soft));}
 .predicate-practice .section-top{margin-bottom:14px}.predicate-practice .section-top>.icon{width:30px;height:30px;color:var(--green-dark)}.predicate-practice>p{margin:12px 0}.predicate-practice .predicate-count{font-weight:750;color:var(--green-dark)}.predicate-practice .button-row{align-items:center;gap:10px;margin-top:12px}.predicate-practice .button-row>.button{flex:1}.predicate-test #predicate-answer{display:block;width:100%;margin:8px 0 18px;min-height:58px;font-size:1.05rem}.predicate-test form>.button{margin-top:8px}.predicate-test>.test-content>.button{margin-top:18px}
 @media(max-width:600px){.predicate-practice{padding:20px}.predicate-practice .button-row{display:grid;grid-template-columns:1fr}.predicate-practice .button-row>.button{width:100%}}
+
+/* Latinio 2.0 — shared visual system; feedback colors remain semantic. */
+:root{--control-radius:12px;--panel-radius:18px;--control-height:44px}
+.content{max-width:1180px;margin-inline:auto}
+.card,.training-card,.word-list,.modal,.latin-word,.result-stats>div{border-width:1px;border-radius:var(--panel-radius);box-shadow:none}
+.card,.training-card{padding:24px}
+.button,.text-button,.chip,.correction,.icon-button{
+ min-height:var(--control-height);border:1px solid var(--border);border-radius:var(--control-radius);
+ padding:10px 16px;background:var(--surface);color:var(--text);box-shadow:none;
+ font-weight:650;line-height:1.35;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ vertical-align:middle;transition:background .15s,border-color .15s
+}
+.button.primary,:root[data-subject=english] .button.primary{background:var(--green);border-color:var(--green);color:#fff;box-shadow:none}
+.button.secondary,.text-button{background:var(--surface);border-color:var(--border)}
+.button.danger{background:var(--red);border-color:var(--red);color:white}
+.danger-text,.text-button.danger-text,.button.danger-text{color:var(--red)}
+.button:hover:not(:disabled),.text-button:hover:not(:disabled),.chip:hover:not(:disabled){filter:brightness(.97)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.icon-button{width:44px;padding:10px;flex-shrink:0}
+.chip.selected{background:var(--green-soft);border-color:var(--green);color:var(--green-dark)}
+input:not([type=checkbox]):not([type=radio]),select,textarea{border-width:1px;border-radius:var(--control-radius);min-height:44px}
+input[type=checkbox],input[type=radio]{accent-color:var(--green)}
+.brand,.mobile-brand,.brand-switch{border:0;background:transparent;box-shadow:none;border-radius:0}
+.sidebar{border-right-width:1px}
+.nav-item{border-radius:var(--control-radius);min-height:48px}
+.topbar{border-bottom:1px solid var(--border)}
+.page-heading{margin-bottom:28px}
+.page-heading h1{font-size:clamp(1.7rem,3vw,2.25rem);letter-spacing:-.04em}
+.eyebrow{letter-spacing:.1em;font-size:.7rem}
+.learning-grid{grid-template-columns:minmax(0,1.65fr) minmax(240px,1fr);gap:24px;align-items:start}
+.training-card,:root[data-subject=english] .training-card{background:var(--surface);border:1px solid var(--border)}
+.training-card h2{font-size:2rem;color:var(--text);margin-top:22px}
+.training-card>p{color:var(--muted)}
+.training-card .tag{background:var(--soft);color:var(--muted)}
+.training-card .large-icon{color:var(--green)}
+.word-tools,.profile-controls,.button-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.word-tools .wide{flex:1 1 200px}
+.card-foot{color:var(--muted);border-top:1px solid var(--border);margin-top:20px;padding-top:16px}
+.progress-section{margin-top:20px}
+.progress-section>summary{font-weight:700;cursor:pointer}
+.progress-section[open]>.section-top{margin-top:20px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--control-radius)}
+.stats-row .stat-icon,.reminder-card .stat-icon{color:var(--muted);background:var(--soft)}
+.daily-badge{color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--control-radius)}
+.goal-ring{width:138px;height:138px;box-shadow:none}
+.reminder-card{background:var(--surface);border:1px solid var(--border)}
+.reminder-card h3{color:var(--text);font-size:1rem}
+.collection-link{min-height:60px;box-shadow:none}
+.predicate-practice{margin-top:24px}
+.predicate-practice .button-row{margin-top:16px}
+.predicate-count{font-size:.85rem;color:var(--muted)}
+.settings-grid{display:flex;flex-direction:column;gap:16px;max-width:850px;margin-inline:auto}
+.settings-grid>.card{width:100%;align-self:start;min-height:0}
+.settings-grid details.card:not([open]){padding:0}
+.settings-grid details.card>summary{padding:20px 24px;min-height:64px;cursor:pointer;font-weight:700;margin:0}
+.settings-grid details.card[open]{padding:0 24px 24px}
+.settings-grid details.card[open]>summary{margin-inline:-24px;margin-bottom:8px}
+.settings-grid .cloud-settings{grid-column:auto}
+.settings-grid .card>h2{font-size:1.15rem}
+.section-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.admin-tabs{margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:16px}
+.admin-content{max-width:950px}
+.admin-content>h2,.admin-content>.section-top{margin-bottom:16px}
+.admin-content .section-top{align-items:center;gap:12px;flex-wrap:wrap}
+.people-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-block:20px}
+.person-card{display:flex;align-items:center;gap:14px;text-align:left;padding:18px;min-height:96px;border:1px solid var(--border);border-radius:var(--panel-radius);background:var(--surface);color:var(--text);min-width:0}
+.person-card.selected{border-color:var(--green);background:var(--green-soft)}
+.person-card>span:nth-child(2){flex:1;min-width:0;display:grid;gap:5px}
+.person-card small{color:var(--muted);overflow-wrap:anywhere;font-size:.78rem}
+.person-avatar{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;background:var(--soft);border-radius:12px;color:var(--green-dark);font-weight:750}
+.person-detail{margin-block:20px}
+.person-detail .profile-controls{margin-top:20px}
+.create-profile{margin-top:24px}
+.create-profile>summary,.share-picker>summary{cursor:pointer;font-weight:700}
+.admin-content form{max-width:100%}
+.admin-content .share-picker{margin-block:18px}
+.share-picker[open]>.button-row{margin-top:18px}
+.share-entry,.user-collection,.announcement-history{border:1px solid var(--border);border-radius:var(--control-radius);background:var(--surface);padding:18px;margin-block:12px}
+.share-entry>summary,.user-collection>summary,.announcement-history>summary{cursor:pointer;font-weight:650;overflow-wrap:anywhere}
+.share-entry[open]>.profile-controls{margin-top:16px}
+.share-entry p{margin-top:12px}
+.admin-content .bounded-list{max-height:340px;overflow:auto;margin-block:16px}
+.announcement-history-heading{margin-top:18px}
+.modal{max-width:640px}
+.collection-footer{display:flex;flex-wrap:wrap;gap:10px}
+@media(max-width:800px){
+ .mobile-nav nav{grid-template-columns:repeat(5,minmax(0,1fr));gap:2px}
+ .mobile-nav nav:not(:has([data-screen=admin])){grid-template-columns:repeat(4,minmax(0,1fr))}
+ .mobile-nav .nav-item{font-size:.64rem;min-width:0;padding:6px 2px}
+ .content{padding-bottom:120px}
+ .learning-grid{grid-template-columns:1fr}
+ .secondary-column{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+ .secondary-column .collection-link{grid-column:1/-1}
+}
+@media(max-width:560px){
+ .people-grid{grid-template-columns:1fr}
+ .card,.training-card{padding:20px}
+ .person-detail .profile-controls>.button{flex:1 1 140px}
+ .training-card h2{font-size:1.7rem}
+ .predicate-practice .button-row>*{flex:1 1 160px}
+ .settings-grid details.card>summary{padding:18px 20px}
+ .settings-grid details.card[open]{padding:0 20px 20px}
+ .settings-grid details.card[open]>summary{margin-inline:-20px}
+ .admin-tabs .chip{flex:1;padding-inline:8px}
+}
+.home-practice-grid{grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch}
+.home-practice-grid>.predicate-practice{margin:0}
+.home-practice-grid>.training-card,.home-practice-grid>.predicate-practice{display:flex;flex-direction:column}
+.home-practice-grid .predicate-practice>p{margin-top:18px}
+.home-practice-grid .predicate-practice>.button-row{margin-top:auto;padding-top:24px}
+.home-practice-grid .predicate-practice h2{font-size:1.5rem;margin-top:12px}
+.home-practice-grid .predicate-practice .button.primary{width:100%}
+.home-practice-grid .word-tools{margin-top:auto;padding-top:20px}
+.home-practice-grid .deck-picker{margin-bottom:18px}
+.progress-note{margin-block:20px}
+:root[data-subject=english] .home-practice-grid{grid-template-columns:1fr}
+.button:active:not(:disabled){transform:none}
+.admin-tabs{display:flex}
+@media(max-width:1000px){.home-practice-grid{grid-template-columns:1fr}}

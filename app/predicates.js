@@ -43,3 +43,28 @@ export function predicateMatches(expected,answer){
 export function shufflePredicates(items,random=Math.random){
  const result=[...(items||[])];for(let i=result.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[result[i],result[j]]=[result[j],result[i]];}return result;
 }
+
+// Individual settings records reuse the existing authenticated, subject-scoped
+// operation log. Concurrent imports of different verbs do not replace a whole deck.
+export async function predicateCloudKey(grundform){
+ const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(key(grundform)));
+ return 'predicate_'+Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+export function predicateCloudItems(data){
+ return Object.values(data?.settings||{}).filter(row=>row?.kind==='predicateItem'&&typeof row.grundform==='string'&&Array.isArray(row.praedikate)).map(({grundform,praedikate})=>({grundform,praedikate}));
+}
+
+export async function predicateChanges(items,name='Prädikate'){
+ return Promise.all(items.map(async item=>{
+  const id=await predicateCloudKey(item.grundform);
+  return ['settings',id,{kind:'predicateItem',id,grundform:item.grundform,praedikate:item.praedikate,name}];
+ }));
+}
+
+export async function migrateLocalPredicates(store,items){
+ if(store.subject==='english'||store.doc.predicatesCloudMigrated)return;
+ const changes=(await predicateChanges(items)).filter(([,id])=>!store.data.settings[id]);
+ if(changes.length)await store.commit(changes);
+ await store.update(doc=>{doc.predicatesCloudMigrated=true;return doc;});
+}
