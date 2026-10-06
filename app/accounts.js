@@ -42,4 +42,4 @@ export async function openAccount(root){
 }
 export function signOut(){localStorage.removeItem(ACTIVE);localStorage.setItem(MIGRATED,'1');location.reload();}
 export function updateActiveProfile(profile){localStorage.setItem(ACTIVE,JSON.stringify(profile));}
-export function accountCard(profile){return `<section class="card"><h2>Dein Profil</h2><p>${h(profile.role==='admin'?'Tiago':profile.name)}</p><p class="small muted">${profile.role==='admin'?'Administrator':h(profile.email)}</p><div class="divider"></div><button type="button" class="button secondary wide" data-action="account-logout">Abmelden</button><p class="small muted">Lokale Lernstände bleiben auf diesem Gerät erhalten.</p></section>`;}
+export function accountCard(profile){return `<section class="settings-section profile-settings"><h2>Dein Profil</h2><p><strong>${h(profile.role==='admin'?'Tiago':profile.name)}</strong></p><p class="small muted">${profile.role==='admin'?'Administrator':h(profile.email)}</p><button type="button" class="button secondary wide" data-action="account-logout">Abmelden</button><p class="small muted">Lokale Lernstände bleiben auf diesem Gerät erhalten.</p></section>`;}

@@ -294,3 +294,51 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .button:active:not(:disabled){transform:none}
 .admin-tabs{display:flex}
 @media(max-width:1000px){.home-practice-grid{grid-template-columns:1fr}}
+/* Follow-up to 2.0: flat, scroll-first settings and comfortable controls. */
+.settings-list{display:flex;flex-direction:column;width:min(100%,760px);margin:0 auto}
+.settings-list>.settings-section{padding:24px 0;border-bottom:1px solid var(--border)}
+.settings-section>h2{font-size:1.05rem;margin:0 0 12px}
+.settings-section>p{margin:5px 0 10px}
+.settings-section .setting-row{padding:15px 0;border-top:1px solid var(--border)}
+.settings-section .setting-row:first-of-type{border-top:0}
+.settings-section .setting-row>span{flex:1;min-width:0;padding-right:20px}
+.settings-section .setting-row small{max-width:560px}
+.settings-section .setting-row>select{flex:0 0 auto;width:auto;min-width:142px}
+.profile-settings{padding-top:0!important;border-top:0!important}
+.profile-settings>[data-action=account-logout]{width:100%;margin:15px 0 8px}
+.settings-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:14px 0}
+.settings-actions>.button,.settings-actions>.text-button{width:100%;min-width:0}
+.install-hint{padding:14px 0 0;border-top:1px solid var(--border)}
+.app-version{margin:25px auto 0}
+.sync-box{margin:12px 0;background:transparent;border:0;border-radius:0;padding:0;box-shadow:none}
+.sync-box dl{margin:12px 0;gap:0}
+.sync-box dl>div{padding:12px 0;border-bottom:1px solid var(--border)}
+.sync-box dt{font-weight:450}
+.settings-section .sync-state{padding:0;background:transparent;color:var(--text)}
+.button,.text-button,.chip,.correction,.icon-button{
+ box-sizing:border-box;min-height:48px;margin:0;padding:12px 18px;border-width:1px;
+ border-radius:12px;line-height:1.35;white-space:normal;overflow-wrap:anywhere;
+ text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+ vertical-align:middle;flex-shrink:0
+}
+.button .icon,.text-button .icon,.chip .icon{flex:none}
+.icon-button{width:48px;min-width:48px;padding:12px}
+.text-button{font-weight:650;color:var(--green-dark);background:var(--surface)}
+.button-row,.word-tools,.profile-controls,.collection-footer,.collection-actions,.section-tabs{
+ align-items:stretch;column-gap:14px;row-gap:12px
+}
+.button-row>.button,.word-tools>.button,.profile-controls>.button,.collection-footer>.button,.collection-actions>.button{flex:1 1 210px;min-width:0}
+.word-tools>.button.wide,.button-row>.button.wide{width:auto}
+.button-row>.text-button,.word-tools>.text-button,.profile-controls>.text-button{flex:1 1 210px;min-width:0}
+.word-tools{display:flex}
+.settings-actions>.button,.settings-actions>.text-button{flex:initial;min-height:50px}
+.button:active:not(:disabled){transform:none}
+@media(max-width:600px){
+ .settings-section .setting-row{align-items:flex-start;gap:14px}
+ .settings-section .setting-row>span{padding-right:4px}
+ .settings-section .setting-row>select{min-width:126px;max-width:42%;font-size:.85rem}
+ .settings-list{padding-inline:2px}
+ .button,.text-button,.chip,.correction{padding:12px 16px}
+ .word-tools>.button,.button-row>.button,.profile-controls>.button,.collection-footer>.button{flex:1 1 100%;width:100%}
+ .settings-actions>.button,.settings-actions>.text-button{width:100%}
+}

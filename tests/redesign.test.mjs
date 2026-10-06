@@ -10,7 +10,7 @@ function viewContext(english=false,admin=true){
  return vm.createContext({english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
   prefs:()=>({direction:'mixed',daily:10}),data:()=>data,activeWords:()=>[word],progressFor:()=>({level:'new',seen:false}),directionsFor:()=>['en-de','de-en'],
   todayCount:()=>2,trainingDecks:()=>[deck],wordsForDecks:()=>[word],directionLabel:()=>'',selected:[],predicateItems:[{grundform:'amare'}],
-  accountCard:()=>'<section class="card">Profil</section>',updateView:()=>'<p>Update</p>',syncDetails:()=>'<p>Cloud</p>',sync:{configured:true},adminContent:'Nutzerliste',adminTab:'people'});
+  accountCard:()=>'<section class="settings-section profile-settings">Profil</section>',updateView:()=>'<p>Update</p>',syncDetails:()=>'<p>Cloud</p>',sync:{configured:true},adminContent:'Nutzerliste',adminTab:'people'});
 }
 function balanced(html){
  const stack=[],voids=new Set(['input','br','hr']);
@@ -20,13 +20,13 @@ function balanced(html){
  }
  assert.deepEqual(stack,[]);
 }
-test('home keeps all training actions, folds progress, and isolates Latin-only forms',()=>{
+test('home keeps all training actions without a progress section, and isolates Latin-only forms',()=>{
  for(const english of [false,true]){
   const context=viewContext(english);
   vm.runInContext(section('function learnView()','function startPredicatePractice()'),context);
   const html=vm.runInContext('learnView()',context);balanced(html);
   assert.match(html,/data-action="start"/);assert.match(html,/data-action="training-options"/);
-  assert.match(html,/<details class="progress-section card">/);
+  assert.doesNotMatch(html,/Lernfortschritt|Schon sicher|Im Training/);
   assert.equal(html.includes('predicate-import'),!english);
   assert.equal(html.includes('id="direction"'),english);
  }
@@ -39,10 +39,19 @@ test('admin has dedicated navigation; students do not get management controls',(
   assert.equal(html.includes('data-screen="admin"'),admin);
  }
 });
-test('settings preserve updates and training but no longer duplicate messaging',()=>{
+test('settings are a flat scrolling list with no accordion or card boxes',()=>{
  const context=viewContext();
  vm.runInContext(section('function settingsView()','function showModal('),context);
  const html=vm.runInContext('settingsView()',context);balanced(html);
- for(const item of ['updates','appearance','import','cloud'])assert.ok(html.includes('data-panel="'+item+'"'));
+ assert.match(html,/class="settings-list"/);
+ assert.doesNotMatch(html,/<details|class="card|data-panel=/);
+ for(const item of ['Training','App-Updates','Vokabeln & Installation','Cloud & Versionen'])assert.ok(html.includes(item));
  assert.ok(!html.includes('announcement-'));
+});
+test('shared buttons have breathing room and equal space inside action rows',()=>{
+ const css=fs.readFileSync(new URL('../app/style.css',import.meta.url),'utf8');
+ assert.match(css,/\.button,\.text-button,\.chip,\.correction,\.icon-button\{[\s\S]*?padding:12px 18px/);
+ assert.match(css,/\.button-row>\.button,\.word-tools>\.button[^{]*\{flex:1 1 210px;min-width:0\}/);
+ assert.match(css,/align-items:stretch;column-gap:14px;row-gap:12px/);
+ assert.match(css,/\.button \.icon,\.text-button \.icon,\.chip \.icon\{flex:none\}/);
 });
