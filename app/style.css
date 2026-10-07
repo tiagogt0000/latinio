@@ -287,6 +287,9 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .home-practice-grid .predicate-practice>.button-row{margin-top:auto;padding-top:24px}
 .home-practice-grid .predicate-practice h2{font-size:1.5rem;margin-top:12px}
 .home-practice-grid .predicate-practice .button.primary{width:100%}
+.home-practice-grid .predicate-practice>.button-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch;gap:10px}
+.home-practice-grid .predicate-practice>.button-row>.button.primary{grid-column:1/-1}
+.home-practice-grid .predicate-practice>.button-row>.button,.home-practice-grid .predicate-practice>.button-row>.text-button{box-sizing:border-box;width:100%;min-width:0;padding-inline:12px;white-space:normal;word-break:normal;overflow-wrap:anywhere}
 .home-practice-grid .word-tools{margin-top:auto;padding-top:20px}
 .home-practice-grid .deck-picker{margin-bottom:18px}
 .progress-note{margin-block:20px}
@@ -351,6 +354,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .person-entry:has(.person-detail) .person-card{border-radius:var(--panel-radius) var(--panel-radius) 0 0}
 .person-detail{margin:0 0 8px;padding:16px 18px;border:1px solid var(--border);border-top:0;border-radius:0 0 var(--panel-radius) var(--panel-radius);background:var(--surface);animation:person-expand .2s ease-out both}
 .person-detail .profile-controls{margin-top:12px}
+.person-card .person-meta{font-size:.74rem;line-height:1.3}
 .create-profile{margin:0 0 20px;padding:18px;border:0;border-bottom:1px solid var(--border);animation:person-expand .2s ease-out both}
 .create-profile label{margin-block:12px}
 .share-subjects{margin-block:18px}
@@ -360,3 +364,4 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .share-all{border-bottom:1px solid var(--border);padding-bottom:10px}
 @keyframes person-expand{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.person-detail,.create-profile,.share-entry form{animation:none}}
+@media(max-width:600px){.home-practice-grid .predicate-practice>.button-row{grid-template-columns:minmax(0,1fr)}.home-practice-grid .predicate-practice>.button-row>.button.primary{grid-column:auto}}

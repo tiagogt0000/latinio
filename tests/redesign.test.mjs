@@ -61,3 +61,9 @@ test('refresh collections do not duplicate the JSON import action and collection
  assert.match(css,/\.collection-search input\{text-align:center\}/);
  assert.match(css,/\.collection-list-toolbar \.text-button[^}]*border:0/);
 });
+test('predicate card controls use a compact grid and cannot collapse into narrow letter columns',()=>{
+ const css=fs.readFileSync(new URL('../app/style.css',import.meta.url),'utf8');
+ assert.match(css,/\.home-practice-grid \.predicate-practice>\.button-row\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+ assert.match(css,/\.home-practice-grid \.predicate-practice>\.button-row>\.button\.primary\{grid-column:1\/-1\}/);
+ assert.match(css,/\.home-practice-grid \.predicate-practice>\.button-row>\.button,\.home-practice-grid \.predicate-practice>\.button-row>\.text-button\{[^}]*overflow-wrap:anywhere/);
+});

@@ -13,7 +13,7 @@ test('Profiles open before slow Google request completes; closing prevents stale
  const {ui,requests,views,nodes}=setup();const result=await ui.handle({dataset:{action:'account-profiles'}});
  assert.equal(result,true);assert.match(views[0],/Deine Nutzer/);assert.doesNotMatch(views[0],/Aktualisieren/);assert.match(views[0],/profile-new-toggle/);assert.equal(requests.length,1);
  const list=nodes.get('.profile-list');requests[0].resolve({profiles:[{id:'p',name:'Felix',email:'test@example.org',allowedSubjects:['english']}]});
- await new Promise(resolve=>setImmediate(resolve));assert.match(list.innerHTML,/Englisch/);assert.match(list.innerHTML,/data-action="admin-person"/);assert.equal(views.length,1);await ui.handle({dataset:{action:'admin-person',id:'p'}});assert.match(views[1],/data-action="profile-edit"/);assert.match(views[1],/Aktivitäten/);assert.match(views[1],/Sammlungen ansehen/);assert.doesNotMatch(views[1],/Freigaben verwalten/);
+ await new Promise(resolve=>setImmediate(resolve));assert.match(list.innerHTML,/Englisch/);assert.match(list.innerHTML,/data-action="admin-person"/);assert.match(list.innerHTML,/Version: noch nicht gemeldet/);assert.match(list.innerHTML,/Zuletzt online: noch nicht erfasst/);assert.equal(views.length,1);await ui.handle({dataset:{action:'admin-person',id:'p'}});assert.match(views[1],/data-action="profile-edit"/);assert.match(views[1],/Aktivitäten/);assert.match(views[1],/Sammlungen ansehen/);assert.doesNotMatch(views[1],/Freigaben verwalten/);
 });
 test('Sharing opens immediately and reports network failures inside the open window',async()=>{
  const {ui,requests,views,nodes}=setup();await ui.handle({dataset:{action:'share-panel'}});

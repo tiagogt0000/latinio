@@ -56,15 +56,20 @@ function latinioApi(request) {
     if(request.base!==version)return {conflict:true,version:version};
     if(!Array.isArray(request.ops)||request.ops.length>200)throw new Error('Ungültige Anzahl von Änderungen.');
     const known={};log.forEach(function(row){known[row.op.id]=true;});
-    const rows=[],accepted=[];let next=version;
+    const rows=[],accepted=[];let next=version,sawOpenedEvent=false;
     request.ops.forEach(function(op){
       validateOp_(op);accepted.push(op.id);if(known[op.id])return;
+      if(op.entity==='settings'&&op.value&&op.value.kind==='activityEvent'&&op.value.action==='opened')sawOpenedEvent=true;
       known[op.id]=true;next++;
       const json=JSON.stringify(op);if(json.length>45000)throw new Error('Eine Änderung ist zu groß.');
       rows.push([next,op.id,new Date().toISOString(),op.device,json]);
       apply_(data,op);
     });
     if(rows.length){sheet.getRange(lastRow+1,1,rows.length,5).setValues(rows);SpreadsheetApp.flush();}
+    if(sawOpenedEvent&&identity.role==='student'){
+      const profile=records_('_LatinioProfiles')[identity.id];
+      if(profile&&profile.active){profile.lastSeenAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);}
+    }
     return {version:next,data:data,accepted:accepted};
   } finally {if(lock)lock.releaseLock();}
 }
