@@ -1,16 +1,16 @@
-import {activityRows} from './activity.js';
+import {activityRows,activityLabels} from './activity.js';
 import {sortedCollections} from './refresh-decks.js';
 import {incoming,settleSync} from './multiuser-sync.js';
 export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,notify,render,openCollection,openShareSubject}){
-  let shares=store.doc.adminDirectory?.shares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false,newProfileOpen=false;
+  let shares=store.doc.adminDirectory?.shares||[],predicateShares=store.doc.adminDirectory?.predicateShares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false,newProfileOpen=false;
   let pending=0,directoryEpoch=0,selectedPerson='',shareStore=store,shareSync=sync,shareSubject=sync.subject||'latin';
   let loaded=!!store.doc.adminDirectory;
-  async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,people};return doc;});}
+  async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,predicateShares,people};return doc;});}
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
-  function lastOnline(value){const at=Number(value);return Number.isFinite(at)&&at>0?new Date(at).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Berlin'}):'noch nicht erfasst';}
+  function latestActivity(event){return event?`${new Date(event.at).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Berlin'})} · ${activityLabels[event.action]||'Aktivität'}`:'Noch keine Aktivität';}
   function profileRows(){
-    return `<div class="people-grid">${people.map(p=>`<section class="person-entry"><button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}" aria-expanded="${p.id===selectedPerson}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small><small class="person-meta">Version: ${h(p.latestAppVersion?'v'+p.latestAppVersion:'noch nicht gemeldet')}</small><small class="person-meta" title="Zeitpunkt des zuletzt synchronisierten App-Starts; Offline-Starts erscheinen erst nach dem Abgleich.">Zuletzt online: ${h(lastOnline(p.lastSeenAt))}</small></span><span aria-hidden="true">${p.id===selectedPerson?'⌄':'›'}</span></button>${p.id===selectedPerson?`<div class="person-detail"><div class="profile-controls"><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitäten</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-edit" data-id="${h(p.id)}">Bearbeiten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div></div>`:''}</section>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
+    return `<div class="people-grid">${people.map(p=>`<section class="person-entry"><button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}" aria-expanded="${p.id===selectedPerson}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small><small class="person-meta">Version: ${h(p.latestAppVersion?'v'+p.latestAppVersion:'noch nicht gemeldet')}</small><small class="person-meta" title="Oberster Eintrag aus dem bestehenden Aktivitätsprotokoll.">Letzte Aktivität: ${h(p.latestActivityLoading?'wird geladen …':latestActivity(p.latestActivity))}</small></span><span aria-hidden="true">${p.id===selectedPerson?'⌄':'›'}</span></button>${p.id===selectedPerson?`<div class="person-detail"><div class="profile-controls"><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitäten</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-edit" data-id="${h(p.id)}">Bearbeiten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div></div>`:''}</section>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
   }
   function normalizeSubjects(value){return Array.isArray(value)&&value.length?value.filter(x=>x==='latin'||x==='english'):['latin','english'];}
   function subjectName(value){return value==='english'?'Englisch':'Latein';}
@@ -21,7 +21,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     return `<div class="section-top"><h3>${rows.length} Freigaben</h3>${rows.length?`<button class="button secondary" data-action="share-notify" data-id="${h(selectedPerson)}">Erneut benachrichtigen</button>`:''}</div>`+(rows.map(s=>`<details class="share-entry"><summary>${h(s.collection?.name||'Gelöschte Sammlung')}</summary><p class="small muted">${s.delivery?(s.delivery.present?'In der Empfänger-Cloud: '+s.delivery.wordCount+' Wörter'+(s.delivery.missingWords?' · '+s.delivery.missingWords+' fehlende Einträge':''):'Sammlung fehlt in der Empfänger-Cloud'):'Empfang noch nicht geprüft'}</p><div class="profile-controls"><button class="button secondary" data-action="share-changes" data-id="${h(s.id)}">Änderungen senden</button><button class="button secondary" data-action="share-repair" data-id="${h(s.id)}">Übertragung prüfen</button><button class="button secondary" data-action="profile-view" data-id="${h(s.profileId)}">Beim Nutzer ansehen</button><button class="button secondary" data-action="share-source" data-id="${h(s.sourceId)}">Meine Sammlung</button><button class="button secondary danger-text" data-action="share-revoke" data-id="${h(s.id)}">Freigabe beenden</button></div></details>`).join('')||'<p class="muted">Noch keine Sammlungen mit diesem Nutzer geteilt.</p>');
   }
   const admin=profile.role==='admin';
-  async function refresh(){if(admin){shares=(await sync.request('shareList')).shares;loaded=true;await remember();}return shares;}
+  async function refresh(){if(admin){const result=await sync.request('shareList');shares=result.shares||[];predicateShares=result.predicateShares||[];loaded=true;await remember();}return shares;}
   store.addEventListener('commit',event=>{
     if(!admin)return;
     for(const [entity,key,value] of event.detail.changes){
@@ -38,11 +38,16 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     if(!fetch)return;
     const epoch=directoryEpoch;
     const root=document.querySelector('.profile-list'),message=document.querySelector('[data-directory-status]');
-    void sync.request('profiles').then(async result=>{if(epoch!==directoryEpoch)return;people=result.profiles;await remember();if(root.isConnected)root.innerHTML=profileRows();status(message,'Aktuell');}).catch(e=>status(message,errorText(e)));
+    void sync.request('profiles').then(async result=>{if(epoch!==directoryEpoch)return;people=result.profiles.map(p=>({...p,latestActivityLoading:true}));await remember();if(root.isConnected)root.innerHTML=profileRows();status(message,'Aktuell');const activities=await Promise.allSettled(people.map(p=>sync.request('profileActivity',{profileId:p.id})));if(epoch!==directoryEpoch)return;people=people.map((p,index)=>({...p,latestActivityLoading:false,latestActivity:activities[index].status==='fulfilled'?activities[index].value.events?.[0]:null}));await remember();if(root.isConnected)root.innerHTML=profileRows();}).catch(e=>status(message,errorText(e)));
   }
   function accessRows(){
     const collections=sortedCollections(shareStore.data);
-    return collections.map(c=>{const existing=shares.filter(s=>s.sourceId===c.id&&!s.revoked);const ids=new Set(existing.map(s=>s.profileId));return `<details class="share-entry"><summary>${h(c.name)} <small class="muted">· ${ids.size} Nutzer</small></summary><form id="share-access-form" data-id="${h(c.id)}"><label class="collection-check share-all"><input type="checkbox" data-share-all ${people.length&&ids.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${ids.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Zugriff speichern</button><p role="status" class="small muted" data-save-status></p></form></details>`;}).join('')||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>';
+    const collectionHtml=collections.map(c=>{const existing=shares.filter(s=>s.sourceId===c.id&&!s.revoked);const ids=new Set(existing.map(s=>s.profileId));return `<details class="share-entry"><summary>${h(c.name)} <small class="muted">· ${ids.size} Nutzer</small></summary><form id="share-access-form" data-id="${h(c.id)}"><label class="collection-check share-all"><input type="checkbox" data-share-all ${people.length&&ids.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${ids.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Zugriff speichern</button><p role="status" class="small muted" data-save-status></p></form></details>`;}).join('');
+    const predicateItems=Object.values(shareStore.data.settings||{}).filter(row=>row?.kind==='predicateItem'&&Array.isArray(row.praedikate));
+    if(shareSubject!=='latin')return collectionHtml||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>';
+    const predicateShares=shares.filter(s=>s.kind==='predicateShare'&&!s.revoked),predicateIds=new Set(predicateShares.map(s=>s.profileId));
+    const predicateHtml=predicateItems.length?`<section class="predicate-share-block"><h3>Perfekt &amp; Prädikate</h3><p class="small muted">${predicateItems.length} Prädikate · separat von normalen Sammlungen. Speichern überträgt auch spätere Änderungen erneut.</p><form id="predicate-access-form"><label class="collection-check share-all"><input type="checkbox" data-predicate-all ${people.length&&predicateIds.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${predicateIds.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Freigabe speichern</button><p role="status" class="small muted" data-save-status></p></form></section>`:'<section class="predicate-share-block"><h3>Perfekt &amp; Prädikate</h3><p class="small muted">Noch keine Prädikate in der Cloud.</p></section>';
+    return (collectionHtml||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>')+predicateHtml;
   }
   function panel(fetch=true){
     showAdmin(`<h2>Sammlungen freigeben</h2><p class="muted">Wähle zuerst ein Lernfach, dann eine Sammlung. Dort kannst du den Zugriff für alle oder einzelne Nutzer festlegen.</p><div class="button-row share-subjects"><button class="chip ${shareSubject==='latin'?'selected':''}" data-action="share-subject" data-id="latin">Latein</button><button class="chip ${shareSubject==='english'?'selected':''}" data-action="share-subject" data-id="english">Englisch</button></div><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben werden geladen …':''}</p><div class="share-collections" data-share-list>${accessRows()}</div>`,'shares');
@@ -50,7 +55,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     const epoch=directoryEpoch;
     const form=document.querySelector('[data-share-list]'),message=document.querySelector('[data-directory-status]'),list=document.querySelector('[data-share-list]');
     void Promise.all([sync.request('profiles'),shareSync.request('shareList')]).then(async ([p,s])=>{
-      if(epoch!==directoryEpoch)return;people=p.profiles;shares=s.shares;loaded=true;await remember();
+      if(epoch!==directoryEpoch)return;people=p.profiles;shares=s.shares||[];predicateShares=s.predicateShares||[];loaded=true;await remember();
       if(!form.isConnected)return;
       list.innerHTML=accessRows();status(message,'Aktuell');
     }).catch(e=>status(message,errorText(e)));
@@ -117,10 +122,11 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     if(action==='profile-new-toggle'){newProfileOpen=!newProfileOpen;profiles(false);return true;}
     if(action==='share-subject'){
       if(id!==shareSubject&&openShareSubject){const context=await openShareSubject(id);shareStore=context.store;shareSync=context.sync;}
-      shareSubject=id;shares=shareStore.doc.adminDirectory?.shares||[];await panel();return true;
+      shareSubject=id;shares=shareStore.doc.adminDirectory?.shares||[];predicateShares=shareStore.doc.adminDirectory?.predicateShares||[];await panel();return true;
     }
     if(action==='admin-person-shares'){selectedPerson=id;panel();return true;}
     if(action==='share-select-all'||action==='share-select-none'){document.querySelectorAll('#share-create input[name=collectionId]').forEach(el=>el.checked=action==='share-select-all');return true;}
+    if(action==='predicate-share-all'){document.querySelectorAll('#predicate-access-form input[name=recipient]').forEach(el=>el.checked=true);return true;}
     if(action==='share-notify'){
       showModal(`<h2 id="modal-title">Erneut benachrichtigen</h2><form id="share-notify-form" data-id="${h(id)}"><div class="bounded-list">${shares.filter(s=>s.profileId===id).map(s=>`<label class="collection-check"><input type="checkbox" name="shareId" value="${h(s.id)}" checked><span>${h(s.collection?.name||'Sammlung')}</span></label>`).join('')}</div><button type="submit" class="button primary wide">Benachrichtigung senden</button><p role="status" data-save-status></p></form>`);return true;
     }
@@ -150,7 +156,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     return false;
   }
   async function submit(form){
-    if(!['profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','predicate-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
@@ -183,6 +189,11 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
           await flush();const result=await sync.request('shareCreateMany',{collectionIds,profileId:fd.get('profileId')});
           directoryEpoch++;for(const item of result.results){shares=shares.filter(s=>s.id!==item.share.id);shares.push(item.share);}loaded=true;await remember();
           if(form.isConnected)panel(false);notify(result.results.every(r=>r.share.delivery?.present)?`${result.results.length} Sammlungen in der Empfänger-Cloud bestätigt.`:'Freigabe gespeichert. Empfang noch nicht geprüft – bitte Google-Skript aktualisieren.');
+        }else if(form.id==='predicate-access-form'){
+          const selectedIds=fd.getAll('recipient'),currentIds=new Set(predicateShares.filter(s=>!s.revoked).map(s=>s.profileId));
+          await settleSync(shareSync,shareStore);
+          for(const person of people){const enabled=selectedIds.includes(person.id);if(enabled||currentIds.has(person.id)){const result=await shareSync.request('predicateShareSet',{profileId:person.id,enabled});predicateShares=predicateShares.filter(s=>s.profileId!==person.id);if(result.share)predicateShares.push(result.share);}}
+          await remember();if(form.isConnected)panel(false);notify('Prädikatfreigaben gespeichert.');
         }else if(form.id==='share-access-form'){
           const collectionId=form.dataset.id,selectedIds=fd.getAll('recipient'),existing=shares.filter(s=>s.sourceId===collectionId&&!s.revoked),currentIds=new Set(existing.map(s=>s.profileId));
           await settleSync(shareSync,shareStore);
@@ -208,6 +219,6 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     })();
     return true;
   }
-  function change(el){if(el.matches?.('[data-share-all]')){const form=el.closest('#share-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.name==='recipient'&&el.closest('#share-access-form')){const form=el.closest('#share-access-form'),all=form.querySelector('[data-share-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}return false;}
+  function change(el){if(el.matches?.('[data-share-all]')){const form=el.closest('#share-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.matches?.('[data-predicate-all]')){const form=el.closest('#predicate-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.name==='recipient'&&el.closest('#share-access-form')){const form=el.closest('#share-access-form'),all=form.querySelector('[data-share-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}if(el.name==='recipient'&&el.closest('#predicate-access-form')){const form=el.closest('#predicate-access-form'),all=form.querySelector('[data-predicate-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}return false;}
   return {handle,submit,toolbar,afterAction,refresh,change,get busy(){return pending>0;}};
 }

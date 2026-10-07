@@ -172,7 +172,7 @@ function accountApi_(request,identity,subject='latin'){
   if(request.action==='profileDelete'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile)throw new Error('Profil nicht gefunden.');
     profile.active=false;profile.deletedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    const shares=Object.values(records_('_LatinioShares')).filter(function(s){return s.kind==='share'&&s.profileId===profile.id;});
+    const shares=Object.values(records_('_LatinioShares')).filter(function(s){return (s.kind==='share'||s.kind==='predicateShare')&&s.profileId===profile.id;});
     saveRecords_('_LatinioShares',shares.map(function(s){s.revoked=true;return [s.id,s];}));
     return {ok:true};
   }
@@ -239,7 +239,32 @@ function accountApi_(request,identity,subject='latin'){
   const records=records_('_LatinioShares');
   if(request.action==='shareList'){
     const states=Object.create(null);
-    return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&shareSubject_(s)===subject&&!s.revoked;}).map(function(s){if(!states[s.profileId])states[s.profileId]=readState_(s.profileId,true,subject);return Object.assign({},s,{delivery:shareDelivery_(s,states[s.profileId],records)});})};
+    return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&shareSubject_(s)===subject&&!s.revoked;}).map(function(s){if(!states[s.profileId])states[s.profileId]=readState_(s.profileId,true,subject);return Object.assign({},s,{delivery:shareDelivery_(s,states[s.profileId],records)});}),predicateShares:subject==='latin'?Object.values(records).filter(function(s){return s&&s.kind==='predicateShare'&&s.subject==='latin'&&!s.revoked&&records_('_LatinioProfiles')[s.profileId]?.active;}).map(function(s){return s;}):[]};
+  }
+  if(request.action==='predicateShareSet'){
+    if(subject!=='latin')throw new Error('Prädikate können nur im Latein-Modus geteilt werden.');
+    const profile=records_('_LatinioProfiles')[String(request.profileId||'')];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    const enabled=request.enabled===true,id='ps_'+hash_('latin:'+profile.id+':predicate-set').slice(0,32),existing=records[id];
+    if(!enabled){if(existing&&existing.kind==='predicateShare'&&!existing.revoked){existing.revoked=true;existing.updatedAt=Date.now();saveRecord_('_LatinioShares',id,existing);}return {ok:true,enabled:false};}
+    const sourceData=readState_('admin',true,'latin').data,recipientState=readState_(profile.id,true,'latin'),recipientData=recipientState.data;
+    const sourceItems=Object.keys(sourceData.settings).filter(function(key){const row=sourceData.settings[key];return row&&row.kind==='predicateItem'&&typeof row.grundform==='string'&&Array.isArray(row.praedikate);}).map(function(key){return {key:key,value:sourceData.settings[key]};});
+    if(!sourceItems.length)throw new Error('In der Cloud sind noch keine Prädikate vorhanden.');
+    if(sourceItems.length>500)throw new Error('Es können höchstens 500 Prädikate geteilt werden.');
+    const oldEntries=Object.values(records_('_LatinioShares')).filter(function(row){return row&&row.kind==='predicateEntry'&&row.shareId===id;}),oldBySource=Object.create(null),newSources=Object.create(null),ops=[],snapshots=[];
+    oldEntries.forEach(function(row){oldBySource[row.sourceId]=row;});
+    sourceItems.forEach(function(item){
+      newSources[item.key]=true;const targetKey='shared_'+hash_(id+':'+item.key).slice(0,32),value=Object.assign({},item.value,{id:targetKey,kind:'predicateItem',sharedFrom:profile.id});
+      const previous=oldBySource[item.key]?.source||null;
+      if(JSON.stringify(previous)!==JSON.stringify(item.value)||JSON.stringify(recipientData.settings[targetKey]||null)!==JSON.stringify(value)){const opId='pred_'+hash_(id+':'+item.key+':'+recipientState.version+':'+JSON.stringify(item.value)).slice(0,40);ops.push({id:opId,entity:'settings',key:targetKey,value:value});}
+      snapshots.push([id+'_'+item.key,{kind:'predicateEntry',shareId:id,sourceId:item.key,source:item.value}]);
+    });
+    oldEntries.forEach(function(row){if(!newSources[row.sourceId]){const targetKey='shared_'+hash_(id+':'+row.sourceId).slice(0,32),opId='pred_'+hash_(id+':'+row.sourceId+':deleted:'+recipientState.version+':'+JSON.stringify(row.source)).slice(0,40);if(recipientData.settings[targetKey])ops.push({id:opId,entity:'settings',key:targetKey,value:null});snapshots.push([id+'_'+row.sourceId,{kind:'predicateEntry',shareId:id,sourceId:row.sourceId,source:null}]);}});
+    const newlyShared=!existing||existing.revoked;
+    if(newlyShared){const noticeId='notice_'+hash_('predicate:'+id+':'+Date.now()).slice(0,40);ops.push({id:noticeId,entity:'settings',key:noticeId,value:{kind:'shareNotice',id:noticeId,at:Date.now(),resources:[{id:'predicate-set',name:'Perfekt & Prädikate'}]}});}
+    serverWrite_(profile.id,ops,'latin');
+    const share={id:id,kind:'predicateShare',subject:'latin',profileId:profile.id,profileName:profile.name,sourceId:'predicate-set',name:'Perfekt & Prädikate',ready:true,revoked:false,updatedAt:Date.now()};
+    saveRecord_('_LatinioShares',id,share);saveRecords_('_LatinioShares',snapshots);
+    return {ok:true,enabled:true,changed:ops.length,share:share};
   }
   if(request.action==='shareCreate'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');

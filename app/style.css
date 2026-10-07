@@ -187,6 +187,9 @@ input:focus,select:focus{border-color:var(--accent)}
  vertical-align:middle;transition:background .15s,border-color .15s
 }
 .button.primary,:root[data-subject=english] .button.primary{background:var(--green);border-color:var(--green);color:#fff;box-shadow:none}
+.subject-dropdown>summary{box-shadow:none!important;border:1px solid var(--border)!important;border-radius:12px!important;min-height:48px!important;padding:12px 18px!important;background:var(--surface)!important;color:var(--text);font:inherit;font-weight:650;line-height:1.35;}
+.subject-dropdown>summary:active{transform:none!important}
+.predicate-share-block{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}.predicate-share-block>p{margin-top:8px}.predicate-share-block form{max-width:620px}
 .button.secondary,.text-button{background:var(--surface);border-color:var(--border)}
 .button.danger{background:var(--red);border-color:var(--red);color:white}
 .danger-text,.text-button.danger-text,.button.danger-text{color:var(--red)}

@@ -48,8 +48,8 @@ test('Cloud blur stays open until notices are confirmed and the acknowledgement 
  x.store.commit=async edits=>{for(const [e,k,v] of edits)x.store.data[e][k]=v;x.store.doc.pending=[1];uploading=true;};
  x.sync.run=async()=>{if(uploading){await new Promise(resolve=>release=resolve);uploading=false;x.store.doc.pending=[];}else await original();};
  const run=x.gate.run();await new Promise(resolve=>setImmediate(resolve));
- assert.equal(x.dialog.open,true);assert.match(x.dialog.innerHTML,/Neue Sammlungen/);assert.equal(x.nodes.get('ul').children[0].textContent,'Lektion 1');assert.equal(x.store.data.settings.read_n,undefined);
+ assert.equal(x.dialog.open,true);assert.match(x.dialog.innerHTML,/Neue Inhalte/);assert.equal(x.nodes.get('ul').children[0].textContent,'Lektion 1');assert.equal(x.store.data.settings.read_n,undefined);
  x.dialog.onclick({target:{closest:()=>({})}});await new Promise(resolve=>setImmediate(resolve));assert.equal(x.dialog.open,true);assert.equal(x.gate.blocked,true);assert.equal(x.nodes.get('button').disabled,true);
  release();await run;assert.equal(x.dialog.open,false);assert.equal(x.store.data.settings.read_n.noticeId,'n');
- await x.gate.run();assert.doesNotMatch(x.dialog.innerHTML,/Neue Sammlungen/);
+ await x.gate.run();assert.doesNotMatch(x.dialog.innerHTML,/Neue Inhalte/);
 });
