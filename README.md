@@ -1,4 +1,19 @@
-# Latinio · Version 1.9.12
+# Latinio · Version 2.0.5
+
+## 2.0.5 · Perfekt-Sammlungen und direkter App-Start
+
+- „Perfektform lernen“ und „Vokabeln üben“ verwenden dieselbe Lernkarte mit „Smart lernen“, „Mehr Optionen“ und Sammlungswahl.
+- Sammlungen → Perfektformen: Anlegen, Umbenennen, Aktivieren, Formen bearbeiten/hinzufügen und Löschen. Bestehende benannte Prädikatlisten erscheinen automatisch als Sammlungen; ihre IDs und bisherigen Antworten bleiben erhalten.
+- Einstellungen → Sammlung importieren erkennt Vokabel-, Auffrisch- und Perfektdateien. Perfektdateien werden im Lateinbereich importiert.
+- Die App öffnet sofort mit dem lokalen Stand. Der erste Cloud-Abgleich läuft im Hintergrund. Ein währenddessen angeklickter Lernstart zeigt drei Punkte und wartet auf den Abgleich; Navigation bleibt möglich. Ohne Verbindung lässt sich mit dem gespeicherten Stand lernen.
+- Cloudsymbol in der Kopfzeile: grau mit Spinner während des Abgleichs, grün nach bestätigtem Speichern. Neue Freigaben erscheinen als eigene Mitteilung, sobald keine Runde oder Bearbeitung offen ist.
+- Eigenes Nutzer-Symbol, flache Sprachoptionen und korrigierte Anzeige bestehender Prädikatfreigaben.
+
+Für **diese Änderungen** ist keine neue Apps-Script-Bereitstellung erforderlich. Das Teilen der Perfektformen setzt weiterhin den bereits mit 2.0.4 eingeführten Endpunkt `predicateShareSet` voraus. Der aktive Google-Deploymentstand wurde hier nicht live verifiziert. Freigaben übertragen weiterhin den gesamten Perfektbereich pro Empfänger, einschließlich Sammlungsnamen; individuelle Freigaben einzelner Perfekt-Sammlungen sind noch nicht implementiert.
+
+Technischer Stand, Architektur und Arbeitsvorgaben: [Projektübergabe](docs/PROJECT_HANDOVER.md).
+
+Die folgenden Abschnitte beschreiben historische Versionen; insbesondere die dortige rein lokale Speicherung des Prädikat-Trainers gilt seit 2.0 nicht mehr.
 
 ## 1.9.12 · Separater Prädikat-Trainer
 

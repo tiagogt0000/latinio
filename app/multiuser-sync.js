@@ -42,42 +42,26 @@ async function settle(sync,store){
   }
   throw Error('Der Abgleich ist noch nicht abgeschlossen. Bitte erneut versuchen.');
 }
-export function cloudGate({sync,store,name='du',onReady}){
- const dialog=document.createElement('dialog');dialog.className='cloud-wait';dialog.setAttribute('aria-labelledby','cloud-greeting');document.body.append(dialog);
- dialog.addEventListener('cancel',e=>e.preventDefault());let running=null;
- const stages={checking:'Verbindung zur Cloud wird hergestellt …',newer:'Cloud-Stand wird heruntergeladen …',loading:'Cloud-Stand wird heruntergeladen …',uploading:'Fortschritt wird gespeichert …',synced:'Alles bereit.'};
- function status(){const el=dialog.querySelector('[data-cloud-stage]');if(el)el.textContent=stages[sync.status]||'Cloud-Stand wird geprüft …';}
- function showLoading(label){dialog.classList.remove('leaving');dialog.innerHTML='<div class="cloud-welcome"><h1 id="cloud-greeting"></h1><p class="cloud-intro"></p><div class="cloud-orbit" aria-hidden="true"><i></i><i></i><i></i></div><p data-cloud-stage role="status" aria-live="polite"></p></div>';dialog.querySelector('h1').textContent='Hallo '+name;dialog.querySelector('.cloud-intro').textContent=label;status();}
- function execute(label='Wir bereiten alles vor.'){
+// Only the first reconciliation is awaited by learning actions. Navigation and
+// editing remain available, and a failed/offline check releases cached lessons.
+export function cloudGate({sync,store,onReady,onError,afterSync}){
+ let running=null,finished=false;
+ function execute(){
   if(running)return running;
-  // Defer execution so the guard is set even when offline.
+  if(finished)return Promise.resolve();
   running=Promise.resolve().then(async()=>{
-   if(!navigator.onLine)return;
-   showLoading(label);dialog.showModal();sync.addEventListener('change',status);
-   while(true){
-    try{
-     await settleSync(sync,store);
-     while(unreadShareNotices(store.data).length){
-      const notices=unreadShareNotices(store.data),collections=noticeCollections(notices);
-      dialog.innerHTML='<div class="cloud-welcome share-welcome"><h1 id="cloud-greeting">Neue Inhalte für dich</h1><p>Diese Inhalte wurden mit dir geteilt:</p><ul class="shared-notice-list"></ul><button class="button primary wide" data-choice="continue">Weiter</button><p role="status" class="small muted"></p></div>';
-      const list=dialog.querySelector('ul');
-      for(const c of collections){const li=document.createElement('li');li.textContent=c.name;list.append(li);}
-      await new Promise(resolve=>{dialog.onclick=e=>{if(e.target.closest('[data-choice="continue"]'))resolve();};});dialog.onclick=null;
-      dialog.querySelector('button').disabled=true;dialog.querySelector('[role="status"]').textContent='Bestätigung wird gespeichert …';
-      await acknowledgeShareNotices(store,sync,notices);
-     }
-     break;
-    }
-    catch(error){
-     if(sync.status==='restricted'){dialog.close();break;}
-     dialog.innerHTML='<div class="cloud-welcome"><h1 id="cloud-greeting">Verbindung unterbrochen</h1><p role="status"></p><div class="word-tools"><button class="button primary" data-choice="retry">Erneut versuchen</button><button class="button secondary" data-choice="offline">Offline fortfahren</button></div></div>';
-     dialog.querySelector('p').textContent=error.message;
-     const choice=await new Promise(resolve=>{dialog.onclick=e=>{const b=e.target.closest('[data-choice]');if(b)resolve(b.dataset.choice);};});dialog.onclick=null;
-     if(choice==='offline')break;showLoading(label);
-    }
-   }
-  }).finally(async()=>{sync.removeEventListener('change',status);if(dialog.open){dialog.classList.add('leaving');await new Promise(resolve=>setTimeout(resolve,180));dialog.close();}running=null;onReady?.();});
+   if(navigator.onLine&&sync.configured!==false)await settleSync(sync,store);
+   await afterSync?.();
+  }).catch(error=>{onError?.(error);}).finally(()=>{running=null;finished=true;onReady?.();});
   return running;
  }
- return {run:execute,get blocked(){return !!running;}};
+ return {run:execute,wait:()=>running||Promise.resolve(),get blocked(){return !!running;}};
+}
+
+export async function waitForInitialSync(gate,button){
+ if(!gate?.blocked)return;
+ const original=button.innerHTML,disabled=button.disabled,label=button.getAttribute('aria-label');
+ button.disabled=true;button.setAttribute('aria-busy','true');button.setAttribute('aria-label','Runde wird geladen');
+ button.innerHTML='<span class="button-loading" role="status" aria-label="Runde wird geladen"><i></i><i></i><i></i></span>';
+ try{await gate.wait();}finally{button.innerHTML=original;button.disabled=disabled;button.removeAttribute('aria-busy');if(label===null)button.removeAttribute('aria-label');else button.setAttribute('aria-label',label);}
 }

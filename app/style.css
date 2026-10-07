@@ -368,3 +368,23 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 @keyframes person-expand{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.person-detail,.create-profile,.share-entry form{animation:none}}
 @media(max-width:600px){.home-practice-grid .predicate-practice>.button-row{grid-template-columns:minmax(0,1fr)}.home-practice-grid .predicate-practice>.button-row>.button.primary{grid-column:auto}}
+
+/* 2.0.5: matching training cards, flat subject choices and quiet cloud status. */
+.subject-options,.subject-options>button,.subject-options>button:active{box-shadow:none!important;transform:none!important;background-image:none!important}
+.subject-options{border:1px solid var(--border);padding:6px}
+.subject-options>button{min-height:48px;padding:12px 18px;line-height:1.35}
+.topbar-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
+.topbar .topbar-actions [data-sync]{max-width:none}
+.topbar .sync-indicator{position:relative;width:44px;height:44px;min-width:44px;padding:10px;border:0;background:transparent;box-shadow:none;color:var(--muted)}
+.topbar .sync-indicator.synced{color:#348a36}
+.sync-spinner{position:absolute;right:3px;bottom:4px;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--muted);border-radius:50%;animation:sync-spin .85s linear infinite;background:var(--surface)}
+@keyframes sync-spin{to{transform:rotate(360deg)}}
+.button-loading{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:24px;min-width:90px}
+.button-loading i{display:block;width:6px;height:6px;border-radius:50%;background:currentColor;animation:cloud-dot 1.2s ease-in-out infinite}
+.button-loading i:nth-child(2){animation-delay:.16s}.button-loading i:nth-child(3){animation-delay:.32s}
+.home-practice-grid>.training-card{min-width:0}
+.home-practice-grid .word-tools{display:grid;grid-template-columns:1fr;gap:12px}
+.home-practice-grid .word-tools>.button{width:100%;min-width:0;min-height:52px;margin:0;padding:14px 18px;word-break:normal;overflow-wrap:normal}
+.home-practice-grid .card-foot{margin-top:18px}
+@media(max-width:600px){.topbar-actions{gap:6px}.topbar{gap:8px}.section-tabs{grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}}
+@media(prefers-reduced-motion:reduce){.sync-spinner,.button-loading i{animation:none}}

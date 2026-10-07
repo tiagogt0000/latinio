@@ -94,7 +94,7 @@ export class Sync extends EventTarget {
       await this.store.update(doc=>{doc.lastSync=Date.now();return doc;});
       this.set('synced',`Alles hochgeladen · v${this.store.doc.base}`);
     }catch(e){this.set('error',e.message);}
-    finally{this.busy=false;}
+    finally{this.busy=false;this.dispatchEvent(new Event('change'));}
   }
   async fetchRemote(full=false){
     this.remote=await this.request('pull',{since:full?0:this.store.doc.base});this.remoteFull=full;this.cloudVersion=this.remote.version;

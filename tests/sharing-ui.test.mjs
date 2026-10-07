@@ -55,3 +55,11 @@ test('Selected lessons are submitted together in one sharing request',async()=>{
  await new Promise(resolve=>setImmediate(resolve));assert.equal(t.store.doc.adminDirectory.shares.length,2);assert.equal(t.ui.busy,false);
  }finally{globalThis.FormData=Previous;}
 });
+
+test('Already granted predicate access is checked from predicateShares, not lesson shares',async()=>{
+ const t=setup();t.store.data.settings.p={kind:'predicateItem',grundform:'amare',praedikate:['amavi']};
+ t.store.doc.adminDirectory={people:[{id:'felix',name:'Felix',email:'felix@example.org'}],shares:[],predicateShares:[{kind:'predicateShare',profileId:'felix',revoked:false}]};
+ const ui=sharingUI({store:t.store,sync:t.sync,profile:{role:'admin'},h:s=>String(s??''),showAdmin:s=>t.views.push(s),showModal(){},notify(){},render(){}});
+ await ui.handle({dataset:{action:'share-panel'}});
+ assert.match(t.views[0],/name="recipient" value="felix" checked/);assert.match(t.views[0],/data-predicate-all checked/);
+});

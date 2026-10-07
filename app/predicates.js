@@ -52,7 +52,41 @@ export async function predicateCloudKey(grundform){
 }
 
 export function predicateCloudItems(data){
- return Object.values(data?.settings||{}).filter(row=>row?.kind==='predicateItem'&&typeof row.grundform==='string'&&Array.isArray(row.praedikate)).map(({grundform,praedikate})=>({grundform,praedikate}));
+ return Object.entries(data?.settings||{}).filter(([,row])=>row?.kind==='predicateItem'&&typeof row.grundform==='string'&&Array.isArray(row.praedikate)).map(([id,row])=>({...row,id,deckId:row.deckId||legacyPredicateDeckId(row.name)}));
+}
+
+// Legacy imports already have a collection name. Derive a stable group without
+// rewriting their keys or disturbing existing review/share history.
+function legacyPredicateDeckId(name){let hash=14695981039346656037n;for(const byte of new TextEncoder().encode(key(name||'Prädikate')))hash=BigInt.asUintN(64,(hash^BigInt(byte))*1099511628211n);return 'predicate_deck_legacy_'+hash.toString(16);}
+export function predicateDecks(data){
+ const decks=new Map();
+ for(const item of predicateCloudItems(data))if(!decks.has(item.deckId))decks.set(item.deckId,{kind:'predicateDeck',id:item.deckId,name:item.name||'Prädikate',active:true});
+ for(const row of Object.values(data?.settings||{}))if(row?.kind==='predicateDeck')decks.set(row.id,row);
+ return [...decks.values()].sort((a,b)=>a.name.localeCompare(b.name,'de',{numeric:true}));
+}
+export function predicateDeckChanges(data,deck){
+ // Names travel with items through the existing predicate sharing endpoint.
+ return [['settings',deck.id,{...deck,kind:'predicateDeck'}],...predicateCloudItems(data).filter(item=>item.deckId===deck.id&&item.name!==deck.name).map(item=>['settings',item.id,{...item,name:deck.name}])];
+}
+export async function importPredicateCollection(data,parsed,newId){
+ const deck=predicateDecks(data).find(d=>key(d.name)===key(parsed.name))||{id:newId,kind:'predicateDeck',name:parsed.name,active:true};
+ const existing=predicateCloudItems(data).filter(item=>item.deckId===deck.id);
+ const changes=await Promise.all(parsed.items.map(async item=>{
+  const id=existing.find(row=>key(row.grundform)===key(item.grundform))?.id||await predicateCloudKey(deck.id+':'+item.grundform);
+  return ['settings',id,{...item,id,kind:'predicateItem',deckId:deck.id,name:deck.name}];
+ }));
+ return {deck,changes:[['settings',deck.id,deck],...changes]};
+}
+export function predicateProgress(data,item){
+ const reviews=Object.values(data.settings||{}).filter(row=>row?.kind==='predicateReview'&&(row.itemId?row.itemId===item.id:key(row.grundform)===key(item.grundform))).sort((a,b)=>b.at-a.at);
+ return {seen:reviews.length>0,known:reviews[0]?.correct===true,at:reviews[0]?.at||0};
+}
+export function predicateQueue(data,deckIds,mode='smart',limit=10,random=Math.random){
+ let items=shufflePredicates(predicateCloudItems(data).filter(item=>deckIds.includes(item.deckId)),random);
+ if(mode==='learning')return items.filter(item=>!predicateProgress(data,item).known);
+ if(mode==='refresh')return items.filter(item=>predicateProgress(data,item).known);
+ if(mode==='all')return items;
+ return items.sort((a,b)=>{const pa=predicateProgress(data,a),pb=predicateProgress(data,b);return Number(pa.known)-Number(pb.known)||pa.at-pb.at;}).slice(0,limit);
 }
 
 export async function predicateChanges(items,name='Prädikate'){

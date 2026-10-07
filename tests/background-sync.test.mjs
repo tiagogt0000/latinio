@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {settleSync,incomingChanges,cloudGate} from '../app/multiuser-sync.js';
+import {settleSync,incomingChanges,cloudGate,waitForInitialSync} from '../app/multiuser-sync.js';
 import {emptyData,applyOps} from '../app/core.js';
 Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});
 test('Concurrent automatic sync callers share one download and preserve local choices',async()=>{
@@ -8,21 +8,31 @@ test('Concurrent automatic sync callers share one download and preserve local ch
  const sync={status:'newer',remote:{},run:async()=>{runs++;if(runs===1)await new Promise(resolve=>release=resolve);else sync.status='synced';},compare:()=>({conflicts:[{key:'edited-word'}]}),accept:async choices=>{assert.equal(choices['edited-word'],'local');accepted++;sync.remote=null;}};
  const a=settleSync(sync,store),b=settleSync(sync,store);assert.equal(a,b);release();await Promise.all([a,b]);assert.equal(accepted,1);assert.equal(runs,2);
 });
-function gateFixture(name){
- const nodes=new Map(),dialog={open:false,innerHTML:'',onclick:null,classList:{add(){},remove(){}},setAttribute(){},addEventListener(){},querySelector(key){if(!nodes.has(key))nodes.set(key,{textContent:'',children:[],append(node){this.children.push(node);}});return nodes.get(key);},showModal(){this.open=true;},close(){this.open=false;}};
- globalThis.document={createElement:tag=>tag==='dialog'?dialog:{textContent:''},body:{append(){}}};
- const store={doc:{pending:[]},data:emptyData()},sync=new EventTarget();sync.status='synced';sync.run=async()=>{};
- return {dialog,nodes,store,sync,gate:cloudGate({sync,store,name})};
+function gateFixture(){
+ globalThis.document={createElement(){throw Error('Startup must not create a loading screen');}};
+ const store={doc:{pending:[]},data:emptyData()},sync=new EventTarget(),errors=[];sync.status='synced';sync.run=async()=>{};
+ return {store,sync,errors,gate:cloudGate({sync,store,onError:error=>errors.push(error.message)})};
 }
-test('Full-screen greeting works for both admin and student names',async()=>{
- for(const name of ['Tiago','Felix']){const x=gateFixture(name);const run=x.gate.run();assert.equal(x.gate.blocked,true);await run;assert.equal(x.nodes.get('h1').textContent,'Hallo '+name);assert.equal(x.gate.blocked,false);assert.equal(x.dialog.open,false);assert.match(x.dialog.innerHTML,/cloud-welcome/);}
+test('Startup runs once without creating a dialog and concurrent learning waits join it',async()=>{
+ const x=gateFixture();let release,calls=0;x.sync.run=()=>{calls++;return new Promise(resolve=>release=resolve);};
+ const run=x.gate.run();assert.equal(x.gate.blocked,true);assert.equal(run,x.gate.run());
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(calls,1);
+ let started=false;const wait=x.gate.wait().then(()=>started=true);assert.equal(started,false);
+ release();await Promise.all([run,wait]);assert.equal(started,true);assert.equal(x.gate.blocked,false);await x.gate.run();assert.equal(calls,1);
 });
-test('Offline startup never opens a blocking greeting and can retry later',async()=>{
- const x=gateFixture('Tiago');navigator.onLine=false;await x.gate.run();assert.equal(x.dialog.open,false);assert.equal(x.gate.blocked,false);navigator.onLine=true;await x.gate.run();assert.equal(x.nodes.get('h1').textContent,'Hallo Tiago');
+test('Offline startup releases local learning immediately without a loading screen',async()=>{
+ const x=gateFixture();navigator.onLine=false;let calls=0;x.sync.run=async()=>calls++;
+ try{await x.gate.run();assert.equal(calls,0);assert.equal(x.gate.blocked,false);}finally{navigator.onLine=true;}
 });
-test('Failed online sync offers Offline fortfahren without erasing pending work',async()=>{
- const x=gateFixture('Felix');x.store.doc.pending=[{id:'local-change'}];x.sync.status='error';x.sync.message='Nicht erreichbar';
- const run=x.gate.run();await new Promise(resolve=>setImmediate(resolve));assert.match(x.dialog.innerHTML,/Offline fortfahren/);assert.equal(x.gate.blocked,true);x.dialog.onclick({target:{closest:()=>({dataset:{choice:'offline'}})}});await run;assert.equal(x.store.doc.pending.length,1);assert.equal(x.gate.blocked,false);
+test('Failed initial sync releases learning and preserves pending work',async()=>{
+ const x=gateFixture();x.store.doc.pending=[{id:'local-change'}];x.sync.status='error';x.sync.message='Nicht erreichbar';
+ await x.gate.run();assert.deepEqual(x.errors,['Nicht erreichbar']);assert.equal(x.store.doc.pending.length,1);assert.equal(x.gate.blocked,false);
+});
+test('Only the clicked start button displays three dots and its original accessible state is restored',async()=>{
+ const x=gateFixture();let release;x.sync.run=()=>new Promise(resolve=>release=resolve);x.gate.run();
+ const attrs=new Map(),button={innerHTML:'Smart lernen',disabled:false,getAttribute:k=>attrs.get(k)??null,setAttribute:(k,v)=>attrs.set(k,v),removeAttribute:k=>attrs.delete(k)};
+ const wait=waitForInitialSync(x.gate,button);assert.equal((button.innerHTML.match(/<i>/g)||[]).length,3);assert.equal(button.disabled,true);assert.equal(attrs.get('aria-busy'),'true');
+ await new Promise(resolve=>setImmediate(resolve));release();await wait;assert.equal(button.innerHTML,'Smart lernen');assert.equal(button.disabled,false);assert.equal(attrs.size,0);
 });
 test('Student sync loads cloud before uploading local work and applying shared vocabulary',async()=>{
  const data=emptyData();data.collections.c={id:'c',name:'Latein'};
@@ -42,14 +52,7 @@ test('Personal changes survive incoming edits and nonempty collection deletion r
  const r=incomingChanges(d);assert.equal(r.changes.length,0);assert.equal(r.conflicts.length,2);assert.equal(d.words.w.latin,'mein Wort');
 });
 
-test('Cloud blur stays open until notices are confirmed and the acknowledgement reaches the server',async()=>{
- const x=gateFixture('Felix');x.store.data.settings.n={id:'n',kind:'shareNotice',at:1,collections:[{id:'c',name:'Lektion 1'}]};
- let uploading=false,release;const original=x.sync.run;
- x.store.commit=async edits=>{for(const [e,k,v] of edits)x.store.data[e][k]=v;x.store.doc.pending=[1];uploading=true;};
- x.sync.run=async()=>{if(uploading){await new Promise(resolve=>release=resolve);uploading=false;x.store.doc.pending=[];}else await original();};
- const run=x.gate.run();await new Promise(resolve=>setImmediate(resolve));
- assert.equal(x.dialog.open,true);assert.match(x.dialog.innerHTML,/Neue Inhalte/);assert.equal(x.nodes.get('ul').children[0].textContent,'Lektion 1');assert.equal(x.store.data.settings.read_n,undefined);
- x.dialog.onclick({target:{closest:()=>({})}});await new Promise(resolve=>setImmediate(resolve));assert.equal(x.dialog.open,true);assert.equal(x.gate.blocked,true);assert.equal(x.nodes.get('button').disabled,true);
- release();await run;assert.equal(x.dialog.open,false);assert.equal(x.store.data.settings.read_n.noticeId,'n');
- await x.gate.run();assert.doesNotMatch(x.dialog.innerHTML,/Neue Inhalte/);
+test('Unread share notices survive initial sync without delaying learning',async()=>{
+ const x=gateFixture();x.store.data.settings.n={id:'n',kind:'shareNotice',at:1,collections:[{id:'c',name:'Lektion 1'}]};
+ await x.gate.run();assert.equal(x.gate.blocked,false);assert.equal(x.store.data.settings.n.kind,'shareNotice');assert.equal(x.store.data.settings.read_n,undefined);
 });
