@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.4.
+Stand: 8. Oktober 2026, Version 2.1.5.
+
+## Stand 2.1.5
+
+Die Streak-Zahl ist um Karten-Innenabstand und Randbreite eingerückt und endet auf dem Handy bündig mit dem Buchsymbol. Karten und Tagesanzeige verwenden denselben responsiven Innenabstand (24 px, unter 560 px 20 px).
 
 ## Stand 2.1.4
 

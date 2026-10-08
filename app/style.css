@@ -179,7 +179,9 @@ input:focus,select:focus{border-color:var(--accent)}
 :root{--control-radius:12px;--panel-radius:18px;--control-height:44px}
 .content{max-width:1180px;margin-inline:auto}
 .card,.training-card,.word-list,.modal,.latin-word,.result-stats>div{border-width:1px;border-radius:var(--panel-radius);box-shadow:none}
-.card,.training-card{padding:24px}
+.card{padding:24px}
+.home-practice-grid{--home-card-padding:24px}
+.training-card{padding:var(--home-card-padding,24px)}
 .button,.text-button,.chip,.correction,.icon-button{
  min-height:var(--control-height);border:1px solid var(--border);border-radius:var(--control-radius);
  padding:10px 16px;background:var(--surface);color:var(--text);box-shadow:none;
@@ -274,7 +276,9 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 }
 @media(max-width:560px){
  .people-grid{grid-template-columns:1fr}
- .card,.training-card{padding:20px}
+ .card{padding:20px}
+ .home-practice-grid{--home-card-padding:20px}
+ .training-card{padding:var(--home-card-padding,20px)}
  .person-detail .profile-controls>.button{flex:1 1 140px}
  .training-card h2{font-size:1.7rem}
  .predicate-practice .button-row>*{flex:1 1 160px}

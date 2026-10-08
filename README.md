@@ -1,4 +1,8 @@
-# Latinio · Version 2.1.4
+# Latinio · Version 2.1.5
+
+## 2.1.5 · Streak-Zahl am Buchsymbol
+
+Die Streak-Zahl ist um Karten-Innenabstand und Randbreite eingerückt und endet auf dem Handy bündig mit dem Buchsymbol. Karten und Tagesanzeige verwenden denselben responsiven Innenabstand (24 px, unter 560 px 20 px).
 
 ## 2.1.4 · Streak-Zahl rechts ausrichten
 
