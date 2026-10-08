@@ -1,4 +1,12 @@
-# Latinio · Version 2.0.6
+# Latinio · Version 2.0.7
+
+## 2.0.7 · Ruhigere Navigation und Animationen
+
+- Die Vokabelsuche unter Sammlungen öffnet sich erst per Suchsymbol neben der Überschrift. Alle Sammlungsreiter bleiben in einer Zeile.
+- Nutzeraktionen erscheinen als flache Textaktion mit grüner Linie.
+- Bei Aktualisierungen derselben Seite bleibt die Scrollposition erhalten. Seitenwechsel erhalten kurze, je nach Bereich passende Übergänge. Aktionsknöpfe zeigen beim Laden nach kurzer Verzögerung drei animierte Punkte; reduzierte Bewegungseinstellungen werden respektiert.
+
+Die folgenden Abschnitte beschreiben frühere Versionen.
 
 ## 2.0.6 · Übersichtliche Sammlungen und Freigaben
 

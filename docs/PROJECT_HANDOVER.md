@@ -1,6 +1,14 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.6.
+Stand: 8. Oktober 2026, Version 2.0.7.
+
+## Stand 2.0.7
+
+Unter Sammlungen startet die Suche geschlossen und öffnet sich über ein Symbol neben der Überschrift. Die Sammlungsreiter bleiben auch auf schmalen Displays in einer Zeile. Nutzeraktionen sind flache Textaktionen mit grüner Linie.
+
+`render()` merkt die Scrollposition bei Aktualisierungen derselben Ansicht und setzt sie nur bei Seitenwechsel zurück. Die Ganzseiten-Einblendung läuft nicht mehr bei jedem Render; Seitenwechsel und Dialoge erhalten unterschiedliche kurze Übergänge. Nach 140 ms zeigen aktive Aktionsknöpfe drei animierte Ladepunkte. `prefers-reduced-motion` wird berücksichtigt. Keine visuelle Browserprüfung (Nutzerwunsch).
+
+Die Google-Apps-Script-kompatible FNV-Funktion für alte Perfekt-Sammlungs-IDs verwendet zwei 32-Bit-Werte statt BigInt-Literalen. Regressionstest deckt 102 lateinische, mehrsprachige und Unicode-Namen ab.
 
 ## Stand 2.0.6
 
@@ -37,7 +45,7 @@ Vanilla JavaScript mit ES-Modulen, ohne Buildschritt und ohne npm-Abhängigkeite
 
 Latein und Englisch haben getrennte Datenbereiche. Die letzte Sprachwahl bleibt lokal. Adminbegrüßung „Hallo Tiago“. Englisch nutzt rote Akzente. Perfektformen gehören nur zum Lateinbereich.
 
-## Stand 2.0.5
+## Stand 2.0.7\n\nSammlungssuche startet eingeklappt über ein Suchsymbol. Sammlungsreiter sind immer einzeilig. Nutzeraktionslink ist flach. `render()` bewahrt bei Re-Renders auf derselben Seite `window.scrollY` und setzt Scroll nur bei Seitenwechsel zurück. Daueranimation der gesamten `.content`-Fläche wurde durch bereichsspezifische kurze Übergänge nur beim Wechsel ersetzt. Buttons, die länger als 140 ms laden, zeigen drei Punkte. Dialoge und Antwortfeedback erhalten jeweils passende Einblendungen; `prefers-reduced-motion` wird eingehalten. Kein visueller Browsercheck (Nutzerpräferenz).\n\nDie vorherigen Stände folgen.\n\n## Stand 2.0.5
 
 Die letzte Nutzeranfrage wurde umgesetzt: gleiche Home-Lernkarten, Perfekt-Sammlungsreiter und Bearbeitung, zentraler JSON-Import, Nutzersymbol, flache Sprachoptionen und Hintergrund-Synchronisierung ohne Cloud-Startbildschirm. Startknöpfe warten nur auf den ersten noch laufenden Abgleich. Weiteres Navigieren ist möglich; ein durch Navigation verlassener Start wird verworfen. Spätere Hintergrundabgleiche überschreiben keine Eingaben einer laufenden Runde.
 
