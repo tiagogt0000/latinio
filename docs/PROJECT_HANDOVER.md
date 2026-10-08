@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.10.
+Stand: 8. Oktober 2026, Version 2.0.11.
+
+## Stand 2.0.11
+
+Auf Nutzerwunsch rote Hintergrundflächen auf etwa halbe Intensität reduziert (Spitze .46, Abschluss .28). Home-Smart-Buttons wieder mit `--green` wie vor 2.0.6; die dort eingeführte `--green-dark`-Überschreibung war im Dark Mode heller. Keine Backendänderung.
 
 ## Stand 2.0.10
 

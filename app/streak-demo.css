@@ -52,7 +52,7 @@
 .streak-stage[data-phase=celebrate] .streak-current-right{animation:streak-red-right 10.5s .3s ease-in-out infinite}
 .streak-stage[data-phase=celebrate] .streak-current-top{animation:streak-red-top 11s .3s ease-in-out infinite}
 .streak-stage[data-phase=celebrate] .streak-current-bottom{animation:streak-red-bottom 12s .3s ease-in-out infinite}
-@keyframes streak-red-swell{0%{opacity:0}20%{opacity:.22}47%{opacity:.93}70%{opacity:.8}100%{opacity:.66}}
+@keyframes streak-red-swell{0%{opacity:0}20%{opacity:.1}47%{opacity:.46}70%{opacity:.36}100%{opacity:.28}}
 @keyframes streak-red-left{0%,100%{transform:translate(-12%,5%) scale(1)}40%{transform:translate(11%,-7%) scale(1.08)}70%{transform:translate(2%,9%) scale(1.02)}}
 @keyframes streak-red-right{0%,100%{transform:translate(12%,-6%) scale(1)}38%{transform:translate(-11%,7%) scale(1.12)}72%{transform:translate(-2%,-8%) scale(1.04)}}
 @keyframes streak-red-top{0%,100%{transform:translate(5%,-15%) rotate(-5deg)}43%{transform:translate(-7%,11%) rotate(6deg)}72%{transform:translate(8%,2%) rotate(1deg)}}
@@ -157,6 +157,6 @@
 .streak-stage[data-reduced-motion=true] *{animation:none!important;transition:none!important}
 .streak-stage[data-reduced-motion=true] .streak-flame-entry,.streak-stage[data-reduced-motion=true] .streak-new,.streak-stage[data-reduced-motion=true] .streak-copy>*{opacity:1;transform:none}
 .streak-stage[data-reduced-motion=true] .streak-atmosphere{opacity:var(--stage-glow-opacity)}
-.streak-stage[data-reduced-motion=true] .streak-backdrop{opacity:.5}
+.streak-stage[data-reduced-motion=true] .streak-backdrop{opacity:.25}
 .streak-stage[data-reduced-motion=true] .streak-old,.streak-stage[data-reduced-motion=true] .streak-sparks,.streak-stage[data-reduced-motion=true] .streak-rays{display:none}
-@media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important;transition:none!important}.streak-stage .streak-flame-entry,.streak-stage .streak-new,.streak-stage .streak-copy>*{opacity:1;transform:none}.streak-stage .streak-atmosphere{opacity:var(--stage-glow-opacity)}.streak-stage .streak-backdrop{opacity:.5}.streak-stage .streak-old,.streak-stage .streak-sparks,.streak-stage .streak-rays{display:none}}
+@media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important;transition:none!important}.streak-stage .streak-flame-entry,.streak-stage .streak-new,.streak-stage .streak-copy>*{opacity:1;transform:none}.streak-stage .streak-atmosphere{opacity:var(--stage-glow-opacity)}.streak-stage .streak-backdrop{opacity:.25}.streak-stage .streak-old,.streak-stage .streak-sparks,.streak-stage .streak-rays{display:none}}

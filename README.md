@@ -1,4 +1,8 @@
-# Latinio · Version 2.0.10
+# Latinio · Version 2.0.11
+
+## 2.0.11 · Dezenterer Hintergrund und ursprüngliche Knopffarbe
+
+Die bewegten roten Flächen der Admin-Streak-Vorschau haben etwa die halbe Intensität. Die Smart-Lernen-Knöpfe auf der Startseite verwenden wieder die ursprüngliche fach- und themeabhängige Grundfarbe (`--green` statt `--green-dark`). Kein Google-Update nötig.
 
 ## 2.0.10 · Bewegter roter Hintergrund
 

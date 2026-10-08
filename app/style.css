@@ -399,7 +399,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .collection-search>.icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none}
 .collection-search input{display:block;width:100%;min-width:0;margin:0;padding:16px 48px!important;text-align:center;box-sizing:border-box}
 .confusions-panel{padding-block:12px}.confusions-panel>.muted{margin-block:12px 20px}
-.home-practice-grid .word-tools>.button.primary{border:0!important;box-shadow:none!important;background:var(--green-dark);color:#fff;justify-content:space-between;padding:14px 20px!important;border-radius:16px;letter-spacing:.01em;transition:background .18s,filter .18s}
+.home-practice-grid .word-tools>.button.primary{border:0!important;box-shadow:none!important;background:var(--green);color:#fff;justify-content:space-between;padding:14px 20px!important;border-radius:16px;letter-spacing:.01em;transition:background .18s,filter .18s}
 .home-practice-grid .word-tools>.button.primary>.icon{width:30px;height:30px;padding:6px;border-radius:50%;background:#ffffff24}
 .home-practice-grid .word-tools>.button.primary:hover:not(:disabled){filter:brightness(1.1)}
 .home-practice-grid .word-tools>.button.primary:active:not(:disabled){filter:brightness(.93);transform:none}
