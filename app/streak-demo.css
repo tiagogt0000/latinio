@@ -157,13 +157,15 @@
 @media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important;transition:none!important}.streak-stage .streak-flame-entry,.streak-stage .streak-new,.streak-stage .streak-copy>*{opacity:1;transform:none}.streak-stage .streak-atmosphere{opacity:var(--stage-glow-opacity)}.streak-stage .streak-backdrop{opacity:.25}.streak-stage .streak-old,.streak-stage .streak-sparks,.streak-stage .streak-rays{display:none}}
 
 /* Home badge aligns with the greeting itself, not the whole heading block. */
-.home-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;row-gap:0;align-items:center}
+.home-heading{width:100%;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;row-gap:0;align-items:center}
 .home-heading>div:first-child{display:contents}
-.home-heading>.streak-badge{grid-column:2;grid-row:2;align-self:center}
+.home-heading>.streak-badge{grid-column:2;grid-row:2;align-self:center;justify-self:end;max-width:100%}
 .home-heading .eyebrow{grid-column:1;grid-row:1}
-.home-heading h1{grid-column:1;grid-row:2}
+.home-heading h1{grid-column:1;grid-row:2;min-width:0;overflow-wrap:anywhere}
 .home-heading>div:first-child>p{grid-column:1/-1;grid-row:3}
 .streak-badge{color:var(--muted);gap:7px;min-width:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;line-height:1}
+.home-heading .streak-badge>span{display:none}
+.home-heading .streak-badge>strong{flex:none;text-align:right;font-variant-numeric:tabular-nums}
 .streak-badge-flame{width:23px;height:27px;flex:none;display:block;color:#9da5ac}
 .streak-badge-core{fill:#d1d5d8}
 .streak-badge.is-active{color:var(--orange)}

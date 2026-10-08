@@ -1,4 +1,8 @@
-# Latinio · Version 2.1.3
+# Latinio · Version 2.1.4
+
+## 2.1.4 · Streak-Zahl rechts ausrichten
+
+Die Home-Tagesanzeige endet mit der Zahl am rechten Inhaltsrand, bündig zu den Trainingskarten auf dem Handy. Das zusätzliche Tag/Tage-Wort entfällt; die zugängliche Beschreibung bleibt erhalten. Mehrstellige Zahlen wachsen nach links, lange Begrüßungen dürfen umbrechen.
 
 ## 2.1.3 · Transparente Home-Flamme
 

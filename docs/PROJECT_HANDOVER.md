@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.3.
+Stand: 8. Oktober 2026, Version 2.1.4.
+
+## Stand 2.1.4
+
+Die Home-Tagesanzeige endet mit der Zahl am rechten Inhaltsrand, bündig zu den Trainingskarten auf dem Handy. Das zusätzliche Tag/Tage-Wort entfällt; die zugängliche Beschreibung bleibt erhalten. Mehrstellige Zahlen wachsen nach links, lange Begrüßungen dürfen umbrechen.
 
 ## Stand 2.1.3
 
