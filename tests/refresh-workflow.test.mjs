@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {emptyData,normalize,progressFor} from '../app/core.js';
+import {completionRoot} from '../app/round-completion.js';
 import {saveDeck,pendingMembers,deckMembers,sortedCollections,refreshDecks} from '../app/refresh-decks.js';
 import {legacyRefreshCount,reconcileRefreshDeck} from '../app/refresh-reconcile.js';
 import {refreshCreate,checkPicker,refreshMethod,refreshReconcileEditor,refreshEditor} from '../app/refresh-ui.js';
@@ -48,7 +49,7 @@ test('Automatic update waits for live work, but not a saved paused session',()=>
 });
 test('Starting a selected refresher never silently resumes an unrelated paused test',async()=>{
  const d=emptyData();d.words.x={id:'x',collectionId:'a'};d.collections.a={id:'a'};
- const ctx=vm.createContext({english:false,shuffleQueue:items=>items,refreshFlow:null,backgroundSync:async()=>{},sync:{schedule(){}},store:{doc:{session:{finished:false,mode:'inactive-check'}},async update(fn){this.doc=fn(this.doc);}},data:()=>d,cloudWait:{run:async()=>{}},prefs:()=>({daily:10}),confirm:()=>true,notify(){},inactiveQueue:()=>['x'],uid:()=> 'new-session',closeModal(){},render(){},screen:'learn',Date});
+ const ctx=vm.createContext({completionRoot,english:false,shuffleQueue:items=>items,refreshFlow:null,backgroundSync:async()=>{},sync:{schedule(){}},store:{doc:{session:{finished:false,mode:'inactive-check'}},async update(fn){this.doc=fn(this.doc);}},data:()=>d,cloudWait:{run:async()=>{}},prefs:()=>({daily:10}),confirm:()=>true,notify(){},inactiveQueue:()=>['x'],uid:()=> 'new-session',closeModal(){},render(){},screen:'learn',Date});
  vm.runInContext(source.slice(source.indexOf("async function start("),source.indexOf('function current(')),ctx);
  await ctx.start('inactive-check',['a'],'refresh_target');assert.equal(ctx.store.doc.session.refreshTarget,'refresh_target');assert.equal(ctx.store.doc.session.id,'new-session');assert.equal(ctx.store.doc.session.cardFlipped,false);
 

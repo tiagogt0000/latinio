@@ -1,6 +1,18 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.11.
+Stand: 8. Oktober 2026, Version 2.1.0.
+
+## Stand 2.1.0
+
+Echte Streaks und Rundenabschluss statt alter Ergebnisseite. `app/streak.js`: unveränderliche settings-Records `streak_day_YYYY-MM-DD`, lokale Kalendergrenzen, Vereinigung statt Zähler, profilbezogener Cache über die Fächer und Web Lock gegen doppelte lokale Claims. Alte Sessiondaten werden nicht rückwirkend zu Streak-Tagen. Pause/Abbruch und Admin Tests verdienen keine Tage. Ein Claim erfolgt erst beim bewussten Ende bzw. fehlerfreiem Abschluss. Bei Save-Fehlern bleibt ein erneuter Versuch möglich.
+
+`round-completion.js` hält den Ausgangs-Lernstand fest; `completionRoot` wird durch `createErrorRetry` getragen. Richtig/falsch stammen aus den ursprünglichen Reviews, neu sicher aus dem aktuellen Stand minus Anfangsstand. Englisch wertet Lernrichtungen separat aus. Perfektformen nutzen ihren vorhandenen predicateProgress-Status und einen eigenen Rundenausgangspunkt. Der letzte Submit öffnet sofort den Fehlerdialog oder Abschluss; es gibt keinen zusätzlichen Weiter-Schritt dazwischen. Automatisches Verwechslungs-Matching wird beim Abschluss nicht mehr vorgeschaltet; der separate Übungsbereich bleibt verfügbar.
+
+`screen=round-end` schützt die letzte Abfrage vor Hintergrund-Re-Renders. Fehlerdialog ohne Schließen-X, Wiederholen ohne Tagesclaim; Beenden: speichern, gestaffelt ausblenden (`round-transition.js`), gemeinsame Grafik (`streak-demo.js` mit live-Option), Statistik/Weiter. Danach Home. Weitere Tagesrunden haben statische Grafik statt erneuter Feier. Die drei Varianten rotieren mit der Tageszahl. Echte Tage sind nicht auf die Admin-Demo-Auswahl beschränkt.
+
+`Sync.request` kann explizit check/pull im anderen freigegebenen Fach lesen (keine fachfremden Writes). Der fremde Lernstand wird nur bei Versionsänderung geladen, daraus werden ausschließlich Streak-Tage im Profilcache vereinigt. Abgleich im vorhandenen Start-Gate sowie im Hintergrund, höchstens ein Versionscheck pro Minute. Tagesereignisse werden beim nächsten Abschluss ins aktuelle Fachjournal gespiegelt. Offline lernen bleibt möglich. Zwei gleichzeitig offline arbeitende Geräte können jeweils feiern; ihre Tagesereignisse zählen nach Sync nur einmal. Kein Backendupdate.
+
+Neue Tests decken Tageswechsel, DST, Lücken, Profil-/Fachtrennung, Wiederholungen, Erstversuche, echte neu-sicher-Zahlen, Speicherausfall, Google-Kompatibilität und den Abschlussfluss ab. Kein visueller Browsercheck gemäß Nutzerwunsch.
 
 ## Stand 2.0.11
 

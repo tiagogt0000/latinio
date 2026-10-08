@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {predicateDecks,predicateCloudItems} from '../app/predicates.js';
+import {streakState,streakDays} from '../app/streak.js';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 const section=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
 function viewContext(english=false,admin=true){
@@ -10,7 +11,7 @@ function viewContext(english=false,admin=true){
  const data={words:{w:word},collections:{c:deck},settings:{},reviews:{}};
  return vm.createContext({english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
   cloudWait:{blocked:false},predicateSelected:null,predicateDecks,predicateCloudItems,prefs:()=>({direction:'mixed',daily:10}),data:()=>data,activeWords:()=>[word],progressFor:()=>({level:'new',seen:false}),directionsFor:()=>['en-de','de-en'],
-  todayCount:()=>2,trainingDecks:()=>[deck],wordsForDecks:()=>[word],directionLabel:()=>'',selected:[],predicateItems:[{grundform:'amare'}],
+  streakLedger:null,streakState,streakDays,streakBadgeFlame:()=>'<svg></svg>',todayCount:()=>2,trainingDecks:()=>[deck],wordsForDecks:()=>[word],directionLabel:()=>'',selected:[],predicateItems:[{grundform:'amare'}],
   accountCard:()=>'<section class="settings-section profile-settings">Profil</section>',updateView:()=>'<p>Update</p>',syncDetails:()=>'<p>Cloud</p>',sync:{configured:true},adminContent:'Nutzerliste',adminTab:'people'});
 }
 function balanced(html){

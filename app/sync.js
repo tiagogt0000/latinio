@@ -37,7 +37,8 @@ export class Sync extends EventTarget {
   set(status,message){this.status=status;this.message=message;this.dispatchEvent(new Event('change'));}
   get configured(){return !!this.store.doc.config.url&&!!this.store.doc.config.token;}
   schedule(ms=1200){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
-  async request(action,payload){
+  async request(action,payload,requestSubject=this.subject){
+    if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
     try{
@@ -45,15 +46,15 @@ export class Sync extends EventTarget {
         const identity=await this.bridge.request('whoami');
         if(identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
       }
-      if(this.subject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
-      return await this.bridge.request(action,{...payload,subject:this.subject});
+      if(requestSubject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
+      return await this.bridge.request(action,{...payload,subject:requestSubject});
     }catch(error){
       // A long-lived Apps Script iframe may still point at the previous deployment.
       // Retry only an unknown-action rejection: the server has not performed it.
       if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
       this.bridge.destroy();this.bridge=new GoogleBridge(config.url,config.token);
-      if(this.subject==='english'){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript.');this.bridge.englishVerified=true;}
-      return this.bridge.request(action,{...payload,subject:this.subject});
+      if(requestSubject==='english'){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript.');this.bridge.englishVerified=true;}
+      return this.bridge.request(action,{...payload,subject:requestSubject});
     }
   }
   run(){if(this.inFlight)return this.inFlight;this.inFlight=this.performRun().finally(()=>{this.inFlight=null;});return this.inFlight;}

@@ -1,4 +1,12 @@
-# Latinio · Version 2.0.11
+# Latinio · Version 2.1.0
+
+## 2.1.0 · Tages-Streak und neuer Rundenabschluss
+
+Die Startseite zeigt die Streak-Flamme: grau vor der ersten abgeschlossenen Runde des Tages, farbig danach. Die Zahl zählt aufeinanderfolgende lokale Kalendertage; nach einem ausgelassenen Tag beginnt die nächste Folge bei 1. Neue Streak-Tage werden ab dieser Version erfasst. Latein und Englisch teilen sich den Streak je Profil, einschließlich Perfektformen und Auffrisch-Karteikarten.
+
+Nach der letzten Antwort erscheint bei Fehlern ein weich eingeblendeter Dialog: Fehler wiederholen oder Runde beenden. Wiederholungen verschieben die Feier bis zum endgültigen Abschluss. Fehlerfreie Runden gehen direkt weiter. Die erste abgeschlossene Runde des Tages zeigt abwechselnd Feuerkreis, Flammenwelle oder Sonnenkern. Weitere Runden zeigen einen ruhigen Abschluss. Drei Felder zeigen die ursprünglichen Erstversuche (richtig/nicht ganz richtig) und die inzwischen neu sicheren Aufgaben. Englisch zählt Abfragerichtungen getrennt. Weiter führt weich zur Startseite. Admin Tests bleiben ohne Streak-Wirkung.
+
+Tagesereignisse werden lokal und mit der bestehenden Cloud gespeichert; kein Google-Skript-Update nötig. Zwischen gleichzeitig offline genutzten Geräten kann die Feier bis zum nächsten Abgleich je Gerät erscheinen, der Tag wird beim Zusammenführen aber nur einmal gezählt.
 
 ## 2.0.11 · Dezenterer Hintergrund und ursprüngliche Knopffarbe
 

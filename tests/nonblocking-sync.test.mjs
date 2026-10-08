@@ -9,10 +9,10 @@ test('Initial app sync starts after ready and does not await a loading screen',(
 });
 test('Results appear before cloud completion and late sync cannot reopen results',async()=>{
  let release,renders=[],updates=0;
- const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},store:{doc:{session:{mode:'smart',finished:true}}},sync:{},modalRoot:{children:[]},screen:'test',render(){renders.push(ctx.screen);},updateStatus(){updates++;},settleSync:()=>new Promise(r=>release=r)});
+ const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},store:{doc:{session:{id:'round',mode:'smart',finished:true}}},sync:{},modalRoot:{children:[]},screen:'test',data:()=>({reviews:{}}),roundStats:()=>({correct:1}),failedTasks:()=>[],offerRoundEnd:async()=>{ctx.screen='round-end';renders.push(ctx.screen);},refreshStreak:async()=>{},render(){renders.push(ctx.screen);},updateStatus(){updates++;},settleSync:()=>new Promise(r=>release=r)});
  vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function showResult(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
- await ctx.showResult();assert.equal(ctx.screen,'result');assert.deepEqual(renders,['result']);
- ctx.screen='learn';release();await new Promise(r=>setImmediate(r));assert.equal(ctx.screen,'learn');assert.deepEqual(renders,['result','learn']);assert.equal(updates,1);
+ await ctx.showResult();assert.equal(ctx.screen,'round-end');assert.deepEqual(renders,['round-end']);
+ ctx.screen='learn';release();await new Promise(r=>setImmediate(r));assert.equal(ctx.screen,'learn');assert.deepEqual(renders,['round-end','learn']);assert.equal(updates,1);
 });
 test('Cloud return during a test never rerenders or reads away typed answers',async()=>{
  let rendered=0,checked=0;

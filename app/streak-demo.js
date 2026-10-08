@@ -1,4 +1,5 @@
-// Animation sandbox only: deliberately no learning, storage, or cloud imports.
+// Shared animation artwork for admin previews and completed rounds.
+// Persistence belongs to streak.js; this renderer never writes learning data.
 const variants={
  orbit:{title:'Feuerkreis',tag:'Licht, das sich sammelt',description:'Ein glühender Bogen zeichnet einen Kreis. Funken umkreisen die lebendige Flamme, dann wechselt die Tageszahl.'},
  wave:{title:'Flammenwelle',tag:'Ein warmer, ruhiger Auftritt',description:'Aus einem roten Schimmer steigen weiche Lichtwellen auf. Die Flamme entfaltet sich und trägt die neue Zahl nach oben.'},
@@ -12,20 +13,21 @@ export function streakLab(day=1,theme='auto'){
 function flame(){
  return `<svg class="streak-flame" viewBox="0 0 120 150" aria-hidden="true"><defs><linearGradient id="streak-fire" x1="0" y1="1" x2=".65" y2="0"><stop stop-color="#e7492c"/><stop offset=".55" stop-color="#ff923e"/><stop offset="1" stop-color="#ffcd78"/></linearGradient><linearGradient id="streak-core" x1="0" y1="1" x2="0" y2="0"><stop stop-color="#fff9df"/><stop offset="1" stop-color="#ffd375"/></linearGradient></defs><g class="streak-flame-shell"><path fill="url(#streak-fire)" d="M60 3C77 29 61 42 78 60c5-9 9-17 10-24 6 28 24 40 24 66 0 28-22 44-52 44S8 128 8 102c0-24 13-39 25-53-1 20 4 25 10 30C35 46 53 25 60 3Z"/><path class="streak-flame-middle" fill="#ffbb52" d="M61 43c9 22-2 35 10 49 7-5 10-13 10-19 12 18 17 26 17 40 0 20-17 32-38 32s-38-13-38-32c0-17 12-30 17-39 0 15 5 20 11 23-7-23 5-39 11-54Z"/><path class="streak-flame-core" fill="url(#streak-core)" d="M61 85c4 16-1 23 8 31 4-4 5-8 5-12 8 10 12 16 12 23 0 11-12 18-26 18s-26-8-26-19c0-10 8-18 13-25 0 9 2 13 6 17-1-13 3-22 8-33Z"/></g></svg>`;
 }
-export function streakDemo(day,variant='orbit',theme='auto'){
- day=days.includes(Number(day))?Number(day):1;
+export function streakDemo(day,variant='orbit',theme='auto',options={}){
+ const live=options.live===true;
+ day=live?(Number.isSafeInteger(Number(day))&&Number(day)>0?Number(day):1):(days.includes(Number(day))?Number(day):1);
  variant=Object.hasOwn(variants,variant)?variant:'orbit';
  theme=Object.hasOwn(themes,theme)?theme:'auto';
  const special=[1,30,100].includes(day);
- const caption=day===1?'Jeder große Streak beginnt mit einem Funken.':day===30?'30 Tage drangeblieben. Dein Feuer wächst.':day===100?'Hundert Tage. Das ist dein Moment.':'Ein neuer Tag. Dein Feuer bleibt.';
+ const caption=live&&options.celebrate===false?'Dein Tagesziel für den Streak ist schon erreicht.':day===1?'Jeder große Streak beginnt mit einem Funken.':day===30?'30 Tage drangeblieben. Dein Feuer wächst.':day===100?'Hundert Tage. Das ist dein Moment.':'Ein neuer Tag. Dein Feuer bleibt.';
  const sparks=Array.from({length:day===100?36:24},(_,i)=>`<i style="--angle:${i*(day===100?10:15)}deg;--delay:${(i%6)*.065}s;--distance:${82+(i%5)*11}px;--drift:${Math.round(Math.sin(i)*100)}px"></i>`).join('');
- return `<div class="streak-stage" data-phase="question" data-variant="${variant}" data-day="${day}" data-theme="${theme}" data-special="${special}">
- <h2 id="modal-title" class="streak-sr">Animationsvorschau · ${variants[variant].title}</h2><p class="streak-sr" data-streak-status role="status" aria-live="polite"></p>
- <div class="streak-question"><form data-streak-form novalidate>
+ return `<div class="streak-stage" data-live="${live}" data-long-count="${day>=1000}" data-phase="${live?'blank':'question'}" data-variant="${variant}" data-day="${day}" data-theme="${theme}" data-special="${special}">
+ <h2 id="modal-title" class="streak-sr">${live?'Runde abgeschlossen':'Animationsvorschau · '+variants[variant].title}</h2><p class="streak-sr" data-streak-status role="status" aria-live="polite"></p>
+ ${live?'':`<div class="streak-question"><form data-streak-form novalidate>
  <div class="streak-question-card"><div class="streak-question-top"><span>TEST-RUNDE</span><span>1 / 1</span></div><div class="streak-question-progress"><span></span></div><h3>Was bedeutet …</h3><div class="latin-word">Test</div></div>
  <div class="streak-answer-block"><label for="streak-test-answer">Deine Antwort</label><input id="streak-test-answer" name="answer" placeholder="Test eingeben" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="40" aria-describedby="streak-answer-hint streak-answer-error"><p id="streak-answer-hint">Schreibe „Test“, um den Rundenabschluss auszuprobieren.</p><p id="streak-answer-error" role="alert"></p></div>
  <div class="streak-question-next"><button class="button primary wide" type="submit">Weiter <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button><p>Animationsvorschau · ${variants[variant].title}</p></div>
- </form></div>
+ </form></div>`}
  <div class="streak-celebration" hidden aria-hidden="true">
  <div class="streak-backdrop" aria-hidden="true"><div class="streak-current streak-current-left"></div><div class="streak-current streak-current-right"></div><div class="streak-current streak-current-top"></div><div class="streak-current streak-current-bottom"></div></div><div class="streak-atmosphere" aria-hidden="true"></div><div class="streak-horizon" aria-hidden="true"></div>
  <div class="streak-composition"><div class="streak-emblem">
@@ -34,9 +36,9 @@ export function streakDemo(day,variant='orbit',theme='auto'){
  <div class="streak-sparks" aria-hidden="true">${sparks}</div><div class="streak-rays" aria-hidden="true">${Array.from({length:12},(_,i)=>`<i style="--angle:${i*30}deg;--delay:${(i%3)*.1}s"></i>`).join('')}</div>
  <div class="streak-flame-entry"><div class="streak-flame-float">${flame()}<i class="streak-loose-ember"></i><i class="streak-loose-ember streak-loose-ember-second"></i></div></div>
  <div class="streak-counter" aria-hidden="true">${day>1?`<span class="streak-old">${day-1}</span>`:''}<span class="streak-new">${day}</span></div>
- </div><div class="streak-copy"><p class="streak-milestone">${day===1?'DER ANFANG':day===30?'DEIN MEILENSTEIN':day===100?'DREISTELLIG. UNAUFHALTSAM.':'STREAK FORTGESETZT'}</p><h3 class="streak-day-label">Tag ${day}</h3><p class="streak-caption">${caption}</p></div></div>
+ </div><div class="streak-copy"><p class="streak-milestone">${live&&options.celebrate===false?'RUNDE GESCHAFFT':day===1?'DER ANFANG':day===30?'DEIN MEILENSTEIN':day===100?'DREISTELLIG. UNAUFHALTSAM.':'STREAK FORTGESETZT'}</p><h3 class="streak-day-label">Tag ${day}</h3><p class="streak-caption">${caption}</p></div></div>
  </div>
- <footer class="streak-demo-controls" hidden><p>${variants[variant].title} · Nur eine Vorschau</p><div><button type="button" data-action="streak-demo-replay" disabled>Noch einmal</button><button type="button" data-action="admin-tests" disabled>Andere Variante</button></div></footer></div>`;
+ ${live?finishControls(options.stats):`<footer class="streak-demo-controls" hidden><p>${variants[variant].title} · Nur eine Vorschau</p><div><button type="button" data-action="streak-demo-replay" disabled>Noch einmal</button><button type="button" data-action="admin-tests" disabled>Andere Variante</button></div></footer>`}</div>`;
 }
 
 // Cancellable sequence: keyboard dismissal, staggered exit, empty frame, reveal.
@@ -69,4 +71,24 @@ export function mountStreakDemo(stage,{reducedMotion=false,schedule=setTimeout,c
  }
  form.addEventListener('submit',start);input.addEventListener('input',clearError);input.focus({preventScroll:true});
  return ()=>{disposed=true;timers.forEach(cancel);timers.clear();form.removeEventListener('submit',start);input.removeEventListener('input',clearError);};
+}
+
+function finishControls(stats={}){
+ const number=value=>Number.isFinite(value)?Math.max(0,Math.floor(value)):0;
+ return `<footer class="streak-finish-controls" hidden><div class="streak-round-stats" aria-label="Ergebnis der Lernrunde">${[[stats.correct,'Auf Anhieb richtig'],[stats.wrong,'Nicht auf Anhieb'],[stats.newlyKnown,'Neu sicher']].map(([value,label])=>`<div><strong>${number(value)}</strong><span>${label}</span></div>`).join('')}</div><button type="button" class="streak-continue" data-action="round-home" disabled>Weiter <span aria-hidden="true">→</span></button></footer>`;
+}
+export function mountStreakFinish(stage,{celebrate=true,reducedMotion=false,schedule=setTimeout,cancel=clearTimeout}={}){
+ let disposed=false;const timers=new Set();
+ const later=(fn,delay)=>{const id=schedule(()=>{timers.delete(id);if(!disposed)fn();},delay);timers.add(id);};
+ stage.dataset.reducedMotion=String(reducedMotion);
+ later(()=>{
+  const scene=stage.querySelector('.streak-celebration');scene.hidden=false;scene.setAttribute('aria-hidden','false');
+  stage.dataset.phase=celebrate?'celebrate':'settled';
+  later(()=>{
+   const controls=stage.querySelector('.streak-finish-controls');controls.hidden=false;
+   const button=controls.querySelector('button');button.disabled=false;button.focus({preventScroll:true});
+   stage.querySelector('[data-streak-status]').textContent=celebrate?`Streak fortgesetzt: Tag ${stage.dataset.day}.`:'Runde abgeschlossen.';
+  },celebrate&&!reducedMotion?3600:100);
+ },reducedMotion?0:240);
+ return ()=>{disposed=true;timers.forEach(cancel);timers.clear();};
 }

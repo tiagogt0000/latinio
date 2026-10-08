@@ -15,6 +15,7 @@ export function createErrorRetry(previous,tasks,id,now=Date.now()){
   queue:tasks.map(item=>({...item,repeat:false})),cursor:0,originalLength:tasks.length,
   answers:[''],feedback:null,overrides:{},startedAt:now,finished:false,
   retryStage:(previous.retryStage||1)+1,
+  completionRoot:previous.completionRoot,
   allWordIds:tasks.map(item=>item.wordId),
  };
 }
