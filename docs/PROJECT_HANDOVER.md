@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.9.
+Stand: 8. Oktober 2026, Version 2.0.10.
+
+## Stand 2.0.10
+
+Nur Hintergrund der Admin-Streak-Demos erweitert: vier radiale Rotflächen in `streak-backdrop` mit unabhängig bewegten Transform-Ebenen, weichem Intensitätsaufbau und ruhiger Mitte. Bewegung reduziert: statischer Hintergrund. Kein Backendupdate.
 
 ## Stand 2.0.9
 

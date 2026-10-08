@@ -27,7 +27,7 @@ export function streakDemo(day,variant='orbit',theme='auto'){
  <div class="streak-question-next"><button class="button primary wide" type="submit">Weiter <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></button><p>Animationsvorschau · ${variants[variant].title}</p></div>
  </form></div>
  <div class="streak-celebration" hidden aria-hidden="true">
- <div class="streak-atmosphere" aria-hidden="true"></div><div class="streak-horizon" aria-hidden="true"></div>
+ <div class="streak-backdrop" aria-hidden="true"><div class="streak-current streak-current-left"></div><div class="streak-current streak-current-right"></div><div class="streak-current streak-current-top"></div><div class="streak-current streak-current-bottom"></div></div><div class="streak-atmosphere" aria-hidden="true"></div><div class="streak-horizon" aria-hidden="true"></div>
  <div class="streak-composition"><div class="streak-emblem">
  <svg class="streak-rings" viewBox="0 0 400 400" fill="none" aria-hidden="true"><circle class="streak-ring-track" cx="200" cy="200" r="168"/><g class="streak-ring-turn"><circle class="streak-ring-draw" cx="200" cy="200" r="168" pathLength="100"/><circle class="streak-ring-trail" cx="200" cy="200" r="181" pathLength="100"/></g><circle class="streak-month-ring" cx="200" cy="200" r="187" pathLength="30"/></svg>
  <div class="streak-shockwave" aria-hidden="true"></div><div class="streak-shockwave streak-shockwave-second" aria-hidden="true"></div>

@@ -1,4 +1,8 @@
-# Latinio · Version 2.0.9
+# Latinio · Version 2.0.10
+
+## 2.0.10 · Bewegter roter Hintergrund
+
+Die Admin-Streak-Vorschauen erhalten vier weich ineinanderfließende Farbflächen in Korallrot, Scharlach und dunklem Karmin. Nach einem sanften Beginn strömt die Farbe aus allen Richtungen kräftig ein und bleibt anschließend langsam in Bewegung. Die Mitte bleibt für Zahl und Flamme lesbar; Hell-/Dunkelmodus und Bewegungsreduktion werden berücksichtigt. Kein Google-Update nötig.
 
 ## 2.0.9 · Vom letzten Wort zum Streak-Moment
 

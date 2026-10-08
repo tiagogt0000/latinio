@@ -39,6 +39,24 @@
 .streak-composition{position:relative;z-index:2;display:grid;justify-items:center;gap:22px;width:100%;text-align:center}
 .streak-emblem{position:relative;display:grid;grid-template-rows:54% 46%;justify-items:center;align-items:center;width:var(--emblem);height:var(--emblem);perspective:1000px}
 .streak-atmosphere{position:absolute;inset:-25%;background:radial-gradient(ellipse at 50% 44%,var(--stage-heat),transparent 52%);opacity:0;transform-origin:50% 44%}
+.streak-backdrop{position:absolute;inset:0;overflow:hidden;opacity:0;pointer-events:none}
+.streak-current{position:absolute;inset:-18%;transform-origin:50% 50%}
+.streak-current-left{background:radial-gradient(ellipse at 0% 42%,#e52d44 0%,#ee4055b8 24%,#f15b653d 44%,transparent 65%)}
+.streak-current-right{background:radial-gradient(ellipse at 100% 62%,#be1744 0%,#d92a4bbd 24%,#e647643d 44%,transparent 65%)}
+.streak-current-top{background:radial-gradient(ellipse at 58% 0%,#f4513b 0%,#ff6754a8 23%,#f8766430 43%,transparent 63%)}
+.streak-current-bottom{background:radial-gradient(ellipse at 38% 100%,#b41d3c 0%,#e434489e 25%,#f2596133 43%,transparent 64%)}
+/* Keep the center quiet enough to read while color flows around all four edges. */
+.streak-backdrop::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 43%,color-mix(in srgb,var(--stage-bg) 82%,transparent) 5%,color-mix(in srgb,var(--stage-bg) 40%,transparent) 24%,transparent 57%)}
+.streak-stage[data-phase=celebrate] .streak-backdrop{animation:streak-red-swell 6s .3s ease-in-out both}
+.streak-stage[data-phase=celebrate] .streak-current-left{animation:streak-red-left 9s .3s ease-in-out infinite}
+.streak-stage[data-phase=celebrate] .streak-current-right{animation:streak-red-right 10.5s .3s ease-in-out infinite}
+.streak-stage[data-phase=celebrate] .streak-current-top{animation:streak-red-top 11s .3s ease-in-out infinite}
+.streak-stage[data-phase=celebrate] .streak-current-bottom{animation:streak-red-bottom 12s .3s ease-in-out infinite}
+@keyframes streak-red-swell{0%{opacity:0}20%{opacity:.22}47%{opacity:.93}70%{opacity:.8}100%{opacity:.66}}
+@keyframes streak-red-left{0%,100%{transform:translate(-12%,5%) scale(1)}40%{transform:translate(11%,-7%) scale(1.08)}70%{transform:translate(2%,9%) scale(1.02)}}
+@keyframes streak-red-right{0%,100%{transform:translate(12%,-6%) scale(1)}38%{transform:translate(-11%,7%) scale(1.12)}72%{transform:translate(-2%,-8%) scale(1.04)}}
+@keyframes streak-red-top{0%,100%{transform:translate(5%,-15%) rotate(-5deg)}43%{transform:translate(-7%,11%) rotate(6deg)}72%{transform:translate(8%,2%) rotate(1deg)}}
+@keyframes streak-red-bottom{0%,100%{transform:translate(-6%,15%) rotate(4deg)}42%{transform:translate(8%,-12%) rotate(-5deg)}73%{transform:translate(-7%,-2%) rotate(1deg)}}
 .streak-horizon{position:absolute;width:min(100vw,700px);height:220px;left:50%;top:48%;margin-left:max(-50vw,-350px);border-radius:50%;background:radial-gradient(ellipse,var(--stage-gold),transparent 65%);opacity:0;filter:blur(18px)}
 .streak-rings{position:absolute;inset:-8%;width:116%;height:116%;overflow:visible;stroke:var(--stage-gold);pointer-events:none}
 .streak-ring-track{stroke-width:.6;opacity:0}.streak-ring-turn{transform-origin:200px 200px}
@@ -139,5 +157,6 @@
 .streak-stage[data-reduced-motion=true] *{animation:none!important;transition:none!important}
 .streak-stage[data-reduced-motion=true] .streak-flame-entry,.streak-stage[data-reduced-motion=true] .streak-new,.streak-stage[data-reduced-motion=true] .streak-copy>*{opacity:1;transform:none}
 .streak-stage[data-reduced-motion=true] .streak-atmosphere{opacity:var(--stage-glow-opacity)}
+.streak-stage[data-reduced-motion=true] .streak-backdrop{opacity:.5}
 .streak-stage[data-reduced-motion=true] .streak-old,.streak-stage[data-reduced-motion=true] .streak-sparks,.streak-stage[data-reduced-motion=true] .streak-rays{display:none}
-@media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important;transition:none!important}.streak-stage .streak-flame-entry,.streak-stage .streak-new,.streak-stage .streak-copy>*{opacity:1;transform:none}.streak-stage .streak-atmosphere{opacity:var(--stage-glow-opacity)}.streak-stage .streak-old,.streak-stage .streak-sparks,.streak-stage .streak-rays{display:none}}
+@media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important;transition:none!important}.streak-stage .streak-flame-entry,.streak-stage .streak-new,.streak-stage .streak-copy>*{opacity:1;transform:none}.streak-stage .streak-atmosphere{opacity:var(--stage-glow-opacity)}.streak-stage .streak-backdrop{opacity:.5}.streak-stage .streak-old,.streak-stage .streak-sparks,.streak-stage .streak-rays{display:none}}
