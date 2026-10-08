@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.7.
+Stand: 8. Oktober 2026, Version 2.0.8.
+
+## Stand 2.0.8
+
+Admin Tests unter Einstellungen öffnen das Animationslabor. `app/streak-demo.js` und `app/streak-demo.css` sind isolierte Vorschauen ohne Store-/Sync-Abhängigkeiten. Die drei Varianten unterstützen Tag 1, 2, 3, 7, 30 und 100. Aufrufaktionen sind zusätzlich mit isAdmin abgesichert. Kein echtes Streak-System implementiert; Home-Blitz unverändert. Bewegungsreduktion wird berücksichtigt. Dateien liegen im Offline-Shell-Cache.
 
 ## Stand 2.0.7
 

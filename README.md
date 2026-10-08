@@ -1,4 +1,8 @@
-# Latinio · Version 2.0.7
+# Latinio · Version 2.0.8
+
+## 2.0.8 · Streak-Animationslabor
+
+Unter Einstellungen → Admin Tests können Admins drei rein visuelle Streak-Animationen ausprobieren: Funke, Einschlag und Feuerkreis. Vorschautage 1, 2, 3, 7, 30 und 100; Meilensteine erhalten eigene Farben und Texte. Wiederholen und Zurück sind direkt in der Vorschau verfügbar. Es gibt noch keine Streak-Logik, keine Datenänderungen und keine Änderungen am Home-Blitz. Kein Google-Skript-Update notwendig.
 
 ## 2.0.7 · Ruhigere Navigation und Animationen
 

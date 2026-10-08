@@ -1,0 +1,57 @@
+/* Deliberately isolated demo styles; no live streak UI. */
+.streak-day-picker{margin-block:20px}.streak-demo-options{display:grid;gap:12px;margin-bottom:18px}.streak-demo-options article{padding:16px 0;border-bottom:1px solid var(--border)}.streak-demo-options h3{margin-bottom:4px}.streak-demo-options .button{margin-top:12px}
+.modal:has(.streak-stage){position:fixed;inset:0;width:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;border-radius:0;overflow:hidden;animation:none;isolation:isolate}
+.modal:has(.streak-stage)>.modal-close{position:fixed;z-index:5;top:max(18px,env(safe-area-inset-top));right:18px;border:1px solid #ffffff30;border-radius:50%;background:#ffffff18;color:#fff;box-shadow:none}
+.streak-stage{--fire:#ff9e36;--fire-light:#ffe2a1;--fire-deep:#eb4b28;--night:#261911;position:relative;height:100%;width:100%;overflow:hidden;display:grid;place-items:center;background:var(--night);color:#fff;perspective:900px;font-family:inherit}
+.streak-stage[data-day="30"]{--fire:#83eb82;--fire-light:#dbffb1;--fire-deep:#309e5b;--night:#102b24}
+.streak-stage[data-day="100"]{--fire:#ffc666;--fire-light:#fff1c2;--fire-deep:#c564ff;--night:#25163f}
+.streak-wash{position:absolute;inset:-20%;background:radial-gradient(ellipse at center,color-mix(in srgb,var(--fire-deep) 65%,transparent),transparent 65%);opacity:.65}
+.streak-scene{position:relative;z-index:2;text-align:center;width:100%;padding:0 24px 42px;pointer-events:none}
+.streak-flame-wrap{width:clamp(100px,25vw,160px);height:clamp(125px,31vw,200px);margin:0 auto 8px;filter:drop-shadow(0 0 24px color-mix(in srgb,var(--fire) 40%,transparent));transform-origin:50% 100%}
+.streak-flame{width:100%;height:100%;overflow:visible}
+.streak-counter{position:relative;height:clamp(130px,27vw,210px);font-weight:900;line-height:1;font-size:clamp(110px,25vw,190px);letter-spacing:-.07em;font-variant-numeric:tabular-nums}
+.streak-counter>span{position:absolute;inset:0;display:grid;place-items:center;text-shadow:0 5px 40px #0003}
+.streak-old{animation:streak-old-out .7s .25s both}.streak-new{color:var(--fire-light)}
+.streak-day-label{font-size:clamp(22px,5vw,32px)!important;letter-spacing:.03em;animation:streak-copy-in .6s 1.7s both}
+.streak-caption{font-size:clamp(14px,3.5vw,18px);color:#ffffffb8;max-width:30ch;margin:10px auto 0!important;animation:streak-copy-in .6s 2s both}
+.streak-halo{position:absolute;width:300px;height:300px;left:50%;top:48%;border:2px solid var(--fire);border-radius:50%;pointer-events:none;opacity:0}
+.streak-orbit{position:absolute;left:50%;top:43%;width:1px;height:1px;pointer-events:none}
+.streak-orbit i{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--fire-light);box-shadow:0 0 15px var(--fire);opacity:0}
+.streak-demo-controls{position:absolute;z-index:3;bottom:max(24px,env(safe-area-inset-bottom));left:16px;right:16px;display:grid;gap:14px;text-align:center;color:#ffffff90}
+.streak-demo-controls>div{display:flex;gap:12px;justify-content:center}
+.streak-demo-controls button{border:1px solid #ffffff30;background:#ffffff12;color:#fff;border-radius:100px;padding:12px 18px;min-height:44px;font-size:.86rem;font-weight:650;box-shadow:none}
+.streak-demo-controls button:hover{background:#ffffff25}
+/* Everyday: a warm, gentle flame and a rolling counter. */
+.streak-stage[data-variant="ember"] .streak-flame-wrap{animation:streak-ember-in 1s both,streak-breathe 2.8s 1s ease-in-out infinite}
+.streak-stage[data-variant="ember"] .streak-new{animation:streak-roll-in .85s .7s cubic-bezier(.16,1,.3,1) both}
+.streak-stage[data-variant="ember"] .streak-orbit i{animation:streak-ember-spark 2.3s calc(.5s + var(--delay)) ease-out both}
+/* Milestone: the number travels towards the viewer and lands. */
+.streak-stage[data-variant="impact"] .streak-wash{animation:streak-impact-wash 3.5s both}
+.streak-stage[data-variant="impact"] .streak-flame-wrap{animation:streak-fire-reveal 1.6s both,streak-breathe 3s 1.6s infinite}
+.streak-stage[data-variant="impact"] .streak-new{animation:streak-impact-number 1.6s .55s cubic-bezier(.2,.8,.2,1) both}
+.streak-stage[data-variant="impact"] .streak-halo{animation:streak-impact-ring 1.5s 1.75s ease-out both}
+.streak-stage[data-variant="impact"] .streak-orbit i{animation:streak-burst 1.8s calc(1.75s + var(--delay)) cubic-bezier(.12,.8,.3,1) both}
+/* Orbit: sparks spiral out of the flame, then settle into a celebration. */
+.streak-stage[data-variant="orbit"] .streak-wash{animation:streak-orbit-wash 3s both}
+.streak-stage[data-variant="orbit"] .streak-flame-wrap{animation:streak-orbit-fire 1.5s both,streak-breathe 3s 1.5s infinite}
+.streak-stage[data-variant="orbit"] .streak-new{animation:streak-orbit-number 1.1s 1s cubic-bezier(.16,1,.3,1) both}
+.streak-stage[data-variant="orbit"] .streak-orbit i{animation:streak-orbit-spark 3.2s calc(.1s + var(--delay)) cubic-bezier(.2,.7,.3,1) both}
+.streak-stage[data-variant="orbit"] .streak-halo{animation:streak-impact-ring 2s 1.6s ease-out both}
+.streak-special .streak-counter{font-size:clamp(130px,29vw,210px)}
+@keyframes streak-old-out{0%,35%{opacity:.8;transform:translateY(0)}100%{opacity:0;transform:translateY(-35px) scale(.8)}}
+@keyframes streak-copy-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes streak-ember-in{from{opacity:0;transform:translateY(18px) scale(.7)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes streak-breathe{0%,100%{transform:scale(1) rotate(-1deg)}50%{transform:scale(1.035) rotate(1deg)}}
+@keyframes streak-roll-in{from{opacity:0;transform:translateY(35px) scale(.8)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes streak-ember-spark{0%{opacity:0;transform:rotate(var(--angle)) translateY(-40px)}25%{opacity:.8}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--reach))) scale(.1)}}
+@keyframes streak-fire-reveal{0%,20%{opacity:0;transform:scale(.2)}75%{opacity:1;transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes streak-impact-number{0%{opacity:0;transform:translateZ(-700px) translateY(-120px) rotateX(28deg)}55%{opacity:1;transform:translateZ(50px) translateY(-25px) rotateX(0)}76%{transform:translateZ(0) translateY(16px) scale(1.1,.9)}90%{transform:translateY(-7px) scale(.98,1.03)}100%{opacity:1;transform:translateZ(0) translateY(0) scale(1)}}
+@keyframes streak-impact-wash{0%{opacity:0;transform:scale(.3)}40%{opacity:.7;transform:scale(1)}60%{opacity:1;transform:scale(1.35)}100%{opacity:.65;transform:scale(1)}}
+@keyframes streak-impact-ring{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}15%{opacity:.65}100%{opacity:0;transform:translate(-50%,-50%) scale(2.8)}}
+@keyframes streak-burst{0%{opacity:0;transform:rotate(var(--angle)) translateY(0) scale(1.5)}15%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1.7 * var(--reach))) scale(.1)}}
+@keyframes streak-orbit-fire{from{opacity:0;transform:scale(.4) rotate(-15deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes streak-orbit-number{from{opacity:0;transform:scale(.4);filter:blur(12px)}to{opacity:1;transform:scale(1);filter:blur(0)}}
+@keyframes streak-orbit-spark{0%{opacity:0;transform:rotate(calc(var(--angle) - 100deg)) translateY(-20px) scale(.5)}35%{opacity:1;transform:rotate(var(--angle)) translateY(calc(-1 * var(--reach))) scale(1)}65%{opacity:1;transform:rotate(calc(var(--angle) + 100deg)) translateY(calc(-1.2 * var(--reach)))}100%{opacity:0;transform:rotate(calc(var(--angle) + 160deg)) translateY(calc(-1.8 * var(--reach))) scale(.1)}}
+@keyframes streak-orbit-wash{0%{opacity:0;transform:rotate(-30deg) scale(.5)}70%{opacity:.9;transform:rotate(20deg) scale(1.2)}100%{opacity:.65;transform:rotate(0) scale(1)}}
+@media(max-height:650px){.streak-scene{padding-bottom:75px}.streak-flame-wrap{width:85px;height:110px}.streak-counter{height:110px;font-size:100px}.streak-special .streak-counter{font-size:110px}.streak-demo-controls{gap:6px;bottom:12px}.streak-caption{margin-top:4px!important}}
+@media(prefers-reduced-motion:reduce){.streak-stage *{animation:none!important}.streak-old{display:none}.streak-new,.streak-flame-wrap,.streak-day-label,.streak-caption{opacity:1!important;transform:none!important}.streak-orbit,.streak-halo{display:none}}
