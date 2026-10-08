@@ -116,6 +116,87 @@ function repairShare_(share){
   }
   return {repaired:Math.max(0,changes.length-1),delivery:shareDelivery_(share,readState_(share.profileId,true,subject),records)};
 }
+
+/** Sammlungsgenaue Freigaben ab 2.0.6. Kein Zugriff auf Lernstände erforderlich. */
+function predicateDeckId_(row){
+  if(row.deckId)return row.deckId;
+  const name=String(row.name||'Prädikate').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de');
+  let hash=14695981039346656037n;
+  const encoded=encodeURIComponent(name);
+  for(let i=0;i<encoded.length;i++){let byte;if(encoded[i]==='%'){byte=parseInt(encoded.slice(i+1,i+3),16);i+=2;}else byte=encoded.charCodeAt(i);hash=BigInt.asUintN(64,(hash^BigInt(byte))*1099511628211n);}
+  return 'predicate_deck_legacy_'+hash.toString(16);
+}
+function resourceShareId_(profileId,kind,sourceId,subject){return 'rs_'+hash_(subject+':'+profileId+':'+kind+':'+sourceId).slice(0,32);}
+function migratePredicateAccess_(profileId){
+  const records=records_('_LatinioShares'),legacy=Object.values(records).filter(function(s){return s.kind==='predicateShare'&&s.profileId===profileId&&!s.revoked;});
+  const updates=[];
+  legacy.forEach(function(share){
+    const groups=Object.create(null);
+    Object.values(records).filter(function(e){return e.kind==='predicateEntry'&&e.shareId===share.id&&e.source;}).forEach(function(e){
+      const sourceId=predicateDeckId_(e.source),id=resourceShareId_(profileId,'predicates',sourceId,'latin');
+      if(!groups[id])groups[id]={id:id,kind:'resourceShare',resourceKind:'predicates',sourceId:sourceId,targetId:sourceId,subject:'latin',profileId:profileId,profileName:share.profileName,name:e.source.name||'Prädikate',ready:true,revoked:false,revision:0};
+      const target='shared_'+hash_(share.id+':'+e.sourceId).slice(0,32);
+      const value=Object.assign({},e.source,{id:target,kind:'predicateItem',sharedFrom:profileId});
+      if(!records[id])updates.push([id+'_'+hash_(e.sourceId).slice(0,24),{kind:'resourceEntry',shareId:id,sourceId:e.sourceId,entity:'settings',targetKey:target,value:value}]);
+    });
+    Object.values(groups).forEach(function(s){if(!records[s.id])updates.push([s.id,s]);});
+    updates.push([share.id,Object.assign({},share,{revoked:true,migrated:true})]);
+  });
+  saveRecords_('_LatinioShares',updates);
+}
+function collectionAccessSet_(request,identity,subject){
+  const profile=records_('_LatinioProfiles')[request.profileId],kind=request.resourceKind,sourceId=request.sourceId;
+  if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+  if(!['lesson','refresh','predicates'].includes(kind)||typeof sourceId!=='string'||!sourceId||sourceId.length>160||typeof request.enabled!=='boolean')throw new Error('Ungültige Sammlungsfreigabe.');
+  if(kind==='predicates'&&subject!=='latin')throw new Error('Prädikate gehören zum Lernfach Latein.');
+  if(request.enabled&&!normalizeSubjects_(profile.allowedSubjects).includes(subject))throw new Error('Dieses Lernfach ist für '+profile.name+' nicht freigegeben.');
+  if(kind==='lesson'){
+    if(request.enabled)return accountApi_({action:'shareCreateMany',profileId:profile.id,collectionIds:[sourceId]},identity,subject);
+    const existing=Object.values(records_('_LatinioShares')).find(function(s){return s.kind==='share'&&s.profileId===profile.id&&s.sourceId===sourceId&&shareSubject_(s)===subject&&!s.revoked;});
+    if(existing)accountApi_({action:'shareRevoke',shareId:existing.id},identity,subject);
+    return {ok:true,enabled:false};
+  }
+  const source=readState_('admin',true,subject).data;
+  const forms=kind==='predicates'?Object.entries(source.settings).filter(function(entry){return entry[1]?.kind==='predicateItem'&&predicateDeckId_(entry[1])===sourceId;}):[];
+  const deck=source.settings[sourceId]?.kind===(kind==='predicates'?'predicateDeck':'refreshDeck')?source.settings[sourceId]:forms.length?{id:sourceId,name:forms[0][1].name||'Prädikate'}:null;
+  if(request.enabled&&!deck)throw new Error('Sammlung nicht gefunden. Bitte zuerst synchronisieren.');
+  if(forms.length>500)throw new Error('Bitte höchstens 500 Formen je Sammlung teilen.');
+  if(kind==='predicates')migratePredicateAccess_(profile.id);
+  const records=records_('_LatinioShares'),id=resourceShareId_(profile.id,kind,sourceId,subject),existing=records[id];
+  if(!request.enabled){if(existing)saveRecord_('_LatinioShares',id,Object.assign({},existing,{revoked:true}));return {ok:true,enabled:false};}
+  const share=Object.assign({id:id,kind:'resourceShare',resourceKind:kind,sourceId:sourceId,targetId:'resource_'+hash_(id).slice(0,32),subject:subject,profileId:profile.id,profileName:profile.name,revision:0},existing||{},{name:deck.name,ready:true,revoked:false});
+  const recipient=readState_(profile.id,true,subject),baselines=Object.values(records).filter(function(e){return e.kind==='resourceEntry'&&e.shareId===id;}),desired=[],snapshots=[],ops=[];
+  const target=function(sourceKey){return baselines.find(function(e){return e.sourceId===sourceKey;})?.targetKey||'shared_'+hash_(id+':'+sourceKey).slice(0,32);};
+  const currentDeck=recipient.data.settings[share.targetId];
+  if(kind==='predicates'){
+    desired.push({sourceId:'deck',entity:'settings',targetKey:share.targetId,value:{id:share.targetId,kind:'predicateDeck',name:deck.name,active:currentDeck?.active!==false}});
+    forms.forEach(function(entry){const key=target(entry[0]);desired.push({sourceId:entry[0],entity:'settings',targetKey:key,value:Object.assign({},entry[1],{id:key,deckId:share.targetId,name:deck.name,sharedFrom:'admin'})});});
+  }else{
+    const collectionId='source_'+hash_(id).slice(0,32);
+    desired.push({sourceId:'source',entity:'collections',targetKey:collectionId,value:{id:collectionId,name:deck.name,refreshSource:true}});
+    const members=(deck.members||[]).filter(function(m){return source.words[m.wordId]&&source.collections[source.words[m.wordId].collectionId];});
+    if(members.length>5000)throw new Error('Bitte höchstens 5000 Wörter je Sammlung teilen.');
+    members.forEach(function(m){const key=target(m.wordId);desired.push({sourceId:m.wordId,entity:'words',targetKey:key,value:Object.assign({},source.words[m.wordId],{id:key,collectionId:collectionId})});});
+    desired.push({sourceId:'deck',entity:'settings',targetKey:share.targetId,value:{id:share.targetId,kind:'refreshDeck',name:deck.name,active:currentDeck?.active!==false,...(deck.direction?{direction:deck.direction}:{}),members:members.map(function(m){const wordId=target(m.wordId);return currentDeck?.members?.find(function(old){return old.wordId===wordId;})||{wordId:wordId,addedAt:Date.now()};})}});
+  }
+  baselines.forEach(function(e){if(!desired.some(function(row){return row.sourceId===e.sourceId;}))desired.push({sourceId:e.sourceId,entity:e.entity,targetKey:e.targetKey,value:null});});
+  desired.forEach(function(row){
+    const previous=baselines.find(function(e){return e.sourceId===row.sourceId;}),current=recipient.data[row.entity][row.targetKey]||null;
+    const equal=function(a,b){return JSON.stringify(a)===JSON.stringify(b);};
+    const opId='access_'+hash_(id+':'+row.sourceId+':'+recipient.version+':'+JSON.stringify(row.value)).slice(0,40);
+    if(!equal(current,row.value)&&(!previous||!equal(previous.value,row.value))){
+      if(current&&(!previous||!equal(current,previous.value))){
+        ops.push({id:opId,entity:'settings',key:opId,value:{kind:'incomingShare',id:opId,entity:row.entity,key:row.targetKey,previous:previous?.value||null,value:row.value,collectionId:row.value?.collectionId,label:row.value?.grundform||row.value?.latin||deck.name,at:Date.now()}});
+      }else ops.push({id:opId,entity:row.entity,key:row.targetKey,value:row.value});
+    }
+    snapshots.push([id+'_'+hash_(row.sourceId).slice(0,24),{kind:'resourceEntry',shareId:id,sourceId:row.sourceId,entity:row.entity,targetKey:row.targetKey,value:row.value}]);
+  });
+  if(!existing||existing.revoked){share.revision=(existing?.revision||0)+1;const noticeId='notice_'+hash_(id+':'+share.revision).slice(0,40);ops.push({id:noticeId,entity:'settings',key:noticeId,value:{kind:'shareNotice',id:noticeId,at:Date.now(),resources:[{id:share.targetId,name:deck.name}]}});}
+  serverWrite_(profile.id,ops,subject);
+  saveRecords_('_LatinioShares',snapshots.concat([[id,share]]));
+  return {ok:true,enabled:true,share:share,changed:ops.length};
+}
+
 function accountApi_(request,identity,subject='latin'){
   if(request.action==='logout'){saveRecord_('_LatinioSessions',hash_(request.token),{profileId:identity.id,expires:0});return {ok:true};}
   if(request.action==='announcementInbox'){
@@ -141,6 +222,7 @@ function accountApi_(request,identity,subject='latin'){
     return {version:profile.latestAppVersion,reportedAt:profile.latestAppVersionAt||null};
   }
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
+  if(request.action==='collectionAccessSet')return collectionAccessSet_(request,identity,subject);
   if(request.action==='announcementSend'){
     const profileId=String(request.profileId||''),title=String(request.title||'').trim(),message=String(request.message||'').trim();
     if(!title||title.length>120||!message||message.length>2000)throw new Error('Bitte Titel und Nachricht eingeben (maximal 120 bzw. 2.000 Zeichen).');
@@ -172,7 +254,7 @@ function accountApi_(request,identity,subject='latin'){
   if(request.action==='profileDelete'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile)throw new Error('Profil nicht gefunden.');
     profile.active=false;profile.deletedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    const shares=Object.values(records_('_LatinioShares')).filter(function(s){return (s.kind==='share'||s.kind==='predicateShare')&&s.profileId===profile.id;});
+    const shares=Object.values(records_('_LatinioShares')).filter(function(s){return (s.kind==='share'||s.kind==='predicateShare'||s.kind==='resourceShare')&&s.profileId===profile.id;});
     saveRecords_('_LatinioShares',shares.map(function(s){s.revoked=true;return [s.id,s];}));
     return {ok:true};
   }
@@ -239,7 +321,7 @@ function accountApi_(request,identity,subject='latin'){
   const records=records_('_LatinioShares');
   if(request.action==='shareList'){
     const states=Object.create(null);
-    return {shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&shareSubject_(s)===subject&&!s.revoked;}).map(function(s){if(!states[s.profileId])states[s.profileId]=readState_(s.profileId,true,subject);return Object.assign({},s,{delivery:shareDelivery_(s,states[s.profileId],records)});}),predicateShares:subject==='latin'?Object.values(records).filter(function(s){return s&&s.kind==='predicateShare'&&s.subject==='latin'&&!s.revoked&&records_('_LatinioProfiles')[s.profileId]?.active;}).map(function(s){return s;}):[]};
+    return {accessSchema:2,resourceShares:Object.values(records).filter(function(s){return s.kind==='resourceShare'&&shareSubject_(s)===subject&&!s.revoked&&records_('_LatinioProfiles')[s.profileId]?.active;}),shares:Object.values(records).filter(function(s){return s&&s.kind==='share'&&shareSubject_(s)===subject&&!s.revoked;}).map(function(s){if(!states[s.profileId])states[s.profileId]=readState_(s.profileId,true,subject);return Object.assign({},s,{delivery:shareDelivery_(s,states[s.profileId],records)});}),predicateShares:subject==='latin'?Object.values(records).filter(function(s){return s&&s.kind==='predicateShare'&&s.subject==='latin'&&!s.revoked&&records_('_LatinioProfiles')[s.profileId]?.active;}).map(function(s){return Object.assign({},s,{sourceIds:Array.from(new Set(Object.values(records).filter(function(e){return e.kind==='predicateEntry'&&e.shareId===s.id&&e.source;}).map(function(e){return predicateDeckId_(e.source);})))});}):[]};
   }
   if(request.action==='predicateShareSet'){
     if(subject!=='latin')throw new Error('Prädikate können nur im Latein-Modus geteilt werden.');

@@ -1,4 +1,14 @@
-# Latinio · Version 2.0.5
+# Latinio · Version 2.0.6
+
+## 2.0.6 · Übersichtliche Sammlungen und Freigaben
+
+- Sprachwahl und Sammlungsreiter ohne Kästen; Verwechslungen als eigener Reiter. Zentrierte Suche und flache Startknöpfe.
+- Freigaben zeigen Empfänger direkt pro Sammlung, mit Suche, Typfilter und Mehrfachauswahl. Vokabeln, Auffrisch- und einzelne Perfekt-Sammlungen verwenden dieselbe Oberfläche.
+- Nutzerliste ohne Kachelrahmen; Aktionen bleiben direkt beim ausgewählten Nutzer.
+- **Google-Update erforderlich:** `google/Code.gs` und `google/Accounts.gs` ersetzen und die vorhandene Web-App als neue Version bereitstellen. Anleitung: [google/UPDATE.md](google/UPDATE.md). Ohne Update zeigt die App einen Hinweis.
+- Frühere globale Perfektfreigaben werden beim Bearbeiten auf einzelne Sammlungen umgestellt; vorhandene Kopien, IDs und Lernstände bleiben erhalten. Freigabe beenden löscht keine bereits übertragenen Inhalte.
+
+Die folgenden Abschnitte beschreiben frühere Versionen.
 
 ## 2.0.5 · Perfekt-Sammlungen und direkter App-Start
 

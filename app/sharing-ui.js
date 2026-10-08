@@ -1,11 +1,12 @@
 import {activityRows,activityLabels} from './activity.js';
 import {sortedCollections} from './refresh-decks.js';
+import {shareResources,resourceRecipients,accessOverview} from './share-access.js';
 import {incoming,settleSync} from './multiuser-sync.js';
 export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,notify,render,openCollection,openShareSubject}){
   let shares=store.doc.adminDirectory?.shares||[],predicateShares=store.doc.adminDirectory?.predicateShares||[],people=store.doc.adminDirectory?.people||[],changed=new Set(),notifying=false,newProfileOpen=false;
   let pending=0,directoryEpoch=0,selectedPerson='',shareStore=store,shareSync=sync,shareSubject=sync.subject||'latin';
-  let loaded=!!store.doc.adminDirectory;
-  async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,predicateShares,people};return doc;});}
+  let loaded=!!store.doc.adminDirectory,resourceShares=store.doc.adminDirectory?.resourceShares||[],accessSchema=0,accessQuery='',accessKind='all',accessSelection=new Set();
+  async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,predicateShares,resourceShares,people};return doc;});}
   const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function latestActivity(event){return event?`${new Date(event.at).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Berlin'})} · ${activityLabels[event.action]||'Aktivität'}`:'Noch keine Aktivität';}
@@ -40,31 +41,72 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     const root=document.querySelector('.profile-list'),message=document.querySelector('[data-directory-status]');
     void sync.request('profiles').then(async result=>{if(epoch!==directoryEpoch)return;people=result.profiles.map(p=>({...p,latestActivityLoading:true}));await remember();if(root.isConnected)root.innerHTML=profileRows();status(message,'Aktuell');const activities=await Promise.allSettled(people.map(p=>sync.request('profileActivity',{profileId:p.id})));if(epoch!==directoryEpoch)return;people=people.map((p,index)=>({...p,latestActivityLoading:false,latestActivity:activities[index].status==='fulfilled'?activities[index].value.events?.[0]:null}));await remember();if(root.isConnected)root.innerHTML=profileRows();}).catch(e=>status(message,errorText(e)));
   }
-  function accessRows(){
-    const collections=sortedCollections(shareStore.data);
-    const collectionHtml=collections.map(c=>{const existing=shares.filter(s=>s.sourceId===c.id&&!s.revoked);const ids=new Set(existing.map(s=>s.profileId));return `<details class="share-entry"><summary>${h(c.name)} <small class="muted">· ${ids.size} Nutzer</small></summary><form id="share-access-form" data-id="${h(c.id)}"><label class="collection-check share-all"><input type="checkbox" data-share-all ${people.length&&ids.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${ids.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Zugriff speichern</button><p role="status" class="small muted" data-save-status></p></form></details>`;}).join('');
-    const predicateItems=Object.values(shareStore.data.settings||{}).filter(row=>row?.kind==='predicateItem'&&Array.isArray(row.praedikate));
-    if(shareSubject!=='latin')return collectionHtml||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>';
-    const activePredicateShares=predicateShares.filter(s=>!s.revoked),predicateIds=new Set(activePredicateShares.map(s=>s.profileId));
-    const predicateHtml=predicateItems.length?`<section class="predicate-share-block"><h3>Perfekt &amp; Prädikate</h3><p class="small muted">${predicateItems.length} Prädikate · separat von normalen Sammlungen. Speichern überträgt auch spätere Änderungen erneut.</p><form id="predicate-access-form"><label class="collection-check share-all"><input type="checkbox" data-predicate-all ${people.length&&predicateIds.size===people.length?'checked':''}><span><strong>Alle Nutzer</strong></span></label>${people.map(p=>`<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${predicateIds.has(p.id)?'checked':''}><span>${h(p.name)} <small class="muted">${h(p.email)}</small></span></label>`).join('')}<button class="button primary" type="submit" ${!people.length?'disabled':''}>Freigabe speichern</button><p role="status" class="small muted" data-save-status></p></form></section>`:'<section class="predicate-share-block"><h3>Perfekt &amp; Prädikate</h3><p class="small muted">Noch keine Prädikate in der Cloud.</p></section>';
-    return (collectionHtml||'<p class="muted">In diesem Lernfach gibt es noch keine Sammlungen.</p>')+predicateHtml;
+
+  function accessState(){return {shares,resourceShares,predicateShares};}
+  function visibleResources(){return shareResources(shareStore.data,shareSubject).filter(c=>(accessKind==='all'||c.resourceKind===accessKind)&&c.name.toLocaleLowerCase('de').includes(accessQuery.toLocaleLowerCase('de')));}
+  function accessRows(){return accessOverview(visibleResources(),accessState(),people,h);}
+  function paintAccess(){
+    const list=document.querySelector('[data-share-list]');if(list){list.innerHTML=accessRows();list.querySelectorAll?.('[data-access-select]').forEach(input=>input.checked=accessSelection.has(input.dataset.accessSelect));}
+    const count=document.querySelector('[data-access-count]');if(count)count.textContent=accessSelection.size+' ausgewählt';
+    const batch=document.querySelector('[data-action="access-batch"]');if(batch)batch.disabled=!accessSelection.size||accessSchema!==2;
+  }
+  function accessEditor(keys){
+    if(accessSchema!==2){notify('Bitte zuerst Code.gs und Accounts.gs als neue Google-Skript-Version bereitstellen.');return;}
+    const resources=shareResources(shareStore.data,shareSubject).filter(c=>keys.includes(c.key));if(!resources.length)return;
+    const single=resources.length===1,recipients=single?new Set(resourceRecipients(resources[0],accessState(),people).map(p=>p.id)):new Set();
+    showModal(`<h2 id="modal-title">${single?h(resources[0].name):resources.length+' Sammlungen teilen'}</h2><p class="small muted">${resources.map(c=>h(c.name)).join(' · ')}</p><form id="access-editor" data-resources="${h(JSON.stringify(resources.map(c=>({resourceKind:c.resourceKind,sourceId:c.id,name:c.name}))))}" data-subject="${shareSubject}">${single?'':`<label>Aktion<select name="mode"><option value="add">Mit ausgewählten Nutzern teilen</option><option value="remove">Freigaben ausgewählter Nutzer beenden</option></select></label>`}<label class="collection-check share-all"><input type="checkbox" data-access-all ${people.length&&recipients.size===people.length?'checked':''}><span>Alle Nutzer auswählen</span></label><div class="access-editor-list">${people.map(p=>{const allowed=normalizeSubjects(p.allowedSubjects).includes(shareSubject);return `<label class="collection-check"><input type="checkbox" name="recipient" value="${h(p.id)}" ${recipients.has(p.id)?'checked':''} ${!allowed&&!recipients.has(p.id)?'disabled':''}><span>${h(p.name)}<small class="muted">${h(p.email)}${!allowed?' · Lernfach nicht freigegeben':''}</small></span></label>`;}).join('')||'<p>Lege zuerst einen Nutzer an.</p>'}</div><p class="small muted">${single?'Häkchen zeigen die aktuellen Empfänger. Entfernte Häkchen beenden die Freigabe.':'Andere Nutzer und Sammlungen bleiben unverändert.'} Bereits übertragene Inhalte und Lernstände bleiben beim Beenden erhalten.</p><button class="button primary wide" type="submit" ${!people.length?'disabled':''}>Freigaben speichern</button><p role="status" data-save-status></p></form>${single&&resources[0].resourceKind==='lesson'?shares.filter(x=>x.sourceId===resources[0].id&&!x.revoked).map(x=>`<button class="text-button" data-action="share-changes" data-id="${h(x.id)}">Inhaltsänderungen für ${h(x.profileName)} senden</button>`).join(''):''}`);
   }
   function panel(fetch=true){
-    showAdmin(`<h2>Sammlungen freigeben</h2><p class="muted">Wähle zuerst ein Lernfach, dann eine Sammlung. Dort kannst du den Zugriff für alle oder einzelne Nutzer festlegen.</p><div class="button-row share-subjects"><button class="chip ${shareSubject==='latin'?'selected':''}" data-action="share-subject" data-id="latin">Latein</button><button class="chip ${shareSubject==='english'?'selected':''}" data-action="share-subject" data-id="english">Englisch</button></div><p role="status" class="small muted" data-directory-status>${fetch?'Freigaben werden geladen …':''}</p><div class="share-collections" data-share-list>${accessRows()}</div>`,'shares');
+    const resources=shareResources(shareStore.data,shareSubject),shared=resources.filter(c=>resourceRecipients(c,accessState(),people).length).length;
+    showAdmin(`<div class="section-top"><h2>Freigaben</h2><span class="access-summary">${shared} von ${resources.length} Sammlungen geteilt</span></div><div class="access-subjects"><button class="chip ${shareSubject==='latin'?'selected':''}" data-action="share-subject" data-id="latin">Latein</button><button class="chip ${shareSubject==='english'?'selected':''}" data-action="share-subject" data-id="english">Englisch</button></div><p role="status" class="small muted" data-directory-status>${fetch?'Cloud-Stand wird geprüft …':''}</p><div data-access-warning></div><div class="access-tools"><input type="search" id="access-search" value="${h(accessQuery)}" placeholder="Sammlung suchen" aria-label="Freigaben durchsuchen"><select id="access-kind" aria-label="Sammlungsart"><option value="all">Alle Arten</option><option value="lesson" ${accessKind==='lesson'?'selected':''}>Vokabeln</option><option value="refresh" ${accessKind==='refresh'?'selected':''}>Auffrischen</option>${shareSubject==='latin'?`<option value="predicates" ${accessKind==='predicates'?'selected':''}>Prädikate</option>`:''}</select></div><div class="access-actions"><button class="text-button" data-action="access-select-all">Sichtbare auswählen</button><span class="small muted" data-access-count>${accessSelection.size} ausgewählt</span><button class="button primary" data-action="access-batch" ${!accessSelection.size||accessSchema!==2?'disabled':''}>Auswahl teilen / verwalten</button></div><div data-share-list>${accessRows()}</div>`,'shares');
+    paintAccess();
     if(!fetch)return;
-    const epoch=directoryEpoch;
-    const form=document.querySelector('[data-share-list]'),message=document.querySelector('[data-directory-status]'),list=document.querySelector('[data-share-list]');
-    void Promise.all([sync.request('profiles'),shareSync.request('shareList')]).then(async ([p,s])=>{
-      if(epoch!==directoryEpoch)return;people=p.profiles;shares=s.shares||[];predicateShares=s.predicateShares||[];loaded=true;await remember();
-      if(!form.isConnected)return;
-      list.innerHTML=accessRows();status(message,'Aktuell');
-    }).catch(e=>status(message,errorText(e)));
+    const epoch=++directoryEpoch,contextSync=shareSync,contextStore=shareStore,root=document.querySelector('[data-share-list]'),message=document.querySelector('[data-directory-status]');
+    void Promise.all([sync.request('profiles'),contextSync.request('shareList'),contextSync.configured?settleSync(contextSync,contextStore):Promise.resolve()]).then(async ([p,result])=>{
+      if(epoch!==directoryEpoch||contextStore!==shareStore)return;
+      people=p.profiles;shares=result.shares||[];predicateShares=result.predicateShares||[];resourceShares=result.resourceShares||[];accessSchema=result.accessSchema||0;loaded=true;await remember();
+      if(!root.isConnected)return;
+      paintAccess();status(message,'Aktuell');
+      const summary=document.querySelector('.access-summary');if(summary){const all=shareResources(shareStore.data,shareSubject);summary.textContent=all.filter(c=>resourceRecipients(c,accessState(),people).length).length+' von '+all.length+' Sammlungen geteilt';}
+      const warning=document.querySelector('[data-access-warning]');if(warning&&accessSchema!==2)warning.innerHTML='<p class="access-warning">Für sammlungsgenaue Freigaben bitte <a href="https://github.com/tiagogt0000/latinio/blob/main/google/Code.gs" target="_blank" rel="noopener">Code.gs</a> und <a href="https://github.com/tiagogt0000/latinio/blob/main/google/Accounts.gs" target="_blank" rel="noopener">Accounts.gs</a> im Google-Skript aktualisieren und als neue Version bereitstellen. Vorhandene Freigaben bleiben erhalten.</p>';
+    }).catch(e=>{accessSchema=0;status(message,errorText(e));});
   }
-  function describe(value){return value?(value.latin?value.latin+' – '+value.meanings.map(g=>g.join(' / ')).join(', '):value.name):'Gelöscht / noch nicht vorhanden';}
+  async function saveAccess(form){
+    if(form.dataset.saving)return;
+    const fd=new FormData(form),resources=JSON.parse(form.dataset.resources),recipientIds=fd.getAll('recipient'),mode=resources.length===1?'replace':fd.get('mode');
+    if(!['replace','add','remove'].includes(mode))throw Error('Bitte eine Aktion auswählen.');
+    if(mode!=='replace'&&!recipientIds.length)throw Error('Wähle mindestens einen Nutzer.');
+    const contextStore=shareStore,contextSync=shareSync,contextSubject=shareSubject,state=accessState(),allPeople=[...people];
+    if(form.dataset.subject!==contextSubject||accessSchema!==2)throw Error('Bitte Freigaben erneut öffnen.');
+    const targets=[];
+    for(const resource of resources){
+      const current=resourceRecipients({resourceKind:resource.resourceKind,id:resource.sourceId},state,allPeople).map(p=>p.id);
+      for(const person of allPeople){
+        const selected=recipientIds.includes(person.id),exists=current.includes(person.id);
+        if(mode==='add'&&selected||mode==='remove'&&selected&&exists||mode==='replace'&&(selected||exists))targets.push({...resource,profileId:person.id,enabled:mode==='remove'?false:selected});
+      }
+    }
+    if(!targets.length){notify('Keine Freigaben zu ändern.');return;}
+    const statusNode=form.querySelector('[data-save-status]'),controls=[...form.querySelectorAll('input,select,button')],previous=controls.map(c=>c.disabled);controls.forEach(c=>c.disabled=true);form.dataset.saving='1';pending++;directoryEpoch++;
+    let completed=0,error=null;
+    try{
+      await settleSync(contextSync,contextStore);
+      for(const target of targets){status(statusNode,`Speichern · ${completed+1} / ${targets.length}`);await contextSync.request('collectionAccessSet',target);completed++;}
+    }catch(e){error=e;}
+    try{
+      const result=await contextSync.request('shareList');
+      await contextStore.update(doc=>{doc.adminDirectory={...(doc.adminDirectory||{}),shares:result.shares||[],predicateShares:result.predicateShares||[],resourceShares:result.resourceShares||[],people:allPeople};return doc;});
+      if(contextStore===shareStore){shares=result.shares||[];predicateShares=result.predicateShares||[];resourceShares=result.resourceShares||[];}
+    }catch(e){error ||= e;}
+    finally{pending--;delete form.dataset.saving;controls.forEach((c,i)=>c.disabled=previous[i]);}
+    if(error){const message=`${completed} von ${targets.length} gespeichert. ${errorText(error)}`;if(form.isConnected)status(statusNode,message);else notify(message);}
+    else {if(form.isConnected){closeModal();accessSelection.clear();panel(false);}notify('Freigaben gespeichert.');}
+  }
+  function describe(value){return value?(value.latin?value.latin+' – '+value.meanings.map(g=>g.join(' / ')).join(', '):value.grundform?value.grundform+' – '+(value.praedikate||[]).join(' / '):value.name):'Gelöscht / noch nicht vorhanden';}
   async function changes(id){
     showModal('<h2 id="modal-title">Änderungen auswählen</h2><p role="status" data-changes-loading>Änderungen werden geladen …</p><div class="indeterminate"></div>');
     const loading=document.querySelector('[data-changes-loading]');
-    try{await flush();const result=await sync.request('shareChanges',{shareId:id});if(!loading.isConnected)return;
+    try{await settleSync(shareSync,shareStore);const result=await shareSync.request('shareChanges',{shareId:id});if(!loading.isConnected)return;
     showModal(`<h2 id="modal-title">Änderungen an ${h(result.share.profileName)}</h2><p class="muted">Wähle nur die Änderungen aus, die du senden möchtest.</p><form id="share-send" data-id="${h(id)}">${result.changes.map(c=>`<label class="collection-check"><input name="change" type="checkbox" value="${h(c.key)}"><span><strong>${h(c.label)}</strong><br><small>Bisher geteilt: ${h(describe(c.previous))}<br>Neue Fassung: ${h(describe(c.source))}</small></span></label>`).join('')||'<p>Keine ungesendeten Änderungen.</p>'}<button class="button primary wide" ${!result.changes.length?'disabled':''}>Ausgewählte Änderungen senden</button><p role="status" class="small muted" data-save-status></p></form>`);
     }catch(e){status(loading,errorText(e));if(loading.isConnected)loading.nextElementSibling?.remove();}
   }
@@ -113,16 +155,20 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
   }
   function inbox(){
     const items=incoming(store.data);
-    showModal(`<h2 id="modal-title">Vokabeländerungen</h2><p class="muted">Diese Einträge unterscheiden sich von deiner eigenen Fassung. Du entscheidest, was du übernehmen möchtest.</p>${items.map(item=>{const current=store.data[item.entity]?.[item.key];const text=v=>v?(v.latin?v.latin+' – '+v.meanings.flat().join(', '):v.name):'Gelöscht';return `<section class="conflict"><h3>${h(item.label)}</h3><p><strong>Bei dir:</strong> ${h(text(current))}</p><p><strong>Vorschlag:</strong> ${h(text(item.value))}</p><div class="button-row"><button class="button secondary" data-action="incoming-keep" data-id="${h(item.id)}">Meine Fassung behalten</button><button class="button primary" data-action="incoming-accept" data-id="${h(item.id)}">Übernehmen</button></div></section>`;}).join('')||'<p>Alles erledigt.</p>'}`);
+    showModal(`<h2 id="modal-title">Geteilte Änderungen</h2><p class="muted">Diese Einträge unterscheiden sich von deiner eigenen Fassung. Du entscheidest, was du übernehmen möchtest.</p>${items.map(item=>{const current=store.data[item.entity]?.[item.key];const text=describe;return `<section class="conflict"><h3>${h(item.label)}</h3><p><strong>Bei dir:</strong> ${h(text(current))}</p><p><strong>Vorschlag:</strong> ${h(text(item.value))}</p><div class="button-row"><button class="button secondary" data-action="incoming-keep" data-id="${h(item.id)}">Meine Fassung behalten</button><button class="button primary" data-action="incoming-accept" data-id="${h(item.id)}">Übernehmen</button></div></section>`;}).join('')||'<p>Alles erledigt.</p>'}`);
   }
   function toolbar(){const count=incoming(store.data).length;return count?`<button class="button secondary" data-action="incoming-open">${count} Vokabeländerungen ansehen</button>`:'';}
   async function handle(button){
     const action=button.dataset.action,id=button.dataset.id;
+    if(action==='access-edit'){accessEditor([id]);return true;}
+    if(action==='access-batch'){accessEditor([...accessSelection]);return true;}
+    if(action==='access-select-all'){const keys=visibleResources().map(c=>c.key),remove=keys.every(key=>accessSelection.has(key));keys.forEach(key=>remove?accessSelection.delete(key):accessSelection.add(key));paintAccess();return true;}
     if(action==='admin-person'){selectedPerson=selectedPerson===id?'':id;profiles(false);return true;}
     if(action==='profile-new-toggle'){newProfileOpen=!newProfileOpen;profiles(false);return true;}
     if(action==='share-subject'){
+      if(pending){notify('Bitte warte, bis die laufende Übertragung abgeschlossen ist.');return true;}directoryEpoch++;accessSchema=0;accessSelection.clear();accessQuery='';accessKind='all';
       if(id!==shareSubject&&openShareSubject){const context=await openShareSubject(id);shareStore=context.store;shareSync=context.sync;}
-      shareSubject=id;shares=shareStore.doc.adminDirectory?.shares||[];predicateShares=shareStore.doc.adminDirectory?.predicateShares||[];await panel();return true;
+      shareSubject=id;resourceShares=shareStore.doc.adminDirectory?.resourceShares||[];shares=shareStore.doc.adminDirectory?.shares||[];predicateShares=shareStore.doc.adminDirectory?.predicateShares||[];await panel();return true;
     }
     if(action==='admin-person-shares'){selectedPerson=id;panel();return true;}
     if(action==='share-select-all'||action==='share-select-none'){document.querySelectorAll('#share-create input[name=collectionId]').forEach(el=>el.checked=action==='share-select-all');return true;}
@@ -139,7 +185,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
     if(action==='profile-delete'||action==='share-revoke'){confirmRemoval(action,id);return true;}
-    if(action==='account-profiles'){await profiles();return true;}
+    if(action==='account-profiles'){directoryEpoch++;await profiles();return true;}
     if(action==='share-panel'){await panel();return true;}
     if(action==='share-changes'){void changes(id);return true;}
     if(action==='incoming-open'){inbox();return true;}
@@ -156,6 +202,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     return false;
   }
   async function submit(form){
+    if(form.id==='access-editor'){void saveAccess(form).catch(e=>notify(errorText(e)));return true;}
     if(!['profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','predicate-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
@@ -211,14 +258,15 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
           if(form.isConnected)panel(false);notify('Benachrichtigung gesendet.');
         }else{
           const keys=fd.getAll('change');if(!keys.length)throw Error('Wähle mindestens eine Änderung.');
-          await flush();const result=await sync.request('shareSend',{shareId:form.dataset.id,keys});
-          if(form.isConnected)panel(false);notify(`${result.sent} Änderungen gesendet.`);
+          await settleSync(shareSync,shareStore);const result=await shareSync.request('shareSend',{shareId:form.dataset.id,keys});
+          if(form.isConnected){closeModal();panel(false);}notify(`${result.sent} Änderungen gesendet.`);
         }
       }catch(e){if(form.isConnected)status(message,errorText(e));else notify(errorText(e));}
       finally{pending--;delete form.dataset.saving;if(button?.isConnected)button.disabled=false;}
     })();
     return true;
   }
-  function change(el){if(el.matches?.('[data-share-all]')){const form=el.closest('#share-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.matches?.('[data-predicate-all]')){const form=el.closest('#predicate-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.name==='recipient'&&el.closest('#share-access-form')){const form=el.closest('#share-access-form'),all=form.querySelector('[data-share-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}if(el.name==='recipient'&&el.closest('#predicate-access-form')){const form=el.closest('#predicate-access-form'),all=form.querySelector('[data-predicate-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}return false;}
-  return {handle,submit,toolbar,afterAction,refresh,change,get busy(){return pending>0;}};
+  function input(el){if(el.id==='access-search'){accessQuery=el.value;paintAccess();return true;}return false;}
+  function change(el){if(el.dataset.accessSelect){el.checked?accessSelection.add(el.dataset.accessSelect):accessSelection.delete(el.dataset.accessSelect);const count=document.querySelector('[data-access-count]');if(count)count.textContent=accessSelection.size+' ausgewählt';const button=document.querySelector('[data-action="access-batch"]');if(button)button.disabled=!accessSelection.size||accessSchema!==2;return true;}if(el.id==='access-kind'){accessKind=el.value;paintAccess();return true;}if(el.matches?.('[data-access-all]')){el.closest('form')?.querySelectorAll('input[name=recipient]:not(:disabled)').forEach(input=>input.checked=el.checked);return true;}if(el.matches?.('[data-share-all]')){const form=el.closest('#share-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.matches?.('[data-predicate-all]')){const form=el.closest('#predicate-access-form');form?.querySelectorAll('input[name="recipient"]').forEach(input=>input.checked=el.checked);return true;}if(el.name==='recipient'&&el.closest('#share-access-form')){const form=el.closest('#share-access-form'),all=form.querySelector('[data-share-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}if(el.name==='recipient'&&el.closest('#predicate-access-form')){const form=el.closest('#predicate-access-form'),all=form.querySelector('[data-predicate-all]');if(all)all.checked=[...form.querySelectorAll('input[name="recipient"]')].every(input=>input.checked);return true;}return false;}
+  return {handle,submit,toolbar,afterAction,refresh,change,input,get busy(){return pending>0;}};
 }

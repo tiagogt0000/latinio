@@ -1,6 +1,16 @@
 # Latinio – Projektübergabe
 
-Stand: 7. Oktober 2026, Version 2.0.5.
+Stand: 8. Oktober 2026, Version 2.0.6.
+
+## Stand 2.0.6
+
+Neue Freigabeübersicht in `app/share-access.js` und `app/sharing-ui.js`: alle Sammlungstypen, sichtbare Empfänger, Suche/Filter und Mehrfachbearbeitung. `collectionAccessSet` im Google-Skript verarbeitet einzelne Nutzer/Sammlungen. `shareList.accessSchema === 2` ist Voraussetzung; ältere Backends erhalten einen Update-Hinweis. Beide Google-Dateien müssen separat bereitgestellt werden; der produktive Backendstand wurde nicht verändert.
+
+`resourceShare` und `resourceEntry` speichern sammlungsgenaue Auffrisch-/Perfektfreigaben samt Vergleichsständen. Bisherige globale Perfektfreigaben werden beim Bearbeiten migriert; IDs und Reviews bleiben erhalten. Empfängerbearbeitungen werden als `incomingShare` angeboten statt überschrieben. Widerruf entfernt keine Kopien. Normale Lektionen verwenden weiterhin ihre bestehenden Freigabeoperationen.
+
+Sprachwahl und Sammlungstabs ohne Kästen, Verwechslungen eigener Reiter, zentrierte Suche und flache Startbuttons. Service Worker enthält das neue Modul. Tests laufen ausschließlich lokal gegen simuliertes Apps Script; kein visueller Browsercheck.
+
+Die folgenden 2.0.5-Abschnitte sind historisch; insbesondere die dort genannte globale Perfektfreigabe wurde ersetzt.
 
 ## Projekt und Arbeitsweise
 
