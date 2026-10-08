@@ -1,6 +1,12 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.0.8.
+Stand: 8. Oktober 2026, Version 2.0.9.
+
+## Stand 2.0.9
+
+Animationslabor neu choreografiert: Feuerkreis, Flammenwelle, Sonnenkern. Jede Vorschau beginnt mit Test → Test → Weiter. `mountStreakDemo()` bindet ausschließlich das eigene Formular, stoppt dessen Submit-Bubbling vor den Lernformular-Handlern und steuert die Phasen question → leaving → blank → celebrate. `showStreakDemo()` hängt die Abmeldung aller Listener/Timer und die Wiederherstellung des Scroll-Locks an den bestehenden Dialog-Cleanup. Wiederholen beginnt erneut mit der Testfrage. Keine Store-/Cloud-Abhängigkeiten, echte Streaks weiterhin nicht implementiert.
+
+CSS isoliert die Vorschau vom globalen Dialoglayout (dessen h2-Innenabstand hatte die alte Überschrift verschoben). Flamme und Zahl liegen in einem gemeinsamen zentrierten Raster; Einflug und laufende Flammenbewegungen nutzen getrennte Ebenen. Hell/Dunkel/Wie in der App nur für die Vorschau auswählbar. Tag 1: Zündung; Tag 30: 30 Lichtstriche; Tag 100: Funkenkrone. `prefers-reduced-motion` wird bei Start gelesen und zusätzlich in CSS beachtet. Automatische Tests prüfen Eingabe, Ablauf, Zwischenphase, Doppelklick, Abbruch, Replay und Bewegungsreduktion. Kein visueller Browsercheck gemäß Nutzerpräferenz. Keine Backendänderung.
 
 ## Stand 2.0.8
 

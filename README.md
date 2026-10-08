@@ -1,4 +1,8 @@
-# Latinio · Version 2.0.8
+# Latinio · Version 2.0.9
+
+## 2.0.9 · Vom letzten Wort zum Streak-Moment
+
+Admin Tests starten jetzt mit der Test-Vokabel: „Test“ eingeben und Weiter drücken. Wortkarte, Eingabe und Knopf verschwinden nacheinander; nach einer leeren Zwischenphase entstehen Licht, eine bewegliche Flamme und der Tageswechsel. Drei neu choreografierte Varianten: Feuerkreis, Flammenwelle und Sonnenkern. Gemeinsame Mittelachse für Flamme, Zahl und Text; getrennte Hell-/Dunkel-Paletten, in der Vorschau frei vergleichbar. Tag 1, 30 und 100 erhalten eigene Licht- und Funkeneffekte. Bewegungsreduktion sowie Abbruch und Wiederholen sind berücksichtigt. Weiterhin ausschließlich Admin-Vorschauen, ohne Lernstand- oder Streak-Speicherung. Kein Google-Skript-Update nötig.
 
 ## 2.0.8 · Streak-Animationslabor
 

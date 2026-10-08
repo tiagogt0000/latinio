@@ -13,7 +13,7 @@ import {uid,clone,normalize,evaluateSession,progressFor,chooseWords,parseImport,
 import {confusionUI} from './confusion-ui.js';
 import {openAccount,signOut,accountCard,updateActiveProfile} from './accounts.js';
 import {sharingUI} from './sharing-ui.js';
-import {streakLab,streakDemo} from './streak-demo.js';
+import {streakLab,streakDemo,mountStreakDemo} from './streak-demo.js';
 import {predicateList,predicateDetail,predicateDeckForm,predicateItemForm} from './predicate-ui.js';
 import {cloudGate,settleSync,waitForInitialSync,unreadShareNotices,noticeCollections} from './multiuser-sync.js';
 import {Sync} from './sync.js';
@@ -35,7 +35,7 @@ const icon=(name,cls='')=>`<svg class="icon ${cls}" viewBox="0 0 24 24" fill="no
 const openPanels=new Set();
 let collectionTab='lessons',collectionsSearchOpen=false,refreshFlow=null,adminContent='',adminTab='people';
 let predicateSelected=null;
-let streakDemoDay=1,streakDemoVariant='impact';
+let streakDemoDay=1,streakDemoVariant='orbit',streakDemoTheme='auto';
 let predicateKey='',predicateRun=[],predicateCursor=0,predicateAnswer='',predicateFeedback=null;
 let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
@@ -106,6 +106,12 @@ function settingsView(){const p=prefs();return `<div class="page-heading"><div><
 function showModal(content,closable=true){const previous=document.activeElement;modalCleanup?.();modalRoot.innerHTML=`<div class="modal-overlay"><section role="dialog" aria-modal="true" class="modal" aria-labelledby="modal-title">${closable?`<button class="icon-button modal-close" data-action="close-modal" aria-label="Schließen">${icon('close')}</button>`:''}${content}</section></div>`;
   const listener=e=>{if(e.key==='Escape'&&closable)closeModal();if(e.key==='Tab'){const nodes=[...modalRoot.querySelectorAll('button,input,select,textarea,a[href]')].filter(n=>!n.disabled);const first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};document.addEventListener('keydown',listener);modalCleanup=()=>{document.removeEventListener('keydown',listener);previous?.focus();};modalRoot.querySelector('input,select,button')?.focus();}
 function closeModal(){modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;}
+function showStreakDemo(){
+ showModal(streakDemo(streakDemoDay,streakDemoVariant,streakDemoTheme));
+ const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
+ const dispose=mountStreakDemo(modalRoot.querySelector('.streak-stage'),{reducedMotion:window.matchMedia('(prefers-reduced-motion: reduce)').matches,onStart:()=>modalRoot.querySelector('.modal-close')?.focus({preventScroll:true})});
+ const cleanup=modalCleanup;modalCleanup=()=>{dispose();document.body.style.overflow=overflow;cleanup?.();};
+}
 function announcementView(item,preview=false){showModal(`<span class="stat-icon purple">${icon('info')}</span>${preview?'<div class="eyebrow">VORSCHAU · SO SIEHT DIE NACHRICHT AUS</div>':''}<h2 id="modal-title">${h(item.title)}</h2><p class="announcement-message">${h(item.message).replace(/\n/g,'<br>')}</p>${preview?'<button class="button secondary wide" data-action="announcement-history">Zurück zur Nachrichtenliste</button>':`<button class="button primary wide" data-action="announcement-next" data-id="${h(item.id)}">Weiter ${icon('arrow')}</button>`}`,preview);}
 function checkShareNotices(){if(!ready||cloudWait?.blocked||working||waitingStart||modalRoot.children.length||!['learn','collections','settings'].includes(screen))return;const notices=unreadShareNotices(data());if(!notices.length)return;showModal(`<h2 id="modal-title">Neue Inhalte für dich</h2><p>Diese Inhalte wurden mit dir geteilt:</p><ul>${noticeCollections(notices).map(item=>`<li>${h(item.name)}</li>`).join('')}</ul><button class="button primary wide" data-action="share-notices-read">Weiter</button>`,false);}
 async function checkAnnouncements(){if(cloudWait?.blocked||!ready||!sync?.configured||!navigator.onLine||announcementLoading||modalRoot.children.length||['test','match','predicate-test'].includes(screen))return;announcementLoading=true;try{const result=await sync.request('announcementInbox');announcementQueue=result.announcements||[];if(announcementQueue.length&&!working&&!waitingStart&&!modalRoot.children.length&&!['test','match','predicate-test'].includes(screen))announcementView(announcementQueue[0]);}catch{}finally{announcementLoading=false;}}
@@ -279,9 +285,9 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'sync-now':void loadCloud();break;
  case 'remote':void loadCloud();break;
  case 'close-modal':closeModal();break;
- case 'admin-tests':if(isAdmin())showModal(streakLab(streakDemoDay));break;
- case 'streak-demo':if(isAdmin()){streakDemoDay=Number(document.querySelector('#streak-demo-day')?.value)||1;streakDemoVariant=id;showModal(streakDemo(streakDemoDay,streakDemoVariant));}break;
- case 'streak-demo-replay':if(isAdmin())showModal(streakDemo(streakDemoDay,streakDemoVariant));break;
+ case 'admin-tests':if(isAdmin())showModal(streakLab(streakDemoDay,streakDemoTheme));break;
+ case 'streak-demo':if(isAdmin()){streakDemoDay=Number(document.querySelector('#streak-demo-day')?.value)||1;streakDemoTheme=document.querySelector('#streak-demo-theme')?.value||'auto';streakDemoVariant=id;showStreakDemo();}break;
+ case 'streak-demo-replay':if(isAdmin())showStreakDemo();break;
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:english?[{english:'hello',german:['hallo']}]:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download=english?'latinio-englisch-beispiel.json':'latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
  }}catch(error){notify(error.message);}finally{clearTimeout(actionDotsTimer);actionDots?.remove();button.removeAttribute?.('aria-busy');working=false;void sharing?.afterAction();checkShareNotices();autoUpdate();}}
 document.addEventListener('click',event=>{
