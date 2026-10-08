@@ -163,7 +163,7 @@
 .home-heading .eyebrow{grid-column:1;grid-row:1}
 .home-heading h1{grid-column:1;grid-row:2}
 .home-heading>div:first-child>p{grid-column:1/-1;grid-row:3}
-.streak-badge{color:var(--muted);gap:7px;min-width:0;padding:0;border:0;border-radius:0;line-height:1}
+.streak-badge{color:var(--muted);gap:7px;min-width:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;line-height:1}
 .streak-badge-flame{width:23px;height:27px;flex:none;display:block;color:#9da5ac}
 .streak-badge-core{fill:#d1d5d8}
 .streak-badge.is-active{color:var(--orange)}

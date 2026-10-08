@@ -1,4 +1,8 @@
-# Latinio · Version 2.1.2
+# Latinio · Version 2.1.3
+
+## 2.1.3 · Transparente Home-Flamme
+
+Den geerbten Hintergrund der Tagesanzeige entfernt: Flamme und Zahl stehen direkt auf dem Seitenhintergrund, auch im Dunkelmodus.
 
 ## 2.1.2 · Home-Flamme nach Vorlage
 

@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.2.
+Stand: 8. Oktober 2026, Version 2.1.3.
+
+## Stand 2.1.3
+
+`.streak-badge` setzt explizit `background:transparent` und `box-shadow:none`, damit die geerbte `.daily-badge`-Hintergrundfarbe keinen Kasten hinter Flamme und Zahl erzeugt.
 
 ## Stand 2.1.2
 
