@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.1.
+Stand: 8. Oktober 2026, Version 2.1.2.
+
+## Stand 2.1.2
+
+Home-Badge als zweifarbige SVG-Flamme nach der Nutzervorlage: breite abgerundete Außenform und innerer Tropfen. Graue Flächen inaktiv, orange/gelb aktiv. Nur `streakBadgeFlame()` und Badge-Farben angepasst; Animationsgrafik und Streak-Logik unverändert. Kein neues Asset und keine Google-Skript-Änderung.
 
 ## Stand 2.1.1
 

@@ -1,4 +1,8 @@
-# Latinio · Version 2.1.1
+# Latinio · Version 2.1.2
+
+## 2.1.2 · Home-Flamme nach Vorlage
+
+Die Home-Flamme folgt der zweifarbigen Vorlage mit breiter Außenform und innerem Tropfen. Als Vektorgrafik bleibt sie bei jeder Auflösung scharf: grau vor dem Lernen, orange-gelb nach einer abgeschlossenen Tagesrunde. Keine Änderung am Google-Skript erforderlich.
 
 ## 2.1.1 · Schlichter Streak-Abschluss
 

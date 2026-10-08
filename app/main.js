@@ -117,7 +117,7 @@ function showStreakDemo(){
  const cleanup=modalCleanup;modalCleanup=()=>{dispose();document.body.style.overflow=overflow;cleanup?.();};
 }
 
-function streakBadgeFlame(){return '<svg class="streak-badge-flame" viewBox="0 0 24 28" aria-hidden="true"><path fill="currentColor" d="M13 2c1 7-7 8-7 14 0 2 1 3 2 4-1-5 5-7 7-11 0 4 5 7 5 11a8 8 0 0 1-16 0C4 12 11 10 13 2Z"/></svg>';}
+function streakBadgeFlame(){return '<svg class="streak-badge-flame" viewBox="100 90 1060 1320" aria-hidden="true"><path fill="currentColor" d="M583 114C606 84 647 84 671 115L1036 584C1118 689 1155 792 1155 915C1155 1200 920 1402 629 1402C339 1402 103 1196 103 916V388C103 325 144 289 198 312L365 389Z"/><path class="streak-badge-core" d="M600 652C614 631 640 631 655 652L809 870C839 911 854 953 854 1001C854 1118 755 1210 628 1210C502 1210 402 1118 402 1001C402 953 417 911 447 870Z"/></svg>';}
 async function refreshStreak(){
  if(!streakLedger)return;
  streakLedger.merge(streakDays(data()));

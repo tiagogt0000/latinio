@@ -164,9 +164,11 @@
 .home-heading h1{grid-column:1;grid-row:2}
 .home-heading>div:first-child>p{grid-column:1/-1;grid-row:3}
 .streak-badge{color:var(--muted);gap:7px;min-width:0;padding:0;border:0;border-radius:0;line-height:1}
-.streak-badge-flame{width:23px;height:27px;flex:none;display:block}
+.streak-badge-flame{width:23px;height:27px;flex:none;display:block;color:#9da5ac}
+.streak-badge-core{fill:#d1d5d8}
 .streak-badge.is-active{color:var(--orange)}
-.streak-badge.is-active .streak-badge-flame{color:#ef812f}
+.streak-badge.is-active .streak-badge-flame{color:#f39b32}
+.streak-badge.is-active .streak-badge-core{fill:#f8ce43}
 .modal-overlay:has(.round-decision){backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .round-decision>p{margin:14px 0;color:var(--muted)}
 .round-decision-actions{display:grid;gap:12px;margin:24px 0 18px}
