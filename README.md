@@ -1,4 +1,8 @@
-# Latinio · Version 2.1.0
+# Latinio · Version 2.1.1
+
+## 2.1.1 · Schlichter Streak-Abschluss
+
+Grüne Smart-Lernen-Knöpfe etwas dunkler. Die Home-Flamme ist ein einfaches einfarbiges Symbol und sitzt auf Höhe der Begrüßung. Ergebnisfelder aus dem Streak-Abschluss entfernt; echte Runden und Admin-Vorschauen haben denselben rahmenlosen Weiter-Knopf. In der Vorschau führt Weiter zurück zur Auswahl, nach einer echten Runde zur Startseite.
 
 ## 2.1.0 · Tages-Streak und neuer Rundenabschluss
 

@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.0.
+Stand: 8. Oktober 2026, Version 2.1.1.
+
+## Stand 2.1.1
+
+Auf Nutzerwunsch Ergebnisfelder vollständig aus dem Streak-Abschluss entfernt. `finishControls(live)` ist derselbe rahmenlose Weiter-Knopf für Admin-Test und echten Abschluss; Ziele sind Admin-Auswahl bzw. Home. Keine Wiederholen-/Andere-Variante-Knöpfe mehr im Demo-Abschluss. Gemeinsame Grafikgröße und Position. Home-Begrüßung als Raster mit Badge in der h1-Zeile; Flamme besteht aus einer einfarbigen Konturfläche. Latein-Smart-Knöpfe 15 % dunkler gemischt, Englischfarbe unverändert. Streak- und Fehlerlogik bleibt bestehen.
 
 ## Stand 2.1.0
 

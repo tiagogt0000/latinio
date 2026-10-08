@@ -55,7 +55,7 @@ test('choosing finish claims once and displays the three stats; continue clears 
  const f=flow();await f.context.offerRoundEnd({kind:'vocab',id:'root',stats:roundStats(f.session,f.d),errors:[{wordId:'b'}]});
  await f.context.acceptRoundEnd();await f.context.acceptRoundEnd();
  assert.equal(f.calls.claims,1);assert.equal(f.calls.fades,1);assert.equal(f.calls.mounts[0].celebrate,true);
- assert.match(f.calls.dialogs.at(-1).html,/Neu sicher/);assert.doesNotMatch(f.calls.dialogs.at(-1).html,/data-streak-form|admin-tests/);
+ assert.doesNotMatch(f.calls.dialogs.at(-1).html,/Neu sicher|streak-round-stats/);assert.doesNotMatch(f.calls.dialogs.at(-1).html,/data-streak-form|admin-tests/);
  await f.context.returnFromRound();assert.equal(f.context.screen,'learn');assert.equal(f.store.doc.session,null);assert.equal(f.context.roundEnd,null);
 });
 test('a flawless round proceeds immediately and later same-day rounds do not replay the celebration',async()=>{

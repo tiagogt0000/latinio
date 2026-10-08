@@ -38,7 +38,7 @@ export function streakDemo(day,variant='orbit',theme='auto',options={}){
  <div class="streak-counter" aria-hidden="true">${day>1?`<span class="streak-old">${day-1}</span>`:''}<span class="streak-new">${day}</span></div>
  </div><div class="streak-copy"><p class="streak-milestone">${live&&options.celebrate===false?'RUNDE GESCHAFFT':day===1?'DER ANFANG':day===30?'DEIN MEILENSTEIN':day===100?'DREISTELLIG. UNAUFHALTSAM.':'STREAK FORTGESETZT'}</p><h3 class="streak-day-label">Tag ${day}</h3><p class="streak-caption">${caption}</p></div></div>
  </div>
- ${live?finishControls(options.stats):`<footer class="streak-demo-controls" hidden><p>${variants[variant].title} · Nur eine Vorschau</p><div><button type="button" data-action="streak-demo-replay" disabled>Noch einmal</button><button type="button" data-action="admin-tests" disabled>Andere Variante</button></div></footer>`}</div>`;
+ ${finishControls(live)}</div>`;
 }
 
 // Cancellable sequence: keyboard dismissal, staggered exit, empty frame, reveal.
@@ -46,7 +46,7 @@ export function streakDemo(day,variant='orbit',theme='auto',options={}){
 export function mountStreakDemo(stage,{reducedMotion=false,schedule=setTimeout,cancel=clearTimeout,onStart=()=>{}}={}){
  const form=stage.querySelector('[data-streak-form]'),input=stage.querySelector('#streak-test-answer');
  const error=stage.querySelector('#streak-answer-error'),question=stage.querySelector('.streak-question');
- const celebration=stage.querySelector('.streak-celebration'),controls=stage.querySelector('.streak-demo-controls');
+ const celebration=stage.querySelector('.streak-celebration'),controls=stage.querySelector('.streak-finish-controls');
  const status=stage.querySelector('[data-streak-status]'),submit=form.querySelector('[type="submit"]');
  const timers=new Set();let disposed=false,started=false;
  stage.dataset.reducedMotion=String(reducedMotion);
@@ -64,18 +64,17 @@ export function mountStreakDemo(stage,{reducedMotion=false,schedule=setTimeout,c
   later(()=>{
    celebration.hidden=false;celebration.setAttribute('aria-hidden','false');stage.dataset.phase='celebrate';
    later(()=>{
-    controls.hidden=false;controls.querySelectorAll('button').forEach(button=>button.disabled=false);
+    controls.hidden=false;controls.querySelectorAll('button').forEach(button=>{button.disabled=false;button.focus({preventScroll:true});});
     status.textContent=`Vorschau: Tag ${stage.dataset.day}. ${stage.querySelector('.streak-caption').textContent}`;
-   },reducedMotion?100:4200);
+   },reducedMotion?100:3600);
   },reducedMotion?220:1200);
  }
  form.addEventListener('submit',start);input.addEventListener('input',clearError);input.focus({preventScroll:true});
  return ()=>{disposed=true;timers.forEach(cancel);timers.clear();form.removeEventListener('submit',start);input.removeEventListener('input',clearError);};
 }
 
-function finishControls(stats={}){
- const number=value=>Number.isFinite(value)?Math.max(0,Math.floor(value)):0;
- return `<footer class="streak-finish-controls" hidden><div class="streak-round-stats" aria-label="Ergebnis der Lernrunde">${[[stats.correct,'Auf Anhieb richtig'],[stats.wrong,'Nicht auf Anhieb'],[stats.newlyKnown,'Neu sicher']].map(([value,label])=>`<div><strong>${number(value)}</strong><span>${label}</span></div>`).join('')}</div><button type="button" class="streak-continue" data-action="round-home" disabled>Weiter <span aria-hidden="true">→</span></button></footer>`;
+function finishControls(live=false){
+ return `<footer class="streak-finish-controls" hidden><button type="button" class="streak-continue" data-action="${live?'round-home':'admin-tests'}" disabled>Weiter <span aria-hidden="true">→</span></button></footer>`;
 }
 export function mountStreakFinish(stage,{celebrate=true,reducedMotion=false,schedule=setTimeout,cancel=clearTimeout}={}){
  let disposed=false;const timers=new Set();

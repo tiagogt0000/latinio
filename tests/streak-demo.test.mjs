@@ -10,12 +10,12 @@ function fixture(options={}){
   focus(){this.focused=true;}
   blur(){this.focused=false;}
  }
- const selectors=['[data-streak-form]','#streak-test-answer','#streak-answer-error','.streak-question','.streak-celebration','.streak-demo-controls','[data-streak-status]','.streak-caption'];
+ const selectors=['[data-streak-form]','#streak-test-answer','#streak-answer-error','.streak-question','.streak-celebration','.streak-finish-controls','[data-streak-status]','.streak-caption'];
  const elements=Object.fromEntries(selectors.map(selector=>[selector,new Element()]));
  const stage=new Element();stage.dataset={phase:'question',day:'30'};stage.querySelector=selector=>elements[selector];
  const form=elements['[data-streak-form]'],input=elements['#streak-test-answer'],submit=new Element();
  form.querySelector=()=>submit;
- const controls=elements['.streak-demo-controls'],celebration=elements['.streak-celebration'];
+ const controls=elements['.streak-finish-controls'],celebration=elements['.streak-celebration'];
  controls.hidden=true;celebration.hidden=true;const buttons=[new Element(),new Element()];buttons.forEach(button=>button.disabled=true);controls.querySelectorAll=()=>buttons;
  elements['.streak-caption'].textContent='Dein Feuer wächst.';
  let time=0,id=0,started=0;const timers=new Map();
