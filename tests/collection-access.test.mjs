@@ -10,6 +10,15 @@ function push(h,entity,key,value,token,subject='latin'){
 function fixture(){const h=harness(),{profile}=h.request({action:'profileCreate',name:'Felix',email:'access@example.org'}),{token}=h.request({action:'login',email:'access@example.org'});return {h,profile,token,pull:(subject='latin')=>h.request({action:'pull',since:0,token,subject}).data,set:(kind,id,enabled=true,subject='latin')=>h.request({action:'collectionAccessSet',profileId:profile.id,resourceKind:kind,sourceId:id,enabled,subject})};}
 function seed(t){for(const id of ['a','b']){push(t.h,'settings',id,{id,kind:'predicateDeck',name:'Prädikate '+id});push(t.h,'settings','p'+id,{id:'p'+id,kind:'predicateItem',deckId:id,name:'Prädikate '+id,grundform:'verb'+id,praedikate:['answer'+id]});}}
 
+test('Apps Script legacy hash matches frontend 64-bit IDs without BigInt literals',()=>{
+ const h=harness();
+ for(const name of ['Prädikate','ÄÖÜ é Lektion 17','日本語 😀',...Array.from({length:100},(_,i)=>'Prädikate Lektion '+i)]){
+  const row={kind:'predicateItem',name,grundform:'amare',praedikate:['amavi']};
+  const expected=predicateDecks({settings:{p:row}})[0].id;
+  assert.equal(h.ctx.predicateDeckId_(row),expected,name);
+ }
+});
+
 test('One selected predicate deck shares no items from any other deck; repeating is idempotent',()=>{
  const t=fixture();seed(t);t.set('predicates','a');const first=t.pull(),version=t.h.request({action:'check',token:t.token}).version;
  assert.deepEqual(predicateCloudItems(first).map(x=>x.grundform),['verba']);assert.equal(predicateDecks(first).length,1);assert.equal(Object.keys(first.collections).length,0);

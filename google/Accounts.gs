@@ -121,10 +121,11 @@ function repairShare_(share){
 function predicateDeckId_(row){
   if(row.deckId)return row.deckId;
   const name=String(row.name||'Prädikate').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('de');
-  let hash=14695981039346656037n;
+  // FNV-1a 64 as two unsigned words: Apps Script rejects BigInt literals.
+  let high=0xcbf29ce4,low=0x84222325;
   const encoded=encodeURIComponent(name);
-  for(let i=0;i<encoded.length;i++){let byte;if(encoded[i]==='%'){byte=parseInt(encoded.slice(i+1,i+3),16);i+=2;}else byte=encoded.charCodeAt(i);hash=BigInt.asUintN(64,(hash^BigInt(byte))*1099511628211n);}
-  return 'predicate_deck_legacy_'+hash.toString(16);
+  for(let i=0;i<encoded.length;i++){let byte;if(encoded[i]==='%'){byte=parseInt(encoded.slice(i+1,i+3),16);i+=2;}else byte=encoded.charCodeAt(i);low=(low^byte)>>>0;const product=low*435;high=(high*435+low*256+Math.floor(product/4294967296))>>>0;low=product>>>0;}
+  return 'predicate_deck_legacy_'+(high.toString(16)+low.toString(16).padStart(8,'0')).replace(/^0+(?=.)/,'');
 }
 function resourceShareId_(profileId,kind,sourceId,subject){return 'rs_'+hash_(subject+':'+profileId+':'+kind+':'+sourceId).slice(0,32);}
 function migratePredicateAccess_(profileId){
