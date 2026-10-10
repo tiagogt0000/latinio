@@ -1,4 +1,6 @@
+import {RestBridge} from './rest-bridge.js';
 import {rebase} from './core.js';
+export function createBridge(url,token){return /\/api$/.test(url)?new RestBridge(url,token):new GoogleBridge(url,token);}
 export const FULL_SYNC_INTERVAL=86400000;
 export function needsFullSync(doc,now=Date.now()){const last=Number(doc.lastFullSync)||0;return !last||now-last>FULL_SYNC_INTERVAL;}
 export class GoogleBridge {
@@ -40,7 +42,7 @@ export class Sync extends EventTarget {
   async request(action,payload,requestSubject=this.subject){
     if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
     const config=this.store.doc.config;
-    if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=new GoogleBridge(config.url,config.token);}
+    if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=createBridge(config.url,config.token);}
     try{
       if(['profileCreate','profileUpdate','profileUpdateSubjects'].includes(action)){
         const identity=await this.bridge.request('whoami');
@@ -52,7 +54,7 @@ export class Sync extends EventTarget {
       // A long-lived Apps Script iframe may still point at the previous deployment.
       // Retry only an unknown-action rejection: the server has not performed it.
       if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
-      this.bridge.destroy();this.bridge=new GoogleBridge(config.url,config.token);
+      this.bridge.destroy();this.bridge=createBridge(config.url,config.token);
       if(requestSubject==='english'){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript.');this.bridge.englishVerified=true;}
       return this.bridge.request(action,{...payload,subject:requestSubject});
     }

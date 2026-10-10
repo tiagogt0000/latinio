@@ -1,0 +1,20 @@
+name: vokabeltrainer
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: server/Dockerfile
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - latinio_data:/data
+    restart: unless-stopped
+    mem_limit: 256m
+    cpus: 0.75
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+volumes:
+  latinio_data:

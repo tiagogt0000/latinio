@@ -1,4 +1,4 @@
-import {GoogleBridge} from './sync.js';
+import {createBridge} from './sync.js';
 import {Store} from './store.js';
 import {CLOUD_URL} from './cloud-config.js';
 const ACTIVE='latinio-account-v2',MIGRATED='latinio-account-migrated-v2';
@@ -14,6 +14,7 @@ export async function openAccount(root){
   const endpoint=CLOUD_URL||legacy.doc.config.url;
   // Only an existing, previously configured device migrates without logging in again.
   if(!localStorage.getItem(MIGRATED)&&legacy.doc.config.token&&legacy.doc.config.url){
+    if(CLOUD_URL)await legacy.update(doc=>{doc.config.url=CLOUD_URL;return doc;});
     const profile={id:'admin',role:'admin',name:'Admin'};localStorage.setItem(ACTIVE,JSON.stringify(profile));localStorage.setItem(MIGRATED,'1');return {store:legacy,profile};
   }
   legacy.close();
@@ -28,7 +29,7 @@ export async function openAccount(root){
         try{
           if(!endpoint)throw Error('Die neue Cloud-Verbindung wird noch eingerichtet.');
           if(!navigator.onLine)throw Error('Für die erste Anmeldung auf diesem Gerät brauchst du Internet.');
-          bridge=new GoogleBridge(endpoint,'');const value=new FormData(form).get('credential').trim();
+          bridge=createBridge(endpoint,'');const value=new FormData(form).get('credential').trim();
           const result=await bridge.request('login',admin?{admin:true,pin:value}:{email:value});
           const store=await new Store().open(result.profile.id);
           await store.update(doc=>{doc.config={url:endpoint,token:result.token};doc.profile=result.profile;doc.seeded=true;return doc;});

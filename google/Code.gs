@@ -34,6 +34,7 @@ function latinioApi(request) {
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
+    if(typeof piMigrationRoute_==='function'){const routed=piMigrationRoute_(request);if(routed.handled)return routed.result;}
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
