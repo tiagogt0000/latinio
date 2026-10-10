@@ -1,6 +1,12 @@
 # Latinio – Projektübergabe
 
-Stand: 8. Oktober 2026, Version 2.1.5.
+Stand: 11. Oktober 2026. Produktiv weiterhin 2.1.5; Pi-Umstellung 2.2.0 vorbereitet.
+
+## Vorbereitet: 2.2.0 – Pi-Speicher
+
+Frontend und PWA-Ursprung bleiben bei GitHub Pages. Der neue REST-Endpunkt ist https://elektrogilbersserver.tail7c7157.ts.net:8443/api. Eigener Compose-Stack vokabeltrainer, localhost:8081, SQLite-Volume; die Elektro-App bleibt unverändert. Pi-Testimport und öffentliche Health-/CORS-Prüfung erfolgreich. Hauptbranch noch nicht umgeschaltet.
+
+Nächste Schritte: finalen Export mit beginPiMigrationExport erzeugen, ausschließlich die Pi-Testdatenbank mit dem aktuellen Export ersetzen, prüfen und sichern, finishPiMigration aktivieren, dann vorbereitetes Frontend veröffentlichen. Alte zwischengespeicherte PWAs nutzen vorübergehend die Google-Weiterleitung; keine Google-Schreibzugriffe nach Umschaltung. Google erst abschalten, wenn Altversionen nicht mehr benötigt werden.
 
 ## Stand 2.1.5
 

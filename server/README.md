@@ -25,36 +25,22 @@ Die Oberfläche wird ausdrücklich weiter auf GitHub gehostet.
 - Eigener Compose-Name vokabeltrainer, eigener Volume latinio_data,
   ausschließlich 127.0.0.1:8081, automatischer Neustart und Ressourcenlimits.
 
-server/rest-bridge.mjs ist der geprüfte, noch nicht in die laufende Oberfläche
-eingebundene REST-Client. Die aktive App nutzt weiterhin Google. Kein
-Versionswechsel wurde veröffentlicht. Docker-Build, öffentliche HTTPS-Adresse
-und Pi-Betrieb sind noch nicht vor Ort geprüft.
+Der REST-Client in app/rest-bridge.js und Version 2.2.0 sind im Arbeitsbranch
+vorbereitet. Der produktive Hauptbranch bleibt bis zur finalen Datenübernahme
+bei Google und Version 2.1.5.
 
-## Nächster benötigter Schritt: nur Pi-Inventar lesen
+## Vor Ort geprüfter Stand (10./11. Oktober 2026)
 
-Vom Nutzer am 10. Oktober 2026 per Terminal-Screenshot bestätigt:
-- Elektro-Container: gilbers-app-app-1, Status healthy.
-- Image: gilbers-app-app; Versionsnummer im Screenshot nicht sichtbar.
-- Elektro-Volume: gilbers-app_gilbers_data.
-- Binding: 127.0.0.1:8080 auf Container-Port 8080.
-- Funnel auf HTTPS 443 leitet / an http://127.0.0.1:8080.
-- In der vorherigen Portliste kein Listener auf 8081 oder 8443.
-
-Nächster Arbeitsschritt ist der private Google-Datenexport. Vor Änderungen
-am Pi das vorhandene Elektro-Backupverfahren prüfen und ausführen.
-
-```sh
-docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}\t{{.Status}}'
-docker volume ls
-ss -ltn
-tailscale serve status
-tailscale funnel status
-```
-
-Vor Änderungen an gemeinsam genutzter Infrastruktur die vorhandene
-Elektro-Sicherung ausführen und überprüfen. Keine Änderung am Elektro-Projekt,
-kein pauschales Compose-down und kein Tailscale-reset. Der freie lokale und
-öffentliche HTTPS-Port wird erst nach dieser Bestandsaufnahme festgelegt.
+- Elektro-Container gilbers-app-app-1 gesund, Binding 127.0.0.1:8080.
+- Elektro-Volume gilbers-app_gilbers_data unverändert.
+- Elektro-Sicherung gilbers-20261010-193955.sqlite erfolgreich.
+- Latinio-Container vokabeltrainer-api-1 gesund, Binding 127.0.0.1:8081.
+- Eigenes Volume vokabeltrainer_latinio_data; erster Export als Testkopie importiert.
+- Bestehender Tailscale-Funnel HTTPS 443 weiter zur Elektro-App.
+- Zusätzlicher Funnel HTTPS 8443 zur Vokabel-App.
+- Öffentlicher Health- und CORS-Test erfolgreich; kein Tailscale auf den Endgeräten nötig.
+- RAM-Limit wird vom vorhandenen Kernel nicht unterstützt; keine Betriebssystemänderung vorgenommen.
+- Google-Kompatibilitätsdatei vom Nutzer vorbereitet; Migration noch nicht aktiviert.
 
 ## Datenübernahme und Umschaltung: noch auszuführen
 
