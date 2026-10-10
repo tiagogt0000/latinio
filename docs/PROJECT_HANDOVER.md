@@ -1,12 +1,18 @@
 # Latinio – Projektübergabe
 
-Stand: 11. Oktober 2026. Produktiv weiterhin 2.1.5; Pi-Umstellung 2.2.0 vorbereitet.
+Stand: 11. Oktober 2026, Version 2.2.1.
 
-## Vorbereitet: 2.2.0 – Pi-Speicher
+## Stand 2.2.1
 
-Frontend und PWA-Ursprung bleiben bei GitHub Pages. Der neue REST-Endpunkt ist https://elektrogilbersserver.tail7c7157.ts.net:8443/api. Eigener Compose-Stack vokabeltrainer, localhost:8081, SQLite-Volume; die Elektro-App bleibt unverändert. Pi-Testimport und öffentliche Health-/CORS-Prüfung erfolgreich. Hauptbranch noch nicht umgeschaltet.
+Safari meldete nach der Pi-Umstellung „Can only call Window.fetch on instances of Window“. RestBridge ruft natives fetch jetzt ausdrücklich über globalThis auf; der injizierbare Testtransport bleibt erhalten. Regressionstest prüft den erforderlichen Empfänger. Keine Änderung am Pi oder an gespeicherten Daten.
 
-Nächste Schritte: finalen Export mit beginPiMigrationExport erzeugen, ausschließlich die Pi-Testdatenbank mit dem aktuellen Export ersetzen, prüfen und sichern, finishPiMigration aktivieren, dann vorbereitetes Frontend veröffentlichen. Alte zwischengespeicherte PWAs nutzen vorübergehend die Google-Weiterleitung; keine Google-Schreibzugriffe nach Umschaltung. Google erst abschalten, wenn Altversionen nicht mehr benötigt werden.
+## Stand 2.2.0 – Pi-Speicher aktiviert
+
+Frontend und PWA-Ursprung bleiben bei GitHub Pages. REST-Endpunkt: https://elektrogilbersserver.tail7c7157.ts.net:8443/api. Eigener Compose-Stack vokabeltrainer, localhost:8081, SQLite-Volume; Elektro-Projekt unverändert.
+
+Finalen Export vom 11. Oktober 00:12 Uhr übernommen: 17 Tabellen, 5 Profilzeilen, 11474 Datenzeilen; alle zuvor importierten Journale unverändert enthalten. Import erstellt Sicherung und ersetzt ausschließlich die gestoppte Vokabel-Datenbank. Nutzer bestätigt beide Container healthy und Health ready. finishPiMigration um 00:18:56 erfolgreich; Frontend 2.2.0 danach veröffentlicht und Pages-Version, Endpunkt und Service Worker geprüft.
+
+Alte zwischengespeicherte PWAs nutzen vorübergehend die Google-Weiterleitung; keine Google-Schreibzugriffe nach Umschaltung. Google noch nicht deaktivieren. Keine Rückschaltung auf den veralteten Google-Datenstand. Benutzerprüfung der Synchronisierung nach Safari-Korrektur noch ausstehend.
 
 ## Stand 2.1.5
 

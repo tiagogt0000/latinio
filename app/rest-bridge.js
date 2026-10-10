@@ -1,7 +1,7 @@
-// Staged replacement for GoogleBridge. Wire into the app only after the Pi
-// snapshot is validated and its public HTTPS endpoint has been tested.
+// Keep the native fetch receiver: Safari rejects window.fetch called as a
+// method of RestBridge rather than of Window.
 export class RestBridge {
-  constructor(url,token,{fetchImpl=globalThis.fetch}={}) {
+  constructor(url,token,{fetchImpl=(...args)=>globalThis.fetch(...args)}={}) {
     this.url=url;this.token=token;this.fetchImpl=fetchImpl;
     const parsed=new URL(url);
     if(parsed.protocol!=='https:' || parsed.username || parsed.password || parsed.search || parsed.hash) throw Error('HTTPS-Endpunkt erforderlich.');

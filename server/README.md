@@ -1,4 +1,4 @@
-# Pi-Backend für Latinio — vorbereitet, noch nicht produktiv
+# Pi-Backend für Latinio — seit 11. Oktober 2026 produktiv
 
 ## Ziel
 
@@ -25,9 +25,9 @@ Die Oberfläche wird ausdrücklich weiter auf GitHub gehostet.
 - Eigener Compose-Name vokabeltrainer, eigener Volume latinio_data,
   ausschließlich 127.0.0.1:8081, automatischer Neustart und Ressourcenlimits.
 
-Der REST-Client in app/rest-bridge.js und Version 2.2.0 sind im Arbeitsbranch
-vorbereitet. Der produktive Hauptbranch bleibt bis zur finalen Datenübernahme
-bei Google und Version 2.1.5.
+Der REST-Client in app/rest-bridge.js ist produktiv. Version 2.2.1 korrigiert den
+Safari-Aufruf von fetch. Die Hauptversion verbindet sich direkt mit dem Pi.
+Ältere PWA-Versionen werden vorübergehend über Google an den Pi weitergereicht.
 
 ## Vor Ort geprüfter Stand (10./11. Oktober 2026)
 
@@ -40,9 +40,12 @@ bei Google und Version 2.1.5.
 - Zusätzlicher Funnel HTTPS 8443 zur Vokabel-App.
 - Öffentlicher Health- und CORS-Test erfolgreich; kein Tailscale auf den Endgeräten nötig.
 - RAM-Limit wird vom vorhandenen Kernel nicht unterstützt; keine Betriebssystemänderung vorgenommen.
-- Google-Kompatibilitätsdatei vom Nutzer vorbereitet; Migration noch nicht aktiviert.
+- Finaler Export: 17 Tabellen und 11474 Datenzeilen; Import mit vorheriger SQLite-Sicherung erfolgreich.
+- Nutzer bestätigt beide Container healthy; öffentliche Health-Prüfung ready.
+- Google-Weiterleitung am 11. Oktober um 00:18:56 aktiviert; Pages-Release erfolgreich.
+- Abschließende Synchronisierungsprüfung durch Nutzer noch ausstehend.
 
-## Datenübernahme und Umschaltung: noch auszuführen
+## Ablauf der Datenübernahme (Schritte 1–7 abgeschlossen)
 
 1. Google-Tabelle und aktuelle Script-Konfiguration privat sichern.
 2. ExportPi.gs als zusätzliche Datei im Apps-Script-Editor hinzufügen und
