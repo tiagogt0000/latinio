@@ -1,6 +1,10 @@
 # Latinio – Projektübergabe
 
-Stand: 11. Oktober 2026, Version 2.2.1.
+Stand: 11. Oktober 2026, Version 2.2.2.
+
+## Stand 2.2.2
+
+Cloud-Symbol und zugehörigen Klickpfad aus der oberen Leiste auf Nutzerwunsch entfernt. Automatischer Pi-Abgleich und Admin-Statusbereich in den Einstellungen bleiben aktiv. Kein Backendupdate.
 
 ## Stand 2.2.1
 
