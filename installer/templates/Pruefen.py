@@ -46,7 +46,7 @@ def container(file):
     info = json.loads(file.read_text())[0]
     labels = info['Config']['Labels']
     require(labels.get('com.docker.compose.project') == 'vokabeltrainer' and labels.get('com.docker.compose.service') == 'api', 'Falscher laufender Container.')
-    require(info['State']['Running'], 'Die bisherige Vokabel-App laeuft nicht. Abbruch.')
+    require(info['State']['Running'] or info['State'].get('Restarting') or info['State'].get('Status') == 'exited', 'Der Vokabel-Container hat einen unerwarteten Zustand. Abbruch.')
     data = [mount for mount in info['Mounts'] if mount['Destination'] == '/data']
     require(len(data) == 1 and data[0]['Type'] == 'volume' and data[0]['Name'] == 'vokabeltrainer_latinio_data', 'Der laufende Container nutzt nicht den privaten Vokabel-Speicher.')
 
@@ -60,6 +60,15 @@ def database(path):
     finally:
         db.close()
 
+def ready(path):
+    require(json.loads(path.read_text()).get('ready') is True, 'Die Vokabel-App ist nicht bereit.')
+
+def rollback_image(path,version):
+    import re
+    matches=[tag for tag in path.read_text().splitlines() if re.fullmatch(r'vokabeltrainer:vor-'+re.escape(version)+r'-[0-9]{8}-[0-9]{6}-[0-9]+',tag)]
+    require(bool(matches), 'Keine passende gesicherte Vokabel-Version gefunden.')
+    print(max(matches))
+
 def health(path):
     result = json.loads(path.read_text())
     require(result.get('ready') is True and result.get('studentCodesRequired') is True and result.get('autoSharingEnabled') is True, 'Das neue Vokabel-Backend ist noch nicht bereit.')
@@ -71,4 +80,6 @@ if __name__ == '__main__':
     elif action == 'container': container(Path(sys.argv[2]))
     elif action == 'database': database(Path(sys.argv[2]))
     elif action == 'health': health(Path(sys.argv[2]))
+    elif action == 'ready': ready(Path(sys.argv[2]))
+    elif action == 'rollback-image': rollback_image(Path(sys.argv[2]),sys.argv[3])
     else: raise SystemExit('Unbekannte Pruefung.')
