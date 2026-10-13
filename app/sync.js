@@ -89,15 +89,19 @@ export class Sync extends EventTarget {
       while(this.store.doc.pending.length){
         const ops=this.store.doc.pending.slice(0,200),base=this.store.doc.base;
         this.set('uploading',`Fortschritt wird hochgeladen · ${this.store.doc.pending.length} Änderungen`);
+        const autoContent=this.store.profileId==='admin'&&ops.some(o=>o.entity==='collections'||o.entity==='words'||o.entity==='settings'&&(!o.value||['predicateDeck','predicateItem'].includes(o.value.kind)));
+        if(autoContent){this.autoShareState={busy:true,total:this.autoShareState?.total||this.store.doc.pending.length,done:this.autoShareState?.done||0,message:'Wird automatisch mit allen freigegebenen Nutzern geteilt …'};this.dispatchEvent(new Event('change'));}
         const result=await this.request('push',{base,ops});
+        if(autoContent&&result.autoShare){const done=(this.autoShareState.done||0)+result.accepted.length,total=this.autoShareState.total;this.autoShareState={busy:done<total,total,done,message:done<total?`Wird geteilt · ${done} / ${total} Änderungen`:result.autoShare.changes?`Automatisch geteilt · ${result.autoShare.users} Nutzer`:'Geteilte Inhalte sind aktuell.'};this.dispatchEvent(new Event('change'));}
         if(result.conflict){await this.fetchRemote();return;}
         this.cloudVersion=result.version;
         const ids=new Set(result.accepted);
         await this.store.update(doc=>{doc.shadow=result.data;doc.base=result.version;doc.pending=doc.pending.filter(o=>!ids.has(o.id));doc.lastSync=Date.now();return doc;});
       }
       await this.store.update(doc=>{doc.lastSync=Date.now();return doc;});
+      if(this.autoShareState?.busy)this.autoShareState={busy:false,message:'Geteilte Inhalte sind aktuell.'};
       this.set('synced',`Alles hochgeladen · v${this.store.doc.base}`);
-    }catch(e){this.set('error',e.message);}
+    }catch(e){if(this.autoShareState?.busy)this.autoShareState={busy:false,message:'Teilen noch ausstehend · '+e.message};this.set('error',e.message);}
     finally{this.busy=false;this.dispatchEvent(new Event('change'));}
   }
   async fetchRemote(full=false){

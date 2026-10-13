@@ -1,8 +1,20 @@
 # Latinio – Projektübergabe
 
-Stand: 13. Oktober 2026. Produktiv 2.2.2, Version 2.3.0 zur Pi-Aktualisierung vorbereitet.
+Stand: 13. Oktober 2026. Produktiv 2.3.0; Version 2.4.0 vorbereitet.
 
-## Vorbereitet: 2.3.0 – Schüler-Zugangscodes und Startauswahl
+## Vorbereitet: 2.4.0 – Lernfeedback und automatische Freigaben
+
+Letzte Antwort behält Feedback bis zum expliziten Weiter, auch bei Perfektformen. Fehlerwiederholungen neu gemischt. Ganze in Klammern gesetzte Bedeutungsgruppen sind optional, auch bei allen Bedeutungen; Teilklammern bleiben bisherige alternative Schreibweisen. Direkter Dropdown-Fachwechsel konsumiert ein einmaliges sessionStorage-Flag und überspringt die Startauswahl. Logos mit US-/Vatikan-Flaggen, dezente helle/dunkle Farbverläufe. Zurück-, Umbenennen- und Löschen-Knöpfe der Sammlungsdetails ohne Rahmen.
+
+AutoSharing.gs läuft im Pi-VM-Adapter; start.mjs aktiviert AUTOMATIC_SHARING_ENABLED. Admin-Push verteilt neue/geänderte Lektionen (ohne refreshSource) und lateinische predicateDeck/predicateItem-Inhalte innerhalb derselben SQLite-Transaktion an alle aktiven Profile mit Fachberechtigung. Persönliche Reviews, Sessions, Streaks, Aktivität und Aktiv-Schalter bleiben erhalten. Neue Nutzer erhalten die aktuellen Inhalte. Private Metadaten in _LatinioAutoShares bewahren Ziel-IDs; vorhandene manuelle/alte Prädikatfreigaben werden übernommen. Auffrisch-Sammlungen bleiben manuell.
+
+Freigabe-Prüfer unter Nutzer/Freigaben: frische Pi-Daten beider Fächer, Unterschiede nach Nutzer, selektive Auswahl, maximal 200 Änderungen pro Schritt, fehlende Eltern-Sammlung als Abhängigkeit. Stabile Vergleichs-Hashes verhindern das Anwenden veralteter Prüfergebnisse. Ungeprüfte eigene/offline Änderungen werden nicht behauptet sichtbar zu sein; maßgeblich ist der Pi-Stand. Unbetroffene eigene Nutzerbearbeitungen bleiben bei zukünftigen einzelnen Admin-Wortänderungen erhalten. Eine bewusste Inhaltsänderung oder Sammlungsumbenennung kann zugehörige Inhalte kanonisch angleichen; der Prüfer erlaubt Ausnahmen.
+
+SQLite-Migration braucht keinen Reimport. Vor privatem Backendupdate Online-Sicherung erstellen; Docker-Aufrufe innerhalb Bash-Heredocs unbedingt mit </dev/null, da exec -T sonst restliche Befehle konsumieren kann. Nur vokabeltrainer aktualisieren; Code.gs, Accounts.gs, AutoSharing.gs, database.mjs, start.mjs, http.mjs und Dockerfile austauschen. Health muss autoSharingEnabled:true bestätigen, dann Frontend veröffentlichen. Geschäftliche App unverändert lassen.
+
+Automatische Tests plus isolierter Test am historischen Export: 5 Profile, 122 Differenzen vollständig angeglichen, danach 0 Differenzen; persönliche Lern-/Aktivitätsdaten unverändert. Dies war ausschließlich eine temporäre lokale Kopie, keine Änderung produktiver Daten. Keine visuellen Browserchecks auf Nutzerwunsch.
+
+## Stand 2.3.0 – Schüler-Zugangscodes und Startauswahl
 
 Pi-Start erzwingt persönliche vierstellige Schüler-Codes statt E-Mail-Anmeldung. Admin-PIN und Admin-Sitzungen unverändert. Admin erzeugt/ersetzt pro Nutzer einen eindeutigen Code, einmalige Anzeige; gesalzene Hashes, fünf Fehlversuche sperren Schüler-Anmeldung fünf Minuten. Neuer Code widerruft alte Sitzungen. Bestehende Schüler-Sitzungen aus der E-Mail-Zeit müssen sich neu anmelden; lokale Daten und Journale bleiben erhalten. Code allein identifiziert den Nutzer. Codes sind wiederverwendbare Zugangsdaten, keine Einmal-Links.
 

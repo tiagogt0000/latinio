@@ -1,10 +1,10 @@
 export const subjectChoices=[
-  {id:'latin',label:'Latein',logo:'./icon.svg'},
-  {id:'english',label:'Englisch',logo:'./icon-english.svg'}
+  {id:'latin',label:'Latein',flag:'🇻🇦',logo:'./icon.svg'},
+  {id:'english',label:'Englisch',flag:'🇺🇸',logo:'./icon-english.svg'}
 ];
 
 export function entranceMarkup(){
-  return `<main class="subject-entrance" aria-labelledby="entrance-title"><div class="entrance-content"><p class="entrance-eyebrow">LATINIO</p><h1 id="entrance-title">Was möchtest du lernen?</h1><div class="entrance-choices">${subjectChoices.map(choice=>`<button type="button" class="entrance-choice" data-enter-subject="${choice.id}"><img src="${choice.logo}" alt="" width="72" height="72"><span>${choice.label}</span><span class="entrance-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div></main>`;
+  return `<main class="subject-entrance" aria-labelledby="entrance-title"><div class="entrance-content"><p class="entrance-eyebrow">LATINIO</p><h1 id="entrance-title">Was möchtest du lernen?</h1><div class="entrance-choices">${subjectChoices.map(choice=>`<button type="button" class="entrance-choice" data-enter-subject="${choice.id}"><img src="${choice.logo}" alt="" width="72" height="72"><span>${choice.label}<small class="entrance-flag" aria-hidden="true">${choice.flag}</small></span><span class="entrance-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div></main>`;
 }
 
 export function chooseSubject(root,{reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches}={}){
@@ -31,3 +31,6 @@ export function arrive(root){
   root.classList.add('app-arriving');
   setTimeout(()=>root.classList.remove('app-arriving'),900);
 }
+
+export const SUBJECT_SWITCH_KEY='latinio-direct-subject-switch';
+export function consumeSubjectSwitch(storage){const value=storage.getItem(SUBJECT_SWITCH_KEY);storage.removeItem(SUBJECT_SWITCH_KEY);return value==='latin'||value==='english'?value:null;}

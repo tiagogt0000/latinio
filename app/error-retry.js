@@ -1,3 +1,4 @@
+import {shuffleQueue} from './core.js';
 export function failedTasks(session,reviews){
  if(!session||!Array.isArray(session.queue))return [];
  return session.queue.flatMap((item,index)=>{
@@ -12,7 +13,7 @@ export function createErrorRetry(previous,tasks,id,now=Date.now()){
   id,mode:previous.mode==='inactive-check'?'inactive-check':'errors',
   sourceIds:[...(previous.sourceIds||[])],refreshTarget:previous.refreshTarget,
   meaningRequirement:previous.meaningRequirement||'all',cardFlipped:false,
-  queue:tasks.map(item=>({...item,repeat:false})),cursor:0,originalLength:tasks.length,
+  queue:shuffleQueue(tasks).map(item=>({...item,repeat:false})),cursor:0,originalLength:tasks.length,
   answers:[''],feedback:null,overrides:{},startedAt:now,finished:false,
   retryStage:(previous.retryStage||1)+1,
   completionRoot:previous.completionRoot,

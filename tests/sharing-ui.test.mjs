@@ -81,5 +81,5 @@ test('Already granted scoped predicate access is visible in the overview',async(
  t.store.doc.adminDirectory={people:[{id:'felix',name:'Felix',email:'felix@example.org'}],shares:[],resourceShares:[{resourceKind:'predicates',sourceId:'deck',profileId:'felix',revoked:false}]};
  const ui=sharingUI({store:t.store,sync:t.sync,profile:{role:'admin'},h:s=>String(s??''),showAdmin:s=>t.views.push(s),showModal(){},notify(){},render(){}});
  await ui.handle({dataset:{action:'share-panel'}});
- assert.match(t.views[0],/Alle Nutzer/);assert.match(t.views[0],/Felix/);assert.match(t.views[0],/Bearbeiten/);
+ assert.match(t.views[0],/Alle Nutzer/);assert.match(t.views[0],/Felix/);assert.match(t.views[0],/Automatisch geteilt/);
 });

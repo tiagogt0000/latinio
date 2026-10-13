@@ -284,13 +284,17 @@ function accountApi_(request,identity,subject='latin'){
     const name=String(request.name||'').trim(),email=String(request.email||'').trim().toLowerCase();
     if(!name||name.length>80||email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.id!==profile.id&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
+    const previousSubjects=normalizeSubjects_(profile.allowedSubjects);
     profile.name=name;profile.email=email;profile.allowedSubjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.updatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    return {profile:publicProfile_(profile)};
+    const added=profile.allowedSubjects.filter(function(s){return previousSubjects.indexOf(s)<0;});const autoShare=added.length?autoShareNewProfile_(Object.assign({},profile,{allowedSubjects:added})):null;
+    return {profile:publicProfile_(profile),autoShare:autoShare};
   }
   if(request.action==='profileUpdateSubjects'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    const previousSubjects=normalizeSubjects_(profile.allowedSubjects);
     const subjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.allowedSubjects=subjects;profile.subjectsUpdatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    return {profile:publicProfile_(profile)};
+    const added=subjects.filter(function(s){return previousSubjects.indexOf(s)<0;});const autoShare=added.length?autoShareNewProfile_(Object.assign({},profile,{allowedSubjects:added})):null;
+    return {profile:publicProfile_(profile),autoShare:autoShare};
   }
   if(request.action==='profileDelete'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile)throw new Error('Profil nicht gefunden.');
@@ -315,7 +319,7 @@ function accountApi_(request,identity,subject='latin'){
     if(!name||name.length>80||email.length>254||!/^\S+@\S+\.\S+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     const profile={id:'p_'+Utilities.getUuid().replace(/-/g,''),name:name,email:email,active:true,allowedSubjects:normalizeRequestedSubjects_(request.allowedSubjects)};
-    saveRecord_('_LatinioProfiles',profile.id,profile);return {profile:publicProfile_(profile)};
+    saveRecord_('_LatinioProfiles',profile.id,profile);const autoShare=autoShareNewProfile_(profile);return {profile:publicProfile_(profile),autoShare:autoShare};
   }
   if(request.action==='shareCreateMany'){
     if(!Array.isArray(request.collectionIds)||!request.collectionIds.length||request.collectionIds.length>50)throw new Error('Bitte 1 bis 50 Sammlungen auswählen.');

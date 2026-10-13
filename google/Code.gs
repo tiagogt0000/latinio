@@ -30,7 +30,7 @@ function latinioApi(request) {
   requestSheets_=Object.create(null);
   const subject=request&&request.subject||'latin';
   if(subject!=='latin'&&subject!=='english')throw new Error('Unbekanntes Lernfach.');
-  const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity','announcementInbox','announcementList'].includes(request.action);
+  const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
@@ -38,8 +38,9 @@ function latinioApi(request) {
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
-    if(request.action==='whoami')return {profile:identity,apiVersion:5,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
-    if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(['autoShareCheck','autoShareApply'].includes(request.action))return autoSharingApi_(request,identity);
+    if(request.action==='whoami')return {profile:identity,apiVersion:6,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
+    if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action)){const result=accountApi_(request,identity,subject);return request.action==='shareList'?autoShareDirectory_(result,subject):result;}
     if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
@@ -66,7 +67,8 @@ function latinioApi(request) {
       apply_(data,op);
     });
     if(rows.length){sheet.getRange(lastRow+1,1,rows.length,5).setValues(rows);SpreadsheetApp.flush();}
-    return {version:next,data:data,accepted:accepted};
+    const autoShare=rows.length&&identity.role==='admin'?autoShareChanges_(request.ops,subject):null;
+    return {version:next,data:data,accepted:accepted,autoShare:autoShare};
   } finally {if(lock)lock.releaseLock();}
 }
 function hash_(value){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,value,Utilities.Charset.UTF_8).map(function(b){return ('0'+((b+256)%256).toString(16)).slice(-2);}).join('');}

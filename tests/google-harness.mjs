@@ -8,6 +8,6 @@ export function harness(){
  const props={SHEET_ID:'test',TOKEN_HASH:hash(token),ADMIN_PIN_SALT:'salt',ADMIN_PIN_HASH:hash('salt:1234')};
  const book={getSheetByName:name=>sheets.get(name),insertSheet:makeSheet};
  const ctx=vm.createContext({console,Number,JSON,Date,Error,Array,SpreadsheetApp:{openById:()=>book,flush:()=>{}},PropertiesService:{getScriptProperties:()=>({getProperty:k=>props[k],setProperties:p=>Object.assign(props,p)})},Utilities:{getUuid:()=>crypto.randomUUID(),DigestAlgorithm:{SHA_256:'sha256'},Charset:{UTF_8:'utf8'},computeDigest:(_a,s)=>[...crypto.createHash('sha256').update(s).digest()]},LockService:{getScriptLock:()=>({tryLock:()=>{if(locked)return false;locked=true;return true;},releaseLock:()=>locked=false})}});
- for(const file of ['Code.gs','Accounts.gs'])vm.runInContext(fs.readFileSync(new URL('../google/'+file,import.meta.url),'utf8'),ctx);
+ for(const file of ['Code.gs','Accounts.gs','AutoSharing.gs'])vm.runInContext(fs.readFileSync(new URL('../google/'+file,import.meta.url),'utf8'),ctx);
  ctx.ensureLog_('admin');return {request:request=>ctx.latinioApi({token,...request}),ctx,rows:sheets.get('Änderungen').rows,sheets,props,metrics};
 }

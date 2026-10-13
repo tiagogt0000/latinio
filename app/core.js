@@ -72,9 +72,14 @@ function meaningsInAnswer(input,groups){
   return overall;
 }
 function popcount(value){let count=0;while(value){value&=value-1n;count++;}return count;}
+export function optionalMeaning(text){
+  const value=String(text).trim();if(!value.startsWith('(')||!value.endsWith(')'))return false;
+  let depth=0;for(let i=0;i<value.length;i++){if(value[i]==='(')depth++;if(value[i]===')')depth--;if(depth<0||depth===0&&i<value.length-1)return false;}return depth===0;
+}
+export const optionalMeaningGroup=group=>group.length>0&&group.every(optionalMeaning);
 export function evaluate(word, answers, allowTypos=true, overrides={}) {
   const groups=word.meanings.map(g=>g.flatMap(variants));
-  if(answers.length===1&&!Object.hasOwn(overrides,0)){const matched=meaningsInAnswer(normalizeAnswer(answers[0]),word.meanings);if(matched){const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(({i})=>!(matched&(1n<<BigInt(i))));return {rows:[{index:0,answer:answers[0],kind:missing.length?'partial-combined':'combined',group:0}],missing,grade:missing.length?'partial':'full'};}}
+  if(answers.length===1&&!Object.hasOwn(overrides,0)){const matched=meaningsInAnswer(normalizeAnswer(answers[0]),word.meanings);if(matched){const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(({i})=>!optionalMeaningGroup(word.meanings[i])&&!(matched&(1n<<BigInt(i))));return {rows:[{index:0,answer:answers[0],kind:missing.length?'partial-combined':'combined',group:0}],missing,grade:missing.length?'partial':'full'};}}
   const seen=new Set();
   const rows=answers.map((answer,index)=>{
     const input=normalizeAnswer(answer);
@@ -97,9 +102,9 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
     if(assignedGroups)for(const assigned of assignedGroups)seen.add(assigned);
     return {index,answer,kind,group,...(assignedGroups?{groups:assignedGroups}: {})};
   });
-  const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(g=>!seen.has(g.i));
+  const missing=word.meanings.map((g,i)=>({label:g[0],i})).filter(g=>!optionalMeaningGroup(word.meanings[g.i])&&!seen.has(g.i));
   const wrong=rows.some(r=>r.kind==='wrong');
-  return {rows,missing,grade:wrong||!seen.size?'wrong':missing.length?'partial':'full'};
+  return {rows,missing,grade:wrong||!seen.size&&word.meanings.some(g=>!optionalMeaningGroup(g))?'wrong':missing.length?'partial':'full'};
 }
 export function evaluateSession(word,answers,allowTypos=true,overrides={},session={}) {
   const result=evaluate(word,answers,allowTypos,overrides);

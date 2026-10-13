@@ -25,7 +25,7 @@ Die Oberfläche wird ausdrücklich weiter auf GitHub gehostet.
 - Eigener Compose-Name vokabeltrainer, eigener Volume latinio_data,
   ausschließlich 127.0.0.1:8081, automatischer Neustart und Ressourcenlimits.
 
-Der REST-Client in app/rest-bridge.js ist produktiv. Version 2.2.1 korrigiert den
+Der REST-Client in app/rest-bridge.js ist produktiv. Version 2.3.0 nutzt Schüler-Zugangscodes; Version 2.2.1 korrigierte den
 Safari-Aufruf von fetch. Die Hauptversion verbindet sich direkt mit dem Pi.
 Ältere PWA-Versionen werden vorübergehend über Google an den Pi weitergereicht.
 
@@ -77,3 +77,18 @@ Für die Umschaltung ist keine Weiterleitung der GitHub-Website vorgesehen.
 Eine transparente Migration aller Geräte kann erst nach diesen Prüfungen
 bestätigt werden. Wiederherstellung und automatischer Start beider Apps müssen
 auf dem tatsächlichen Pi geprüft werden.
+
+## Vorbereitetes Update 2.4.0
+
+AutoSharing.gs ergänzt automatische Inhaltsfreigaben und den Live-Prüfer. Der
+Pi-Start aktiviert enableAutoSharing:true. Keine Änderung vorhandener DB-Dateien
+und kein Reimport. Die persönlichen Lernjournale bleiben bestehen; zusätzliche
+Metadaten entstehen beim Teilen in _LatinioAutoShares.
+
+Vor Installation SQLite online sichern. Nur den Stack vokabeltrainer bauen und
+neu starten. Health muss danach autoSharingEnabled:true zeigen. Erst dann das
+vorbereitete Frontend veröffentlichen. Bestand mit dem Prüfer bewusst auswählen
+und angleichen; die Installation selbst überschreibt keine bestehenden Inhalte.
+
+Bash-Heredoc-Installer müssen Docker-Aufrufe mit </dev/null ausführen, damit
+Docker nicht die restlichen Scriptzeilen als stdin konsumiert.
