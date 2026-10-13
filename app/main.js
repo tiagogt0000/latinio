@@ -25,10 +25,11 @@ import {englishTasks,directionsFor,answerWord,promptFor,englishImport} from './e
 import {answerFeedback,evaluationCorrection,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
 import {preserveTestDraft} from './app-lifecycle.js';
+import {chooseSubject,arrive} from './subject-entrance.js';
 import {currentSubject,rememberSubject} from './subject-preference.js';
 const updates=new AppUpdates(navigator.serviceWorker);
-const subject=currentSubject(location.search,localStorage);
-const english=subject==='english';
+let subject=currentSubject(location.search,localStorage);
+let english=subject==='english';
 document.documentElement.dataset.subject=subject;
 if(english){document.querySelector('link[rel="icon"]').href='./icon-english.svg';document.querySelector('meta[name="theme-color"]').content='#d64b54';document.title='Latinio · Englisch lernen';}
 const directionLabel=dir=>dir==='de-en'?'Deutsch → Englisch':dir==='en-de'?'Englisch → Deutsch':'Beide Richtungen';
@@ -421,10 +422,16 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();checkShareNotices();autoUpdate();}});
 async function loadCloud(){await backgroundSync();}
 async function boot(){try{
+ subject=await chooseSubject(app);rememberSubject(subject,localStorage);english=subject==='english';
+ document.documentElement.dataset.subject=subject;
+ document.querySelector('link[rel="icon"]').href=english?'./icon-english.svg':'./icon.svg';
+ document.querySelector('meta[name="theme-color"]').content=english?'#d64b54':'#59b923';
+ document.title=english?'Latinio · Englisch lernen':'Latinio · Latein lernen';
+ arrive(app);
  ({store,profile}=await openAccount(app));predicateKey=predicateStorageKey(profile.id);streakLedger=createStreakLedger({profileId:profile.id,storage:localStorage,locks:navigator.locks});
  if(profile.role!=='admin'&&Array.isArray(profile.allowedSubjects)&&!profile.allowedSubjects.includes(subject)){
   const allowed=profile.allowedSubjects;const fallback=allowed.includes(english?'latin':'english')?(english?'latin':'english'):allowed[0];
-  if(fallback){const target=new URL(location.href);target.searchParams.set('subject',fallback);location.replace(target.href);return;}
+  if(fallback){subject=fallback;english=subject==='english';rememberSubject(subject,localStorage);document.documentElement.dataset.subject=subject;document.querySelector('link[rel="icon"]').href=english?'./icon-english.svg':'./icon.svg';document.querySelector('meta[name="theme-color"]').content=english?'#d64b54':'#59b923';document.title=english?'Latinio · Englisch lernen':'Latinio · Latein lernen';}
  }
  if(english){const latinStore=store,config=latinStore.doc.config;store=await new Store().open(profile.id,'english');await store.update(doc=>{doc.config={...config};doc.profile=profile;doc.seeded=true;return doc;});latinStore.close();}
  await store.seed();await store.listDeletedCollections();if(store.doc.session||store.doc.matchRound)await store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});sync=new Sync(store);
@@ -440,9 +447,10 @@ async function boot(){try{
  store.addEventListener('change',updateStatus);
  store.addEventListener('external',async()=>{streakLedger.merge(streakDays(data()));if(screen==='test'||screen==='match'){await store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});screen='learn';notify('Die laufende Runde wurde beendet. Bereits gespeicherte Antworten bleiben erhalten.');}render();});
  sync.addEventListener('change',updateStatus);
+ sync.addEventListener('authentication-required',()=>{if(!isAdmin())signOut();});
  sync.addEventListener('remote',()=>{if(!cloudWait.blocked)void loadCloud();});
  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);
- ready=true;const startup=cloudWait.run();render();
+ ready=true;const startup=cloudWait.run();render();arrive(app);
  void startup.then(async()=>{await store.recordActivity('opened');sync.schedule();if(!working&&!waitingStart&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','admin'].includes(screen))render();updateStatus();checkShareNotices();void checkAnnouncements();void reportAppVersion();}).catch(error=>notify(error.message));
  async function reportAppVersion(){if(!ready||isAdmin()||!sync?.configured||!navigator.onLine||store.doc.appVersionReported===APP_VERSION)return;try{await sync.request('profileVersion',{version:APP_VERSION});await store.update(doc=>{doc.appVersionReported=APP_VERSION;return doc;});}catch{}}
  async function resume(){if(!ready||document.hidden)return;await store.recordActivity('opened');await loadCloud();checkShareNotices();if(screen==='learn'||screen==='collections'||screen==='collection-detail'||screen==='settings')void checkAnnouncements();void updates.check();}

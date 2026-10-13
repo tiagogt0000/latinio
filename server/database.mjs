@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 // Preserve the existing domain rules and journal versions while replacing
 // every Google storage/service call with local SQLite and Node operations.
-export function openDatabase(path) {
+export function openDatabase(path,{requireStudentCodes=false}={}) {
   const db = new DatabaseSync(path);
   db.exec(`PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;
     CREATE TABLE IF NOT EXISTS properties (key TEXT PRIMARY KEY, value TEXT NOT NULL);
@@ -48,7 +48,7 @@ export function openDatabase(path) {
     insertSheet(name) { db.prepare('INSERT INTO sheets VALUES (?)').run(name); return sheet(name); }
   };
   const ctx = vm.createContext({
-    Number, JSON, Date, Error, Array,
+    Number, JSON, Date, Error, Array, STUDENT_CODES_REQUIRED:requireStudentCodes,
     SpreadsheetApp: {openById: () => book, flush() {}},
     PropertiesService: {getScriptProperties: () => ({
       getProperty: key => getProp.get(key)?.value ?? null,
@@ -64,6 +64,7 @@ export function openDatabase(path) {
   }
   return {
     db,
+    studentCodesRequired:requireStudentCodes,
     ready: () => Boolean(getProp.get('SHEET_ID') && getProp.get('TOKEN_HASH') && getProp.get('ADMIN_PIN_HASH')),
     request(request) {
       db.exec('BEGIN IMMEDIATE');

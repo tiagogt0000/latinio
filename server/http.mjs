@@ -8,7 +8,7 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io') {
       res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});
       res.end(JSON.stringify(body));
     };
-    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready()});
+    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true});
     if (req.headers.origin !== origin) return reply(403,{error:'Herkunft nicht erlaubt.'});
     res.setHeader('Access-Control-Allow-Origin',origin);
     res.setHeader('Vary','Origin');

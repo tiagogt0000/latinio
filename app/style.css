@@ -476,3 +476,25 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 @keyframes modal-create-arrive{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:600px){.collection-tabs-nav>.chip{font-size:clamp(.66rem,2.45vw,.82rem)}.admin-tabs{gap:8px}.admin-tabs>.chip{font-size:.82rem}}
 @media(prefers-reduced-motion:reduce){.content[data-screen-transition],.collection-search,.feedback,.practice-result,.test-content .latin-word,.modal{animation:none!important}}
+
+/* Subject entrance: neutral surface, subject colour only in the two logos. */
+.subject-entrance{--entry-bg:#fff;--entry-fg:#000;position:fixed;inset:0;z-index:30;background:var(--entry-bg);color:var(--entry-fg);display:grid;place-items:center;padding:28px;overflow:auto}
+.entrance-content{width:min(100%,560px);padding:40px 0;animation:entry-rise .6s ease both}
+.entrance-eyebrow{font-size:.75rem;font-weight:800;letter-spacing:.24em;margin-bottom:22px;opacity:.6}
+.subject-entrance h1{font-size:clamp(2rem,7vw,3.5rem);line-height:1.08;max-width:480px;margin-bottom:40px}
+.entrance-choices{display:grid;gap:16px}
+.entrance-choice{display:flex;align-items:center;gap:22px;width:100%;padding:24px;background:var(--entry-fg);color:var(--entry-bg);border:0;border-radius:22px;text-align:left;min-height:120px;font-size:1.35rem;font-weight:750;transition:transform .25s ease,opacity .25s ease}
+.entrance-choice img{width:72px;height:72px;flex:none;border-radius:18px}
+.entrance-choice:hover{transform:translateY(-3px)}.entrance-choice:active{transform:scale(.98)}.entrance-choice:disabled{opacity:1}
+.entrance-arrow{margin-left:auto;font-weight:400;opacity:.65}
+.app-arriving>.login-shell,.app-arriving>.workspace,.app-arriving>.sidebar,.app-arriving>.mobile-nav{animation:entry-rise .65s cubic-bezier(.2,.7,.2,1) both}
+.app-arriving .page-heading,.app-arriving .home-greeting{animation:entry-rise .7s .08s ease both}
+.access-code{font-size:3rem;letter-spacing:.3em;font-weight:800;text-align:center;margin:24px 0;font-variant-numeric:tabular-nums}
+@keyframes entry-rise{from{opacity:0;transform:translateY(14px);filter:blur(4px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@media(prefers-color-scheme:dark){.subject-entrance{--entry-bg:#000;--entry-fg:#fff}}
+@media(prefers-reduced-motion:reduce){.entrance-content,.app-arriving>.login-shell,.app-arriving>.workspace,.app-arriving>.sidebar,.app-arriving>.mobile-nav,.app-arriving .page-heading,.app-arriving .home-greeting{animation:none}.entrance-choice{transition:none}}
+
+.app-arriving::before{content:"";position:fixed;inset:0;z-index:100;background:#fff;pointer-events:none;animation:entrance-veil .65s ease forwards}
+@keyframes entrance-veil{from{opacity:1}to{opacity:0}}
+@media(prefers-color-scheme:dark){.app-arriving::before{background:#000}}
+@media(prefers-reduced-motion:reduce){.app-arriving::before{display:none}}

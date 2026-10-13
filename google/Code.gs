@@ -38,8 +38,8 @@ function latinioApi(request) {
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
-    if(request.action==='whoami')return {profile:identity,apiVersion:4,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
-    if(['profiles','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action))return accountApi_(request,identity,subject);
+    if(request.action==='whoami')return {profile:identity,apiVersion:5,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
+    if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action))return accountApi_(request,identity,subject);
     if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
@@ -80,7 +80,8 @@ function authorize_(request){
   if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english']};
   const profile=records_('_LatinioProfiles')[session.profileId];
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
-  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects)};
+  if((studentCodesRequired_()||profile.loginCodeHash)&&(!profile.loginCodeHash||!session.codeAuthVersion||session.codeAuthVersion!==profile.codeAuthVersion))throw new Error('Bitte melde dich mit deinem Zugangscode neu an.');
+  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),codeAuthVersion:session.codeAuthVersion||null};
 }
 function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english';}))):['latin','english'];}
 function ensureLog_(profileId,readOnly,subject='latin'){

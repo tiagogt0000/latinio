@@ -1,4 +1,4 @@
-/** Profile login is intentionally email-only. Admin PIN is stored only in ScriptProperties. */
+/** Student access codes and the unchanged admin PIN are validated server-side. */
 function setupMultiuser(){
   const props=PropertiesService.getScriptProperties(),ui=SpreadsheetApp.getUi();
   if(!props.getProperty('SHEET_ID')||!props.getProperty('TOKEN_HASH'))throw new Error('Die bestehende Latinio-Einrichtung fehlt.');
@@ -52,14 +52,50 @@ function login_(request){
     }
     props.setProperties({PIN_FAILURES:'0',PIN_BLOCKED_UNTIL:'0'});profile={id:'admin',name:'Admin',role:'admin'};
   }else{
-    const email=String(request.email||'').trim().toLowerCase();
-    profile=Object.values(records_('_LatinioProfiles')).find(function(p){return p.active&&p.email===email;});
-    if(!profile)throw new Error('Diese E-Mail ist noch nicht freigeschaltet. Bitte frage den Admin.');
-    profile={id:profile.id,name:profile.name,email:profile.email,role:'student',allowedSubjects:normalizeSubjects_(profile.allowedSubjects)};
+    const profiles=Object.values(records_('_LatinioProfiles'));
+    if(studentCodesRequired_()||request.code!==undefined){
+      const blocked=Number(props.getProperty('CODE_BLOCKED_UNTIL')||0);
+      if(blocked>Date.now())throw new Error('Zu viele Code-Versuche. Bitte in fünf Minuten erneut versuchen.');
+      const code=typeof request.code==='string'?request.code:'';
+      profile=/^\d{4}$/.test(code)?profiles.find(function(p){return p.active&&p.loginCodeHash&&hash_(p.loginCodeSalt+':'+code)===p.loginCodeHash;}):null;
+      if(!profile){
+        const attempts=Number(props.getProperty('CODE_FAILURES')||0)+1;
+        props.setProperties({CODE_FAILURES:String(attempts>=5?0:attempts),CODE_BLOCKED_UNTIL:String(attempts>=5?Date.now()+300000:0)});
+        throw new Error('Der Zugangscode stimmt nicht. Frage deinen Admin nach deinem persönlichen Code.');
+      }
+      props.setProperties({CODE_FAILURES:'0',CODE_BLOCKED_UNTIL:'0'});
+    }else{
+      // Compatibility for offline domain fixtures. The Pi startup always enables code authentication.
+      const email=String(request.email||'').trim().toLowerCase();
+      profile=profiles.find(function(p){return p.active&&!p.loginCodeHash&&p.email===email;});
+      if(!profile)throw new Error('Diese E-Mail ist noch nicht freigeschaltet. Bitte frage den Admin.');
+    }
+    profile=publicProfile_(profile);profile.role='student';
   }
   const token=Utilities.getUuid().replace(/-/g,'')+Utilities.getUuid().replace(/-/g,'');
-  saveRecord_('_LatinioSessions',hash_(token),{profileId:profile.id,expires:Date.now()+180*86400000});
-  return {token:token,profile:profile,apiVersion:2};
+  saveRecord_('_LatinioSessions',hash_(token),{profileId:profile.id,expires:Date.now()+180*86400000,codeAuthVersion:profile.codeAuthVersion||null});
+  return {token:token,profile:profile,apiVersion:5};
+}
+function studentCodesRequired_(){return typeof STUDENT_CODES_REQUIRED!=='undefined'&&STUDENT_CODES_REQUIRED===true;}
+function publicProfile_(profile){
+  const result=Object.assign({},profile,{allowedSubjects:normalizeSubjects_(profile.allowedSubjects),codeReady:!!profile.loginCodeHash});
+  delete result.loginCodeHash;delete result.loginCodeSalt;
+  return result;
+}
+function generateProfileCode_(profile){
+  const profiles=Object.values(records_('_LatinioProfiles')),props=PropertiesService.getScriptProperties();
+  for(let attempt=0;attempt<1000;attempt++){
+    const random=parseInt(Utilities.getUuid().replace(/-/g,'').slice(-4),16);
+    if(random>=60000)continue;
+    const code=String(random%10000).padStart(4,'0');
+    if(hash_(props.getProperty('ADMIN_PIN_SALT')+':'+code)===props.getProperty('ADMIN_PIN_HASH'))continue;
+    if(profiles.some(function(p){return p.active&&p.loginCodeHash&&hash_(p.loginCodeSalt+':'+code)===p.loginCodeHash;}))continue;
+    profile.loginCodeSalt=Utilities.getUuid();profile.loginCodeHash=hash_(profile.loginCodeSalt+':'+code);
+    profile.codeAuthVersion=Utilities.getUuid();profile.codeGeneratedAt=Date.now();
+    saveRecord_('_LatinioProfiles',profile.id,profile);
+    return {profile:publicProfile_(profile),code:code};
+  }
+  throw new Error('Es konnte kein freier Zugangscode erzeugt werden. Erneut versuchen.');
 }
 function readState_(id,readOnly,subject='latin'){
   const sheet=ensureLog_(id,readOnly,subject);if(!sheet)return {sheet:null,log:[],data:replay_([]),version:0};const last=sheet.getLastRow();
@@ -223,6 +259,10 @@ function accountApi_(request,identity,subject='latin'){
     return {version:profile.latestAppVersion,reportedAt:profile.latestAppVersionAt||null};
   }
   if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
+  if(request.action==='profileCodeGenerate'){
+    const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
+    return generateProfileCode_(profile);
+  }
   if(request.action==='collectionAccessSet')return collectionAccessSet_(request,identity,subject);
   if(request.action==='announcementSend'){
     const profileId=String(request.profileId||''),title=String(request.title||'').trim(),message=String(request.message||'').trim();
@@ -238,19 +278,19 @@ function accountApi_(request,identity,subject='latin'){
     const events=['latin','english'].flatMap(function(language){return Object.values(readState_(profile.id,true,language).data.settings).filter(function(v){return v&&v.kind==='activityEvent'&&allowed.includes(v.action)&&Number.isFinite(v.at)&&v.at>=now-90*86400000&&v.at<=now+300000;}).map(function(v){return {at:v.at,action:v.action,subject:language};});}).sort(function(a,b){return b.at-a.at;});
     return {profile:{id:profile.id,name:profile.name,latestAppVersion:profile.latestAppVersion||null,latestAppVersionAt:profile.latestAppVersionAt||null},events:events.slice(0,200),truncated:events.length>200,checkedAt:now};
   }
-  if(request.action==='profiles')return {profiles:Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}).map(function(p){return Object.assign({},p,{allowedSubjects:normalizeSubjects_(p.allowedSubjects)});})};
+  if(request.action==='profiles')return {profiles:Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}).map(function(p){return publicProfile_(p);})};
   if(request.action==='profileUpdate'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const name=String(request.name||'').trim(),email=String(request.email||'').trim().toLowerCase();
     if(!name||name.length>80||email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.id!==profile.id&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     profile.name=name;profile.email=email;profile.allowedSubjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.updatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    return {profile:Object.assign({},profile,{allowedSubjects:normalizeSubjects_(profile.allowedSubjects)})};
+    return {profile:publicProfile_(profile)};
   }
   if(request.action==='profileUpdateSubjects'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const subjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.allowedSubjects=subjects;profile.subjectsUpdatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
-    return {profile:Object.assign({},profile,{allowedSubjects:subjects})};
+    return {profile:publicProfile_(profile)};
   }
   if(request.action==='profileDelete'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile)throw new Error('Profil nicht gefunden.');
@@ -275,7 +315,7 @@ function accountApi_(request,identity,subject='latin'){
     if(!name||name.length>80||email.length>254||!/^\S+@\S+\.\S+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     const profile={id:'p_'+Utilities.getUuid().replace(/-/g,''),name:name,email:email,active:true,allowedSubjects:normalizeRequestedSubjects_(request.allowedSubjects)};
-    saveRecord_('_LatinioProfiles',profile.id,profile);return {profile:profile};
+    saveRecord_('_LatinioProfiles',profile.id,profile);return {profile:publicProfile_(profile)};
   }
   if(request.action==='shareCreateMany'){
     if(!Array.isArray(request.collectionIds)||!request.collectionIds.length||request.collectionIds.length>50)throw new Error('Bitte 1 bis 50 Sammlungen auswählen.');

@@ -51,6 +51,7 @@ export class Sync extends EventTarget {
       if(requestSubject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
       return await this.bridge.request(action,{...payload,subject:requestSubject});
     }catch(error){
+      if(/Zugangscode neu an/.test(error.message))this.dispatchEvent(new Event('authentication-required'));
       // A long-lived Apps Script iframe may still point at the previous deployment.
       // Retry only an unknown-action rejection: the server has not performed it.
       if(!/Unbekannte.*Aktion/i.test(error.message))throw error;

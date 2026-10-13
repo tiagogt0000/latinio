@@ -1,6 +1,14 @@
 # Latinio – Projektübergabe
 
-Stand: 11. Oktober 2026, Version 2.2.2.
+Stand: 13. Oktober 2026. Produktiv 2.2.2, Version 2.3.0 zur Pi-Aktualisierung vorbereitet.
+
+## Vorbereitet: 2.3.0 – Schüler-Zugangscodes und Startauswahl
+
+Pi-Start erzwingt persönliche vierstellige Schüler-Codes statt E-Mail-Anmeldung. Admin-PIN und Admin-Sitzungen unverändert. Admin erzeugt/ersetzt pro Nutzer einen eindeutigen Code, einmalige Anzeige; gesalzene Hashes, fünf Fehlversuche sperren Schüler-Anmeldung fünf Minuten. Neuer Code widerruft alte Sitzungen. Bestehende Schüler-Sitzungen aus der E-Mail-Zeit müssen sich neu anmelden; lokale Daten und Journale bleiben erhalten. Code allein identifiziert den Nutzer. Codes sind wiederverwendbare Zugangsdaten, keine Einmal-Links.
+
+Startauswahl bei jedem Laden: neutrale Schwarz-/Weiß-Fläche nach Gerätemodus, grüne/rote Original-Logos für Latein/Englisch, weicher Austritt und Eintritt, reduzierte Bewegung berücksichtigt. Fächerberechtigungen weiter serverseitig geprüft.
+
+Vor Veröffentlichung Backend-Dateien Code.gs, Accounts.gs, database.mjs, start.mjs und http.mjs im separaten Vokabel-Projekt aktualisieren, SQLite sichern, nur vokabeltrainer bauen/neustarten. Health muss ready:true und studentCodesRequired:true melden. Danach Frontend veröffentlichen; Admin verteilt Codes. Keine Änderung im Elektro-Projekt, kein Reimport, kein Tailscale-Update und kein Google-Deployment nötig. Sicherheitsbedingt können Altversionen nicht mehr mit E-Mail oder alten Sitzungen auf den Pi zugreifen. Legacy-E-Mail-Pfad bleibt ausschließlich für Offline-Domainfixtures ohne STUDENT_CODES_REQUIRED; der produktive Pi-Start aktiviert die Pflicht immer.
 
 ## Stand 2.2.2
 

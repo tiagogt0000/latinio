@@ -7,11 +7,11 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
   let pending=0,directoryEpoch=0,selectedPerson='',shareStore=store,shareSync=sync,shareSubject=sync.subject||'latin';
   let loaded=!!store.doc.adminDirectory,resourceShares=store.doc.adminDirectory?.resourceShares||[],accessSchema=0,accessQuery='',accessKind='all',accessSelection=new Set();
   async function remember(){await shareStore.update(doc=>{doc.adminDirectory={shares,predicateShares,resourceShares,people};return doc;});}
-  const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Google verwendet eine ältere Skript-Version. Code.gs und Accounts.gs aktualisieren, dann Bereitstellen → Bereitstellungen verwalten → Stift → Neue Version → Bereitstellen.':String(e.message||e).replace(/^Error:\s*/, '');
+  const errorText=e=>/Unbekannte.*Aktion/i.test(e.message||e)?'Der Pi benötigt das neue Latinio-Backend. Bitte das vorbereitete Vokabel-Update installieren.':String(e.message||e).replace(/^Error:\s*/, '');
   function status(node,message){if(node?.isConnected)node.textContent=message;}
   function latestActivity(event){return event?`${new Date(event.at).toLocaleString('de-DE',{dateStyle:'short',timeStyle:'short',timeZone:'Europe/Berlin'})} · ${activityLabels[event.action]||'Aktivität'}`:'Noch keine Aktivität';}
   function profileRows(){
-    return `<div class="people-grid">${people.map(p=>`<section class="person-entry"><button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}" aria-expanded="${p.id===selectedPerson}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small><small class="person-meta">Version: ${h(p.latestAppVersion?'v'+p.latestAppVersion:'noch nicht gemeldet')}</small><small class="person-meta" title="Oberster Eintrag aus dem bestehenden Aktivitätsprotokoll.">Letzte Aktivität: ${h(p.latestActivityLoading?'wird geladen …':latestActivity(p.latestActivity))}</small></span><span aria-hidden="true">${p.id===selectedPerson?'⌄':'›'}</span></button>${p.id===selectedPerson?`<div class="person-detail"><div class="profile-controls"><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitäten</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-edit" data-id="${h(p.id)}">Bearbeiten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div></div>`:''}</section>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
+    return `<div class="people-grid">${people.map(p=>`<section class="person-entry"><button class="person-card ${p.id===selectedPerson?'selected':''}" data-action="admin-person" data-id="${h(p.id)}" aria-expanded="${p.id===selectedPerson}"><span class="person-avatar" aria-hidden="true">${h(p.name.slice(0,1).toUpperCase())}</span><span><strong>${h(p.name)}</strong><small>${h(p.email)}</small><small>${normalizeSubjects(p.allowedSubjects).map(subjectName).join(' · ')}</small><small class="person-meta">Version: ${h(p.latestAppVersion?'v'+p.latestAppVersion:'noch nicht gemeldet')}</small><small class="person-meta" title="Oberster Eintrag aus dem bestehenden Aktivitätsprotokoll.">Letzte Aktivität: ${h(p.latestActivityLoading?'wird geladen …':latestActivity(p.latestActivity))}</small></span><span aria-hidden="true">${p.id===selectedPerson?'⌄':'›'}</span></button>${p.id===selectedPerson?`<div class="person-detail"><div class="profile-controls"><button class="button secondary" data-action="profile-activity" data-id="${h(p.id)}">Aktivitäten</button><button class="button secondary" data-action="profile-view" data-id="${h(p.id)}">Sammlungen ansehen</button><button class="button secondary" data-action="profile-code" data-id="${h(p.id)}">${p.codeReady?'Neuen Zugangscode erzeugen':'Zugangscode erzeugen'}</button><button class="button secondary" data-action="profile-edit" data-id="${h(p.id)}">Bearbeiten</button><button class="button secondary danger-text" data-action="profile-delete" data-id="${h(p.id)}">Nutzer löschen</button></div></div>`:''}</section>`).join('')||'<p class="muted">Noch keine Nutzer angelegt.</p>'}</div>`;
   }
   function normalizeSubjects(value){return Array.isArray(value)&&value.length?value.filter(x=>x==='latin'||x==='english'):['latin','english'];}
   function subjectName(value){return value==='english'?'Englisch':'Latein';}
@@ -181,6 +181,12 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
     }
     if(action==='profile-activity'){if(!admin)return true;profileActivity(id);return true;}
     if(action==='profile-subjects'){if(!admin)return true;profileSubjects(id);return true;}
+    if(action==='profile-code'){
+      if(!admin)return true;
+      const person=people.find(p=>p.id===id);if(!person)return true;
+      showModal(`<h2 id="modal-title">Zugangscode · ${h(person.name)}</h2><p>${person.codeReady?'Ein neuer Code ersetzt den bisherigen und meldet vorhandene Geräte ab.':'Dieser Nutzer braucht einen Code, um sich anzumelden.'} Die Lernstände bleiben erhalten.</p><form id="profile-code-form" data-id="${h(id)}"><button class="button primary wide">Code erzeugen</button><p role="status" data-save-status></p></form>`);
+      return true;
+    }
     if(action==='profile-edit'){if(!admin)return true;profileEdit(id);return true;}
     if(action==='profile-view'){profileView(id);return true;}
     if(action==='share-source'){openCollection?.(id);return true;}
@@ -203,7 +209,7 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
   }
   async function submit(form){
     if(form.id==='access-editor'){void saveAccess(form).catch(e=>notify(errorText(e)));return true;}
-    if(!['profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','predicate-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
+    if(!['profile-code-form','profile-create','profile-edit-form','profile-subjects-form','share-create','share-access-form','predicate-access-form','share-notify-form','share-repair-form','share-send','profile-delete','share-revoke'].includes(form.id))return false;
     if(form.dataset.saving)return true;
     const fd=new FormData(form),button=form.querySelector('button[type="submit"],button'),message=form.querySelector('[data-save-status]');
     pending++;form.dataset.saving='1';if(button)button.disabled=true;
@@ -217,6 +223,11 @@ export function sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,n
           directoryEpoch++;if(deleting){people=people.filter(p=>p.id!==id);shares=shares.filter(s=>s.profileId!==id);}else shares=shares.filter(s=>s.id!==id);
           await remember();if(form.isConnected){if(deleting)profiles(false);else panel(false);}
           notify(deleting?'Nutzer gelöscht.':'Freigabe beendet.');
+        }else if(form.id==='profile-code-form'){
+          const result=await sync.request('profileCodeGenerate',{profileId:form.dataset.id});
+          directoryEpoch++;people=people.map(p=>p.id===result.profile.id?result.profile:p);await remember();
+          profiles(false);
+          showModal(`<h2 id="modal-title">Code für ${h(result.profile.name)}</h2><p class="access-code" aria-label="Zugangscode ${h(result.code.split('').join(' '))}">${h(result.code)}</p><p>Gib diesen Code persönlich an ${h(result.profile.name)} weiter. Er wird nur jetzt angezeigt.</p><p class="small muted">Vergessen? Erzeuge hier einen neuen Code.</p><button class="button primary wide" data-action="close-modal">Fertig</button>`);
         }else if(form.id==='profile-create'){
           const allowedSubjects=fd.getAll('allowedSubject');if(!allowedSubjects.length)throw Error('Wähle mindestens ein Lernfach aus.');
           const result=await sync.request('profileCreate',{name:fd.get('name'),email:fd.get('email'),allowedSubjects});
