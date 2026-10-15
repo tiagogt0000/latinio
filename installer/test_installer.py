@@ -11,6 +11,7 @@ import zipfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+VERSION = json.loads((REPO / 'package.json').read_text())['version']
 spec = importlib.util.spec_from_file_location('build_package', REPO / 'installer/build-package.py')
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
@@ -56,6 +57,8 @@ elif args[0]=='compose':
 else:raise Exception(args)
 '''
 
+DOCKER = DOCKER.replace('2.5.0', VERSION)
+
 CURL = r'''#!/usr/bin/env python3
 import json,os,sys
 from pathlib import Path
@@ -78,9 +81,9 @@ class InstallerTests(unittest.TestCase):
             output=directory/'installer.zip';builder.build(output,'c412e73f0ab2f95c356c23a7db9fdb51b68a64b0')
             package=directory/'package';package.mkdir()
             with zipfile.ZipFile(output) as outer:
-                self.assertEqual(set(outer.namelist()),{'Installieren.bat','Installieren.ps1','Liesmich.txt','Latinio-Backend-2.5.0.zip'})
+                self.assertEqual(set(outer.namelist()),{'Installieren.bat','Installieren.ps1','Liesmich.txt',f'Latinio-Backend-{VERSION}.zip'})
                 self.assertIn(b'\r\n',outer.read('Installieren.bat'))
-                payload=outer.read('Latinio-Backend-2.5.0.zip')
+                payload=outer.read(f'Latinio-Backend-{VERSION}.zip')
                 with zipfile.ZipFile(io.BytesIO(payload)) as inner:inner.extractall(package)
             for source in (package/'Dateien').rglob('*'):
                 if source.is_file():source.chmod(0o600)

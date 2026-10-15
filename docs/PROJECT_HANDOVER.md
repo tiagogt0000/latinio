@@ -1,6 +1,14 @@
 # Latinio – Projektübergabe
 
-Stand: 15. Oktober 2026. Produktiv 2.4.0 (main 1c97e9190114e24d720b76e2e478d7082817ab81); Version 2.5.0 vorbereitet.
+Stand: 15. Oktober 2026. Pi-Backend 2.5.0 und Frontend 2.5.0 produktiv bestätigt; Folge-Frontend 2.5.1.
+
+## 2.5.1 – Korrektur des Markenübergangs und Aktivierungshinweis
+
+Kein Backendupdate nötig. Kooperation: Drei feste Gridspalten 1fr/1px/1fr, identische Spaltenabstände, linker Schriftzug rechtsbündig/rechter linksbündig. Solo-Animationen nutzen gemessene Mittelpunktoffsets. Keine filter-Eigenschaft am App-Root, da diese den containing block des fixierten Startmenüs ändern würde. Transparenter backdrop-filter inklusive -webkit-Präfix erhält dessen echten Hell-/Dunkelhintergrund; Französisch-Auswahl blendet das Startmenü vorher nicht mehr aus. Vocabify-Icon ist jetzt ein geometrisches V, aus frenchHome entfernt.
+
+notificationsUI.maybePrompt zeigt allen nicht angemeldeten Push-Geräten einmal pro Öffnung den Aktivierungshinweis, sobald Synchronisierung abgeschlossen ist und kein Lern-/Modalfluss läuft. Refresh und Ankündigungsabschluss sowie Aktionsabschluss prüfen die Gelegenheit. OK nutzt notification-enable und startet Notification.requestPermission synchron vor dem ersten await. Später bleibt möglich. Bereits blockierte Systemberechtigungen brauchen Geräte-Einstellungen, kein erneuter erzwingbarer Systemdialog. Bestehende Geräteabos werden erhalten. Backend bleibt auf dem zuvor installierten Stand.
+
+2.5.0 wurde nach Nutzerbestätigung installiert und veröffentlicht (main 98b583ed811c3e0b910cf31a4e77101dd2a9b59d); /health bestätigte alle fünf Featureflags.
 
 ## Vorbereitet: 2.5.0 – Französisch, Erinnerungen und Tagesfeier
 

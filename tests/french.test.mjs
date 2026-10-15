@@ -17,7 +17,7 @@ test('French Vocabify text and JSON imports split German meanings and refuse for
 });
 test('French has an explicit third entrance, remembered preference and a single-use direct switch',()=>{
  const storage=disk();rememberSubject('french',storage);assert.equal(currentSubject('',storage),'french');
- assert.equal(currentSubject('?subject=french',storage),'french');assert.match(entranceMarkup(),/data-enter-subject="french"/);assert.match(entranceMarkup(),/Vocabify/);
+ assert.equal(currentSubject('?subject=french',storage),'french');assert.match(entranceMarkup(),/data-enter-subject="french"/);assert.match(entranceMarkup(),/Vocabify/i);
  storage.setItem(SUBJECT_SWITCH_KEY,'french');assert.equal(consumeSubjectSwitch(storage),'french');assert.equal(consumeSubjectSwitch(storage),null);
 });
 test('French modes use both directions, preserve reviews and filter older, unseen and incorrect words',()=>{
@@ -28,7 +28,7 @@ test('French modes use both directions, preserve reviews and filter older, unsee
  assert.deepEqual(new Set(frenchTasks(d,['c'],'older',10,'mixed',now).map(t=>t.wordId)),new Set(['old']));
  assert.deepEqual(new Set(frenchTasks(d,['c'],'newest',10,'mixed',now).map(t=>t.wordId)),new Set(['new']));
  assert.deepEqual(new Set(frenchTasks(d,['c'],'errors',10,'mixed',now).map(t=>t.wordId)),new Set(['wrong']));
- assert.equal(frenchTasks(d,['c'],'all',10,'mixed',now).length,6);assert.equal(JSON.stringify(d.reviews),before);assert.match(frenchHome(d,3,10,h),/Vocabify/);
+ assert.equal(frenchTasks(d,['c'],'all',10,'mixed',now).length,6);assert.equal(JSON.stringify(d.reviews),before);assert.match(frenchHome(d,3,10,h),/Vocabify/i);
 });
 test('French classroom inputs disable correction and use French language markup',()=>{
  const d=emptyData();d.collections.c={id:'c',name:'FR'};d.words.w={id:'w',collectionId:'c',latin:'la maison',meanings:[['das Haus']]};

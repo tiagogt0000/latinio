@@ -71,5 +71,5 @@ test('both home cards use the same controls and subject options have no raised s
 });
 
 test('Vocabify French home renders the shared trainer with French labels and no Latin perfect card',()=>{
- const context=viewContext(true,true,'french');vm.runInContext(section('function learnView()','function startPredicatePractice('),context);const html=vm.runInContext('learnView()',context);balanced(html);assert.match(html,/Vocabify/);assert.match(html,/Französisch/);assert.doesNotMatch(html,/Englisch|Perfektform lernen/);assert.match(html,/id="direction"/);
+ const context=viewContext(true,true,'french');vm.runInContext(section('function learnView()','function startPredicatePractice('),context);const html=vm.runInContext('learnView()',context);balanced(html);assert.match(html,/Vocabify/i);assert.match(html,/Französisch/);assert.doesNotMatch(html,/Englisch|Perfektform lernen/);assert.match(html,/id="direction"/);
 });

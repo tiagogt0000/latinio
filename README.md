@@ -1,4 +1,10 @@
-# Latinio · Version 2.5.0 (vorbereitet)
+# Latinio · Version 2.5.1
+
+## 2.5.1 · Markenübergang und Benachrichtigungsfreigabe
+
+Zentraler Trennstrich mit symmetrischen Schriftzugabständen, gemessene Solo-Positionen und transparenter Safari-kompatibler Hintergrund-Blur statt weißer Übergangsfläche. Der Startbildschirm bleibt beim Französisch-Wechsel sichtbar. Modernes Vocabify-V-Icon ohne Buchmotiv; kein dekoratives Icon mehr im französischen Lernbereich.
+
+Nutzer ohne aktivierte Erinnerungen sehen beim Öffnen einen Hinweis. OK ruft die native Berechtigungsabfrage direkt im Klick-Handler auf, bevor Netzwerkzugriffe stattfinden. Später ist möglich, bereits aktivierte Geräte werden nicht gefragt. Bei blockierter Berechtigung erklärt der Hinweis stattdessen die Geräte-Einstellungen; eine native Systemabfrage lässt sich dann nicht erzwingen. Laufende Runden und andere Dialoge werden nicht unterbrochen. Reines Frontendupdate, kein Pi-Installer erforderlich.
 
 ## 2.5.0 · Vocabify Französisch und Lern-Erinnerungen
 
@@ -8,7 +14,7 @@ Der Pi versendet nach ausdrücklicher Gerätefreigabe maximal eine Lern-Erinneru
 
 Weitere Tagesrunden zeigen einen kurzen Abschluss ohne Flammenbildschirm. Online wird die Feier zusätzlich geräteübergreifend reserviert. Neue weichere Fächerwahl, gemeinsamer Markenübergang, Fachanzeige ohne Mini-App-Logo, Unterrichtssuche ausdrücklich ohne Autokorrektur.
 
-Zuerst `Latinio_Update_2.5.0.zip` entpacken und `Installieren.bat` starten. Erst bei Health `frenchEnabled:true` und `pushReady:true` das vorbereitete Frontend veröffentlichen. Aktuell öffentlich bleibt 2.4.0. Firmenprojekt, Tailscale und Betriebssystem werden nicht verändert.
+Pi-Backend 2.5.0 wurde am 15. Oktober installiert und durch Health `frenchEnabled:true` und `pushReady:true` bestätigt. Die Oberfläche 2.5.0 wurde danach veröffentlicht; 2.5.1 aktualisiert nur diese Oberfläche. Firmenprojekt, Tailscale und Betriebssystem werden nicht verändert.
 
 Tests: `npm test`, `python3 installer/test_installer.py`. Backend-Abhängigkeiten bei Entwicklung: `cd server && npm ci --ignore-scripts`.
 

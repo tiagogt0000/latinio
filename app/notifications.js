@@ -1,17 +1,28 @@
 import {SUBJECTS} from './subjects.js';
-export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,render}){
- let state=null,catalog=null,history=[],enabled=false;
+export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,render,closeModal=()=>{},canPrompt=()=>true}){
+ let state=null,catalog=null,history=[],enabled=false,checked=false,prompted=false;
  const supported=()=>!!(globalThis.Notification&&navigator.serviceWorker&&globalThis.PushManager);
  const request=(action,payload={})=>sync.request(action,payload);
  async function registration(){return navigator.serviceWorker.ready;}
  function settingsMarkup(){return `<section class="settings-section"><h2>Lern-Erinnerungen</h2><p class="small muted">Ein freundlicher Schubs, wenn du heute noch keine Runde abgeschlossen hast. Höchstens einmal am Tag, zu einer zufälligen Zeit am späten Nachmittag oder Abend. Lernen in jedem der drei Fächer zählt.</p><p class="small muted" data-notification-status>${!supported()?'Auf dem iPhone: Öffne die installierte App vom Home-Bildschirm.':enabled?'Auf diesem Gerät eingeschaltet.':Notification.permission==='denied'?'Benachrichtigungen sind vom Gerät blockiert. Erlaube sie in den Geräte-Einstellungen.':'Auf diesem Gerät ausgeschaltet.'}</p><button class="button secondary wide" data-action="${enabled?'notification-disable':'notification-enable'}" ${!supported()?'disabled':''}>${enabled?'Erinnerungen hier ausschalten':'Benachrichtigungen erlauben'}</button>${profile.role==='admin'?'<button class="text-button wide" data-action="notification-admin">Nachrichten & Versand verwalten</button>':''}</section>`;}
  async function refresh(){
   if(!supported())return;
-  try{state=await request('notificationStatus');const sub=await (await registration()).pushManager.getSubscription();enabled=!!sub&&Notification.permission==='granted';
+  checked=false;
+  try{state=await request('notificationStatus');const sub=await (await registration()).pushManager.getSubscription();enabled=!!sub&&Notification.permission==='granted';checked=true;
    // Refresh ownership after a login, and keep a device opted in without prompting again.
    if(enabled)await request('notificationSubscribe',{subscription:sub.toJSON(),zone:Intl.DateTimeFormat().resolvedOptions().timeZone});
    const status=document.querySelector('[data-notification-status]');if(status)render();
-  }catch{enabled=false;}
+  }catch{/* A network error must not turn an already permitted device into a new opt-in. */}
+ }
+ function maybePrompt(){
+  if(!checked||!state||enabled||prompted||!supported()||!canPrompt())return false;
+  prompted=true;
+  if(Notification.permission==='denied'){
+   showModal('<h2 id="modal-title">Lern-Erinnerungen aktivieren</h2><p class="muted">Benachrichtigungen sind auf diesem Gerät blockiert. Erlaube sie bitte in den Geräte- oder Browser-Einstellungen, wenn du Lern-Erinnerungen erhalten möchtest.</p><button type="button" class="button primary wide" data-action="notification-later">Verstanden</button>');
+  }else{
+   showModal('<h2 id="modal-title">Ein kleiner Schubs zum Lernen?</h2><p class="muted">Aktiviere Benachrichtigungen, damit wir dich freundlich ans Lernen erinnern können – nur wenn du heute noch nicht gelernt hast und höchstens einmal am Tag.</p><p class="small muted">Mit OK öffnest du die Freigabe deines Geräts.</p><div class="word-tools"><button type="button" class="button primary wide" data-action="notification-enable">OK · Benachrichtigungen aktivieren</button><button type="button" class="text-button wide" data-action="notification-later">Später</button></div>');
+  }
+  return true;
  }
  async function disable(){if(!supported())return;const sub=await (await registration()).pushManager.getSubscription();if(sub){try{await request('notificationUnsubscribe',{endpoint:sub.endpoint});}finally{await sub.unsubscribe();enabled=false;}}enabled=false;}
  const time=value=>String(Math.floor(value/60)).padStart(2,'0')+':'+String(value%60).padStart(2,'0');
@@ -24,10 +35,12 @@ export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,rende
   const action=button.dataset.action;if(!action?.startsWith('notification-'))return false;
   if(action==='notification-enable'){
    if(!supported())throw Error('Bitte öffne die installierte App auf dem Home-Bildschirm.');
+   prompted=true;closeModal();
    const permission=await Notification.requestPermission();if(permission!=='granted')throw Error('Benachrichtigungen wurden nicht erlaubt. Du kannst das später in den Geräte-Einstellungen ändern.');
    state=state||await request('notificationStatus');const reg=await registration();const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:state.publicKey});
    try{await request('notificationSubscribe',{subscription:sub.toJSON(),zone:Intl.DateTimeFormat().resolvedOptions().timeZone});enabled=true;render();notify('Lern-Erinnerungen sind auf diesem Gerät eingeschaltet.');}catch(error){await sub.unsubscribe();throw error;}
-  }else if(action==='notification-disable'){await disable();render();notify('Erinnerungen auf diesem Gerät ausgeschaltet.');}
+  }else if(action==='notification-later'){prompted=true;closeModal();}
+  else if(action==='notification-disable'){prompted=true;await disable();render();notify('Erinnerungen auf diesem Gerät ausgeschaltet.');}
   else{
    if(profile.role!=='admin')return true;
    if(action==='notification-admin'){const result=await request('notificationAdmin');state=result;catalog=result.catalog;history=result.history;state.historyMore=history.length===200;adminView();}
@@ -41,5 +54,5 @@ export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,rende
   const fd=new FormData(form);const next={enabled:fd.has('enabled'),start:minute(fd.get('start')),end:minute(fd.get('end')),messages:[...form.querySelectorAll('[data-notification-id]')].map(row=>({id:row.dataset.notificationId,enabled:row.querySelector('[name="active"]').checked,subject:row.querySelector('[name="subject"]').value,text:row.querySelector('textarea').value}))};
   await request('notificationCatalogSave',{catalog:next});catalog=next;notify('Erinnerungen gespeichert.');return true;
  }
- return {settingsMarkup,refresh,handle,submit,disable};
+ return {settingsMarkup,refresh,maybePrompt,handle,submit,disable};
 }

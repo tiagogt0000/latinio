@@ -15,7 +15,7 @@ export function chooseSubject(root,{reducedMotion=globalThis.matchMedia?.('(pref
         const subject=button.dataset.enterSubject;
         root.querySelectorAll('[data-enter-subject]').forEach(el=>{el.disabled=true;});
         const content=root.querySelector('.entrance-content');
-        if(!reducedMotion&&content.animate){
+        if(subject!=='french'&&!reducedMotion&&content.animate){
           const animation=content.animate([{opacity:1,transform:'translateY(0)',filter:'blur(0)'},{opacity:0,transform:'translateY(18px)',filter:'blur(6px)'}],{duration:380,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
           await animation.finished.catch(()=>{});
         }
