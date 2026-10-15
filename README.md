@@ -1,4 +1,16 @@
-# Latinio · Version 2.1.5
+# Latinio · Version 2.5.0 (vorbereitet)
+
+## 2.5.0 · Vocabify Französisch und Lern-Erinnerungen
+
+Drei getrennte Fächer unter derselben PWA-Adresse, gemeinsame Konten, Zugangscodes und Streaks. Französisch adaptiert die Lernfunktionen von Vocabify 1.3.1: beide Richtungen, alte/neue/fehlerhafte Wörter, Aussprache und Textimport; normale und Auffrisch-Sammlungen verwenden die bewährte Latinio-Verwaltung. Acht französische Startwörter aus der Vorlage, keine Beispielkonten oder fiktiven Lerndaten. Französische Sammlungen werden vom Admin automatisch geteilt.
+
+Der Pi versendet nach ausdrücklicher Gerätefreigabe maximal eine Lern-Erinnerung pro Nutzer und Kalendertag. Zufälliger Text und Zeitpunkt, standardmäßig 17:00–20:30 Uhr in der Gerätezeitzone, keine Erinnerung nach synchronisiertem Tagesabschluss. Admin kann Texte, Fächer, Aktivierung und Zeitfenster verwalten und den Versandverlauf prüfen. VAPID-Schlüssel und Abos bleiben in der privaten SQLite-Datenbank. Die Geräte-Pushdienste transportieren nur verschlüsselte Nachrichten; der Lernspeicher bleibt auf dem Pi.
+
+Weitere Tagesrunden zeigen einen kurzen Abschluss ohne Flammenbildschirm. Online wird die Feier zusätzlich geräteübergreifend reserviert. Neue weichere Fächerwahl, gemeinsamer Markenübergang, Fachanzeige ohne Mini-App-Logo, Unterrichtssuche ausdrücklich ohne Autokorrektur.
+
+Zuerst `Latinio_Update_2.5.0.zip` entpacken und `Installieren.bat` starten. Erst bei Health `frenchEnabled:true` und `pushReady:true` das vorbereitete Frontend veröffentlichen. Aktuell öffentlich bleibt 2.4.0. Firmenprojekt, Tailscale und Betriebssystem werden nicht verändert.
+
+Tests: `npm test`, `python3 installer/test_installer.py`. Backend-Abhängigkeiten bei Entwicklung: `cd server && npm ci --ignore-scripts`.
 
 ## 2.1.5 · Streak-Zahl am Buchsymbol
 

@@ -29,7 +29,7 @@ function doGet(e) {
 function latinioApi(request) {
   requestSheets_=Object.create(null);
   const subject=request&&request.subject||'latin';
-  if(subject!=='latin'&&subject!=='english')throw new Error('Unbekanntes Lernfach.');
+  if(!['latin','english','french'].includes(subject))throw new Error('Unbekanntes Lernfach.');
   const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
@@ -39,7 +39,7 @@ function latinioApi(request) {
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
     if(['autoShareCheck','autoShareApply'].includes(request.action))return autoSharingApi_(request,identity);
-    if(request.action==='whoami')return {profile:identity,apiVersion:6,subjects:['latin','english'],allowedSubjects:identity.allowedSubjects};
+    if(request.action==='whoami')return {profile:identity,apiVersion:7,subjects:['latin','english','french'],allowedSubjects:identity.allowedSubjects};
     if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action)){const result=accountApi_(request,identity,subject);return request.action==='shareList'?autoShareDirectory_(result,subject):result;}
     if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
@@ -76,20 +76,20 @@ function authorize_(request){
   const props=PropertiesService.getScriptProperties();
   if(!request||typeof request.token!=='string'||request.token.length<32||request.token.length>200)throw new Error('Bitte erneut anmelden.');
   const hashed=hash_(request.token),expected=props.getProperty('TOKEN_HASH');
-  if(expected&&hashed===expected)return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english']};
+  if(expected&&hashed===expected)return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english','french']};
   const session=records_('_LatinioSessions')[hashed];
   if(!session||session.expires<Date.now())throw new Error('Bitte erneut anmelden.');
-  if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english']};
+  if(session.profileId==='admin')return {id:'admin',role:'admin',name:'Admin',allowedSubjects:['latin','english','french']};
   const profile=records_('_LatinioProfiles')[session.profileId];
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
   if((studentCodesRequired_()||profile.loginCodeHash)&&(!profile.loginCodeHash||!session.codeAuthVersion||session.codeAuthVersion!==profile.codeAuthVersion))throw new Error('Bitte melde dich mit deinem Zugangscode neu an.');
   return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),codeAuthVersion:session.codeAuthVersion||null};
 }
-function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english';}))):['latin','english'];}
+function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english'||s==='french';}))):['latin','english','french'];}
 function ensureLog_(profileId,readOnly,subject='latin'){
   const id=PropertiesService.getScriptProperties().getProperty('SHEET_ID');if(!id)throw new Error('Cloud noch nicht eingerichtet.');
   const book=SpreadsheetApp.openById(id);
-  const tab=subject==='english'?(!profileId||profileId==='admin'?'Englisch_Änderungen':'Englisch_Lernen_'+profileId):(!profileId||profileId==='admin'?'Änderungen':'Lernen_'+profileId);
+  const tab=subject==='french'?(!profileId||profileId==='admin'?'Franzoesisch_Änderungen':'Franzoesisch_Lernen_'+profileId):subject==='english'?(!profileId||profileId==='admin'?'Englisch_Änderungen':'Englisch_Lernen_'+profileId):(!profileId||profileId==='admin'?'Änderungen':'Lernen_'+profileId);
   let sheet=book.getSheetByName(tab);
   if(!sheet&&readOnly)return null;
   if(!sheet){sheet=book.insertSheet(tab);sheet.getRange(1,1,1,5).setValues([['Version','Änderung-ID','Gespeichert am','Gerät','Daten (JSON)']]);sheet.setFrozenRows(1);sheet.getRange(1,1,1,5).setFontWeight('bold').setBackground('#59b923').setFontColor('#ffffff');sheet.setColumnWidths(1,4,160);sheet.setColumnWidth(5,600);}

@@ -40,7 +40,7 @@ export class Sync extends EventTarget {
   get configured(){return !!this.store.doc.config.url&&!!this.store.doc.config.token;}
   schedule(ms=1200){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
   async request(action,payload,requestSubject=this.subject){
-    if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
+    if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
     const config=this.store.doc.config;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=createBridge(config.url,config.token);}
     try{
@@ -48,6 +48,7 @@ export class Sync extends EventTarget {
         const identity=await this.bridge.request('whoami');
         if(identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
       }
+      if(requestSubject==='french'&&!this.bridge.frenchVerified){const identity=await this.bridge.request('whoami',{subject:'french'});if(identity.apiVersion<7||!identity.subjects?.includes('french'))throw Error('Bitte zuerst das neue Pi-Backend installieren. Französisch wurde noch nicht freigeschaltet.');this.bridge.frenchVerified=true;}
       if(requestSubject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
       return await this.bridge.request(action,{...payload,subject:requestSubject});
     }catch(error){

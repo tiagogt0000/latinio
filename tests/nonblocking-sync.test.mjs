@@ -5,7 +5,7 @@ import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 test('Initial app sync starts after ready and does not await a loading screen',()=>{
  assert.equal((source.match(/cloudWait\.run\(/g)||[]).length,1);
- assert.match(source,/ready=true;const startup=cloudWait\.run\(\);render\(\)/);assert.doesNotMatch(source,/await cloudWait\.run/);
+ assert.match(source,/ready=true;void reminders.refresh\(\);const startup=cloudWait\.run\(\);render\(\)/);assert.doesNotMatch(source,/await cloudWait\.run/);
 });
 test('Results appear before cloud completion and late sync cannot reopen results',async()=>{
  let release,renders=[],updates=0;

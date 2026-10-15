@@ -42,7 +42,7 @@ function flow(){
  const {d,session}=fixture();session.finished=true;
  const calls={claims:0,dialogs:[],renders:[],mounts:[],fades:0};
  const store={doc:{session},async update(fn){this.doc=fn(this.doc);},async recordActivity(){},async commit(changes){for(const [entity,id,value]of changes)d[entity][id]=value;}};
- const context=vm.createContext({roundEnd:null,predicateRoot:null,predicateRun:[],predicateResults:[],predicateRoundId:'p',predicateCursor:0,predicateAnswer:'',predicateFeedback:null,screen:'test',store,data:()=>d,failedTasks,createErrorRetry,shuffleQueue,predicateProgress,uid:()=> 'retry',h:String,document:{activeElement:{blur(){}},body:{style:{overflow:''}},querySelector:()=>null},matchMedia:()=>({matches:false}),modalRoot:{querySelector:()=>({})},modalCleanup:()=>{},app:{},sync:{schedule(){}},streakLedger:{async claim(){calls.claims++;return {count:1,variant:'orbit',celebrate:calls.claims===1};}},fadeDialog:async()=>{},fadeRound:async()=>{calls.fades++;},showModal:(html,closable)=>calls.dialogs.push({html,closable}),closeModal(){},streakDemo,mountStreakFinish:(stage,options)=>{calls.mounts.push(options);return ()=>{};},backgroundSync:async()=>{},render(){calls.renders.push(context.screen);}});
+ const context=vm.createContext({navigator:{onLine:false},icon:()=>'',roundEnd:null,predicateRoot:null,predicateRun:[],predicateResults:[],predicateRoundId:'p',predicateCursor:0,predicateAnswer:'',predicateFeedback:null,screen:'test',store,data:()=>d,failedTasks,createErrorRetry,shuffleQueue,predicateProgress,uid:()=> 'retry',h:String,document:{activeElement:{blur(){}},body:{style:{overflow:''}},querySelector:()=>null},matchMedia:()=>({matches:false}),modalRoot:{querySelector:()=>({})},modalCleanup:()=>{},app:{},sync:{schedule(){}},streakLedger:{async claim(){calls.claims++;return {count:1,variant:'orbit',celebrate:calls.claims===1};}},fadeDialog:async()=>{},fadeRound:async()=>{calls.fades++;},showModal:(html,closable)=>calls.dialogs.push({html,closable}),closeModal(){},streakDemo,mountStreakFinish:(stage,options)=>{calls.mounts.push(options);return ()=>{};},backgroundSync:async()=>{},render(){calls.renders.push(context.screen);}});
  const start=source.indexOf('async function offerRoundEnd('),end=source.indexOf('function announcementView(',start);
  vm.runInContext(source.slice(start,end),context);return {context,calls,store,d,session};
 }
@@ -62,7 +62,7 @@ test('a flawless round proceeds immediately and later same-day rounds do not rep
  const f=flow();await f.context.offerRoundEnd({kind:'vocab',id:'a',stats:{correct:1,wrong:0,newlyKnown:0,total:1},errors:[]});
  assert.equal(f.calls.dialogs.length,1);assert.equal(f.calls.mounts[0].celebrate,true);
  await f.context.returnFromRound();await f.context.offerRoundEnd({kind:'vocab',id:'b',stats:{correct:1,wrong:0,newlyKnown:0,total:1},errors:[]});
- assert.equal(f.calls.mounts[1].celebrate,false);
+ assert.equal(f.calls.mounts.length,1);assert.match(f.calls.dialogs.at(-1).html,/round-complete-simple/);assert.doesNotMatch(f.calls.dialogs.at(-1).html,/streak-stage|streak-flame/);
 });
 test('save errors leave a usable retry action and do not mark the completion accepted',async()=>{
  const f=flow();f.context.streakLedger.claim=async()=>{throw Error('Speicher voll');};

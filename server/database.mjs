@@ -62,12 +62,22 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
   for (const file of ['Code.gs','Accounts.gs','AutoSharing.gs']) {
     vm.runInContext(readFileSync(new URL('../google/'+file,import.meta.url),'utf8'),ctx);
   }
+  function enableFrench(){
+    if(getProp.get('FRENCH_ENABLED')||!getProp.get('SHEET_ID'))return;
+    db.exec('BEGIN IMMEDIATE');
+    try{
+      vm.runInContext("requestSheets_=Object.create(null); Object.values(records_('_LatinioProfiles')).forEach(function(p){p.allowedSubjects=Array.from(new Set(normalizeSubjects_(p.allowedSubjects).concat(['french'])));saveRecord_('_LatinioProfiles',p.id,p);});",ctx);
+      putProp.run('FRENCH_ENABLED','true');db.exec('COMMIT');
+    }catch(error){db.exec('ROLLBACK');throw error;}
+  }
   return {
     db,
     studentCodesRequired:requireStudentCodes,
     autoSharingEnabled:enableAutoSharing,
+    frenchEnabled:true,
     ready: () => Boolean(getProp.get('SHEET_ID') && getProp.get('TOKEN_HASH') && getProp.get('ADMIN_PIN_HASH')),
     request(request) {
+      enableFrench();
       db.exec('BEGIN IMMEDIATE');
       try {
         ctx.requestInput = JSON.parse(JSON.stringify(request));
@@ -79,6 +89,21 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
         db.exec(request.action === 'login' ? 'COMMIT' : 'ROLLBACK');
         throw error;
       } finally { delete ctx.requestInput; }
+    },
+    notificationSnapshot(){
+      enableFrench();
+      const value=vm.runInContext(`
+        requestSheets_=Object.create(null);
+        [{id:'admin',name:'Tiago',allowedSubjects:['latin','english','french']}]
+        .concat(Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}))
+        .map(function(p){
+          const days=['latin','english','french'].flatMap(function(subject){
+            return Object.values(readState_(p.id,true,subject).data.settings)
+              .filter(function(v){return v.kind==='streakDay';}).map(function(v){return v.day;});
+          });
+          return {id:p.id,name:p.name,subjects:normalizeSubjects_(p.allowedSubjects),days:Array.from(new Set(days))};
+        });`,ctx,{timeout:10000});
+      return JSON.parse(JSON.stringify(value));
     },
     importSnapshot(snapshot) {
       if (db.prepare('SELECT COUNT(*) AS n FROM sheets').get().n || db.prepare('SELECT COUNT(*) AS n FROM properties').get().n) {
@@ -98,7 +123,7 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
         }
         if (!getProp.get('SHEET_ID')) putProp.run('SHEET_ID','local');
         for (const entry of snapshot.sheets) {
-          if (!/^(Änderungen|Englisch_Änderungen|(?:Englisch_)?Lernen_[a-zA-Z0-9_-]+|_Latinio[a-zA-Z]+)$/.test(entry.name) || !Array.isArray(entry.rows)) {
+          if (!/^(Änderungen|(?:Englisch_|Franzoesisch_)Änderungen|(?:(?:Englisch|Franzoesisch)_)?Lernen_[a-zA-Z0-9_-]+|_Latinio[a-zA-Z]+)$/.test(entry.name) || !Array.isArray(entry.rows)) {
             throw Error('Ungültige Tabelle.');
           }
           book.insertSheet(entry.name);

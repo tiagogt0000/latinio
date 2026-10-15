@@ -11,6 +11,7 @@ TEMPLATES = ROOT / 'installer' / 'templates'
 FILES = (
     'google/Code.gs', 'google/Accounts.gs', 'google/AutoSharing.gs',
     'server/database.mjs', 'server/start.mjs', 'server/http.mjs', 'server/Dockerfile',
+    'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
 )
 
 def build(output, release):

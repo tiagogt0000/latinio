@@ -5,7 +5,7 @@ export class Store extends EventTarget {
   static undoWindow=7*24*60*60*1000;
   async open(profileId='admin',subject='latin'){
     this.profileId=profileId;this.subject=subject;
-    const dbName=subject==='english'?'latinio-english-'+profileId:profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
+    const dbName=subject==='french'?'latinio-french-'+profileId:subject==='english'?'latinio-english-'+profileId:profileId==='admin'?'latinio-v1':'latinio-profile-'+profileId;
     this.db=await new Promise((resolve,reject)=>{
       let settled=false;
       const finish=(error,db)=>{if(settled){db?.close();return;}settled=true;clearTimeout(timer);error?reject(error):resolve(db);};
@@ -36,7 +36,7 @@ export class Store extends EventTarget {
   }
   get data(){return applyOps(this.doc.shadow,this.doc.pending);}
   close(){this.channel?.close();this.db?.close();}
-  async seed(){if(this.subject==='english'||this.profileId!=='admin'||this.doc.seeded)return;await this.update(doc=>{
+  async seed(){if(this.subject!=='latin'||this.profileId!=='admin'||this.doc.seeded)return;await this.update(doc=>{
     if(doc.seeded)return doc;
     const data=applyOps(doc.shadow,doc.pending);
     if(!Object.keys(data.collections).length){for(const [entity,key,value] of [['collections',collection.id,collection],...vocabulary.map(w=>['words',w.id,w])]){doc.seq++;doc.pending.push({id:uid(),entity,key,value,device:doc.device,seq:doc.seq,at:Date.now(),bootstrap:true});}}

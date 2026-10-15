@@ -35,7 +35,7 @@ test('Admin can restrict an account to one subject and the server rejects blocke
  assert.deepEqual(Array.from(changed.profile.allowedSubjects),['latin']);
  assert.deepEqual(Array.from(h.request({action:'profiles'}).profiles[0].allowedSubjects),['latin']);
  assert.throws(()=>h.request({action:'check',token:user.token,subject:'english'}),/nicht freigeschaltet/);
- assert.deepEqual(Array.from(h.request({action:'whoami'}).allowedSubjects),['latin','english']);
+ assert.deepEqual(Array.from(h.request({action:'whoami'}).allowedSubjects),['latin','english','french']);
 });
 test('Admin can edit a user name, email and permitted subjects with validation',()=>{
  const h=harness(),created=h.request({action:'profileCreate',name:'Felix',email:'felix@example.org'});

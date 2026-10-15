@@ -275,7 +275,7 @@ function accountApi_(request,identity,subject='latin'){
   if(request.action==='profileActivity'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const allowed=['opened','started','paused','finished','words','collections','refresh','settings'],now=Date.now();
-    const events=['latin','english'].flatMap(function(language){return Object.values(readState_(profile.id,true,language).data.settings).filter(function(v){return v&&v.kind==='activityEvent'&&allowed.includes(v.action)&&Number.isFinite(v.at)&&v.at>=now-90*86400000&&v.at<=now+300000;}).map(function(v){return {at:v.at,action:v.action,subject:language};});}).sort(function(a,b){return b.at-a.at;});
+    const events=['latin','english','french'].flatMap(function(language){return Object.values(readState_(profile.id,true,language).data.settings).filter(function(v){return v&&v.kind==='activityEvent'&&allowed.includes(v.action)&&Number.isFinite(v.at)&&v.at>=now-90*86400000&&v.at<=now+300000;}).map(function(v){return {at:v.at,action:v.action,subject:language};});}).sort(function(a,b){return b.at-a.at;});
     return {profile:{id:profile.id,name:profile.name,latestAppVersion:profile.latestAppVersion||null,latestAppVersionAt:profile.latestAppVersionAt||null},events:events.slice(0,200),truncated:events.length>200,checkedAt:now};
   }
   if(request.action==='profiles')return {profiles:Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}).map(function(p){return publicProfile_(p);})};
@@ -442,8 +442,8 @@ function accountApi_(request,identity,subject='latin'){
   throw new Error('Unbekannte Verwaltungsaktion.');
 }
 function normalizeRequestedSubjects_(subjects){
-  if(!Array.isArray(subjects))return ['latin','english'];
-  const allowed=Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english';})));
+  if(!Array.isArray(subjects))return ['latin','english','french'];
+  const allowed=Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english'||s==='french';})));
   if(!allowed.length||allowed.length!==subjects.length)throw new Error('Bitte mindestens ein gültiges Lernfach auswählen.');
   return allowed;
 }

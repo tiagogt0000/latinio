@@ -1,6 +1,6 @@
 import {createServer} from 'node:http';
 
-export function apiServer(database, origin = 'https://tiagogt0000.github.io') {
+export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null) {
   return createServer(async (req,res) => {
     res.setHeader('Cache-Control','no-store');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -8,7 +8,7 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io') {
       res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});
       res.end(JSON.stringify(body));
     };
-    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true});
+    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true});
     if (req.headers.origin !== origin) return reply(403,{error:'Herkunft nicht erlaubt.'});
     res.setHeader('Access-Control-Allow-Origin',origin);
     res.setHeader('Vary','Origin');
@@ -34,7 +34,14 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io') {
       catch { return reply(400,{error:'Ungültiges JSON.'}); }
       if (!body || Array.isArray(body) || typeof body.action !== 'string') return reply(400,{error:'Ungültige Anfrage.'});
       const token=(req.headers.authorization||'').match(/^Bearer ([a-zA-Z0-9_-]{32,200})$/)?.[1] || '';
-      try { reply(200,{result:database.request({...body,token})}); }
+      try {
+        if(body.action.startsWith('notification')){
+          if(!notifications)throw Error('Benachrichtigungen sind noch nicht eingerichtet.');
+          const identity=database.request({action:'whoami',token}).profile;
+          return reply(200,{result:await notifications.request(body,identity)});
+        }
+        reply(200,{result:database.request({...body,token})});
+      }
       catch (error) { reply(400,{error:error.message}); }
     } catch { if (!res.headersSent) reply(400,{error:'Anfrage abgebrochen.'}); }
   });

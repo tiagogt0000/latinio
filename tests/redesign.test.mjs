@@ -3,19 +3,20 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 import {predicateDecks,predicateCloudItems} from '../app/predicates.js';
+import {frenchHome} from '../app/french.js';
 import {streakState,streakDays} from '../app/streak.js';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 const section=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end,source.indexOf(start)));
-function viewContext(english=false,admin=true){
+function viewContext(english=false,admin=true,subject=english?'english':'latin'){
  const word={id:'w',collectionId:'c'},deck={id:'c',name:'Lektion 1',active:true};
  const data={words:{w:word},collections:{c:deck},settings:{},reviews:{}};
- return vm.createContext({english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
+ return vm.createContext({reminders:null,subject,languageName:()=>subject==='french'?'Französisch':english?'Englisch':'Latein',frenchHome,english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
   cloudWait:{blocked:false},predicateSelected:null,predicateDecks,predicateCloudItems,prefs:()=>({direction:'mixed',daily:10}),data:()=>data,activeWords:()=>[word],progressFor:()=>({level:'new',seen:false}),directionsFor:()=>['en-de','de-en'],
   streakLedger:null,streakState,streakDays,streakBadgeFlame:()=>'<svg></svg>',todayCount:()=>2,trainingDecks:()=>[deck],wordsForDecks:()=>[word],directionLabel:()=>'',selected:[],predicateItems:[{grundform:'amare'}],
   accountCard:()=>'<section class="settings-section profile-settings">Profil</section>',updateView:()=>'<p>Update</p>',syncDetails:()=>'<p>Cloud</p>',sync:{configured:true},adminContent:'Nutzerliste',adminTab:'people'});
 }
 function balanced(html){
- const stack=[],voids=new Set(['input','br','hr']);
+ const stack=[],voids=new Set(['input','br','hr','img']);
  for(const match of html.matchAll(/<(\/?)([a-z][a-z0-9-]*)\b[^>]*>/gi)){
   const [,closing,name]=match;if(voids.has(name))continue;
   if(closing)assert.equal(stack.pop(),name,'Unbalanced '+match[0]);else stack.push(name);
@@ -67,4 +68,8 @@ test('both home cards use the same controls and subject options have no raised s
  const css=fs.readFileSync(new URL('../app/style.css',import.meta.url),'utf8');
  assert.match(css,/\.home-practice-grid \.word-tools>\.button\{[^}]*min-height:52px[^}]*padding:14px 18px/);
  assert.match(css,/\.subject-options,\.subject-options>button,\.subject-options>button:active\{box-shadow:none!important;transform:none!important/);
+});
+
+test('Vocabify French home renders the shared trainer with French labels and no Latin perfect card',()=>{
+ const context=viewContext(true,true,'french');vm.runInContext(section('function learnView()','function startPredicatePractice('),context);const html=vm.runInContext('learnView()',context);balanced(html);assert.match(html,/Vocabify/);assert.match(html,/Französisch/);assert.doesNotMatch(html,/Englisch|Perfektform lernen/);assert.match(html,/id="direction"/);
 });

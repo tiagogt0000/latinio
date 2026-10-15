@@ -10,7 +10,7 @@ CODE_WRITTEN=0
 UP_ATTEMPTED=0
 OLD_IMAGE=''
 OLD_REF=''
-FILES=(google/Code.gs google/Accounts.gs google/AutoSharing.gs server/database.mjs server/start.mjs server/http.mjs server/Dockerfile)
+FILES=(google/Code.gs google/Accounts.gs google/AutoSharing.gs server/database.mjs server/start.mjs server/http.mjs server/Dockerfile server/notifications.mjs server/package.json server/package-lock.json)
 
 compose() { sudo docker compose -p vokabeltrainer -f "$ROOT/server/compose.yaml" "$@" </dev/null; }
 rollback() {

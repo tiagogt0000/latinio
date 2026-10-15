@@ -1,6 +1,20 @@
 # Latinio – Projektübergabe
 
-Stand: 13. Oktober 2026. Produktiv 2.3.0; Version 2.4.0 vorbereitet.
+Stand: 15. Oktober 2026. Produktiv 2.4.0 (main 1c97e9190114e24d720b76e2e478d7082817ab81); Version 2.5.0 vorbereitet.
+
+## Vorbereitet: 2.5.0 – Französisch, Erinnerungen und Tagesfeier
+
+GitHub-Frontend erst nach bestätigter Pi-Installation veröffentlichen! Health benötigt zusätzlich frenchEnabled:true und pushReady:true. Update ausschließlich über ZIP/Installieren.bat; Nutzer möchte keine manuellen SSH-Befehlsblöcke. Bestehende URL, Login-Codes und Elektro Gilbers bleiben erhalten.
+
+French-Integration: app/subjects.js und french.js, eigene IndexedDB latinio-french-{profil}, eigenes Journal Franzoesisch_Änderungen / Franzoesisch_Lernen_{profil}. Vocabify 1.3.1 aus hochgeladener index.html dient als Vorlage; Firebase, dessen Konten und Beispiel-Lerndaten werden nicht verbunden. Aussprache fr-FR, beidseitige Lernaufgaben verwenden intern vorhandene en-de/de-en-Richtungskennungen in getrennten Speichern. Normale Sammlungen und Auffrisch-Sammlungen, automatische Admin-Freigaben und Prüfer gelten auch für Französisch. Die bestehende AutoSharing-Engine braucht keine neue Sonderlogik. Admin bekommt nach dem ersten frischen Französisch-Abgleich einmalig die acht Ma-famille-Startwörter aus der Vorlage, ohne Bewertungen. Bestehende Nutzer erhalten Französisch einmalig zusätzlich zu bisherigen Berechtigungen; später kann Admin es separat einschränken. FRENCH_ENABLED verhindert wiederholte Änderungen. Codes und alte Fachjournale bleiben erhalten.
+
+Streak: Bei celebrate:false wird überhaupt kein streakDemo/mountStreakFinish aufgerufen. Kurzer Abschluss mit round-home. Bei Online-Abschluss reserviert notificationStreakClaim die Feier zusätzlich pro Profil/Tag in SQLite. Offline zählen lokale Ledgertage; zwei komplett offline getrennte Geräte können weiterhin jeweils feiern. refreshStreak vereinigt alle freigegebenen Fächer. Keine visuellen Browserchecks gemäß Nutzerpräferenz.
+
+Push: server/notifications.mjs, web-push 3.6.7 mit festem Lockfile. Schlüssel werden auf dem Pi einmalig generiert und in notification_meta gespeichert. Weitere eigene Tabellen: notification_devices, notification_daily, notification_history, streak_celebrations. Keine neue Datenbank und keine neuen Container/Ports/Volumes. server/http.mjs authentifiziert jede notification-Aktion über bestehendes whoami, Adminaktionen zusätzlich rollenbasiert. Abos auf offizielle Apple/FCM/Mozilla/Windows-Pushendpunkte begrenzt; keine beliebigen ausgehenden URLs. Alte Abos laufen nach 90 Tagen ohne App-Öffnung aus, 404/410 entfernt sie. Der Zeitplan ist dauerhaft pro Profil/Tag reserviert, max. eine Nachricht an alle registrierten Geräte, keine automatische Wiederholung nach unklarem Versandstatus. Unterdrückt nach StreakTag in einem der drei Fächer oder Serverclaim. Maßgeblich ist der Pi-Stand; noch offline liegendes Lernen kann der Pi nicht kennen. TTL 30 Minuten. History sagt ausdrücklich Push-Dienst angenommen, nicht Handy zugestellt. 12 editierbare Starttexte, globales Zeitfenster 08–21 Uhr begrenzt, Standard 17–20:30 Uhr. Keine tatsächlichen Nachrichten bei Entwicklungstests versendet.
+
+Frontend: Gerätefreigabe nur per Klick in Einstellungen, vorhandene iOS-Home-Screen-App genügt. Admin unter Nutzer → Erinnerungen. Service Worker zeigt Push an und öffnet ausschließlich die eigene App mit geprüftem Fach; from=reminder wird einmalig konsumiert und überspringt Fächerwahl. Beim Abmelden versucht die App das Gerät abzumelden. Vorschau im Browser nicht verlangt/ausgeführt. Native Windows-/ARM-/iPhone-Push-Prüfung steht bis Nutzerinstallation aus; lokale Tests prüfen Scheduler, HTTP, DB, Verschlüsselungsanfrage und Installer mit simuliertem Docker.
+
+Paketdateien jetzt zusätzlich server/notifications.mjs, server/package.json, server/package-lock.json. Docker installiert nur die privaten Backend-Abhängigkeiten mit npm ci --omit=dev --ignore-scripts. Alle Quelldateien mit 0644, DB-Backup 0600. Vorherige Code-/Image-Rücksetzung bleibt erhalten, keine Datenbank-Rücksetzung.
 
 ## Vorbereitet: 2.4.0 – Lernfeedback und automatische Freigaben
 

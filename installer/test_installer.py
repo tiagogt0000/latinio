@@ -32,7 +32,7 @@ if args[0]=='inspect':
  else:
   print(json.dumps([{'Config':{'Labels':{'com.docker.compose.project':'vokabeltrainer','com.docker.compose.service':'api'}},'State':{'Running':state['running']!='broken','Restarting':state['running']=='broken'},'Mounts':[{'Destination':'/data','Type':'volume','Name':'vokabeltrainer_latinio_data'}]}]))
 elif args[:2]==['image','tag']:pass
-elif args[:2]==['image','ls']:print('vokabeltrainer:vor-2.4.0-20261013-221958-566047')
+elif args[:2]==['image','ls']:print('vokabeltrainer:vor-2.5.0-20261013-221958-566047')
 elif args[0]=='logs':print('previous startup error fixture')
 elif args[0]=='compose':
  assert args[1:3]==['-p','vokabeltrainer'];assert args[3]=='-f';assert Path(args[4])==root/'server/compose.yaml'
@@ -62,7 +62,7 @@ from pathlib import Path
 state=json.loads(Path(os.environ['LATINIO_TEST_STATE']).read_text())
 ok=state['running']=='new' and state['fail']!='health'
 ready=state['running']=='old' or ok
-Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok}))
+Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok,'frenchEnabled':ok,'pushReady':ok}))
 '''
 
 class InstallerTests(unittest.TestCase):
@@ -78,9 +78,9 @@ class InstallerTests(unittest.TestCase):
             output=directory/'installer.zip';builder.build(output,'c412e73f0ab2f95c356c23a7db9fdb51b68a64b0')
             package=directory/'package';package.mkdir()
             with zipfile.ZipFile(output) as outer:
-                self.assertEqual(set(outer.namelist()),{'Installieren.bat','Installieren.ps1','Liesmich.txt','Latinio-Backend-2.4.0.zip'})
+                self.assertEqual(set(outer.namelist()),{'Installieren.bat','Installieren.ps1','Liesmich.txt','Latinio-Backend-2.5.0.zip'})
                 self.assertIn(b'\r\n',outer.read('Installieren.bat'))
-                payload=outer.read('Latinio-Backend-2.4.0.zip')
+                payload=outer.read('Latinio-Backend-2.5.0.zip')
                 with zipfile.ZipFile(io.BytesIO(payload)) as inner:inner.extractall(package)
             for source in (package/'Dateien').rglob('*'):
                 if source.is_file():source.chmod(0o600)
