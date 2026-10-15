@@ -1,6 +1,6 @@
 # Latinio – Projektübergabe
 
-Stand: 15. Oktober 2026. Pi-Backend 2.5.0 und Frontend 2.5.0 produktiv bestätigt; Folge-Frontend 2.5.1.
+Stand: 15. Oktober 2026. Pi-Backend 2.5.0, Frontend 2.5.2. In 2.5.2 auf ausdrücklichen Nutzerwunsch das Vocabify-Buch-/Häkchen-Icon aus 2.5.0 wiederhergestellt; alle anderen 2.5.1-Korrekturen bleiben bestehen. Kein Pi-Update.
 
 ## 2.5.1 – Korrektur des Markenübergangs und Aktivierungshinweis
 

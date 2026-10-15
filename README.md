@@ -1,4 +1,8 @@
-# Latinio · Version 2.5.1
+# Latinio · Version 2.5.2
+
+## 2.5.2 · Vorheriges Vocabify-Icon
+
+Auf Nutzerwunsch das orange Buch-/Häkchen-Icon aus 2.5.0 exakt wiederhergestellt. Übergang und Benachrichtigungshinweise aus 2.5.1 bleiben bestehen. Kein Backendupdate.
 
 ## 2.5.1 · Markenübergang und Benachrichtigungsfreigabe
 

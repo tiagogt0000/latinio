@@ -24,5 +24,4 @@ test('Entering French keeps the start menu visible for the blur instead of fadin
 });
 test('Vocabify learning home omits the decorative app icon',()=>{
  assert.doesNotMatch(frenchHome(emptyData(),0,10,String),/<img/);
- const svg=fs.readFileSync(new URL('../icon-vocabify.svg',import.meta.url),'utf8');assert.match(svg,/vf-mark/);assert.doesNotMatch(svg,/M105 166|M256 177/);
 });
