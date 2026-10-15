@@ -31,7 +31,8 @@ self.addEventListener('notificationclick',event=>{
   target.searchParams.set('from','reminder');
   const windows=await self.clients.matchAll({type:'window',includeUncontrolled:true});
   const existing=windows.find(client=>new URL(client.url).origin===target.origin&&new URL(client.url).pathname.startsWith(new URL(self.registration.scope).pathname));
-  if(existing){await existing.navigate(target.href);return existing.focus();}
+  // Keep an in-progress round and its typed answers intact.
+  if(existing)return existing.focus();
   return self.clients.openWindow(target.href);
  })());
 });

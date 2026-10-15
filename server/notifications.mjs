@@ -55,7 +55,12 @@ export function createNotifications(database,transport,{now=Date.now,random=rand
    return {celebrate:db.prepare('INSERT OR IGNORE INTO streak_celebrations VALUES(?,?)').run(profile.id,body.day).changes===1};
   }
   if(profile.role!=='admin')throw Error('Nur für den Admin.');
-  if(action==='notificationAdmin')return {catalog:get('catalog'),history:db.prepare('SELECT * FROM notification_history ORDER BY at DESC LIMIT 200').all(),deviceCount:db.prepare('SELECT count(*) n FROM notification_devices').get().n};
+  if(action==='notificationAdmin')return {catalog:get('catalog'),history:db.prepare('SELECT * FROM notification_history ORDER BY at DESC,id DESC LIMIT 200').all(),deviceCount:db.prepare('SELECT count(*) n FROM notification_devices').get().n};
+  if(action==='notificationHistory'){
+   const offset=body.offset;
+   if(!Number.isSafeInteger(offset)||offset<0||offset>10000000)throw Error('Ungültige Verlaufsseite.');
+   return {history:db.prepare('SELECT * FROM notification_history ORDER BY at DESC,id DESC LIMIT 200 OFFSET ?').all(offset)};
+  }
   if(action==='notificationCatalogSave'){
    const c=body.catalog;
    if(!c||typeof c.enabled!=='boolean'||!Number.isInteger(c.start)||!Number.isInteger(c.end)||c.start<8*60||c.end>21*60||c.end<=c.start||!Array.isArray(c.messages)||c.messages.length>120)throw Error('Bitte ein Zeitfenster zwischen 08:00 und 21:00 Uhr und höchstens 120 Texte wählen.');
@@ -70,7 +75,6 @@ export function createNotifications(database,transport,{now=Date.now,random=rand
    const config=get('catalog');if(!config.enabled)return;
    db.prepare('DELETE FROM notification_devices WHERE updated<?').run(now()-90*86400000);
    db.prepare('DELETE FROM notification_daily WHERE day<?').run(new Date(now()-40*86400000).toISOString().slice(0,10));
-   db.prepare('DELETE FROM notification_history WHERE at<?').run(now()-90*86400000);
    const devices=db.prepare('SELECT * FROM notification_devices ORDER BY updated DESC').all(),snapshot=database.notificationSnapshot();
    for(const profileId of new Set(devices.map(d=>d.profile))){
     const person=snapshot.find(p=>p.id===profileId);if(!person)continue;
