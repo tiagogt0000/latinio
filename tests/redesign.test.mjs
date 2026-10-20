@@ -1,3 +1,4 @@
+import {grammarCard} from '../app/grammar.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -10,7 +11,7 @@ const section=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end
 function viewContext(english=false,admin=true,subject=english?'english':'latin'){
  const word={id:'w',collectionId:'c'},deck={id:'c',name:'Lektion 1',active:true};
  const data={words:{w:word},collections:{c:deck},settings:{},reviews:{}};
- return vm.createContext({reminders:null,subject,languageName:()=>subject==='french'?'Französisch':english?'Englisch':'Latein',frenchHome,english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
+ return vm.createContext({grammarCard,grammar:null,reminders:null,subject,languageName:()=>subject==='french'?'Französisch':english?'Englisch':'Latein',frenchHome,english,profile:{name:'Testnutzer'},screen:'learn',isAdmin:()=>admin,h:s=>String(s??''),icon:()=>'',APP_VERSION:'2.0.0',
   cloudWait:{blocked:false},predicateSelected:null,predicateDecks,predicateCloudItems,prefs:()=>({direction:'mixed',daily:10}),data:()=>data,activeWords:()=>[word],progressFor:()=>({level:'new',seen:false}),directionsFor:()=>['en-de','de-en'],
   streakLedger:null,streakState,streakDays,streakBadgeFlame:()=>'<svg></svg>',todayCount:()=>2,trainingDecks:()=>[deck],wordsForDecks:()=>[word],directionLabel:()=>'',selected:[],predicateItems:[{grundform:'amare'}],
   accountCard:()=>'<section class="settings-section profile-settings">Profil</section>',updateView:()=>'<p>Update</p>',syncDetails:()=>'<p>Cloud</p>',sync:{configured:true},adminContent:'Nutzerliste',adminTab:'people'});

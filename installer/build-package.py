@@ -11,7 +11,7 @@ TEMPLATES = ROOT / 'installer' / 'templates'
 FILES = (
     'google/Code.gs', 'google/Accounts.gs', 'google/AutoSharing.gs',
     'server/database.mjs', 'server/start.mjs', 'server/http.mjs', 'server/Dockerfile',
-    'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
+    'server/grammar.mjs', 'server/grammar-content.mjs', 'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
 )
 
 def build(output, release):
@@ -55,6 +55,14 @@ die Datenbank wird nicht auf einen alten Stand zurueckgesetzt.
 
 Passwoerter, Admin-PIN, Nutzer- und Lerndaten sind nicht in diesem Paket enthalten.
 Dieses Paket ist ein Update fuer den bereits eingerichteten Pi.
+
+Neu: Grammatik lernen (zunaechst nur fuer den Admin in Englisch).
+Nach der Veroeffentlichung: Englisch -> Grammatik lernen -> KI-Einstellungen.
+Dort deinen OVHcloud-AI-Endpoints-Schluessel eingeben. Er wird nur auf dem Pi
+gespeichert und ist in dieser ZIP nicht enthalten. Die erste Runde prueft den
+tatsaechlichen Modellzugriff. Bitte den Schluessel nicht im Chat posten.
+Du kannst 3, 5 oder 10 Aufgaben waehlen. Erst am Rundenende werden alle Antworten
+gemeinsam kontrolliert. Bei Verbindungsfehlern bleiben die Eingaben erhalten.
 '''
     output.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(output, 'w', zipfile.ZIP_DEFLATED) as archive:

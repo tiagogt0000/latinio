@@ -8,7 +8,7 @@ from urllib.parse import quote
 FILES = (
     'google/Code.gs', 'google/Accounts.gs', 'google/AutoSharing.gs',
     'server/database.mjs', 'server/start.mjs', 'server/http.mjs', 'server/Dockerfile',
-    'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
+    'server/grammar.mjs', 'server/grammar-content.mjs', 'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
 )
 
 def require(condition, message):
@@ -72,7 +72,7 @@ def rollback_image(path,version):
 
 def health(path):
     result = json.loads(path.read_text())
-    require(result.get('ready') is True and result.get('studentCodesRequired') is True and result.get('autoSharingEnabled') is True and result.get('frenchEnabled') is True and result.get('pushReady') is True, 'Das neue Vokabel-Backend ist noch nicht bereit.')
+    require(result.get('ready') is True and result.get('studentCodesRequired') is True and result.get('autoSharingEnabled') is True and result.get('frenchEnabled') is True and result.get('pushReady') is True and result.get('grammarReady') is True, 'Das neue Vokabel-Backend ist noch nicht bereit.')
 
 if __name__ == '__main__':
     action = sys.argv[1]

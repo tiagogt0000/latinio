@@ -1,6 +1,6 @@
 import {createServer} from 'node:http';
 
-export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null) {
+export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null, grammar = null) {
   return createServer(async (req,res) => {
     res.setHeader('Cache-Control','no-store');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -8,7 +8,7 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io', no
       res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});
       res.end(JSON.stringify(body));
     };
-    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true});
+    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true,grammarReady:grammar?.ready===true});
     if (req.headers.origin !== origin) return reply(403,{error:'Herkunft nicht erlaubt.'});
     res.setHeader('Access-Control-Allow-Origin',origin);
     res.setHeader('Vary','Origin');
@@ -35,6 +35,12 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io', no
       if (!body || Array.isArray(body) || typeof body.action !== 'string') return reply(400,{error:'Ungültige Anfrage.'});
       const token=(req.headers.authorization||'').match(/^Bearer ([a-zA-Z0-9_-]{32,200})$/)?.[1] || '';
       try {
+        if(body.action.startsWith('grammar')){
+          const identity=database.request({action:'whoami',token}).profile;
+          if(identity.role!=='admin')return reply(403,{error:'Nur für den Admin.'});
+          if(!grammar)throw Error('Bitte zuerst das neue Pi-Backend für Grammatik installieren.');
+          return reply(200,{result:await grammar.request(body,identity)});
+        }
         if(body.action.startsWith('notification')){
           if(!notifications)throw Error('Benachrichtigungen sind noch nicht eingerichtet.');
           const identity=database.request({action:'whoami',token}).profile;

@@ -1,5 +1,15 @@
 # Latinio – Projektübergabe
 
+## Vorbereitet: 2.6.0 · Admin-Grammatik mit OVHcloud
+
+Stand 20.10.2026: Backend und Frontend implementiert, Veröffentlichung erst nach privater Pi-Installation via ZIP/Installieren.bat. Live bleibt vorerst Frontend 2.5.2 (main 834d38a8829c15b20229125b80c9931045070945), Backend zuletzt bestätigt 2.5.0. Health muss nach Installation zusätzlich grammarReady:true melden. Kein echter OVH-Schlüssel hier verfügbar; Nutzer hinterlegt ihn nach Veröffentlichung unter Englisch → Grammatik lernen → KI-Einstellungen. Keine manuellen SSH-Befehlsblöcke erforderlich.
+
+Details in docs/GRAMMAR.md. Neue Serverdateien grammar.mjs und grammar-content.mjs im Installer-Manifest; keine Compose- oder Abhängigkeitsänderung. Eigene Tabellen im privaten SQLite-Volume, API-Key separat unter /data/grammar-ovh.key (0600, bleibt bei Containerupdates erhalten). Geschützte admin-only grammar*-API, HTTP-Schicht authentifiziert selbst statt Körperangaben zu vertrauen. REST-Timeout nur für Generierung/Bewertung/Nachprüfung auf 100 s erhöht. Kein Datenimport. Keine Änderung an Elektro, Tailscale oder Betriebssystem.
+
+app/grammar.js/.css isolieren den Adminbereich. 3/5/10 Übersetzungsaufgaben mit finaler Antwortübersicht und gemeinsamer Auswertung. Alle Antworten bleiben bei KI-Fehlern bestehen. Lokaler Entwurf und Pi-Version erkennen Geräte-Konflikte. Serverreservierte Anfrage-IDs plus Statusabfrage erlauben Wiederaufnahme ohne zusätzliche Modellkosten nach verloren gegangener Antwort. Unsichere oder widersprüchliche Nachbewertungen beeinflussen das Lernprofil nicht. Fester Hilfsverb-Lehrplan aus der beigefügten PDF; Nebenfehler dürfen Themenziele nicht verdrängen. Keine Änderungen an bestehenden Vokabel-/Streak-Daten.
+
+OVH offiziell geprüft: Modell Meta-Llama-3_3-70B-Instruct, Chat Completions, json_schema; Temperatur 0,4/0 als Ausgangswerte. Tests mit simuliertem Provider, echter lokaler SQLite-/HTTP-Verarbeitung und simuliertem Docker-Installer. Kein echter Modell- oder visueller Browsertest. Das Paket ist erst nach erfolgreichem Pi-Update live schaltbar.
+
 Stand: 15. Oktober 2026. Pi-Backend 2.5.0, Frontend 2.5.2. In 2.5.2 auf ausdrücklichen Nutzerwunsch das Vocabify-Buch-/Häkchen-Icon aus 2.5.0 wiederhergestellt; alle anderen 2.5.1-Korrekturen bleiben bestehen. Kein Pi-Update.
 
 ## 2.5.1 – Korrektur des Markenübergangs und Aktivierungshinweis

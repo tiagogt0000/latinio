@@ -65,7 +65,7 @@ from pathlib import Path
 state=json.loads(Path(os.environ['LATINIO_TEST_STATE']).read_text())
 ok=state['running']=='new' and state['fail']!='health'
 ready=state['running']=='old' or ok
-Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok,'frenchEnabled':ok,'pushReady':ok}))
+Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok,'frenchEnabled':ok,'pushReady':ok,'grammarReady':ok}))
 '''
 
 class InstallerTests(unittest.TestCase):

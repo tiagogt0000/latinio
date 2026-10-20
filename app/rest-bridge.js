@@ -9,7 +9,7 @@ export class RestBridge {
   }
   async request(action,payload={}) {
     const controller=new AbortController();this.controllers.add(controller);
-    const timer=setTimeout(()=>controller.abort(),30000);
+    const timer=setTimeout(()=>controller.abort(),['grammarGenerate','grammarGrade','grammarReview'].includes(action)?100000:30000);
     try {
       const headers={'Content-Type':'application/json'};
       if(this.token)headers.Authorization='Bearer '+this.token;

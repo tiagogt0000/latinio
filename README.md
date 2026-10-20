@@ -1,4 +1,12 @@
-# Latinio · Version 2.5.2
+# Latinio · Version 2.6.0
+
+## 2.6.0 · Persönliches Grammatiktraining
+
+Vorbereitetes Update: Adminbereich auf dem englischen Lernbildschirm, 3/5/10 Hilfsverb-Aufgaben, gemeinsame KI-Korrektur, getrennte Bewertungen und verständliche Regeln. Fehler passen den fest verankerten Lernplan an. Lernverlauf, Offline-Entwürfe, Wiederaufnahme, unabhängige Nachprüfung und Geräte-Konfliktvergleich sind enthalten.
+
+OVHcloud Meta Llama 3.3 70B Instruct über das bestehende private Pi-Backend. Schlüssel erst nach Installation in den KI-Einstellungen hinterlegen; er bleibt auf dem Pi. Strukturierte JSON-Ausgaben, Tageslimits und persistente Anfrage-IDs. Keine neuen Dienste/Ports/Volumes und keine Änderungen an Elektro Gilbers.
+
+Zuerst ZIP/Installieren.bat ausführen und `grammarReady:true` bestätigen, danach die vorbereitete Oberfläche veröffentlichen. Vollständige Einrichtung, Architektur und Testgrenzen in [docs/GRAMMAR.md](docs/GRAMMAR.md).
 
 ## 2.5.2 · Vorheriges Vocabify-Icon
 
