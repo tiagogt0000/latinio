@@ -1,4 +1,12 @@
-# Latinio · Version 2.6.0
+# Latinio · Version 2.7.0
+
+## 2.7.0 · Tabellen und Präfixe üben
+
+Im Lateinbereich stehen zwei neue Lernkarten bereit: **Tabellen üben** und **Präfixe üben**. Die Tabellen aus den bereitgestellten Buchfotos umfassen Adjektive (magnus), Personalpronomen, Relativpronomen, is/ea/id und das Dehnungsperfekt. Fälle lassen sich beliebig kombinieren oder vollständig auswählen. Je nach Tabelle sind außerdem Numerus, Genus, Person oder Stamm-/Perfektspalten auswählbar.
+
+Alle ausgewählten Felder werden als Arbeitsblatt ausgefüllt und gemeinsam geprüft. Die Präfixübung zeigt alle elf Präfixe links und freie Bedeutungsfelder rechts; eine passende Bedeutung reicht. Ergebnisse zeigen die Lösungen und erlauben gezieltes Wiederholen der Fehler. Längenzeichen und morphologische Trennstriche sind optional; gültige Alternativformen werden akzeptiert.
+
+Auswahl und Antworten bleiben profilbezogen auf diesem Gerät erhalten. Die Inhalte sind Teil des Offline-Caches. Die neuen Übungen ändern keine bestehenden Vokabelbewertungen und zählen derzeit nicht zum Tages-Streak. Reines Frontendupdate, kein Pi-Installer nötig.
 
 ## 2.6.0 · Persönliches Grammatiktraining
 

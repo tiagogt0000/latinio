@@ -25,3 +25,11 @@ test('Offline background failure leaves result actions available',async()=>{
  vm.runInContext(source.split('\n').find(l=>l.startsWith('async function backgroundSync(')),ctx);
  await ctx.backgroundSync();assert.equal(ctx.working,false);assert.equal(ctx.cloudWait.blocked,false);assert.equal(ctx.screen,'result');
 });
+
+test('Cloud completion and available updates preserve an open table worksheet',async()=>{
+ let renders=0,applied=0;
+ const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'tables',sync:{busy:false},sharing:{busy:false},store:{doc:{pending:[]}},modalRoot:{children:[]},updates:{state:'available',apply(){applied++;}},settleSync:async()=>{},refreshStreak:async()=>{},render(){renders++;},updateStatus(){}});
+ vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function backgroundSync(')||l.startsWith('function autoUpdate(')).join('\n'),ctx);
+ await ctx.backgroundSync();ctx.autoUpdate();assert.equal(renders,0);assert.equal(applied,0);
+ ctx.screen='learn';ctx.autoUpdate();assert.equal(applied,1);
+});

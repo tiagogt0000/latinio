@@ -1,5 +1,11 @@
 # Latinio – Projektübergabe
 
+## 2.7.0 · Tabellen und Präfixe
+
+Neue statische Lernmodule `app/table-content.js` und `app/table-practice.js/.css`, erreichbar für alle Lateinprofile über zwei Home-Karten. Inhalt aus fünf bereitgestellten Fotos: vier Kasustabellen (110 Formen), Dehnungsperfekt (9 Stamm-/Perfektaufgaben), elf Präfixe. Alle Fälle und passende weitere Dimensionen frei wählbar. Arbeitsblatt mit gemeinsamer Auswertung, Lösungen und Fehlerwiederholung; Präfixe als linke Spalte plus rechte Eingabefelder.
+
+Lokale, profilbezogene Entwürfe; keine neue Cloudstruktur, keine bestehenden Lernstände geändert und kein zusätzlicher Streak-Claim. `tables` ist vor automatischem Update und Hintergrund-Re-Rendering geschützt. Neue Module und Styles stehen im Service-Worker-Shell; Versionsdateien gemeinsam auf 2.7.0 erhöht. Kein Backendupdate erforderlich. Vor Beginn live 2.6.0 und lokales Health einschließlich `grammarReady:true` bestätigt. Veröffentlichung vom Nutzer ausdrücklich autorisiert. Keine visuellen Browserchecks gemäß bestehender Projektpräferenz.
+
 ## Vorbereitet: 2.6.0 · Admin-Grammatik mit OVHcloud
 
 Stand 20.10.2026: Backend und Frontend implementiert, Veröffentlichung erst nach privater Pi-Installation via ZIP/Installieren.bat. Live bleibt vorerst Frontend 2.5.2 (main 834d38a8829c15b20229125b80c9931045070945), Backend zuletzt bestätigt 2.5.0. Health muss nach Installation zusätzlich grammarReady:true melden. Kein echter OVH-Schlüssel hier verfügbar; Nutzer hinterlegt ihn nach Veröffentlichung unter Englisch → Grammatik lernen → KI-Einstellungen. Keine manuellen SSH-Befehlsblöcke erforderlich.
