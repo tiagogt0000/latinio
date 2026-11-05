@@ -1,4 +1,10 @@
-# Latinio · Version 2.10.0
+# Latinio · Version 2.11.0
+
+## Neu in 2.11.0: Fälle nach und nach lernen
+
+Im Modus **Üben** kommen höchstens zwei neue Fälle auf einmal dazu. Bei fünf ausgewählten Fällen lernst du erst Nominativ und Genitiv, danach zusätzlich Dativ und Akkusativ und zuletzt den Ablativ. Bereits geübte Fälle bleiben in jeder weiteren Gruppe dabei. Jede Gruppe wird erst angeschaut und dann vollständig mit Schnipseln zugeordnet; erst danach kommen neue Fälle hinzu. Bei Fehlern wiederholst du dieselbe Gruppe.
+
+Wenn alle ausgewählten Fälle eingeführt sind, folgen die Schreibübungen mit immer mehr Lücken bis zur vollständigen Tabelle. Es zählen nur deine ausgewählten Fälle und Formen. Direkte Abfragen, Präfixe und das Dehnungsperfekt behalten ihren bisherigen Ablauf. Laufende Entwürfe bleiben nutzbar; kein Backendupdate erforderlich.
 
 ## Neu in 2.10.0: Substantive und zuverlässige Lernstände
 

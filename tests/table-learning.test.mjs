@@ -28,10 +28,13 @@ test('creation starts with all solutions and shuffles an independent order', () 
   assert.deepEqual(forms.map(item => item.id), original);
   assert.notDeepEqual(session.order, original);
   assert.deepEqual([...session.order].sort(), [...original].sort());
-  assert.equal(session.version, 1);
+  assert.equal(session.version, 2);
   assert.equal(session.prefix, false);
   assert.equal(session.step, 0);
-  assert.deepEqual(learningStep(session), { kind: 'study', label: 'Erst anschauen', blankIds: [], number: 1, total: 5 });
+  assert.deepEqual(learningStep(session), {
+    kind: 'study', label: 'Erst anschauen', blankIds: [], number: 1, total: 5,
+    itemIds: original, caseIds: ['nom', 'acc'], newCaseIds: ['nom', 'acc'], batchNumber: 1, batchTotal: 1,
+  });
   assert.deepEqual(learningResult(session, forms), { correct: 0, total: 0, wrongIds: [], passed: true });
   assert.equal(learningAnswer(session, original[0], 'quī'), false);
   assert.equal(learningPlace(session, original[0], original[0]), false);
@@ -86,7 +89,10 @@ test('small selections deduplicate writing rounds and empty selections are immed
     }
     assert.equal(learningStep(session).kind, 'done');
   }
-  assert.deepEqual(learningStep(make([])), { kind: 'done', label: 'Geschafft!', blankIds: [], number: 0, total: 0 });
+  assert.deepEqual(learningStep(make([])), {
+    kind: 'done', label: 'Geschafft!', blankIds: [], number: 0, total: 0,
+    itemIds: [], caseIds: [], newCaseIds: [], batchNumber: 0, batchTotal: 0,
+  });
   assert.equal(learningNext(make([]), []), false);
 });
 
@@ -204,7 +210,7 @@ test('saving and restoring preserves an in-progress round and a failed review', 
 
 test('restore rejects foreign selections, versions and exercise modes', () => {
   const raw = snapshot(make());
-  for (const invalid of [null, [], {}, { ...raw, version: 2 }, { ...raw, prefix: true }, { ...raw, itemIds: [forms[0].id] }, { ...raw, itemIds: raw.itemIds.map(() => forms[0].id) }, { ...raw, itemIds: [...raw.itemIds.slice(1), 'foreign'] }]) {
+  for (const invalid of [null, [], {}, { ...raw, version: 3 }, { ...raw, prefix: true }, { ...raw, itemIds: [forms[0].id] }, { ...raw, itemIds: raw.itemIds.map(() => forms[0].id) }, { ...raw, itemIds: [...raw.itemIds.slice(1), 'foreign'] }]) {
     assert.equal(restoreLearning(invalid, forms), null);
   }
   assert.equal(restoreLearning(raw, forms, { prefix: true }), null);
@@ -277,4 +283,247 @@ test('study and completed restores discard stale attempt state', () => {
     assert.deepEqual(Object.keys(restored.answers), []);
     assert.deepEqual(Object.keys(restored.placements), []);
   }
+});
+
+test('all five cases grow cumulatively by two, two and one before writing the full selection', () => {
+  const items = selectTableItems('nouns');
+  const session = make(items, { random: () => 0 });
+  const cases = ['nom', 'gen', 'dat', 'acc', 'abl'];
+  assert.equal(session.itemIds.length, 40);
+  for (const [index, count] of [2, 4, 5].entries()) {
+    const expected = items.filter(item => cases.slice(0, count).includes(item.case)).map(item => item.id);
+    for (const kind of ['study', 'match']) {
+      const step = learningStep(session);
+      assert.equal(step.kind, kind);
+      assert.deepEqual(step.itemIds, expected);
+      assert.deepEqual(step.caseIds, cases.slice(0, count));
+      assert.deepEqual(step.newCaseIds, cases.slice(index * 2, count));
+      assert.equal(step.batchNumber, index + 1);
+      assert.equal(step.batchTotal, 3);
+      assert.equal(step.total, 9);
+      assert.equal(session.itemIds.length, 40);
+      if (kind === 'match') {
+        assert.deepEqual(step.blankIds, session.order.filter(id => expected.includes(id)));
+        fillMatch(session, items);
+        assert.equal(learningResult(session, items).total, expected.length);
+        assert.equal(learningResult(session, items).passed, true);
+        learningCheck(session, items);
+      }
+      learningNext(session, items);
+    }
+  }
+  for (const count of [20, 30, 40]) {
+    const step = learningStep(session);
+    assert.equal(step.kind, 'write');
+    assert.deepEqual(step.itemIds, session.itemIds);
+    assert.deepEqual(step.caseIds, cases);
+    assert.deepEqual(step.newCaseIds, []);
+    assert.equal(step.batchNumber, 3);
+    assert.deepEqual(step.blankIds, session.order.slice(0, count));
+    fillWrite(session, items);
+    learningCheck(session, items);
+    learningNext(session, items);
+  }
+  const done = learningStep(session);
+  assert.equal(done.kind, 'done');
+  assert.deepEqual(done.itemIds, session.itemIds);
+  assert.deepEqual(done.caseIds, cases);
+  assert.deepEqual(done.newCaseIds, []);
+  assert.equal(done.batchNumber, 3);
+  assert.equal(done.total, 9);
+});
+
+test('arbitrary selected cases use canonical case order independently of item and token order', () => {
+  const items = selectTableItems('personal', { cases: ['abl', 'gen', 'acc'], numbers: ['pl'], persons: ['2'] }).reverse();
+  const session = make(items, { random: () => 0 });
+  const first = learningStep(session);
+  assert.deepEqual(first.caseIds, ['gen', 'acc']);
+  assert.deepEqual(first.newCaseIds, ['gen', 'acc']);
+  assert.deepEqual(first.itemIds, items.filter(item => item.case !== 'abl').map(item => item.id));
+  assert.equal(first.batchTotal, 2);
+  toWrite(session, items);
+  const next = learningStep(session);
+  assert.equal(next.kind, 'study');
+  assert.deepEqual(next.caseIds, ['gen', 'acc', 'abl']);
+  assert.deepEqual(next.newCaseIds, ['abl']);
+  assert.deepEqual(next.itemIds, items.map(item => item.id));
+});
+
+test('case batches keep every selected gender, number, person and declension row together', () => {
+  const selections = [
+    selectTableItems('relative', { numbers: ['pl'], genders: ['m', 'n'] }),
+    selectTableItems('personal', { numbers: ['sg'], persons: ['1'] }),
+    selectTableItems('nouns', { numbers: ['sg', 'pl'], declensions: ['a', 'third'] }),
+  ];
+  for (const items of selections) {
+    const step = learningStep(make(items));
+    assert.deepEqual(step.itemIds, items.filter(item => ['nom', 'gen'].includes(item.case)).map(item => item.id));
+  }
+});
+
+test('one or two selected cases and non-case exercises retain the original phase sequence', () => {
+  for (const items of [selectTableItems('relative', { cases: ['abl'] }), forms, selectTableItems('perfect'), PREFIXES]) {
+    const prefix = items === PREFIXES;
+    const session = make(items, { prefix });
+    const step = learningStep(session);
+    assert.equal(step.batchTotal, 1);
+    assert.equal(step.total, 5);
+    assert.deepEqual(step.itemIds, items.map(item => item.id));
+    if (prefix || items[0].target) assert.deepEqual(step.caseIds, []);
+    toWrite(session, items);
+    assert.equal(learningStep(session).kind, 'write');
+    assert.equal(learningStep(session).number, 3);
+    assert.deepEqual(learningStep(session).newCaseIds, []);
+  }
+});
+
+test('failures review and retry the same cumulative batch without revealing future cases', () => {
+  const items = selectTableItems('relative');
+  const session = make(items);
+  toWrite(session, items);
+  learningNext(session, items);
+  const step = learningStep(session);
+  assert.equal(step.kind, 'match');
+  assert.equal(step.batchNumber, 2);
+  assert.equal(step.itemIds.length, 24);
+  assert.equal(learningNext(session, items), false);
+  learningCheck(session, items);
+  learningNext(session, items);
+  assert.equal(session.reviewing, true);
+  assert.deepEqual(learningStep(session), step);
+  learningNext(session, items);
+  assert.equal(session.reviewing, false);
+  assert.deepEqual(learningStep(session), step);
+  fillMatch(session, items);
+  learningCheck(session, items);
+  learningNext(session, items);
+  assert.equal(learningStep(session).kind, 'study');
+  assert.deepEqual(learningStep(session).newCaseIds, ['abl']);
+});
+
+test('future targets and identical future-answer tokens cannot enter or pass a matching batch', () => {
+  const items = selectTableItems('nouns');
+  const session = make(items);
+  learningNext(session, items);
+  const target = 'nouns-nom-sg-o-n', future = 'nouns-acc-sg-o-n';
+  assert.equal(items.find(item => item.id === target).answer, items.find(item => item.id === future).answer);
+  assert.equal(learningPlace(session, future, target), false);
+  assert.equal(learningPlace(session, target, future), false);
+  assert.equal(learningAnswer(session, future, 'templum'), false);
+  fillMatch(session, items);
+  session.placements[target] = future;
+  assert.deepEqual(learningResult(session, items).wrongIds, [target]);
+  session.placements[future] = target;
+  const restored = restoreLearning(snapshot(session), items);
+  assert.equal(Object.hasOwn(restored.placements, target), false);
+  assert.equal(Object.hasOwn(restored.placements, future), false);
+  assert.deepEqual(learningResult(restored, items).wrongIds, [target]);
+});
+
+test('restoring rebuilds batches from canonical cases and rejects forged future placements', () => {
+  const items = selectTableItems('relative');
+  const session = make(items);
+  learningNext(session, items);
+  fillMatch(session, items);
+  const raw = snapshot(session), expected = snapshot(session);
+  raw.batches = [{ itemIds: raw.itemIds, caseIds: ['abl'], newCaseIds: ['abl'] }];
+  raw.caseIds = ['abl'];
+  raw.items = items.map(item => ({ ...item, case: 'nom', answer: 'forged' }));
+  raw.placements[items.at(-1).id] = items.at(-1).id;
+  const restored = restoreLearning(raw, items);
+  assert.deepEqual(snapshot(restored), expected);
+  assert.deepEqual(learningStep(restored).caseIds, ['nom', 'gen']);
+  assert.equal(learningResult(restored, items).passed, true);
+});
+
+test('version 2 restores preserve current cumulative batch, answers and failed review state', () => {
+  const items = selectTableItems('nouns');
+  const session = make(items);
+  toWrite(session, items);
+  learningNext(session, items);
+  const active = learningStep(session).itemIds;
+  learningPlace(session, active[0], active[1]);
+  let restored = restoreLearning(snapshot(session), items);
+  assert.deepEqual(snapshot(restored), snapshot(session));
+  learningCheck(restored, items);
+  learningNext(restored, items);
+  restored = restoreLearning(snapshot(restored), items);
+  assert.equal(restored.reviewing, true);
+  assert.equal(learningStep(restored).batchNumber, 2);
+  assert.deepEqual(learningStep(restored).itemIds, active);
+});
+
+test('legacy full-set matching migrates to the final case batch without losing placements or review', () => {
+  const items = selectTableItems('relative');
+  const raw = snapshot(make(items));
+  delete raw.batches;
+  Object.assign(raw, { version: 1, step: 1, placements: Object.fromEntries(items.map(item => [item.id, item.id])), checked: true });
+  let restored = restoreLearning(raw, items);
+  assert.equal(restored.version, 2);
+  assert.equal(restored.step, 5);
+  assert.equal(learningStep(restored).kind, 'match');
+  assert.equal(learningStep(restored).batchNumber, 3);
+  assert.deepEqual(learningStep(restored).itemIds, raw.itemIds);
+  assert.deepEqual({ ...restored.placements }, raw.placements);
+  assert.equal(restored.checked, true);
+  assert.equal(learningResult(restored, items).passed, true);
+  raw.placements[items[0].id] = items[1].id;
+  raw.reviewing = true;
+  restored = restoreLearning(raw, items);
+  assert.equal(restored.step, 5);
+  assert.equal(restored.reviewing, true);
+  assert.equal(learningResult(restored, items).passed, false);
+});
+
+test('legacy writing retains its shuffled blanks and answers; legacy completion remains complete', () => {
+  const items = selectTableItems('relative');
+  for (const [oldStep, count] of [[2, 15], [3, 23], [4, 30]]) {
+    const raw = snapshot(make(items, { random: () => 0 }));
+    delete raw.batches;
+    Object.assign(raw, { version: 1, step: oldStep, answers: { [raw.order[0]]: 'saved answer' }, checked: false });
+    const restored = restoreLearning(raw, items);
+    assert.equal(restored.step, oldStep + 4);
+    assert.equal(learningStep(restored).kind, 'write');
+    assert.deepEqual(learningStep(restored).blankIds, raw.order.slice(0, count));
+    assert.equal(restored.answers[raw.order[0]], 'saved answer');
+  }
+  const raw = { ...snapshot(make(items)), version: 1 };
+  assert.deepEqual(learningStep(restoreLearning({ ...raw, step: 0 }, items)).caseIds, ['nom', 'gen']);
+  const done = restoreLearning({ ...raw, step: 5 }, items);
+  assert.equal(done.step, 9);
+  assert.equal(learningStep(done).kind, 'done');
+});
+
+test('legacy prefix and non-case stages migrate without an index shift', () => {
+  for (const [items, prefix] of [[PREFIXES, true], [selectTableItems('perfect'), false], [forms, false]]) {
+    const session = make(items, { prefix });
+    toWrite(session, items);
+    fillWrite(session, items);
+    const raw = { ...snapshot(session), version: 1 };
+    delete raw.batches;
+    const restored = restoreLearning(raw, items, { prefix });
+    assert.equal(restored.step, 2);
+    assert.deepEqual(restored.answers, session.answers);
+    assert.equal(learningResult(restored, items).passed, true);
+  }
+});
+
+test('batch metadata is returned as copies and answer maps retain prototype-safe keys', () => {
+  const items = [
+    { id: '__proto__', answer: 'a', case: 'nom' },
+    { id: 'constructor', answer: 'b', case: 'gen' },
+    { id: 'prototype', answer: 'c', case: 'dat' },
+  ];
+  const session = make(items);
+  const step = learningStep(session);
+  step.itemIds.push('prototype');step.caseIds.push('dat');step.newCaseIds.push('dat');
+  assert.deepEqual(learningStep(session).caseIds, ['nom', 'gen']);
+  learningNext(session, items);
+  fillMatch(session, items);
+  const restored = restoreLearning(snapshot(session), items);
+  assert.equal(Object.getPrototypeOf(restored.placements), null);
+  assert.equal(restored.placements.__proto__, '__proto__');
+  assert.equal(restored.placements.constructor, 'constructor');
+  assert.equal(Object.hasOwn(restored.placements, 'prototype'), false);
+  assert.equal(learningResult(restored, items).passed, true);
 });

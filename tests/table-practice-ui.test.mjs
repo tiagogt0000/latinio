@@ -48,12 +48,13 @@ function dativeCourse(f){
 const courseOf=f=>f.ui.draft.kind==='prefixes'?f.ui.draft.prefixLearning:f.ui.draft.tableLearning;
 const itemsOf=course=>course.tableId?selectTableItems(course.tableId,course.filters):PREFIXES;
 const stepOf=f=>learningStep(courseOf(f).session);
+const activeItemsOf=f=>itemsOf(courseOf(f)).filter(item=>stepOf(f).itemIds.includes(item.id));
 function place(f,targetId,tokenId=targetId){
  assert.equal(f.button('tables-token',{tokenId}),true);
  assert.equal(f.button('tables-place',{targetId}),true);
 }
 function matchAll(f){
- for(const item of itemsOf(courseOf(f)))place(f,item.id);
+ for(const item of activeItemsOf(f))place(f,item.id);
  f.submit(true);
  assert.equal(learningResult(courseOf(f).session,itemsOf(courseOf(f))).passed,true);
  f.button('tables-learning-next');
@@ -270,6 +271,107 @@ test('Noun filters, guided progression, and restored answers retain the declensi
  reopened.button('tables-course-test');
  assert.deepEqual(reopened.ui.draft.tableRound.filters,course.filters);
  assert.equal(inputTags(reopened.ui.view()).length,4);
+});
+
+test('Five-case nouns learn cumulative 16, 32, then 40 forms before writing the full selection',()=>{
+ const f=fixture();select(f,'nouns');f.button('tables-learn');
+ const fullItems=itemsOf(courseOf(f)),caseGroups=[['nom','gen'],['nom','gen','dat','acc'],['nom','gen','dat','acc','abl']];
+ for(const [index,cases] of caseGroups.entries()){
+  const step=stepOf(f),active=activeItemsOf(f),future=fullItems.filter(item=>!step.itemIds.includes(item.id)),study=f.ui.view();
+  assert.equal(step.kind,'study');assert.deepEqual(step.caseIds,cases);
+  assert.equal(active.length,[16,32,40][index]);assert.equal(courseOf(f).session.itemIds.length,40);
+  assert.equal((study.match(/class="table-study-value /g)||[]).length,active.length);
+  assert.match(study,/class="table-learning-meter"/);assert.doesNotMatch(study,/<ol class="table-learning-progress"/);
+  for(const id of ['nom','gen','dat','acc','abl']){
+   const label={nom:'Nominativ',gen:'Genitiv',dat:'Dativ',acc:'Akkusativ',abl:'Ablativ'}[id];
+   assert.equal(study.includes('<th scope="row">'+label+'</th>'),cases.includes(id));
+  }
+  if(index===1)assert.match(study,/Neu: Dativ und Akkusativ\. Nominativ und Genitiv übst du weiter mit\./);
+  if(index===2)assert.match(study,/Neu: Ablativ\. Nominativ, Genitiv, Dativ und Akkusativ übst du weiter mit\./);
+  f.button('tables-learning-next');
+  assert.equal(stepOf(f).kind,'match');
+  const html=f.ui.view(),tokens=[...html.matchAll(/data-action="tables-token" data-token-id="([^"]+)"/g)].map(match=>match[1]);
+  assert.deepEqual(new Set(tokens),new Set(active.map(item=>item.id)));
+  assert.equal((html.match(/data-target-id=/g)||[]).length,active.length);
+  for(const item of future)assert.ok(!html.includes(item.id),'future cells and tokens must stay absent: '+item.id);
+  matchAll(f);
+ }
+ for(const count of [20,30,40]){
+  assert.equal(stepOf(f).kind,'write');assert.equal(stepOf(f).blankIds.length,count);
+  assert.equal(inputTags(f.ui.view()).length,count);
+  assert.deepEqual(stepOf(f).caseIds,['nom','gen','dat','acc','abl']);
+  fillBlanks(f);f.submit(true);f.button('tables-learning-next');
+ }
+ assert.equal(stepOf(f).kind,'done');assert.match(f.ui.view(),/40 Formen/);
+ f.button('tables-course-test');assert.equal(inputTags(f.ui.view()).length,40);
+});
+
+test('Sparse case selections add only selected cases and keep earlier cases in later matching rounds',()=>{
+ const f=fixture();select(f,'relative');
+ f.filter('cases','nom',false);f.filter('cases','dat',false);f.button('tables-learn');
+ assert.deepEqual(stepOf(f).caseIds,['gen','acc']);assert.equal(activeItemsOf(f).length,12);
+ assert.doesNotMatch(f.ui.view(),/<th scope="row">(?:Nominativ|Dativ|Ablativ)<\/th>/);
+ f.button('tables-learning-next');matchAll(f);
+ assert.equal(stepOf(f).kind,'study');assert.deepEqual(stepOf(f).caseIds,['gen','acc','abl']);
+ assert.match(f.ui.view(),/Neu: Ablativ\. Genitiv und Akkusativ übst du weiter mit\./);
+ f.button('tables-learning-next');
+ assert.equal((f.ui.view().match(/data-target-id=/g)||[]).length,18);
+ for(const label of ['Genitiv','Akkusativ','Ablativ'])assert.ok(f.ui.view().includes('<th scope="row">'+label+'</th>'));
+ assert.doesNotMatch(f.ui.view(),/<th scope="row">(?:Nominativ|Dativ)<\/th>/);
+ matchAll(f);assert.equal(stepOf(f).kind,'write');assert.equal(stepOf(f).blankIds.length,9);
+});
+
+test('Later-case tokens and targets cannot be selected or dragged into the active matching batch',()=>{
+ const f=fixture();select(f,'nouns');f.button('tables-learn');f.button('tables-learning-next');
+ const active=activeItemsOf(f)[0],future=itemsOf(courseOf(f)).find(item=>item.case==='abl');
+ let renders=f.calls.renders;
+ f.button('tables-token',{tokenId:future.id});f.button('tables-place',{targetId:active.id});
+ assert.equal(f.calls.renders,renders);assert.deepEqual(Object.keys(courseOf(f).session.placements),[]);
+ assert.equal(f.ui.drag(dragEvent('dragstart',fakeNode({tokenId:future.id}))),false);
+ f.button('tables-token',{tokenId:active.id});
+ renders=f.calls.renders;f.button('tables-place',{targetId:future.id});
+ assert.equal(f.calls.renders,renders);assert.deepEqual(Object.keys(courseOf(f).session.placements),[]);
+ const source=fakeNode({tokenId:active.id}),hidden=fakeNode({targetId:future.id});
+ assert.equal(f.ui.drag(dragEvent('dragstart',source)),true);
+ const over=dragEvent('dragover',hidden),drop=dragEvent('drop',hidden);
+ assert.equal(f.ui.drag(over),false);assert.equal(over.prevented,false);
+ assert.equal(f.ui.drag(drop),false);assert.equal(drop.prevented,false);
+ assert.deepEqual(Object.keys(courseOf(f).session.placements),[]);
+ f.ui.drag(dragEvent('dragend',source));
+});
+
+test('Restoring a four-case phase retains previous cases, and failures retry that phase without adding the fifth case',()=>{
+ const f=fixture();select(f,'nouns');f.button('tables-learn');f.button('tables-learning-next');matchAll(f);
+ f.button('tables-learning-next');
+ assert.deepEqual(stepOf(f).caseIds,['nom','gen','dat','acc']);
+ const active=activeItemsOf(f);place(f,active[0].id,active[0].id);
+ const reopened=fixture({values:f.values});
+ assert.equal(stepOf(reopened).kind,'match');assert.deepEqual(stepOf(reopened).caseIds,['nom','gen','dat','acc']);
+ assert.equal(courseOf(reopened).session.placements[active[0].id],active[0].id);
+ assert.equal((reopened.ui.view().match(/data-target-id=/g)||[]).length,32);
+ reopened.submit(true);assert.equal(courseOf(reopened).session.checked,true);
+ reopened.button('tables-learning-next');
+ assert.equal(courseOf(reopened).session.reviewing,true);
+ assert.deepEqual(stepOf(reopened).caseIds,['nom','gen','dat','acc']);
+ assert.equal((reopened.ui.view().match(/class="table-study-value /g)||[]).length,32);
+ assert.doesNotMatch(reopened.ui.view(),/<th scope="row">Ablativ<\/th>/);
+ const reviewRestore=fixture({values:reopened.values});
+ assert.equal(courseOf(reviewRestore).session.reviewing,true);
+ reviewRestore.button('tables-learning-next');
+ assert.equal(stepOf(reviewRestore).kind,'match');assert.equal(courseOf(reviewRestore).session.checked,false);
+ assert.deepEqual(Object.keys(courseOf(reviewRestore).session.placements),[]);
+ assert.equal((reviewRestore.ui.view().match(/data-target-id=/g)||[]).length,32);
+});
+
+test('Perfect stems still use one study and matching round and direct noun tests include all selected cases',()=>{
+ const f=fixture();select(f,'perfect');f.button('tables-learn');
+ assert.equal(stepOf(f).kind,'study');assert.equal(activeItemsOf(f).length,9);
+ assert.doesNotMatch(f.ui.view(),/table-learning-cases/);
+ f.button('tables-learning-next');matchAll(f);
+ assert.equal(stepOf(f).kind,'write');assert.equal(stepOf(f).blankIds.length,5);
+ select(f,'nouns');f.button('tables-start');
+ assert.equal(inputTags(f.ui.view()).length,40);
+ for(const label of ['Nominativ','Genitiv','Dativ','Akkusativ','Ablativ'])assert.ok(f.ui.view().includes('<th scope="row">'+label+'</th>'));
 });
 
 test('Classic case selection grades only nominative and accusative singular masculine forms',()=>{

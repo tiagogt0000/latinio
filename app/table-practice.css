@@ -127,3 +127,12 @@
 @media(max-width:600px){.table-filter-primary .table-option{min-height:56px;padding:12px 14px}.table-filter-primary .table-option span{font-size:.9rem}.table-settings-button{padding:13px 14px}.table-mode-dialog .table-mode-card{min-height:128px}}
 
 .table-column-example{display:block;margin-top:6px;font-size:.85rem;font-weight:750;color:var(--accent-dark);line-height:1.4}
+
+
+/* Cumulative rounds show one compact meter instead of a long step list. */
+.table-learning-meter{display:block;width:100%;height:8px;margin:0 0 24px;border:0;border-radius:999px;overflow:hidden;background:var(--soft);color:var(--accent);accent-color:var(--accent)}
+.table-learning-meter::-webkit-progress-bar{border-radius:999px;background:var(--soft)}
+.table-learning-meter::-webkit-progress-value{border-radius:999px;background:var(--accent)}
+.table-learning-meter::-moz-progress-bar{border-radius:999px;background:var(--accent)}
+.table-learning-heading .table-learning-cases{margin:14px 0;padding:13px 15px;border-radius:13px;background:var(--accent-soft);color:var(--accent-dark);font-size:.9rem;font-weight:650;line-height:1.6}
+@media(max-width:600px){.table-learning-meter{margin-bottom:20px}.table-learning-heading .table-learning-cases{padding:12px;font-size:.85rem}}

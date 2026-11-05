@@ -115,17 +115,31 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   const explanation=prefix?'Schreibe rechts die deutsche Bedeutung. Eine richtige Bedeutung pro Präfix genügt; mehrere Bedeutungen kannst du mit Komma trennen.':'Trage die lateinischen Formen ein. Längenzeichen und Trennstriche sind freiwillig. Bei mehreren Formen genügt eine passende Variante.';
   return `<section class="table-panel ${checked?'table-results':''}"><span class="tag">${checked?'DEINE AUSWERTUNG':'ABFRAGEN'}</span><h2 id="table-result-heading" tabindex="-1">${checked?`${correct} von ${items.length} richtig`:h(title)}</h2><p class="muted">${checked?(correct===items.length?'Alles richtig!':'Die Lösungen stehen direkt bei deinen Antworten.'):h(explanation)}</p><form id="table-practice-form">${formGrid(round,items,item=>answerCell(item,round,prefix),prefix)}${checked?`<div class="table-actions">${correct<items.length?'<button type="button" class="button primary" data-action="tables-repeat-wrong">Nur Fehler wiederholen</button>':''}<button type="button" class="button secondary" data-action="tables-repeat">Abfrage wiederholen</button></div>`:`<button class="button primary wide" type="submit">${items.length} Antworten kontrollieren</button>`}</form><div class="table-actions"><button class="text-button" data-action="${prefix?'prefixes-config':'tables-config'}">Auswahl &amp; Lernmodus ändern</button></div></section>`;
  }
+ function caseList(ids){
+  const labels=ids.map(id=>CASES.find(item=>item.id===id)?.label).filter(Boolean);
+  return labels.length>1?labels.slice(0,-1).join(', ')+' und '+labels.at(-1):labels[0]||'';
+ }
+ function learningCaseNote(step){
+  if(!step.caseIds?.length)return '';
+  const added=step.newCaseIds||[],previous=step.caseIds.filter(id=>!added.includes(id));
+  let text;
+  if(step.kind==='write')text='Alle ausgewählten Fälle: '+caseList(step.caseIds)+'.';
+  else if(step.batchTotal>1&&previous.length&&added.length)text='Neu: '+caseList(added)+'. '+caseList(previous)+' übst du weiter mit.';
+  else if(step.batchTotal>1&&added.length)text='Du startest mit '+caseList(step.caseIds)+'.';
+  else text='In dieser Runde: '+caseList(step.caseIds)+'.';
+  return `<p class="table-learning-cases">${h(text)}</p>`;
+ }
  function learningView(){
   const prefix=isPrefix(),course=currentCourse();if(!course)return setupView(prefix);
-  const session=course.session,step=learningStep(session),items=courseItems(course),result=learningResult(session,items),title=prefix?'Präfixe und ihre Bedeutung':getTable(course.tableId).label;
+  const session=course.session,step=learningStep(session),allItems=courseItems(course),activeIds=new Set(step.itemIds),items=allItems.filter(item=>activeIds.has(item.id)),result=learningResult(session,allItems),title=prefix?'Präfixe und ihre Bedeutung':getTable(course.tableId).label;
   if(step.kind==='done')return `<section class="table-panel table-learning-complete"><span class="tag">GESCHAFFT</span><h2 id="table-step-heading" tabindex="-1">Du hast alles selbst ausgefüllt!</h2><p>${h(title)} · ${items.length} ${prefix?'Präfixe':'Formen'}</p><p class="muted">Vom Anschauen bis zum Schreiben ohne Hilfe: Alle Stufen sind geschafft.</p><div class="table-actions"><button class="button primary" data-action="tables-course-test">Jetzt abfragen</button><button class="button secondary" data-action="tables-course-restart">Noch einmal üben</button><button class="text-button" data-action="${prefix?'prefixes-config':'tables-catalog'}">${prefix?'Zur Präfixauswahl':'Andere Tabelle wählen'}</button></div></section>`;
   const preview=step.kind==='study'||session.reviewing,blanks=new Set(step.blankIds);
-  const instructions=preview?(session.reviewing?'Schau dir die Lösungen noch einmal an. Die markierten Felder waren noch nicht richtig. Danach versuchst du dieselbe Stufe erneut.':'Schau dir alle Formen in Ruhe an. Tippe unten auf Weiter, sobald du bereit bist.'):step.kind==='match'?'Ziehe die Schnipsel in die passenden Lücken. Du kannst auch zuerst einen Schnipsel und dann seine Lücke antippen. Tippe ein belegtes Feld an, um es wieder zu leeren.':`${blanks.size} von ${items.length} Antworten schreibst du jetzt selbst. ${blanks.size<items.length?'Die übrigen sind schon eingetragen.':'Diesmal ohne Vorgaben.'} Längenzeichen sind freiwillig.`;
-  const progress=`<ol class="table-learning-progress" aria-label="Lernfortschritt">${Array.from({length:step.total},(_,i)=>`<li class="${i+1<step.number?'complete':i+1===step.number?'current':''}" ${i+1===step.number?'aria-current="step"':''}>${i+1===step.number?`${i+1}. ${h(step.label)}`:`${i+1}`}</li>`).join('')}</ol>`;
+  const instructions=preview?(session.reviewing?'Schau dir die Lösungen noch einmal an. Die markierten Felder waren noch nicht richtig. Danach versuchst du dieselbe Stufe erneut.':'Schau dir die gezeigten Formen in Ruhe an. Tippe unten auf Weiter, sobald du bereit bist.'):step.kind==='match'?'Ziehe die Schnipsel in die passenden Lücken. Du kannst auch zuerst einen Schnipsel und dann seine Lücke antippen. Tippe ein belegtes Feld an, um es wieder zu leeren.':`${blanks.size} von ${items.length} Antworten schreibst du jetzt selbst. ${blanks.size<items.length?'Die übrigen sind schon eingetragen.':'Diesmal ohne Vorgaben.'} Längenzeichen sind freiwillig.`;
+  const progress=`<progress class="table-learning-meter" value="${step.number-1}" max="${step.total}" aria-label="Lernfortschritt: Schritt ${step.number} von ${step.total}"></progress>`;
   let bank='';
   if(step.kind==='match'&&!preview){
-   const used=new Set(Object.values(session.placements));
-   bank=`<div class="table-token-bank" role="group" aria-label="Schnipsel zum Zuordnen">${session.order.map(id=>{const item=items.find(item=>item.id===id),taken=used.has(id);return `<button type="button" class="table-token ${selectedToken===id?'selected':''} ${taken?'used':''}" data-action="tables-token" data-token-id="${h(id)}" draggable="${!taken&&!session.checked}" aria-pressed="${selectedToken===id}" ${taken||session.checked?'disabled':''}>${h(item.answer)}</button>`;}).join('')}</div><p class="small muted" data-table-placement role="status">${selectedToken?'Schnipsel ausgewählt. Tippe jetzt auf die passende Lücke.':`${used.size} von ${items.length} Schnipseln zugeordnet`}</p>`;
+   const used=new Set(Object.entries(session.placements).filter(([id])=>activeIds.has(id)).map(([,id])=>id));
+   bank=`<div class="table-token-bank" role="group" aria-label="Schnipsel zum Zuordnen">${session.order.filter(id=>activeIds.has(id)).map(id=>{const item=items.find(item=>item.id===id),taken=used.has(id);return `<button type="button" class="table-token ${selectedToken===id?'selected':''} ${taken?'used':''}" data-action="tables-token" data-token-id="${h(id)}" draggable="${!taken&&!session.checked}" aria-pressed="${selectedToken===id}" ${taken||session.checked?'disabled':''}>${h(item.answer)}</button>`;}).join('')}</div><p class="small muted" data-table-placement role="status">${selectedToken?'Schnipsel ausgewählt. Tippe jetzt auf die passende Lücke.':`${used.size} von ${items.length} Schnipseln zugeordnet`}</p>`;
   }
   const cell=item=>{
    if(preview||step.kind==='write'&&!blanks.has(item.id))return `<div class="table-study-value ${session.reviewing&&result.wrongIds.includes(item.id)?'is-wrong':''}"><span lang="${prefix?'de':'la'}">${h(item.answer)}</span>${session.reviewing&&result.wrongIds.includes(item.id)?'<small>Noch einmal merken</small>':''}</div>`;
@@ -135,7 +149,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   };
   const feedback=session.checked&&!session.reviewing?`<div class="table-learning-feedback" role="status"><strong>${result.correct} von ${result.total} richtig</strong><p>${result.passed?'Alles richtig! Du bist bereit für die nächste Stufe.':'Wir bleiben bei dieser Stufe. Schau dir die Lösungen an und versuche es noch einmal.'}</p></div>`:'';
   const next=preview||session.checked;
-  return `<section class="table-panel">${progress}<div class="table-learning-heading"><span class="tag">ÜBEN · SCHRITT ${step.number} VON ${step.total}</span><h2 id="table-step-heading" tabindex="-1">${session.reviewing?'Noch einmal anschauen':h(step.label)}</h2><p>${h(title)}</p><p class="muted">${h(instructions)}</p></div><form id="table-learning-form">${bank}${formGrid(course,items,cell,prefix)}${feedback}${next?`<button type="button" class="button primary wide" data-action="tables-learning-next">${session.reviewing?'Noch einmal versuchen':session.checked&&!result.passed?'Lösungen noch einmal ansehen':'Weiter'} →</button>`:'<button type="submit" class="button primary wide">Kontrollieren</button>'}</form><div class="table-actions"><button class="text-button" data-action="${prefix?'prefixes-config':'tables-config'}">Auswahl &amp; Lernmodus ändern</button></div></section>`;
+  return `<section class="table-panel">${progress}<div class="table-learning-heading"><span class="tag">ÜBEN · SCHRITT ${step.number} VON ${step.total}</span><h2 id="table-step-heading" tabindex="-1">${session.reviewing?'Noch einmal anschauen':h(step.label)}</h2><p>${h(title)}</p>${learningCaseNote(step)}<p class="muted">${h(instructions)}</p></div><form id="table-learning-form">${bank}${formGrid(course,items,cell,prefix)}${feedback}${next?`<button type="button" class="button primary wide" data-action="tables-learning-next">${session.reviewing?'Noch einmal versuchen':session.checked&&!result.passed?'Lösungen noch einmal ansehen':'Weiter'} →</button>`:'<button type="submit" class="button primary wide">Kontrollieren</button>'}</form><div class="table-actions"><button class="text-button" data-action="${prefix?'prefixes-config':'tables-config'}">Auswahl &amp; Lernmodus ändern</button></div></section>`;
  }
  function view(){const prefix=isPrefix(),mode=currentMode();return `<div class="table-practice-shell"><div class="page-heading"><div><div class="eyebrow">DEIN LATEINTRAINING</div><h1>${prefix?'Präfixe üben':'Tabellen üben'}</h1><p class="muted">${prefix?'Wortbausteine verstehen und sicher behalten.':'Tabelle wählen. Formen auswählen. In deinem Tempo lernen.'}</p></div></div>${mode==='learning'?learningView():mode==='worksheet'?worksheetView(prefix):!prefix&&mode==='catalog'?catalogView():setupView(prefix)}<p class="small muted table-save" data-table-save role="status">${h(saveMessage())}</p></div>`;}
  function start(prefix,learning){
@@ -147,7 +161,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
  }
  function matchActive(){const course=currentCourse();return currentMode()==='learning'&&course&&learningStep(course.session).kind==='match'&&!course.session.checked&&!course.session.reviewing;}
  function place(targetId,tokenId){
-  if(!matchActive())return false;
+  if(!validTarget(targetId)||tokenId!==null&&!validToken(tokenId))return false;
   const changed=learningPlace(currentCourse().session,targetId,tokenId);
   if(changed){selectedToken=null;persist();paint();globalThis.document?.querySelector(`[data-target-id="${targetId}"]`)?.focus();}return changed;
  }
@@ -155,7 +169,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   const action=button?.dataset?.action;if(!action?.startsWith('tables-')&&!action?.startsWith('prefixes-'))return false;
   if(Date.now()<suppressClickUntil&&(action==='tables-token'||action==='tables-place'))return true;
   if(action==='tables-token'){
-   if(matchActive()&&currentCourse().session.itemIds.includes(button.dataset.tokenId)&&!Object.values(currentCourse().session.placements).includes(button.dataset.tokenId)){selectedToken=selectedToken===button.dataset.tokenId?null:button.dataset.tokenId;paint();globalThis.document?.querySelector(`[data-action="tables-token"][data-token-id="${button.dataset.tokenId}"]`)?.focus();}return true;
+   if(validToken(button.dataset.tokenId)&&!Object.values(currentCourse().session.placements).includes(button.dataset.tokenId)){selectedToken=selectedToken===button.dataset.tokenId?null:button.dataset.tokenId;paint();globalThis.document?.querySelector(`[data-action="tables-token"][data-token-id="${button.dataset.tokenId}"]`)?.focus();}return true;
   }
   if(action==='tables-place'){if(matchActive())place(button.dataset.targetId,selectedToken);return true;}
   selectedToken=null;cleanupDrag();
@@ -217,7 +231,8 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   if(region){const bounds=region.getBoundingClientRect();if(x<bounds.left+36)region.scrollLeft-=10;else if(x>bounds.right-36)region.scrollLeft+=10;}
   scrollFrame=globalThis.requestAnimationFrame?.(scrollWhileDragging)??null;
  }
- function validToken(id){return matchActive()&&currentCourse().session.itemIds.includes(id);}
+ function validTarget(id){return matchActive()&&learningStep(currentCourse().session).itemIds.includes(id);}
+ function validToken(id){return validTarget(id);}
  function drag(event){
   const source=event.target?.closest?.('[data-token-id]'),target=event.target?.closest?.('[data-target-id]');
   if(event.type==='dragend'||event.type==='pointercancel'){cleanupDrag();return false;}
@@ -226,9 +241,9 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
    if(!source||source.disabled||!validToken(source.dataset.tokenId))return false;
    dragToken=source.dataset.tokenId;event.dataTransfer?.setData('application/x-latinio-table-token',dragToken);if(event.dataTransfer)event.dataTransfer.effectAllowed='move';return true;
   }
-  if(event.type==='dragover'){if(!target||!validToken(dragToken))return false;event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='move';return true;}
+  if(event.type==='dragover'){if(!target||!validTarget(target.dataset.targetId)||!validToken(dragToken))return false;event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='move';return true;}
   if(event.type==='drop'){
-   if(!target||!validToken(dragToken))return false;event.preventDefault();const token=dragToken;cleanupDrag();place(target.dataset.targetId,token);return true;
+   if(!target||!validTarget(target.dataset.targetId)||!validToken(dragToken))return false;event.preventDefault();const token=dragToken;cleanupDrag();place(target.dataset.targetId,token);return true;
   }
   if(event.type==='pointerdown'){
    if(!['touch','pen'].includes(event.pointerType)||!source||source.disabled||!validToken(source.dataset.tokenId))return false;
@@ -242,7 +257,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
    if(!ghost&&globalThis.document?.body){ghost=document.createElement('div');ghost.className='table-token table-drag-ghost';ghost.textContent=pointer.text;ghost.setAttribute('aria-hidden','true');document.body.append(ghost);}
    if(ghost){ghost.style.left=event.clientX+'px';ghost.style.top=event.clientY+'px';}
    const slot=globalThis.document?.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-target-id]');
-   globalThis.document?.querySelectorAll?.('.table-drop-slot.drag-over').forEach(node=>node.classList.remove('drag-over'));slot?.classList.add('drag-over');return true;
+   globalThis.document?.querySelectorAll?.('.table-drop-slot.drag-over').forEach(node=>node.classList.remove('drag-over'));if(slot&&validTarget(slot.dataset.targetId))slot.classList.add('drag-over');return true;
   }
   if(event.type==='pointerup'){
    const touch=pointer,slot=globalThis.document?.elementFromPoint?.(event.clientX,event.clientY)?.closest?.('[data-target-id]');cleanupDrag();

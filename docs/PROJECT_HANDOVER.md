@@ -1,5 +1,13 @@
 # Latinio – Projektübergabe
 
+## 2.11.0 · Fälle in wachsenden Gruppen
+
+Kasusübungen führen höchstens zwei ausgewählte Fälle auf einmal ein, in Buchreihenfolge Nominativ/Genitiv/Dativ/Akkusativ/Ablativ. Die Schritte sind Anschauen + Zuordnen für die ersten zwei, Anschauen + Zuordnen für die ersten vier, anschließend gegebenenfalls alle fünf. Jede nächste Gruppe enthält sämtliche zuvor eingeführten Formen. Erst nach erfolgreichem Zuordnen aller ausgewählten Fälle folgen die bestehenden Schreibstufen (Hälfte, drei Viertel, alle Lücken). Bei bis zu zwei Fällen sowie Präfixen und Dehnungsperfekt bleibt der bisherige Ablauf. Direkte Abfragen verwenden weiterhin sofort die gesamte Auswahl.
+
+`table-learning.js` hält die vollständige Auswahl in session.itemIds und liefert über learningStep die aktive Gruppe für Darstellung und Bewertung. Zukünftige Fälle dürfen weder als Schnipsel noch als Ziele verwendet werden. Gruppendefinitionen werden beim Erstellen und Wiederherstellen aus den kanonischen Inhalten abgeleitet. Laufende alte Zuordnungs-/Schreibentwürfe werden auf die entsprechende Stufe mit vollständiger Auswahl übernommen; eine alte reine Anschauphase beginnt mit der ersten Gruppe. Ein Neustart beginnt stets bei den ersten höchstens zwei Fällen. Tabellenansicht zeigt die aktiven Fälle und welche neu hinzugekommen sind.
+
+Frontend und Offline-Shell 2.11.0. Kein Backendupdate und keine Datenmigration im Server. 438 automatisierte Tests bestanden, zusätzlich 310 Fall-/Filterkombinationen geprüft. Syntax und 65 Offline-Dateien einschließlich vollständiger Importabdeckung validiert. Regressionen für Gruppenwachstum, Auswahlfilter, Fehlerwiederholung, Entwürfe und bestehende Lernmodi; keine visuellen Browserchecks gemäß Projektpräferenz.
+
 ## 2.10.0 · Sammlung öffnen, Substantive und Lernstand
 
 `collection-opening.js` zeigt am Sammlungsstift sofort Ladepunkte und lässt sie vor der lokalen Darstellung zeichnen. Mehrfachklicks und veraltete Navigation werden abgefangen; andere Navigation bleibt verfügbar. `collection-words.js` gruppiert Bewertungen einmal pro Wortliste, berücksichtigt Suchfilter und Sprachrichtung und trennt globale Sicherheit vom Auffrischstatus Offen/Erledigt. `allWords` liest den Store einmal statt ihn für jede Vokabel vollständig zu klonen. Keine neue Serverabhängigkeit.
