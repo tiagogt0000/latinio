@@ -1,5 +1,10 @@
 # Latinio · Version 2.7.0
 
+## Neu in 2.9.0: Klarere Auswahl und ruhigere Bedienung
+
+Leere Antworten werden beim Vokabellernen nicht versehentlich mit Enter abgeschickt. Neue Bedeutungsfelder bleiben auch mit Bildschirmtastatur sichtbar. Tabellen und Fälle stehen in vertikalen Listen; zusätzliche Filter liegen unter „Weitere Einstellungen“, die Moduswahl folgt nach „Weiter“. Nutzerverwaltung und Freigabe-Prüfer verwenden dieselbe Oberfläche mit Lade-/Fehlerrückmeldungen. Lokale Sammlungen öffnen sofort, und Listen behalten beim Umschalten ihre Scrollposition.
+
+
 ## Neu in 2.8.0: Schrittweise üben
 
 Alle Tabellen stehen zuerst als Auswahlkarten bereit. Wähle Fälle und Formen und entscheide zwischen **Üben** und **Abfragen**. Der Übungsmodus zeigt zunächst die Lösungen, lässt dich Schnipsel zuordnen und verlangt danach immer mehr selbst geschriebene Antworten. Bei Fehlern schaust du die Lösungen erneut an und wiederholst die Stufe. Das funktioniert auch mit allen elf Präfixen, per Ziehen oder Antippen. Entwürfe bleiben auf deinem Gerät gespeichert.

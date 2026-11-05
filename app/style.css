@@ -525,3 +525,18 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .brand-transition .brand-latinio,.brand-transition .brand-latinio span{color:#59b923}.brand-transition .brand-vocabify,.brand-transition .brand-vocabify span{color:#d79040}
 @media(max-width:560px){.entrance-choices{grid-template-columns:1fr;gap:12px}.entrance-choice{min-height:95px;flex-direction:row;align-items:center;padding:17px 20px;gap:17px}.entrance-choice img{width:54px;height:54px}.entrance-flag{position:static;display:inline-block;font-size:1rem;margin-left:10px}.entrance-arrow{top:35px;bottom:auto;right:17px}.entrance-content{padding:15px 0}.entrance-wordmark{margin-bottom:30px}.entrance-subtitle{font-size:.92rem;margin-bottom:25px}.vocabify-stats>div{padding:14px 10px}.vocabify-stats strong{font-size:1.3rem}.vocabify-welcome img{width:60px;height:60px}.brand-partnership{gap:15px}}
 @media(prefers-reduced-motion:reduce){.brand-partnership *{animation:none!important}.brand-partnership i{opacity:.5}}
+
+/* 2.9.0: stable scrolling, visible input and consistent interaction feedback. */
+.bounded-list,.modal,.access-editor-list{overscroll-behavior:contain}
+.test-shell:has(#answer-form input:focus){padding-bottom:calc(45px + var(--answer-keyboard-inset,0px))}
+#answer-form input{scroll-margin-block:24px}
+.icon-button:not(.modal-close){position:relative}
+[data-action]:active:not(:disabled),.table-option:active{filter:brightness(.96)}
+.button-loading{display:inline-flex;flex:none;gap:3px;align-items:center;margin-inline-start:8px}
+.icon-button .button-loading{position:absolute;right:0;bottom:0;padding:4px;border-radius:8px;background:var(--surface)}
+.admin-content{min-width:0;margin-top:24px}
+.admin-content>.section-top{gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.admin-content [role=status]{line-height:1.6}
+.admin-tabs>.chip{min-height:48px}
+@media(prefers-reduced-motion:reduce){[data-action]:active:not(:disabled){filter:none}}
+.admin-error{border:1px solid var(--red);border-radius:16px;background:var(--red-soft);padding:18px;margin:18px 0;line-height:1.6}.admin-error>.button,.admin-error>.text-button{margin-top:12px}

@@ -11,8 +11,8 @@ const clone=value=>JSON.parse(JSON.stringify(value));
 const cacheKey=id=>'latinio-tables-v1:'+id;
 function fixture({id='learner',values=new Map(),storageOverride}={}){
  const storage=storageOverride||{getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,value)};
- const calls={renders:0,go:[],notices:[]};
- const options={profile:{id,role:'student'},storage,h,go:target=>calls.go.push(target),render:()=>calls.renders++,notify:message=>calls.notices.push(message)};
+ const calls={renders:0,go:[],notices:[],modals:[],closes:0,events:[]};
+ const options={profile:{id,role:'student'},storage,h,go:target=>calls.go.push(target),render:()=>{calls.events.push('render');calls.renders++;},showModal:content=>{calls.events.push('modal');calls.modals.push(content);},closeModal:()=>{calls.events.push('close');calls.closes++;},notify:message=>calls.notices.push(message)};
  const ui=tablePracticeUI(options);
  return {
   ui,options,values,calls,
@@ -77,7 +77,7 @@ function dragEvent(type,target,extra={}){
  return {type,target,prevented:false,preventDefault(){this.prevented=true;},dataTransfer:{setData:(key,value)=>values.set(key,value),getData:key=>values.get(key)||''},values,...extra};
 }
 
-test('The catalogue presents all five tables before filters and offers practice or direct testing',()=>{
+test('The catalogue leads through case rows to a separate learning-mode dialog',()=>{
  const f=fixture();
  assert.equal(f.button('tables-open'),true);
  assert.equal(f.ui.draft.tableMode,'catalog');
@@ -87,18 +87,106 @@ test('The catalogue presents all five tables before filters and offers practice 
  assert.doesNotMatch(catalog,/data-table-filter=/);
  f.button('tables-select',{tableId:'relative'});
  assert.equal(f.ui.draft.tableMode,'setup');
- assert.equal(f.ui.draft.tableId,'relative');
- assert.match(f.ui.view(),/data-action="tables-learn"/);
- assert.match(f.ui.view(),/data-action="tables-start"/);
- assert.match(f.ui.view(),/>Üben</);
- assert.match(f.ui.view(),/>Abfragen</);
+ const setup=f.ui.view();
+ assert.equal((setup.match(/data-table-filter="cases"/g)||[]).length,5);
+ assert.doesNotMatch(setup,/data-table-filter="(?:genders|numbers|persons)"/);
+ assert.doesNotMatch(setup,/data-action="tables-(?:learn|start)"/);
+ assert.match(setup,/data-action="tables-choose-mode"/);
+ assert.match(setup,/data-action="tables-settings"/);
+ const renders=f.calls.renders;
+ f.button('tables-choose-mode');
+ assert.equal(f.calls.renders,renders,'opening the shared dialog must not replace the selection page');
+ const dialog=f.calls.modals.at(-1);
+ assert.match(dialog,/id="modal-title"/);
+ assert.match(dialog,/data-action="tables-learn"/);
+ assert.match(dialog,/data-action="tables-start"/);
+ assert.match(dialog,/>Üben</);assert.match(dialog,/>Abfragen</);
+ assert.equal(f.ui.draft.tableLearning,null);assert.equal(f.ui.draft.tableRound,null);
+ const before=f.calls.closes;
+ f.button('tables-learn');
+ assert.equal(f.calls.closes,before+1);
+ assert.deepEqual(f.calls.events.slice(-2),['close','render']);
+ assert.equal(f.ui.draft.tableMode,'learning');
+ assert.equal(f.ui.draft.tableLearning.session.itemIds.length,30);
  f.button('prefixes-open');
  assert.equal(f.ui.draft.prefixMode,'setup');
- assert.equal(f.ui.draft.prefixRound,null);
- assert.equal(f.ui.draft.prefixLearning,null);
- assert.match(f.ui.view(),/data-action="prefixes-learn"/);
- assert.match(f.ui.view(),/data-action="prefixes-start"/);
- assert.equal(inputTags(f.ui.view()).length,0);
+ assert.match(f.ui.view(),/data-action="prefixes-choose-mode"/);
+ assert.doesNotMatch(f.ui.view(),/data-action="prefixes-(?:learn|start)"/);
+ f.button('prefixes-choose-mode');
+ assert.match(f.calls.modals.at(-1),/data-action="prefixes-learn"/);
+ assert.match(f.calls.modals.at(-1),/data-action="prefixes-start"/);
+ assert.equal(f.ui.draft.prefixRound,null);assert.equal(f.ui.draft.prefixLearning,null);
+ f.button('prefixes-start');
+ assert.equal(f.ui.draft.prefixRound.itemIds.length,11);
+});
+
+test('Further settings are separate, retain all defaults, and preserve custom filters across reopening',()=>{
+ const f=fixture();select(f);
+ assert.deepEqual(f.ui.draft.filters.adjectives,{cases:['nom','gen','dat','acc','abl'],numbers:['sg','pl'],genders:['m','f','n']});
+ const renders=f.calls.renders;
+ f.button('tables-settings');
+ const dialog=f.calls.modals.at(-1);
+ assert.match(dialog,/id="modal-title">Weitere Einstellungen/);
+ assert.match(dialog,/data-table-filter="numbers"/);assert.match(dialog,/data-table-filter="genders"/);
+ assert.doesNotMatch(dialog,/data-table-filter="cases"/);
+ f.filter('numbers','pl',false);f.filter('genders','f',false);f.filter('genders','n',false);
+ assert.equal(f.calls.renders,renders,'modal filters update in place');
+ assert.equal(f.calls.modals.length,1,'changing a setting must not reopen the dialog');
+ const before=f.calls.closes;f.button('tables-modal-done');
+ assert.equal(f.calls.closes,before+1);assert.equal(f.calls.renders,renders);
+ f.button('tables-settings');
+ assert.match(f.calls.modals.at(-1),/value="sg" checked/);
+ assert.doesNotMatch(f.calls.modals.at(-1),/value="pl" checked/);
+ f.button('tables-modal-done');f.button('tables-case-basic');f.button('tables-choose-mode');f.button('tables-start');
+ assert.deepEqual(f.ui.draft.tableRound.filters,{cases:['nom','acc'],numbers:['sg'],genders:['m']});
+ assert.equal(f.ui.draft.tableRound.itemIds.length,2);
+ const reopened=fixture({values:f.values});
+ assert.deepEqual(reopened.ui.draft.filters,f.ui.draft.filters);
+});
+
+test('Changing cases and bulk choices preserves focus, page scroll, and modal scroll without rendering',t=>{
+ const f=fixture();select(f);
+ const descriptor=Object.getOwnPropertyDescriptor(globalThis,'document');
+ let focused=0;
+ const fields=['nom','gen','dat','acc','abl'].map(value=>({dataset:{tableFilter:'cases'},value,checked:true,selected:true,focus(){focused++;},closest(){return {classList:{toggle:(_name,selected)=>{this.selected=selected;}}};}}));
+ const all={dataset:{dimension:'cases'},textContent:'Auswahl aufheben'},count={textContent:''},next={disabled:false},note={textContent:''};
+ const modal={scrollTop:180},page={scrollTop:640};
+ const doc={activeElement:fields[2],querySelector:()=>null,querySelectorAll:selector=>({
+  '[data-table-filter]':fields,
+  '[data-action="tables-filter-all"]':[all],
+  '[data-table-selection-count]':[count],
+  '[data-table-settings-note]':[note],
+  '[data-action="tables-choose-mode"]':[next],
+ }[selector]||[])};
+ Object.defineProperty(globalThis,'document',{configurable:true,value:doc});
+ t.after(()=>descriptor?Object.defineProperty(globalThis,'document',descriptor):delete globalThis.document);
+ const renders=f.calls.renders;
+ f.filter('cases','dat',false);
+ assert.equal(fields[2].checked,false);assert.equal(fields[2].selected,false);
+ assert.equal(count.textContent,'24 Formen ausgewählt');
+ assert.equal(all.textContent,'Alle wählen');
+ f.button('tables-filter-all',{dimension:'cases'});
+ assert.ok(fields.every(field=>field.checked&&field.selected));
+ f.button('tables-filter-all',{dimension:'cases'});
+ assert.ok(fields.every(field=>!field.checked&&!field.selected));assert.equal(next.disabled,true);
+ assert.match(count.textContent,/mindestens/);
+ f.button('tables-case-basic');
+ assert.deepEqual(fields.filter(field=>field.checked).map(field=>field.value),['nom','acc']);
+ assert.equal(next.disabled,false);assert.equal(count.textContent,'12 Formen ausgewählt');
+ assert.equal(f.calls.renders,renders);assert.equal(focused,0);assert.equal(doc.activeElement,fields[2]);
+ assert.equal(page.scrollTop,640);assert.equal(modal.scrollTop,180);
+});
+
+test('Empty primary selections disable Weiter and cannot open a learning dialog',()=>{
+ const f=fixture();select(f);
+ f.button('tables-filter-all',{dimension:'cases'});
+ assert.match(f.ui.view(),/data-action="tables-choose-mode"[^>]*disabled/);
+ const renders=f.calls.renders;
+ f.button('tables-choose-mode');
+ assert.equal(f.calls.modals.length,0);assert.equal(f.calls.renders,renders);
+ assert.equal(f.calls.notices.length,1);assert.equal(f.ui.draft.tableLearning,null);
+ f.filter('cases','acc',true);f.button('tables-choose-mode');
+ assert.equal(f.calls.modals.length,1);assert.match(f.calls.modals[0],/6 Formen/);
 });
 
 test('Classic case selection grades only nominative and accusative singular masculine forms',()=>{
@@ -116,8 +204,11 @@ test('An empty selection blocks both learning modes and each table keeps its app
  const f=fixture();select(f);
  f.button('tables-case-basic');
  f.button('tables-select',{tableId:'personal'});
- assert.match(f.ui.view(),/data-table-filter="persons"/);
- assert.doesNotMatch(f.ui.view(),/data-table-filter="genders"/);
+ assert.doesNotMatch(f.ui.view(),/data-table-filter="persons"/);
+ f.button('tables-settings');
+ assert.match(f.calls.modals.at(-1),/data-table-filter="persons"/);
+ assert.doesNotMatch(f.calls.modals.at(-1),/data-table-filter="genders"/);
+ f.button('tables-modal-done');
  f.button('tables-select',{tableId:'perfect'});
  assert.match(f.ui.view(),/data-table-filter="targets"/);
  assert.doesNotMatch(f.ui.view(),/data-table-filter="cases"/);

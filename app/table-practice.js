@@ -12,7 +12,7 @@ const SYMBOLS={adjectives:'magnus',personal:'egō · tū',relative:'quī',is:'is
 export function tablePracticeCard(){return '<section class="training-card table-practice-card"><div class="section-top"><span class="tag">LATEIN · FORMEN</span><span class="table-card-mark" aria-hidden="true">▦</span></div><h2>Tabellen üben</h2><p>Wähle deine Tabelle. Lerne Schritt für Schritt oder frage dich direkt ab.</p><button class="button primary wide" data-action="tables-open">Tabellen auswählen <span aria-hidden="true">→</span></button><div class="card-foot">Adjektive · Pronomen · Perfektstämme</div></section>';}
 export function prefixPracticeCard(){return '<section class="training-card table-practice-card"><div class="section-top"><span class="tag">LATEIN · WORTBAUSTEINE</span><span class="table-card-mark" aria-hidden="true">ab–</span></div><h2>Präfixe üben</h2><p>Erst zuordnen, dann selbst schreiben. Lerne die elf Präfixe aus deinem Buch.</p><button class="button primary wide" data-action="prefixes-open">Präfixe auswählen <span aria-hidden="true">→</span></button><div class="card-foot">Schrittweise üben · direkt abfragen</div></section>';}
 
-export function tablePracticeUI({profile,h,go,render,notify=()=>{},storage=globalThis.localStorage}){
+export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal=()=>{},notify=()=>{},storage=globalThis.localStorage}){
  const cacheKey='latinio-tables-v1:'+profile.id;
  let storageError='',selectedToken=null,dragToken=null,pointer=null,ghost=null,scrollFrame=null,suppressClickUntil=0;
  let state={version:2,kind:'tables',tableId:TABLES[0].id,filters:Object.fromEntries(TABLES.map(table=>[table.id,defaults(table)])),tableMode:'catalog',prefixMode:'setup',tableRound:null,prefixRound:null,tableLearning:null,prefixLearning:null};
@@ -62,15 +62,43 @@ export function tablePracticeUI({profile,h,go,render,notify=()=>{},storage=globa
   return `<div class="table-actions">${course?`<button class="text-button" data-action="${prefix?'prefixes':'tables'}-resume-learning">Übung fortsetzen${prefix?'':': '+h(getTable(course.tableId).label)}</button>`:''}${round?`<button class="text-button" data-action="${prefix?'prefixes':'tables'}-resume">${round.checked?'Letzte Abfrage ansehen':'Abfrage fortsetzen'}${prefix?'':': '+h(getTable(round.tableId).label)}</button>`:''}</div>`;
  }
  function catalogView(){return `<section aria-labelledby="table-step-heading"><h2 id="table-step-heading" tabindex="-1">Welche Tabelle möchtest du lernen?</h2><p class="muted">Wähle eine Tabelle. Danach bestimmst du die Formen und deinen Lernmodus.</p><div class="table-catalog">${TABLES.map(table=>`<button class="table-choice-card" data-action="tables-select" data-table-id="${h(table.id)}"><span class="table-choice-symbol" lang="la" aria-hidden="true">${h(SYMBOLS[table.id])}</span><span class="table-choice-copy"><strong>${h(table.label)}</strong><span>${table.items.length} Formen · ${table.dimensions.includes('cases')?'5 Fälle':'3 Verben'}</span></span><span aria-hidden="true">→</span></button>`).join('')}</div>${resumeLinks()}</section>`;}
- function filterView(table,key){
+ function filterView(table,key,primary=false){
   const {label,options}=DIMENSIONS[key],selected=state.filters[table.id][key],all=options.every(option=>selected.includes(String(option.id)));
-  return `<fieldset class="table-filter"><legend>${h(label)}</legend><div class="table-filter-tools"><button type="button" class="text-button" data-action="tables-filter-all" data-dimension="${h(key)}">${all?'Auswahl aufheben':'Alle wählen'}</button>${key==='cases'?'<button type="button" class="text-button" data-action="tables-case-basic">Nur Nominativ &amp; Akkusativ</button>':''}</div><div class="table-options">${options.map(option=>`<label class="table-option ${selected.includes(String(option.id))?'selected':''}"><input type="checkbox" data-table-filter="${h(key)}" value="${h(String(option.id))}" ${selected.includes(String(option.id))?'checked':''}><span>${h(option.label)}</span></label>`).join('')}</div></fieldset>`;
+  return `<fieldset class="table-filter ${primary?'table-filter-primary':''}" data-table-filter-group="${h(key)}"><legend>${h(label)}</legend><div class="table-filter-tools"><button type="button" class="text-button" data-action="tables-filter-all" data-dimension="${h(key)}">${all?'Auswahl aufheben':'Alle wählen'}</button>${key==='cases'?'<button type="button" class="text-button" data-action="tables-case-basic">Nur Nominativ &amp; Akkusativ</button>':''}</div><div class="table-options">${options.map(option=>`<label class="table-option ${selected.includes(String(option.id))?'selected':''}"><input type="checkbox" data-table-filter="${h(key)}" value="${h(String(option.id))}" ${selected.includes(String(option.id))?'checked':''}><span>${h(option.label)}</span></label>`).join('')}</div></fieldset>`;
  }
  function modeChoices(prefix=false,enabled=true){return `<div class="table-mode-choices" aria-label="Lernmodus wählen"><button class="table-mode-card" data-action="${prefix?'prefixes':'tables'}-learn" ${enabled?'':'disabled'}><span class="tag">SCHRITT FÜR SCHRITT</span><strong>Üben</strong><span>Anschauen → zuordnen → Lücken ergänzen → alles selbst schreiben</span></button><button class="table-mode-card" data-action="${prefix?'prefixes':'tables'}-start" ${enabled?'':'disabled'}><span class="tag">WISSEN PRÜFEN</span><strong>Abfragen</strong><span>Alle Antworten direkt selbst eintragen und gemeinsam kontrollieren</span></button></div>`;}
+ function selectionText(table){const count=selectTableItems(table.id,state.filters[table.id]).length;return count?`${count} Formen ausgewählt`:'Wähle in jedem Bereich mindestens eine Möglichkeit.';}
+ function secondaryDimensions(table){return table.dimensions.filter(key=>!['cases','targets'].includes(key));}
+ function settingsText(table){return secondaryDimensions(table).some(key=>state.filters[table.id][key].length!==DIMENSIONS[key].options.length)?'Auswahl angepasst':'Singular und Plural sowie alle weiteren Formen';}
+ function refreshSelection(){
+  // Keep the existing inputs and scroll containers attached when a selection changes.
+  const table=getTable(state.tableId),doc=globalThis.document;
+  for(const field of doc?.querySelectorAll?.('[data-table-filter]')||[]){
+   const key=field.dataset.tableFilter;if(!table.dimensions.includes(key))continue;
+   field.checked=state.filters[table.id][key].includes(field.value);
+   field.closest?.('.table-option')?.classList.toggle('selected',field.checked);
+  }
+  for(const button of doc?.querySelectorAll?.('[data-action="tables-filter-all"]')||[]){
+   const key=button.dataset.dimension;if(!table.dimensions.includes(key))continue;
+   button.textContent=DIMENSIONS[key].options.every(option=>state.filters[table.id][key].includes(String(option.id)))?'Auswahl aufheben':'Alle wählen';
+  }
+  for(const label of doc?.querySelectorAll?.('[data-table-selection-count]')||[])label.textContent=selectionText(table);
+  for(const label of doc?.querySelectorAll?.('[data-table-settings-note]')||[])label.textContent=settingsText(table);
+  for(const button of doc?.querySelectorAll?.('[data-action="tables-choose-mode"]')||[])button.disabled=!selectTableItems(table.id,state.filters[table.id]).length;
+ }
+ function settingsDialog(){
+  const table=getTable(state.tableId),dimensions=secondaryDimensions(table);if(!dimensions.length)return;
+  showModal(`<div class="table-settings-dialog"><h2 id="modal-title">Weitere Einstellungen</h2><p class="muted">${h(table.label)} · Wähle hier bei Bedarf nur bestimmte Formen.</p>${dimensions.map(key=>filterView(table,key)).join('')}<p class="small muted" data-table-selection-count role="status">${h(selectionText(table))}</p><button class="button primary wide" data-action="tables-modal-done">Fertig</button></div>`);
+ }
+ function modeDialog(prefix=false){
+  const table=prefix?null:getTable(state.tableId),items=prefix?PREFIXES:selectTableItems(table.id,state.filters[table.id]);
+  if(!items.length){notify('Wähle in jedem Bereich mindestens eine Möglichkeit.');return;}
+  showModal(`<div class="table-mode-dialog"><h2 id="modal-title">Wie möchtest du lernen?</h2><p class="muted">${h(prefix?'Präfixe':table.label)} · ${items.length} ${prefix?'Präfixe':'Formen'}</p>${modeChoices(prefix)}</div>`);
+ }
  function setupView(prefix=false){
-  if(prefix)return `<section class="table-panel"><span class="tag">11 PRÄFIXE</span><h2 id="table-step-heading" tabindex="-1">Wie möchtest du lernen?</h2><p class="muted">Die Präfixe stehen links, ihre Bedeutungen rechts. Beim Üben bekommst du anfangs Hilfe und schreibst nach und nach selbst.</p>${modeChoices(true)}${resumeLinks(true)}</section>`;
-  const table=getTable(state.tableId),items=selectTableItems(table.id,state.filters[table.id]);
-  return `<section class="table-panel"><button class="text-button" data-action="tables-catalog">← Alle Tabellen</button><h2 id="table-step-heading" tabindex="-1">${h(table.label)}</h2><p class="muted table-description">${h(table.description)}</p>${table.dimensions.map(key=>filterView(table,key)).join('')}<p role="status">${items.length?`<strong>${items.length} Formen</strong> ausgewählt`:'Wähle in jedem Bereich mindestens eine Möglichkeit.'}</p><h3>Wie möchtest du lernen?</h3>${modeChoices(false,!!items.length)}</section>`;
+  if(prefix)return `<section class="table-panel"><span class="tag">11 PRÄFIXE</span><h2 id="table-step-heading" tabindex="-1">Präfixe und ihre Bedeutung</h2><p class="muted">Die Präfixe stehen links, ihre Bedeutungen rechts. Wähle im nächsten Schritt, ob du mit Hilfe üben oder dich direkt abfragen möchtest.</p><div class="table-setup-actions"><button class="button primary wide" data-action="prefixes-choose-mode">Weiter →</button></div>${resumeLinks(true)}</section>`;
+  const table=getTable(state.tableId),items=selectTableItems(table.id,state.filters[table.id]),primary=table.dimensions.includes('cases')?'cases':'targets';
+  return `<section class="table-panel"><button class="text-button" data-action="tables-catalog">← Alle Tabellen</button><h2 id="table-step-heading" tabindex="-1">${h(table.label)}</h2><p class="muted table-description">${h(table.description)}</p>${filterView(table,primary,true)}${secondaryDimensions(table).length?`<button class="table-settings-button" data-action="tables-settings" aria-haspopup="dialog"><span><strong>Weitere Einstellungen</strong><small data-table-settings-note>${h(settingsText(table))}</small></span><span aria-hidden="true">→</span></button>`:''}<div class="table-setup-actions"><p data-table-selection-count role="status">${h(selectionText(table))}</p><button class="button primary wide" data-action="tables-choose-mode" aria-haspopup="dialog" ${items.length?'':'disabled'}>Weiter →</button></div></section>`;
  }
  function answerCell(item,round,prefix=false){
   const answer=round.answers[item.id]||'',checked=round.checked,correct=checked&&checkAnswer(answer,item,{prefix}),fieldId='table-answer-'+item.id,status=correct?'Richtig':answer.trim()?'Noch nicht richtig':'Nicht beantwortet';
@@ -135,6 +163,9 @@ export function tablePracticeUI({profile,h,go,render,notify=()=>{},storage=globa
   }
   if(action==='tables-place'){if(matchActive())place(button.dataset.targetId,selectedToken);return true;}
   selectedToken=null;cleanupDrag();
+  if(action==='tables-settings'){settingsDialog();return true;}
+  if(action==='tables-choose-mode'||action==='prefixes-choose-mode'){modeDialog(action==='prefixes-choose-mode');return true;}
+  if(action==='tables-modal-done'){closeModal();return true;}
   if(action==='tables-open'||action==='prefixes-open'){state.kind=action==='prefixes-open'?'prefixes':'tables';if(isPrefix())state.prefixMode='setup';else state.tableMode='catalog';persist();go();paint(true);return true;}
   const table=getTable(state.tableId);
   if(action==='tables-select'){if(!getTable(button.dataset.tableId))return true;state.tableId=button.dataset.tableId;state.tableMode='setup';state.kind='tables';}
@@ -145,9 +176,9 @@ export function tablePracticeUI({profile,h,go,render,notify=()=>{},storage=globa
   else if(action==='prefixes-resume'&&state.prefixRound){state.kind='prefixes';state.prefixMode='worksheet';}
   else if(action==='tables-resume-learning'&&state.tableLearning){state.kind='tables';state.tableMode='learning';}
   else if(action==='prefixes-resume-learning'&&state.prefixLearning){state.kind='prefixes';state.prefixMode='learning';}
-  else if(action==='tables-filter-all'){const key=button.dataset.dimension;if(!table.dimensions.includes(key))return true;const all=DIMENSIONS[key].options.map(option=>String(option.id));state.filters[table.id][key]=all.every(id=>state.filters[table.id][key].includes(id))?[]:all;}
-  else if(action==='tables-case-basic'&&table.dimensions.includes('cases'))state.filters[table.id].cases=['nom','acc'];
-  else if(['tables-start','tables-learn','prefixes-start','prefixes-learn','prefixes-new'].includes(action)){if(!start(action.startsWith('prefixes'),action.endsWith('learn')))return true;}
+  else if(action==='tables-filter-all'){const key=button.dataset.dimension;if(!table.dimensions.includes(key))return true;const all=DIMENSIONS[key].options.map(option=>String(option.id));state.filters[table.id][key]=all.every(id=>state.filters[table.id][key].includes(id))?[]:all;persist();refreshSelection();return true;}
+  else if(action==='tables-case-basic'&&table.dimensions.includes('cases')){state.filters[table.id].cases=['nom','acc'];persist();refreshSelection();return true;}
+  else if(['tables-start','tables-learn','prefixes-start','prefixes-learn','prefixes-new'].includes(action)){if(!start(action.startsWith('prefixes'),action.endsWith('learn')))return true;closeModal();}
   else if(action==='tables-learning-next'){if(currentMode()!=='learning'||!currentCourse())return true;learningNext(currentCourse().session,courseItems());}
   else if(action==='tables-course-test'||action==='tables-course-restart'){
    const course=currentCourse();if(!course)return true;
@@ -171,7 +202,7 @@ export function tablePracticeUI({profile,h,go,render,notify=()=>{},storage=globa
   const key=element?.dataset?.tableFilter;if(typeof key!=='string')return false;const table=getTable(state.tableId);
   if(!table.dimensions.includes(key)||!DIMENSIONS[key].options.some(option=>String(option.id)===element.value))return true;
   const selected=new Set(state.filters[table.id][key]);if(element.checked)selected.add(element.value);else selected.delete(element.value);
-  state.filters[table.id][key]=DIMENSIONS[key].options.map(option=>String(option.id)).filter(id=>selected.has(id));persist();paint();globalThis.document?.querySelector(`[data-table-filter="${key}"][value="${element.value}"]`)?.focus();return true;
+  state.filters[table.id][key]=DIMENSIONS[key].options.map(option=>String(option.id)).filter(id=>selected.has(id));persist();refreshSelection();return true;
  }
  function submit(form){
   if(!['table-practice-form','table-learning-form'].includes(form.id))return false;

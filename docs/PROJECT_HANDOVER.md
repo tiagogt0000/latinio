@@ -1,5 +1,14 @@
 # Latinio – Projektübergabe
 
+## 2.9.0 · Eingabe, Auswahl und Adminnavigation
+
+Leeres Enter wird im Tastaturhandler abgefangen; `hasAnswerContent` schützt zusätzlich die direkte Bewertung, explizites „Weiß ich noch nicht“ bleibt möglich. Neues `input-visibility.js` scrollt fokussierte Antwortfelder minimal sichtbar, berücksichtigt visualViewport und reserviert iOS-Tastaturraum per CSS-Variable. `view-state.js` erhält bei derselben Ansicht auch verschachtelte Scrollcontainer und Fokus, statt nur window.scrollY. Gemeinsame Modalfokusverwaltung verwendet preventScroll und erhält den ursprünglichen Auslöser bei Dialogwechseln.
+
+Lokale Navigation umgeht laufende Serveraktionen und asynchrone Moduldispatches. Adminbereiche laden mit Statusanzeige; späte Ergebnisse dürfen verlassene Ansichten nicht wieder öffnen. Freigabe-Prüfer als eigener checks-Tab mit drei Fächern und wiederholbaren Fehlerzuständen; manuelle Freigaben senden nur tatsächliche Auswahländerungen. Keine produktiven Freigaben oder Konten zum Testen geändert. Tabellen-/Fallauswahl jetzt vertikale Listen, sekundäre Filter im Dialog und Üben/Abfragen nach Weiter. Vorhandene Lernentwürfe und Lernstände bleiben erhalten.
+
+Frontendversion und Offline-Shell 2.9.0, kein Backendupdate. Automatisierte Eingabe-, View-State-, Modal-, Navigations-, Tabellen- und Adminregressionen; keine visuellen Browserchecks gemäß Projektpräferenz.
+
+
 ## 2.8.0 · Schrittweise Tabellen- und Präfixübungen
 
 Tabellen öffnen zuerst einen Katalog mit fünf Karten. Nach Auswahl folgen abgerundete Fall-/Formenoptionen und die getrennten Modi Üben / Abfragen; Präfixe bieten dieselbe Moduswahl. Üben führt durch Anschauen, Zuordnen mit Schnipseln, wachsende Schreibanteile (ca. Hälfte, drei Viertel, alles) und einen Abschluss. Eine Stufe wird nur nach vollständig richtiger Lösung verlassen; Fehler führen über eine Lösungsansicht zur Wiederholung derselben Stufe. Gleiche Formen sind beim Zuordnen austauschbar. Maus-Drag-and-drop, Touch-/Stiftziehen und antippbare Schnipsel/Ziele verwenden dieselbe Logik.

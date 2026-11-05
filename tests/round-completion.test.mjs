@@ -1,3 +1,4 @@
+import {hasAnswerContent} from '../app/answer-fields.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -42,7 +43,7 @@ function flow(){
  const {d,session}=fixture();session.finished=true;
  const calls={claims:0,dialogs:[],renders:[],mounts:[],fades:0};
  const store={doc:{session},async update(fn){this.doc=fn(this.doc);},async recordActivity(){},async commit(changes){for(const [entity,id,value]of changes)d[entity][id]=value;}};
- const context=vm.createContext({navigator:{onLine:false},icon:()=>'',roundEnd:null,predicateRoot:null,predicateRun:[],predicateResults:[],predicateRoundId:'p',predicateCursor:0,predicateAnswer:'',predicateFeedback:null,screen:'test',store,data:()=>d,failedTasks,createErrorRetry,shuffleQueue,predicateProgress,uid:()=> 'retry',h:String,document:{activeElement:{blur(){}},body:{style:{overflow:''}},querySelector:()=>null},matchMedia:()=>({matches:false}),modalRoot:{querySelector:()=>({})},modalCleanup:()=>{},app:{},sync:{schedule(){}},streakLedger:{async claim(){calls.claims++;return {count:1,variant:'orbit',celebrate:calls.claims===1};}},fadeDialog:async()=>{},fadeRound:async()=>{calls.fades++;},showModal:(html,closable)=>calls.dialogs.push({html,closable}),closeModal(){},streakDemo,mountStreakFinish:(stage,options)=>{calls.mounts.push(options);return ()=>{};},backgroundSync:async()=>{},render(){calls.renders.push(context.screen);}});
+ const context=vm.createContext({hasAnswerContent,navigator:{onLine:false},icon:()=>'',roundEnd:null,predicateRoot:null,predicateRun:[],predicateResults:[],predicateRoundId:'p',predicateCursor:0,predicateAnswer:'',predicateFeedback:null,screen:'test',store,data:()=>d,failedTasks,createErrorRetry,shuffleQueue,predicateProgress,uid:()=> 'retry',h:String,document:{activeElement:{blur(){}},body:{style:{overflow:''}},querySelector:()=>null},matchMedia:()=>({matches:false}),modalRoot:{querySelector:()=>({})},modalCleanup:()=>{},app:{},sync:{schedule(){}},streakLedger:{async claim(){calls.claims++;return {count:1,variant:'orbit',celebrate:calls.claims===1};}},fadeDialog:async()=>{},fadeRound:async()=>{calls.fades++;},showModal:(html,closable)=>calls.dialogs.push({html,closable}),closeModal(){},streakDemo,mountStreakFinish:(stage,options)=>{calls.mounts.push(options);return ()=>{};},backgroundSync:async()=>{},render(){calls.renders.push(context.screen);}});
  const start=source.indexOf('async function offerRoundEnd('),end=source.indexOf('function announcementView(',start);
  vm.runInContext(source.slice(start,end),context);return {context,calls,store,d,session};
 }
@@ -80,7 +81,7 @@ test('predicate retries retain the first answer and do not earn a streak before 
 test('every typed answer including the last keeps feedback visible until Weiter',async()=>{
  for(const cursor of [0,1]){
   let nexts=0;const session={id:'r',cursor,queue:[{wordId:'x'},{wordId:'x'}]},word={id:'x',meanings:[['Stimme']]};
-  const ctx=vm.createContext({current:()=>({session,word,item:session.queue[cursor]}),readAnswers:()=>['Stimme'],english:false,prefs:()=>({typos:true}),evaluateSession,reviewKey:()=> 'r-'+cursor,store:{async commit(){}},sync:{schedule(){}},render(){},next:async()=>nexts++});
+  const ctx=vm.createContext({hasAnswerContent,current:()=>({session,word,item:session.queue[cursor]}),readAnswers:()=>['Stimme'],english:false,prefs:()=>({typos:true}),evaluateSession,reviewKey:()=> 'r-'+cursor,store:{async commit(){}},sync:{schedule(){}},render(){},next:async()=>nexts++});
   vm.runInContext(source.split('\n').find(line=>line.startsWith('async function checkAnswer(')),ctx);await ctx.checkAnswer();assert.equal(nexts,0);
  }
 });

@@ -1,5 +1,5 @@
 import {SUBJECTS} from './subjects.js';
-export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,render,closeModal=()=>{},canPrompt=()=>true}){
+export function notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView=()=>true,notify,render,closeModal=()=>{},canPrompt=()=>true}){
  let state=null,catalog=null,history=[],enabled=false,checked=false,prompted=false;
  const supported=()=>!!(globalThis.Notification&&navigator.serviceWorker&&globalThis.PushManager);
  const request=(action,payload={})=>sync.request(action,payload);
@@ -43,8 +43,13 @@ export function notificationsUI({sync,profile,h,showModal,showAdmin,notify,rende
   else if(action==='notification-disable'){prompted=true;await disable();render();notify('Erinnerungen auf diesem Gerät ausgeschaltet.');}
   else{
    if(profile.role!=='admin')return true;
-   if(action==='notification-admin'){const result=await request('notificationAdmin');state=result;catalog=result.catalog;history=result.history;state.historyMore=history.length===200;adminView();}
-   if(action==='notification-more'){const result=await request('notificationHistory',{offset:history.length});history=[...new Map([...history,...result.history].map(row=>[row.id,row])).values()];state.historyMore=result.history.length===200;adminView();}
+   if(action==='notification-admin'){
+    showAdmin('<div role="status" data-reminder-loading><span class="button-loading" aria-hidden="true"><i></i><i></i><i></i></span> Erinnerungen werden geladen …</div>','reminders');
+    const target=document.querySelector('[data-reminder-loading]');
+    try{const result=await request('notificationAdmin');if(!target?.isConnected||!isAdminView('reminders'))return true;state=result;catalog=result.catalog;history=result.history;state.historyMore=history.length===200;adminView();}
+    catch(error){if(target?.isConnected&&isAdminView('reminders')){target.textContent='Erinnerungen konnten nicht geladen werden: '+error.message;const retry=document.createElement('button');retry.type='button';retry.className='text-button';retry.dataset.action='notification-admin';retry.textContent='Erneut versuchen';target.append(retry);}}
+   }
+   if(action==='notification-more'){const result=await request('notificationHistory',{offset:history.length});history=[...new Map([...history,...result.history].map(row=>[row.id,row])).values()];state.historyMore=result.history.length===200;if(button.isConnected&&isAdminView('reminders'))adminView();}
    if(action==='notification-new'){const id=crypto.randomUUID();document.querySelector('#notification-messages').insertAdjacentHTML('beforeend',rowMarkup({id,enabled:true,subject:'all',text:''}));document.querySelector(`[data-notification-id="${id}"] textarea`).focus();}
    if(action==='notification-remove')button.closest('[data-notification-id]')?.remove();
   }return true;

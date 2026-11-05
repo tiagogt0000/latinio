@@ -7,7 +7,9 @@ import {parseCollectionFile,importChanges} from './refresh-import.js';
 import {legacyRefreshCount,reconcileRefreshDeck} from './refresh-reconcile.js';
 import {rateRefresh,refreshCardView,bindRefreshSwipe,finishRefresh} from './refresh-cards.js';
 import {installKeyboardSupport} from './keyboard.js';
-import {appendAnswerField} from './answer-fields.js';
+import {appendAnswerField,hasAnswerContent} from './answer-fields.js';
+import {installInputVisibility,focusInput} from './input-visibility.js';
+import {captureViewState,restoreViewState} from './view-state.js';
 import {failedTasks,createErrorRetry} from './error-retry.js';
 import {parsePredicateFile,readPredicateStore,predicateMatches,predicateStorageKey,predicateCloudItems,migrateLocalPredicates,predicateDecks,predicateProgress,predicateDeckChanges,importPredicateCollection,predicateQueue} from './predicates.js';
 import {sortedCollections,refreshDecks,wordEnabled,trainingDecks,wordsForDecks,deckMembers,pendingMembers,selectedDeckPending,saveDeck,checkResultWords} from './refresh-decks.js';
@@ -51,6 +53,7 @@ let streakLedger=null,streakSyncTask=null,streakSyncedAt=0,streakOtherVersion=nu
 let predicateKey='',predicateRun=[],predicateCursor=0,predicateAnswer='',predicateFeedback=null;
 let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
+let modalReturnFocus=null;
 const isBootSplash=()=>app.querySelector('.boot')?.textContent.includes('Deine Vokabeln werden geladen');
 updates.addEventListener('change',()=>{if(!ready&&isBootSplash()&&updates.state==='available')void updates.apply();});
 if('serviceWorker'in navigator&&location.protocol!=='file:')void navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>{updates.watch(registration);void updates.check();}).catch(()=>{});
@@ -71,19 +74,20 @@ function todayCount(){const today=new Date().toLocaleDateString('sv');return Obj
 function updateStatus(){setTimeout(autoUpdate,0);document.querySelectorAll('[data-auto-share]').forEach(el=>el.innerHTML=sharing?.autoStatusMarkup()||'');const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
 function render(){
  theme();
- const sameScreen=renderedScreen===screen,scrollY=window.scrollY,screenChanged=!sameScreen;
+ const sameScreen=renderedScreen===screen,screenChanged=!sameScreen;
  const previousScreen=renderedScreen;renderedScreen=screen;
  if(screen==='match'){app.innerHTML=confusions.view();return;}
  if(screen==='test'){renderTest();return;}
  if(screen==='predicate-test'){renderPredicateTest();return;}
  if(screen==='round-end')return;
+ const viewState=captureViewState(app);
  const transition=screenChanged?({learn:'learn',collections:'collections',admin:'admin',settings:'settings','collection-detail':'detail','predicate-detail':'detail',classroom:'classroom'}[screen]||'fade'):'';
  app.innerHTML=`<aside class="sidebar"><button class="brand brand-switch" data-action="subject-menu" aria-label="Lernfach wechseln">${brandWord(subject)}</button>${nav()}<div class="sidebar-foot"><div class="language-tag">${subject==='french'?'FR ↔ DE':english?'EN ↔ DE':'LA → DE'}</div><p>Ein bisschen ${languageName()}.<br>Jeden Tag.</p><span class="muted small">App ${APP_VERSION}</span></div></aside><div class="workspace"><header class="topbar"><button class="mobile-brand brand" aria-label="${subjectInfo(subject).brand}">${brandWord(subject)}</button><span class="desktop-only muted">Dein ${languageName()}training</span><div class="topbar-actions"><details class="subject-dropdown"><summary><span class="subject-flag" aria-hidden="true">${subjectInfo(subject).flag}</span>${languageName()} <span aria-hidden="true">▾</span></summary><div class="subject-options">${SUBJECTS.filter(x=>subjectAllowed(x.id)).map(x=>`<button data-action="switch-subject" data-id="${x.id}">${x.flag} ${x.label}${subject===x.id?' · aktuell':''}</button>`).join('')}</div></details></div></header><main class="content" ${transition?`data-screen-transition="${transition}"`:''}>${isAdmin()&&['collections','collection-detail','predicate-detail','admin'].includes(screen)?`<div data-auto-share>${sharing?.autoStatusMarkup()||''}</div>`:''}${screen==='tables'&&subject==='latin'?tablePractice.view():screen==='grammar'&&isAdmin()&&subject==='english'?grammar.view():screen==='learn'?learnView():screen==='collections'?collectionsView():screen==='collection-detail'?collectionDetailView():screen==='predicate-detail'?predicateDetail(data(),collectionFilter,h,icon):screen==='classroom'?classroomView(data(),classroomQuery,h,english,subject):screen==='admin'&&isAdmin()?adminView():settingsView()}</main></div><div class="mobile-nav">${nav()}</div>`;
  app.querySelectorAll('details[data-panel]').forEach(el=>{el.open=openPanels.has(el.dataset.panel);});
- if(sameScreen)window.scrollTo(0,scrollY);
- else if(previousScreen!==null)window.scrollTo(0,0);
+ restoreViewState(app,viewState,{preserve:sameScreen});
+ if(!sameScreen&&previousScreen!==null)window.scrollTo({left:0,top:0,behavior:'instant'});
 }
-function adminView(){return `<div class="page-heading"><div><div class="eyebrow">VERWALTUNG</div><h1>Nutzer</h1><p class="muted">Profile, Freigaben und Nachrichten an einem Ort.</p></div></div><div class="section-tabs admin-tabs" aria-label="Nutzerverwaltung"><button class="chip ${adminTab==='people'?'selected':''}" data-action="account-profiles">Nutzer</button><button class="chip ${adminTab==='shares'?'selected':''}" data-action="share-panel">Freigaben</button><button class="chip" data-action="sharing-check">Prüfer</button><button class="chip ${adminTab==='messages'?'selected':''}" data-action="announcement-history">Nachrichten</button><button class="chip ${adminTab==='reminders'?'selected':''}" data-action="notification-admin">Erinnerungen</button></div><section class="admin-content">${adminContent||'<p class="muted">Nutzerverwaltung wird geladen …</p>'}</section>`;}
+function adminView(){return `<div class="page-heading"><div><div class="eyebrow">VERWALTUNG</div><h1>Nutzer</h1><p class="muted">Profile, Freigaben und Nachrichten an einem Ort.</p></div></div><div class="section-tabs admin-tabs" aria-label="Nutzerverwaltung"><button class="chip ${adminTab==='people'?'selected':''}" data-action="account-profiles">Nutzer</button><button class="chip ${adminTab==='shares'?'selected':''}" data-action="share-panel">Freigaben</button><button class="chip ${adminTab==='checks'?'selected':''}" data-action="sharing-check">Freigaben prüfen</button><button class="chip ${adminTab==='messages'?'selected':''}" data-action="announcement-history">Nachrichten</button><button class="chip ${adminTab==='reminders'?'selected':''}" data-action="notification-admin">Erinnerungen</button></div><section class="admin-content">${adminContent||'<p class="muted">Nutzerverwaltung wird geladen …</p>'}</section>`;}
 function showAdmin(content,tab='people'){if(!isAdmin())return;closeModal();adminContent=content;adminTab=tab;screen='admin';render();}
 function learnView(){const d=data(),words=activeWords(),streak=streakLedger?streakLedger.state(d):streakState(streakDays(d)),goal=prefs().daily;const decks=trainingDecks(d).filter(x=>x.active);selected=selected.filter(id=>decks.some(x=>x.id===id));if(!selected.length)selected=decks.map(x=>x.id);
  return `<div class="page-heading home-heading"><div><div class="eyebrow">DEIN TRAINING</div><h1>Hallo ${h(isAdmin()?'Tiago':profile.name)}!</h1><p class="muted">Was möchtest du heute üben?</p></div><div class="daily-badge streak-badge ${streak.active?'is-active':''}" aria-label="${streak.count} ${streak.count===1?'Tag':'Tage'} Streak · ${streak.active?'heute gelernt':'heute noch keine Runde abgeschlossen'}">${streakBadgeFlame()}<strong>${streak.count}</strong><span>${streak.count===1?'Tag':'Tage'}</span></div></div>
@@ -114,14 +118,29 @@ function syncDetails(){const doc=store.doc;return `<div class="sync-box"><p clas
 function updateView(){const busy=['checking','installing'].includes(updates.state);return `<p class="small muted">Installierte Version: ${APP_VERSION}</p><p role="status" class="update-message">${h(updates.message)}</p><button type="button" class="button ${updates.state==='available'?'primary':'secondary'} wide" data-action="${updates.state==='available'?'apply-update':'check-update'}" ${busy?'disabled':''}>${icon('repeat')} ${updates.state==='available'?'Jetzt aktualisieren':busy?'Bitte warten …':'Nach Updates suchen'}</button>`;}
 updates.addEventListener('change',()=>{const area=document.querySelector('[data-app-updates]');if(area)area.innerHTML=updateView();autoUpdate();});
 function settingsView(){const p=prefs();return `<div class="page-heading"><div><div class="eyebrow">DEINE APP</div><h1>Einstellungen</h1><p class="muted">Einfach anpassen, der Reihe nach.</p></div></div><div class="settings-list">${accountCard(profile)}${reminders?.settingsMarkup()||''}<section class="settings-section"><h2>Training</h2><label class="setting-row"><span><strong>Tagesziel</strong><small>Aufgaben pro Runde · kein Tageslimit</small></span><select id="daily">${[5,10,15,20,30].map(n=>`<option value="${n}" ${p.daily===n?'selected':''}>${n} Wörter</option>`).join('')}</select></label><label class="setting-row"><span><strong>Tippfehler tolerieren</strong><small>Deutsche Tippfehler tolerieren; Fremdsprachige Antworten werden streng bewertet. Bewertungen kannst du korrigieren.</small></span><input class="switch" id="typos" type="checkbox" ${p.typos?'checked':''}></label></section><section class="settings-section"><h2>App-Updates</h2><div data-app-updates>${updateView()}</div></section><section class="settings-section"><h2>Vokabeln & Installation</h2><div class="settings-actions"><button class="button secondary wide" data-action="import">${icon('upload')} Sammlung importieren</button><button class="text-button wide" data-action="download-example">Beispiel für das Importformat</button>${!english?'<button class="text-button wide" data-action="predicate-example">Beispiel für Perfekt-Sammlungen</button>':''}</div><p class="muted install-hint"><strong>Auf deinem iPhone oder iPad:</strong> Safari → Teilen → „Zum Home-Bildschirm“.</p></section>${isAdmin()?`<section class="settings-section"><h2>Admin Tests</h2><p class="small muted">Streak-Animationen als Vorschau ausprobieren.</p><div class="settings-actions"><button class="button secondary wide" data-action="admin-tests">Streak-Animationen testen</button></div></section><section class="settings-section cloud-settings"><h2>Cloud & Versionen</h2><div data-sync-details>${syncDetails()}</div><div class="settings-actions"><button class="button secondary wide" data-action="sync-now" ${!sync.configured?'disabled':''}>${icon('repeat')} Jetzt abgleichen</button>${sync.remote?'<button class="button primary wide" data-action="remote">Cloud-Version ansehen</button>':''}</div></section>`:''}</div><p class="small muted app-version">Latinio ${APP_VERSION} · ${english?languageName()+' ↔ Deutsch':'Latein → Deutsch'}</p>`;}
-function showModal(content,closable=true){const previous=document.activeElement;modalCleanup?.();modalRoot.innerHTML=`<div class="modal-overlay"><section role="dialog" aria-modal="true" class="modal" aria-labelledby="modal-title">${closable?`<button class="icon-button modal-close" data-action="close-modal" aria-label="Schließen">${icon('close')}</button>`:''}${content}</section></div>`;
-  const listener=e=>{if(e.key==='Escape'&&closable)closeModal();if(e.key==='Tab'){const nodes=[...modalRoot.querySelectorAll('button,input,select,textarea,a[href]')].filter(n=>!n.disabled);if(!nodes.length){e.preventDefault();return;}const first=nodes[0],last=nodes.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};document.addEventListener('keydown',listener);modalCleanup=()=>{document.removeEventListener('keydown',listener);previous?.focus();};modalRoot.querySelector('input,select,button')?.focus();}
-function closeModal(){modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;}
+function showModal(content,closable=true){
+ const previous=modalRoot.children.length?modalReturnFocus:document.activeElement;
+ modalCleanup?.(false);modalReturnFocus=previous;
+ modalRoot.innerHTML=`<div class="modal-overlay"><section role="dialog" aria-modal="true" class="modal" tabindex="-1" aria-labelledby="modal-title">${closable?`<button class="icon-button modal-close" data-action="close-modal" aria-label="Schließen">${icon('close')}</button>`:''}${content}</section></div>`;
+ const listener=e=>{
+  if(e.key==='Escape'&&closable){e.preventDefault();closeModal();return;}
+  if(e.key!=='Tab')return;
+  const nodes=[...modalRoot.querySelectorAll('button,input,select,textarea,a[href]')].filter(n=>!n.disabled&&!n.hidden&&n.type!=='hidden');
+  if(!nodes.length){e.preventDefault();modalRoot.querySelector('.modal')?.focus({preventScroll:true});return;}
+  const first=nodes[0],last=nodes.at(-1),outside=!modalRoot.contains(document.activeElement);
+  if(e.shiftKey&&(document.activeElement===first||outside)){e.preventDefault();last.focus({preventScroll:true});}
+  else if(!e.shiftKey&&(document.activeElement===last||outside)){e.preventDefault();first.focus({preventScroll:true});}
+ };
+ document.addEventListener('keydown',listener);
+ modalCleanup=(restore=true)=>{document.removeEventListener('keydown',listener);if(restore&&previous?.isConnected!==false)previous?.focus({preventScroll:true});};
+ modalRoot.querySelector('input,select,button,.modal')?.focus({preventScroll:true});
+}
+function closeModal(){modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;modalReturnFocus=null;}
 function showStreakDemo(){
  showModal(streakDemo(streakDemoDay,streakDemoVariant,streakDemoTheme));
  const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
  const dispose=mountStreakDemo(modalRoot.querySelector('.streak-stage'),{reducedMotion:window.matchMedia('(prefers-reduced-motion: reduce)').matches,onStart:()=>modalRoot.querySelector('.modal-close')?.focus({preventScroll:true})});
- const cleanup=modalCleanup;modalCleanup=()=>{dispose();document.body.style.overflow=overflow;cleanup?.();};
+ const cleanup=modalCleanup;modalCleanup=restore=>{dispose();document.body.style.overflow=overflow;cleanup?.(restore);};
 }
 
 function streakBadgeFlame(){return '<svg class="streak-badge-flame" viewBox="100 90 1060 1320" aria-hidden="true"><path fill="currentColor" d="M583 114C606 84 647 84 671 115L1036 584C1118 689 1155 792 1155 915C1155 1200 920 1402 629 1402C339 1402 103 1196 103 916V388C103 325 144 289 198 312L365 389Z"/><path class="streak-badge-core" d="M600 652C614 631 640 631 655 652L809 870C839 911 854 953 854 1001C854 1118 755 1210 628 1210C502 1210 402 1118 402 1001C402 953 417 911 447 870Z"/></svg>';}
@@ -158,7 +177,7 @@ async function acceptRoundEnd(){
  showModal(streakDemo(state.count,state.variant,'auto',{live:true,celebrate:state.celebrate,stats:completion.stats}),false);
  const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
  const dispose=mountStreakFinish(modalRoot.querySelector('.streak-stage'),{celebrate:state.celebrate,reducedMotion:reduced});
- const cleanup=modalCleanup;modalCleanup=()=>{dispose();document.body.style.overflow=overflow;cleanup?.();};
+ const cleanup=modalCleanup;modalCleanup=restore=>{dispose();document.body.style.overflow=overflow;cleanup?.(restore);};
  }catch(error){completion.accepted=false;showModal(`<div class="round-decision"><h2 id="modal-title">Abschluss erneut versuchen</h2><p>${h(error.message)}</p><button class="button primary wide" data-action="round-finish">Erneut versuchen</button></div>`,false);}
 }
 async function retryRoundErrors(){
@@ -250,10 +269,10 @@ function answerInput(value,i,disabled){const toEnglish=english&&current().item?.
 function feedbackView(word,f){const title={full:f.meaningRequirement==='any'?'Bedeutung erkannt!':'Alles richtig!',partial:'Richtig – noch nicht vollständig.',wrong:'Noch nicht ganz.'}[f.grade];return `<section class="feedback compact-feedback ${f.grade}" aria-live="polite"><h2>${icon(f.grade==='wrong'?'repeat':'check')} ${title}</h2><button type="button" class="icon-button" data-action="edit-word" data-id="${h(word.id)}" aria-label="Vokabeleintrag korrigieren">${icon('edit')}</button></section>`;}
 
 function readAnswers(){return [...document.querySelectorAll('#answers input')].map(el=>el.value);}
-async function checkAnswer(skip=false){const {session,word,item}=current();if(!word||session.feedback)return;session.answers=readAnswers();if(skip)session.answers=[''];session.overrides={};session.feedback=evaluateSession(english?answerWord(word,item.direction):word,session.answers,english?item.direction==='en-de'&&prefs().typos:prefs().typos,{},session);const review={id:reviewKey(session),wordId:word.id,direction:item.direction,grade:session.feedback.grade,at:Date.now(),repeat:false,mode:session.mode||'smart',meaningRequirement:session.meaningRequirement||'all',answers:session.answers};await store.commit([['reviews',review.id,review]],session);sync.schedule();render();}
-async function beginCorrection(initial=''){const {session}=current();if(!session?.feedback||session.feedback.grade==='full')return;session.correctionMode=true;session.correctionAnswers=[initial];session.correctionResult=null;await store.update(doc=>{doc.session=session;return doc;});render();const input=document.querySelector('#practice-answers input');input?.focus({preventScroll:true});input?.setSelectionRange?.(input.value.length,input.value.length);}
-async function submitCorrection(){const {session,word,item}=current();if(!session?.correctionMode||!word)return;const answers=[...document.querySelectorAll('#practice-answers input[name="answer"]')].map(el=>el.value);session.correctionAnswers=answers;session.correctionResult=evaluateSession(english?answerWord(word,item.direction):word,answers,english?item.direction==='en-de'&&prefs().typos:prefs().typos,{},session);await store.update(doc=>{doc.session=session;return doc;});render();if(session.correctionResult.grade!=='full')document.querySelector('#practice-answers input')?.focus({preventScroll:true});}
-function appendCorrectionField(){const host=document.querySelector('#practice-answers');if(!host)return;const index=host.querySelectorAll('[name="answer"]').length;host.insertAdjacentHTML('beforeend',answerInput('',index,false));host.lastElementChild?.querySelector('input')?.focus({preventScroll:true});}
+async function checkAnswer(skip=false){const {session,word,item}=current();if(!word||session.feedback)return;const answers=readAnswers();if(!skip&&!hasAnswerContent(answers))return;session.answers=answers;if(skip)session.answers=[''];session.overrides={};session.feedback=evaluateSession(english?answerWord(word,item.direction):word,session.answers,english?item.direction==='en-de'&&prefs().typos:prefs().typos,{},session);const review={id:reviewKey(session),wordId:word.id,direction:item.direction,grade:session.feedback.grade,at:Date.now(),repeat:false,mode:session.mode||'smart',meaningRequirement:session.meaningRequirement||'all',answers:session.answers};await store.commit([['reviews',review.id,review]],session);sync.schedule();render();}
+async function beginCorrection(initial=''){const {session}=current();if(!session?.feedback||session.feedback.grade==='full')return;session.correctionMode=true;session.correctionAnswers=[initial];session.correctionResult=null;await store.update(doc=>{doc.session=session;return doc;});render();const input=document.querySelector('#practice-answers input');focusInput(input);input?.setSelectionRange?.(input.value.length,input.value.length);}
+async function submitCorrection(){const {session,word,item}=current();if(!session?.correctionMode||!word)return;const answers=[...document.querySelectorAll('#practice-answers input[name="answer"]')].map(el=>el.value);if(!hasAnswerContent(answers))return;session.correctionAnswers=answers;session.correctionResult=evaluateSession(english?answerWord(word,item.direction):word,answers,english?item.direction==='en-de'&&prefs().typos:prefs().typos,{},session);await store.update(doc=>{doc.session=session;return doc;});render();if(session.correctionResult.grade!=='full')document.querySelector('#practice-answers input')?.focus({preventScroll:true});}
+function appendCorrectionField(){const host=document.querySelector('#practice-answers');if(!host)return;const index=host.querySelectorAll('[name="answer"]').length;host.insertAdjacentHTML('beforeend',answerInput('',index,false));focusInput(host.lastElementChild?.querySelector('input'));}
 async function reevaluate(){const {session,word,item}=current();if(!session.feedback||!word)return;session.feedback=evaluateSession(english?answerWord(word,item.direction):word,session.answers,english?item.direction==='en-de'&&prefs().typos:prefs().typos,session.overrides,session);const key=reviewKey(session);const review={...data().reviews[key],grade:session.feedback.grade,answers:session.answers};await store.commit([['reviews',key,review]],session);sync.schedule();render();}
 async function finishSession(session){if(session.finished)return;session.finished=true;await store.commit([['sessions',session.id,{id:session.id,at:Date.now(),count:session.originalLength}]],session);sync.schedule(0);await showResult();}
 async function next(){const {session,word}=current();if(!session||session.finished)return;
@@ -266,7 +285,24 @@ async function rateCard(known){const transition=rateRefresh(data(),store.doc.ses
 
 async function changePrefs(changes){await store.commit([['settings','general',{...prefs(),...changes}]]);sync.schedule();render();}
 async function actions(event){const button=event.target.closest('[data-action]');if(!button)return;event.preventDefault();const action=button.dataset.action,id=button.dataset.id;
- if(!ready||working)return;
+ if(!ready)return;
+ if(['collection-open','refresh-tools','predicate-open','collection-tab','nav','close-modal'].includes(action)){
+  if(action==='close-modal'){closeModal();return;}
+  if(action==='nav'){
+   if(button.dataset.screen==='admin'){if(isAdmin())void sharing.handle({dataset:{action:'account-profiles'}}).catch(error=>notify(error.message));return;}
+   if(!['learn','collections','classroom','settings'].includes(button.dataset.screen))return;
+   screen=button.dataset.screen;if(screen==='collections'){collectionFilter='all';search='';collectionsSearchOpen=false;}
+  }else if(action==='collection-tab')collectionTab=id;
+  else{collectionFilter=id;search='';screen=action==='predicate-open'?'predicate-detail':'collection-detail';if(action==='predicate-open')collectionTab='predicates';}
+  closeModal();render();return;
+ }
+ if(['account-profiles','share-panel','sharing-check','announcement-history','notification-admin'].includes(action)&&isAdmin()){
+  try{
+   if(action==='announcement-history')showAnnouncementHistory();
+   else void Promise.resolve(action==='notification-admin'?reminders.handle(button):sharing.handle(button)).catch(error=>notify(error.message));
+  }catch(error){notify(error.message);}return;
+ }
+ if(working){notify('Die vorige Aktion wird noch abgeschlossen …');return;}
  const starts=['start','training-options','start-all','start-learning','start-refresh','confirm-start','predicate-start','predicate-options','predicate-mode','inactive-practice','refresh-check','refresh-select-test','confusion-practice'].includes(action);
  if(starts&&waitingStart)return;
  if(starts&&cloudWait?.blocked){
@@ -277,7 +313,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  }
  working=true;
  let actionDots=null;
- const actionDotsTimer=setTimeout(()=>{if(button.isConnected&&button.matches?.('.button,.text-button')){actionDots=document.createElement('span');actionDots.className='button-loading';actionDots.setAttribute('role','status');actionDots.setAttribute('aria-label','Wird geladen');actionDots.innerHTML='<i></i><i></i><i></i>';button.append(actionDots);button.setAttribute('aria-busy','true');}},140);
+ const actionDotsTimer=setTimeout(()=>{if(button.isConnected){actionDots=document.createElement('span');actionDots.className='button-loading';actionDots.setAttribute('role','status');actionDots.setAttribute('aria-label','Wird geladen');actionDots.innerHTML='<i></i><i></i><i></i>';button.append(actionDots);button.setAttribute('aria-busy','true');}},140);
  try{
  if(subject==='latin'&&tablePractice?.handle(button))return;
  if(grammar?.handle(button))return;
@@ -381,6 +417,7 @@ for(const type of ['dragstart','dragover','drop','dragend','pointerdown','pointe
 },{passive:false});
 
 installKeyboardSupport({root:document,active:()=>ready&&!working&&!cloudWait?.blocked&&!modalRoot.children.length&&screen==='test',session:()=>current().session,submit:()=>document.querySelector('#answer-form')?.requestSubmit?.(),next:()=>document.querySelector('#answer-form [data-action="next"]')?.click(),addField:()=>document.querySelector('#answer-form [data-action="add-answer"]')?.click(),addCorrectionField:appendCorrectionField,beginCorrection,submitCorrection,rateCard:known=>document.querySelector(`[data-action="refresh-card-${known?'known':'wrong'}"]`)?.click()});
+installInputVisibility({root:document,active:()=>screen==='test'&&!modalRoot.children.length});
 document.addEventListener('toggle',event=>{const el=event.target;if(el.dataset?.panel&&el.isConnected){if(el.open)openPanels.add(el.dataset.panel);else openPanels.delete(el.dataset.panel);}},true);
 document.addEventListener('input',event=>{if(screen==='tables'&&tablePractice?.input(event.target))return;if(event.target.dataset.grammarAnswer){grammar?.input(event.target);return;}if(sharing?.input?.(event.target))return;if(event.target.dataset.reconcileSearch!==undefined){const select=document.getElementById(`reconcile-select-${event.target.dataset.reconcileSearch}`),q=normalize(event.target.value),suggestions=JSON.parse(event.target.dataset.candidates||'[]'),available=Object.values(data().words).filter(w=>data().collections[w.collectionId]&&!data().collections[w.collectionId].refreshSource).map(w=>({id:w.id,latin:w.latin,collection:data().collections[w.collectionId].name,meanings:w.meanings}));if(select){const options=q?available.filter(w=>normalize(`${w.latin} ${w.meanings.flat().join(' ')} ${w.collection}`).includes(q)).slice(0,50):suggestions;select.innerHTML=`<option value="">Nicht zuordnen</option>${options.length?`<optgroup label="${q?'Suchtreffer':'Mögliche Treffer'}">${options.map(w=>`<option value="${h(w.id)}">${h(w.latin)} · ${h(w.collection)}</option>`).join('')}</optgroup>`:''}`;}}if(event.target.id==='refresh-word-search'){const q=normalize(event.target.value);document.querySelectorAll('[data-refresh-word-row]').forEach(row=>row.hidden=!normalize(row.textContent).includes(q));}if(event.target.id==='classroom-search'){classroomQuery=event.target.value;document.querySelector('#classroom-results').innerHTML=classroomResults(data(),classroomQuery,h,english,subject);}if(event.target.id==='search'){search=event.target.value;const results=document.querySelector('#collection-search-results');if(results)results.innerHTML=search.trim()?wordRows('all',search):'';else document.querySelector('#word-list').innerHTML=wordRows();}});
 document.addEventListener('change',async event=>{const el=event.target;try{if(screen==='tables'&&tablePractice?.change(el))return;if(sharing?.change?.(el))return;
@@ -453,11 +490,11 @@ async function boot(){try{
  }
  if(subject!=='latin'){const latinStore=store,config=latinStore.doc.config;store=await new Store().open(profile.id,subject);await store.update(doc=>{doc.config={...config};doc.profile=profile;doc.seeded=true;return doc;});latinStore.close();}
  subjectMetadata();await store.seed();await store.listDeletedCollections();if(store.doc.session||store.doc.matchRound)await store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});sync=new Sync(store);
- reminders=notificationsUI({sync,profile,h,showModal,showAdmin,notify,render,closeModal,canPrompt:()=>ready&&!document.hidden&&!working&&!waitingStart&&!cloudWait?.blocked&&!announcementLoading&&!modalRoot.children.length&&['learn','collections','settings'].includes(screen)});
+ reminders=notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView:tab=>screen==='admin'&&adminTab===tab,notify,render,closeModal,canPrompt:()=>ready&&!document.hidden&&!working&&!waitingStart&&!cloudWait?.blocked&&!announcementLoading&&!modalRoot.children.length&&['learn','collections','settings'].includes(screen)});
  if(isAdmin()&&subject==='english')grammar=grammarUI({profile,sync,h,go:()=>{closeModal();screen='grammar';},render,isVisible:()=>screen==='grammar',notify});
- if(subject==='latin')tablePractice=tablePracticeUI({profile,h,go:(target='tables')=>{closeModal();screen=target;},render,notify});
+ if(subject==='latin')tablePractice=tablePracticeUI({profile,h,showModal,closeModal,go:(target='tables')=>{closeModal();screen=target;},render,notify});
  const shareContexts=new Map([[subject,{store,sync}]]);
- sharing=sharingUI({store,sync,profile,h,showModal,showAdmin,closeModal,notify,render,openShareSubject:async next=>{if(shareContexts.has(next))return shareContexts.get(next);const nextStore=await new Store().open(profile.id,next);await nextStore.update(doc=>{doc.config={...store.doc.config};doc.profile=profile;doc.seeded=true;return doc;});await nextStore.seed();const nextSync=new Sync(nextStore);await settleSync(nextSync,nextStore);const context={store:nextStore,sync:nextSync};shareContexts.set(next,context);return context;},openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});
+ sharing=sharingUI({store,sync,profile,h,showModal,showAdmin,isAdminView:tab=>screen==='admin'&&adminTab===tab,closeModal,notify,render,openShareSubject:async next=>{if(shareContexts.has(next))return shareContexts.get(next);const nextStore=await new Store().open(profile.id,next);await nextStore.update(doc=>{doc.config={...store.doc.config};doc.profile=profile;doc.seeded=true;return doc;});await nextStore.seed();const nextSync=new Sync(nextStore);await settleSync(nextSync,nextStore);const context={store:nextStore,sync:nextSync};shareContexts.set(next,context);return context;},openCollection:id=>{collectionFilter=id;search='';screen='collection-detail';closeModal();render();}});
  sync.addEventListener('subject-restricted',event=>{
   const allowed=event.allowedSubjects||[];const fallback=allowed.includes(english?'latin':'english')?(english?'latin':'english'):allowed[0];
   if(fallback){const target=new URL(location.href);target.searchParams.set('subject',fallback);location.replace(target.href);}
