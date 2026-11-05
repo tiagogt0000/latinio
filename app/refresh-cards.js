@@ -18,7 +18,7 @@ export function rateRefresh(data,saved,known,now=Date.now()){
  const word=data.words[item.wordId],ops=[];
  if(word){
   if(!session.cardFlipped)return null;
-  const review={id:session.id+'-'+session.cursor,wordId:word.id,direction:item.direction,grade:known?'full':'wrong',at:now,repeat:false,mode:'inactive-check',selfAssessed:true};
+  const review={id:session.id+'-'+session.cursor,wordId:word.id,direction:item.direction,grade:known?'full':'wrong',at:now,repeat:!!item.repeat,mode:'inactive-check',retryStage:session.retryStage||1,selfAssessed:true};
   ops.push(['reviews',review.id,review]);
  }
  session.cursor++;session.cardFlipped=false;session.feedback=null;session.answers=[''];session.overrides={};

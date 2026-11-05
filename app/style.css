@@ -540,3 +540,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .admin-tabs>.chip{min-height:48px}
 @media(prefers-reduced-motion:reduce){[data-action]:active:not(:disabled){filter:none}}
 .admin-error{border:1px solid var(--red);border-radius:16px;background:var(--red-soft);padding:18px;margin:18px 0;line-height:1.6}.admin-error>.button,.admin-error>.text-button{margin-top:12px}
+
+/* Keep the immediate collection loader inside its original pencil target. */
+.icon-button.opening-collection .button-loading{position:static;min-width:0;min-height:0;margin:0;padding:0;background:none;gap:3px}
+.icon-button.opening-collection .button-loading i{width:5px;height:5px}

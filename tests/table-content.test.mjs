@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {CASES,NUMBERS,GENDERS,PERSONS,TARGETS,TABLES,PREFIXES,selectTableItems,checkAnswer} from '../app/table-content.js';
+import {CASES,NUMBERS,GENDERS,PERSONS,DECLENSIONS,TARGETS,TABLES,PREFIXES,selectTableItems,checkAnswer} from '../app/table-content.js';
 const item=id=>TABLES.flatMap(table=>table.items).find(entry=>entry.id===id);
 const prefix=id=>PREFIXES.find(entry=>entry.id===id);
-test('Photograph corpus contains 110 case cells, nine perfect targets and eleven prefixes',()=>{
- assert.deepEqual(TABLES.map(table=>[table.id,table.items.length]),[['adjectives',30],['personal',20],['relative',30],['is',30],['perfect',9]]);
+test('Photograph corpus contains 150 case cells, nine perfect targets and eleven prefixes',()=>{
+ assert.deepEqual(TABLES.map(table=>[table.id,table.items.length]),[['adjectives',30],['personal',20],['relative',30],['is',30],['perfect',9],['nouns',40]]);
  assert.equal(PREFIXES.length,11);assert.equal(TARGETS.length,3);assert.deepEqual(CASES.map(entry=>entry.id),['nom','gen','dat','acc','abl']);
  const entries=[...TABLES.flatMap(table=>table.items),...PREFIXES];assert.equal(new Set(entries.map(entry=>entry.id)).size,entries.length);assert.ok(entries.every(entry=>entry.prompt&&entry.answer&&entry.accepted.length));
 });
@@ -14,7 +14,7 @@ test('Every displayed solution and each documented alternative passes',()=>{
 });
 test('Every grammatical combination exists once and arbitrary case filters work',()=>{
  for(const table of TABLES.filter(entry=>entry.id!=='perfect')){
-  const dimension=table.id==='personal'?'persons':'genders',choices=table.id==='personal'?PERSONS:GENDERS;
+  const dimension=table.id==='personal'?'persons':table.id==='nouns'?'declensions':'genders',choices={persons:PERSONS,declensions:DECLENSIONS,genders:GENDERS}[dimension];
   for(const grammaticalCase of CASES)for(const number of NUMBERS)for(const choice of choices)assert.equal(selectTableItems(table.id,{cases:[grammaticalCase.id],numbers:[number.id],[dimension]:[choice.id]}).length,1);
  }
  assert.equal(selectTableItems('adjectives',{cases:['nom','acc']}).length,12);
@@ -23,7 +23,7 @@ test('Every grammatical combination exists once and arbitrary case filters work'
 });
 test('Empty or invalid active filters cannot silently broaden a round',()=>{
  assert.equal(selectTableItems('adjectives').length,30);assert.equal(selectTableItems('adjectives',null).length,30);
- for(const [id,filters] of [['missing',{}],['adjectives',{cases:[]}],['personal',{persons:[]}],['is',{genders:[]}],['perfect',{targets:[]}],['is',{numbers:['dual']}],['is',{cases:'nom'}]])assert.deepEqual(selectTableItems(id,filters),[]);
+ for(const [id,filters] of [['missing',{}],['adjectives',{cases:[]}],['personal',{persons:[]}],['is',{genders:[]}],['perfect',{targets:[]}],['is',{numbers:['dual']}],['is',{cases:'nom'}],['nouns',{declensions:[]}],['nouns',{declensions:['fifth']}],['nouns',{declensions:'a'}],['nouns',{cases:['voc']}]])assert.deepEqual(selectTableItems(id,filters),[]);
  assert.equal(selectTableItems('personal',{genders:[]}).length,20);assert.equal(selectTableItems('perfect',{cases:[]}).length,9);
  const filters={cases:['acc','nom'],genders:['n']},before=JSON.stringify(filters);selectTableItems('adjectives',filters).pop();assert.equal(TABLES[0].items.length,30);assert.equal(JSON.stringify(filters),before);
 });
@@ -67,4 +67,57 @@ test('Prefixes accept one meaning and punctuation but reject unknown meanings',(
 test('Blanks, empty alternatives and mixed guesses are rejected',()=>{
  for(const answer of ['', '   ','-','/',',;',null,undefined,4,{},'ii / falsch','falsch, ei','ii;','ii//ei'])assert.equal(checkAnswer(answer,item('is-nom-pl-m')),false,String(answer));
  assert.equal(checkAnswer('ii',null),false);assert.equal(checkAnswer('ii',{accepted:[]}),false);assert.equal(checkAnswer('ii',{answer:'ii'}),true);
+});
+test('Noun overview exposes four declension choices and combines all three filters',()=>{
+ assert.deepEqual(DECLENSIONS.map(({id,label})=>({id,label})),[
+  {id:'a',label:'a-Deklination'},
+  {id:'o-m',label:'o-Deklination (m.)'},
+  {id:'o-n',label:'o-Deklination (n.)'},
+  {id:'third',label:'3. Deklination'}
+ ]);
+ assert.deepEqual(DECLENSIONS.map(entry=>entry.example),['domina','dominus','templum','senātor']);
+ const table=TABLES.find(entry=>entry.id==='nouns');
+ assert.equal(table.label,'Substantive (Deklination)');
+ assert.deepEqual(table.dimensions,['cases','numbers','declensions']);
+ assert.equal(selectTableItems('nouns',{cases:['nom','acc']}).length,16);
+ assert.equal(selectTableItems('nouns',{declensions:['third']}).length,10);
+ assert.deepEqual(selectTableItems('nouns',{cases:['gen','abl'],numbers:['sg'],declensions:['a','third']}).map(entry=>entry.answer),['dominae','senātōris','dominā','senātōre']);
+ assert.deepEqual(selectTableItems('nouns',{cases:['nom','acc'],numbers:['pl'],declensions:['o-n']}).map(entry=>entry.answer),['templa','templa']);
+ assert.equal(selectTableItems('nouns',{genders:[]}).length,40);
+});
+test('All forty noun forms match the photographed singular and plural paradigms',()=>{
+ const paradigms={
+  a:{sg:['domina','dominae','dominae','dominam','dominā'],pl:['dominae','dominārum','dominīs','dominās','dominīs']},
+  'o-m':{sg:['dominus','dominī','dominō','dominum','dominō'],pl:['dominī','dominōrum','dominīs','dominōs','dominīs']},
+  'o-n':{sg:['templum','templī','templō','templum','templō'],pl:['templa','templōrum','templīs','templa','templīs']},
+  third:{sg:['senātor','senātōris','senātōrī','senātōrem','senātōre'],pl:['senātōrēs','senātōrum','senātōribus','senātōrēs','senātōribus']}
+ };
+ for(const [declension,numbers] of Object.entries(paradigms))for(const [number,forms] of Object.entries(numbers)){
+  assert.deepEqual(selectTableItems('nouns',{numbers:[number],declensions:[declension]}).map(entry=>entry.answer),forms,`${declension} ${number}`);
+  for(const [index,answer] of forms.entries()){
+   const entry=item(`nouns-${CASES[index].id}-${number}-${declension}`);
+   assert.equal(checkAnswer(answer.normalize('NFD').replace(/[\u0300-\u036f]/g,''),entry),true,entry.id);
+   assert.ok(entry.prompt.includes(NUMBERS.find(value=>value.id===number).label));
+  }
+ }
+});
+test('Noun ablatives accept the book phrases but keep bare forms as canonical answers',()=>{
+ for(const [id,answer,variants] of [
+  ['nouns-abl-sg-a','dominā',['cum domina','(cum) dominā']],
+  ['nouns-abl-sg-o-m','dominō',['cum domino','(cum) dominō']],
+  ['nouns-abl-sg-o-n','templō',['in templo','(in) templō']],
+  ['nouns-abl-sg-third','senātōre',['cum senatore','(cum) senātōre']],
+  ['nouns-abl-pl-o-n','templīs',['in templis','(in) templīs']],
+  ['nouns-abl-pl-third','senātōribus',['cum senatoribus','(cum) senātōribus']]
+ ]){
+  const entry=item(id);assert.equal(entry.answer,answer);
+  for(const variant of variants)assert.equal(checkAnswer(variant,entry),true,variant);
+ }
+ assert.equal(checkAnswer('cum dominus',item('nouns-abl-sg-o-m')),false);
+ assert.equal(checkAnswer('in templum',item('nouns-abl-sg-o-n')),false);
+ assert.equal(checkAnswer('in templo',item('nouns-dat-sg-o-n')),false);
+ assert.equal(checkAnswer('senatororum',item('nouns-gen-pl-third')),false);
+ assert.equal(checkAnswer('templae',item('nouns-nom-pl-o-n')),false);
+ assert.equal(checkAnswer('ae',item('nouns-gen-sg-a')),false);
+ assert.equal(checkAnswer('SENAT-ORIBUS',item('nouns-dat-pl-third')),true);
 });

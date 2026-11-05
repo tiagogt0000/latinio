@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {createCollectionOpener} from '../app/collection-opening.js';
 import {hasAnswerContent} from '../app/answer-fields.js';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 test('Empty normal vocabulary submissions never grade; explicit skip still records a wrong answer',async()=>{
@@ -12,11 +13,23 @@ test('Empty normal vocabulary submissions never grade; explicit skip still recor
  await ctx.checkAnswer(true);assert.equal(graded,1);assert.equal(commits,1);
  delete session.feedback;values=['richtig'];await ctx.checkAnswer();assert.equal(graded,2);
 });
-test('Collection navigation renders immediately while an unrelated operation is busy',async()=>{
- const ctx=vm.createContext({ready:true,working:true,screen:'collections',collectionFilter:'all',search:'old',collectionTab:'lessons',closeModal(){},render(){},sharing:{handle(){throw Error('navigation waited for sharing');}},notify(){throw Error('navigation blocked');}});
+test('Collection navigation paints loading immediately while an unrelated operation is busy',async()=>{
+ let paint,rendered=0;const attrs=new Map(),classes=new Set();
+ const button={dataset:{action:'collection-open',id:'lesson9'},innerHTML:'pencil',classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)},getAttribute:k=>attrs.get(k)??null,setAttribute:(k,v)=>attrs.set(k,v),removeAttribute:k=>attrs.delete(k)};
+ const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},ready:true,working:true,screen:'collections',collectionFilter:'all',search:'old',collectionTab:'lessons',closeModal(){},render(){rendered++;},sharing:{handle(){throw Error('navigation waited for sharing');}},notify(message){throw Error(message);}});
  vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',event=>")),ctx);
- const task=ctx.actions({preventDefault(){},target:{closest:()=>({dataset:{action:'collection-open',id:'lesson9'}})}});
- assert.equal(ctx.screen,'collection-detail');assert.equal(ctx.collectionFilter,'lesson9');assert.equal(ctx.search,'');assert.equal(ctx.working,true);await task;
+ const task=ctx.actions({preventDefault(){},target:{closest:()=>button}});
+ assert.match(button.innerHTML,/button-loading/);assert.equal(rendered,0);assert.equal(ctx.screen,'collections');
+ paint();await task;assert.equal(ctx.screen,'collection-detail');assert.equal(ctx.collectionFilter,'lesson9');assert.equal(ctx.search,'');assert.equal(ctx.working,true);assert.equal(rendered,1);
+});
+test('A dialog opened after tapping the pencil is not closed by delayed collection navigation',async()=>{
+ let paint,dialog='',rendered=0;const classes=new Set();
+ const pencil={dataset:{action:'collection-open',id:'lesson'},innerHTML:'pencil',getAttribute:()=>null,setAttribute(){},removeAttribute(){},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)}};
+ const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},ready:true,working:false,screen:'collections',isAdmin:()=>true,collectionFilter:'all',search:'',collectionTab:'lessons',closeModal(){dialog='';},render(){rendered++;},sharing:{handle(){dialog='Freigaben';}},notify(message){throw Error(message);}});
+ vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',event=>")),ctx);
+ const opening=ctx.actions({preventDefault(){},target:{closest:()=>pencil}});
+ await ctx.actions({preventDefault(){},target:{closest:()=>({dataset:{action:'share-panel'}})}});
+ paint();await opening;assert.equal(dialog,'Freigaben');assert.equal(ctx.screen,'collections');assert.equal(rendered,0);
 });
 test('Modal replacement, tab trapping and Escape never restore focus with scrolling',()=>{
  const focusCalls=[],listeners=new Map();let rootHtml='';

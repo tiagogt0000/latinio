@@ -3,6 +3,7 @@ export const CASES=[{id:'nom',label:'Nominativ',short:'Nom.'},{id:'gen',label:'G
 export const NUMBERS=[{id:'sg',label:'Singular'},{id:'pl',label:'Plural'}];
 export const GENDERS=[{id:'m',label:'Maskulinum'},{id:'f',label:'Femininum'},{id:'n',label:'Neutrum'}];
 export const PERSONS=[{id:'1',label:'1. Person'},{id:'2',label:'2. Person'}];
+export const DECLENSIONS=[{id:'a',label:'a-Deklination',short:'a-Dekl.',example:'domina'},{id:'o-m',label:'o-Deklination (m.)',short:'o-Dekl. m.',example:'dominus'},{id:'o-n',label:'o-Deklination (n.)',short:'o-Dekl. n.',example:'templum'},{id:'third',label:'3. Deklination',short:'3. Dekl.',example:'senātor'}];
 export const TARGETS=[{id:'presentStem',label:'Präsensstamm'},{id:'perfectStem',label:'Perfektstamm'},{id:'perfectFirst',label:'1. Person Singular Perfekt'}];
 function genderTable(id,label,description,forms){
  const items=CASES.flatMap((grammaticalCase,caseIndex)=>NUMBERS.flatMap((number,numberIndex)=>GENDERS.map((gender,genderIndex)=>{
@@ -46,7 +47,25 @@ const isPronoun=genderTable('is','Pronomen: is, ea, id','Das Demonstrativ-, Pers
 const perfect={id:'perfect',label:'Dehnungsperfekt',description:'Die zusätzliche Tabelle mit vidēre, venīre und capere: Präsensstamm, Perfektstamm und Perfektform.',dimensions:['targets'],
  items:[{id:'videre',infinitive:'vidēre',forms:['vide-','vīd-','vīd-ī']},{id:'venire',infinitive:'venīre',forms:['veni-','vēn-','vēn-ī']},{id:'capere',infinitive:'capere',forms:['capi-','cēp-','cēp-ī']}].flatMap(verb=>TARGETS.map((target,index)=>({id:`perfect-${verb.id}-${target.id}`,target:target.id,prompt:`${verb.infinitive} · ${target.label}`,answer:verb.forms[index],accepted:[verb.forms[index]]})))
 };
-export const TABLES=[adjectives,personal,relative,isPronoun,perfect];
+// Rows follow CASES; each row contains the four singular and four plural forms.
+const nounForms=[
+ ['domina','dominus','templum','senātor','dominae','dominī','templa','senātōrēs'],
+ ['dominae','dominī','templī','senātōris','dominārum','dominōrum','templōrum','senātōrum'],
+ ['dominae','dominō','templō','senātōrī','dominīs','dominīs','templīs','senātōribus'],
+ ['dominam','dominum','templum','senātōrem','dominās','dominōs','templa','senātōrēs'],
+ ['dominā','dominō','templō','senātōre','dominīs','dominīs','templīs','senātōribus']
+];
+const nouns={id:'nouns',label:'Substantive (Deklination)',description:'Die a-, o- und 3. Deklination am Beispiel domina, dominus, templum und senātor. Trage die vollständige Form ein.',dimensions:['cases','numbers','declensions'],
+ items:CASES.flatMap((grammaticalCase,caseIndex)=>NUMBERS.flatMap((number,numberIndex)=>DECLENSIONS.map((declension,declensionIndex)=>{
+  const answer=nounForms[caseIndex][numberIndex*DECLENSIONS.length+declensionIndex],accepted=[answer];
+  if(grammaticalCase.id==='abl'){
+   const preposition=declension.id==='o-n'?'in':'cum';
+   accepted.push(`${preposition} ${answer}`,`(${preposition}) ${answer}`);
+  }
+  return {id:`nouns-${grammaticalCase.id}-${number.id}-${declension.id}`,case:grammaticalCase.id,number:number.id,declension:declension.id,prompt:`${declension.example} · ${grammaticalCase.label} · ${number.label} · ${declension.label}`,answer,accepted};
+ })))
+};
+export const TABLES=[adjectives,personal,relative,isPronoun,perfect,nouns];
 export const PREFIXES=[
  {id:'ab',prompt:'ab- (a-, abs-)',answer:'weg-, ab-',accepted:['weg','ab']},
  {id:'ad',prompt:'ad- (ac-, at- und andere Formen)',answer:'hinzu-, dabei-',accepted:['hinzu','dabei']},
@@ -60,7 +79,7 @@ export const PREFIXES=[
  {id:'ne',prompt:'ne-',answer:'nicht',accepted:['nicht']},
  {id:'re',prompt:'re-',answer:'zurück-, wieder',accepted:['zurück','wieder']}
 ];
-const dimensionFields={cases:'case',numbers:'number',genders:'gender',persons:'person',targets:'target'};
+const dimensionFields={cases:'case',numbers:'number',genders:'gender',persons:'person',targets:'target',declensions:'declension'};
 // Omitted dimensions select everything; empty selections select nothing.
 export function selectTableItems(tableId,filters={}){
  const table=TABLES.find(candidate=>candidate.id===tableId);

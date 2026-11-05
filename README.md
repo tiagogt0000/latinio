@@ -1,4 +1,10 @@
-# Latinio · Version 2.7.0
+# Latinio · Version 2.10.0
+
+## Neu in 2.10.0: Substantive und zuverlässige Lernstände
+
+Die Tabellenauswahl zeigt nur die Tabellennamen und den Umfang, ohne Beispiel-Badges, Fortsetzen-Links oder Umschalter zu Präfixen. Neu ist **Substantive (Deklination)** mit allen 40 Formen der Buchseite: Nominativ, Genitiv, Dativ, Akkusativ und Ablativ, jeweils Singular und Plural für a-, o- und 3. Deklination. Die Deklinationen sind unter „Weitere Einstellungen“ auswählbar; Üben und Abfragen funktionieren wie bei den anderen Tabellen.
+
+Der Stift zum Öffnen einer Sammlung zeigt sofort Ladepunkte. Die Wortliste berechnet den Lernstand ohne wiederholte Durchläufe über den gesamten Lernverlauf. Fehler und unvollständige Antworten setzen sichere Wörter wieder auf „Im Training“, auch in Alle-Wörter-Runden und Fehlerwiederholungen. Richtige Korrekturwiederholungen machen sie nicht sofort wieder sicher. Bestehende Daten bleiben erhalten; kein Backendupdate erforderlich.
 
 ## Neu in 2.9.0: Klarere Auswahl und ruhigere Bedienung
 

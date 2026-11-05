@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {tablePracticeUI,tablePracticeCard,prefixPracticeCard} from '../app/table-practice.js';
-import {TABLES,PREFIXES,selectTableItems} from '../app/table-content.js';
+import {TABLES,PREFIXES,DECLENSIONS,selectTableItems} from '../app/table-content.js';
 import {learningStep,learningResult} from '../app/table-learning.js';
 
 const h=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
@@ -82,7 +82,7 @@ test('The catalogue leads through case rows to a separate learning-mode dialog',
  assert.equal(f.button('tables-open'),true);
  assert.equal(f.ui.draft.tableMode,'catalog');
  const catalog=f.ui.view();
- assert.equal((catalog.match(/data-action="tables-select"/g)||[]).length,5);
+ assert.equal((catalog.match(/data-action="tables-select"/g)||[]).length,6);
  for(const table of TABLES)assert.ok(catalog.includes('data-table-id="'+table.id+'"'));
  assert.doesNotMatch(catalog,/data-table-filter=/);
  f.button('tables-select',{tableId:'relative'});
@@ -187,6 +187,89 @@ test('Empty primary selections disable Weiter and cannot open a learning dialog'
  assert.equal(f.calls.notices.length,1);assert.equal(f.ui.draft.tableLearning,null);
  f.filter('cases','acc',true);f.button('tables-choose-mode');
  assert.equal(f.calls.modals.length,1);assert.match(f.calls.modals[0],/6 Formen/);
+});
+
+test('Catalogue, configuration, and saved activities have no example badges, resume links, or internal page switches',()=>{
+ const f=fixture(),round=basicRound(f);
+ f.answer(round.itemIds[0],'magnus');
+ const original=clone(f.ui.draft.tableRound);
+ f.button('tables-open');
+ const catalog=f.ui.view();
+ assert.doesNotMatch(catalog,/table-choice-symbol|magnus|egō|quī|vīdī/);
+ assert.match(catalog,/>Personalpronomen</);assert.match(catalog,/>Relativpronomen</);
+ assert.match(catalog,/>Substantiv-Deklinationen</);
+ assert.deepEqual(clone(f.ui.draft.tableRound),original,'removing resume controls must not delete a draft');
+ const noNavigation=html=>{
+  assert.doesNotMatch(html,/table-mode-tabs|Übung fortsetzen|Abfrage fortsetzen|Letzte Abfrage ansehen/);
+  assert.doesNotMatch(html,/data-action="(?:tables|prefixes)-(?:open|resume|resume-learning)"/);
+ };
+ noNavigation(catalog);
+ f.button('tables-select',{tableId:'personal'});noNavigation(f.ui.view());
+ f.button('tables-learn');noNavigation(f.ui.view());
+ const reopened=fixture({values:f.values});
+ assert.equal(reopened.ui.draft.tableMode,'learning');
+ assert.deepEqual(clone(reopened.ui.draft.tableRound),original);
+ noNavigation(reopened.ui.view());
+ const prefixRound=prefixes(f);f.answer(prefixRound.itemIds[0],'weg');
+ const prefixReopened=fixture({values:f.values});
+ assert.equal(prefixReopened.ui.draft.prefixMode,'worksheet');
+ assert.equal(prefixReopened.ui.draft.prefixRound.answers[prefixRound.itemIds[0]],'weg');
+ noNavigation(prefixReopened.ui.view());
+ f.button('prefixes-open');noNavigation(f.ui.view());
+ assert.match(tablePracticeCard(),/data-action="tables-open"/);
+ assert.match(prefixPracticeCard(),/data-action="prefixes-open"/);
+});
+
+test('Nouns default to all four declensions and render forty forms with visible noun context',()=>{
+ const f=fixture();select(f,'nouns');
+ assert.deepEqual(f.ui.draft.filters.nouns,{cases:['nom','gen','dat','acc','abl'],numbers:['sg','pl'],declensions:['a','o-m','o-n','third']});
+ assert.match(f.ui.view(),/40 Formen ausgewählt/);
+ assert.doesNotMatch(f.ui.view(),/data-table-filter="declensions"/);
+ f.button('tables-settings');
+ const settings=f.calls.modals.at(-1);
+ assert.equal((settings.match(/data-table-filter="declensions"/g)||[]).length,4);
+ assert.match(settings,/data-table-filter="numbers"/);
+ assert.doesNotMatch(settings,/data-table-filter="(?:genders|persons)"/);
+ f.button('tables-modal-done');f.button('tables-choose-mode');
+ assert.match(f.calls.modals.at(-1),/40 Formen/);
+ f.button('tables-start');
+ const round=f.ui.draft.tableRound,html=f.ui.view();
+ assert.equal(round.itemIds.length,40);assert.equal(inputTags(html).length,40);
+ assert.equal((html.match(/--table-columns:4/g)||[]).length,2);
+ for(const column of DECLENSIONS){assert.ok(html.includes(h(column.label)));assert.ok(html.includes(h(column.example)));}
+ const items=selectTableItems('nouns',round.filters);
+ for(const item of items){assert.ok(html.includes(h(item.prompt)));f.answer(item.id,item.accepted[0]);}
+ f.submit();assert.match(f.ui.view(),/40 von 40 richtig/);
+});
+
+test('Noun filters, guided progression, and restored answers retain the declension dimension',()=>{
+ const f=fixture();select(f,'nouns');
+ f.button('tables-case-basic');
+ f.filter('numbers','pl',false);f.filter('declensions','o-m',false);f.filter('declensions','o-n',false);
+ f.button('tables-learn');
+ const course=courseOf(f);
+ assert.equal(course.session.itemIds.length,4);
+ assert.deepEqual(course.filters,{cases:['nom','acc'],numbers:['sg'],declensions:['a','third']});
+ assert.ok(itemsOf(course).every(item=>['a','third'].includes(item.declension)&&item.number==='sg'));
+ assert.equal((f.ui.view().match(/--table-columns:2/g)||[]).length,1);
+ assert.doesNotMatch(f.ui.view(),/--table-columns:4/);
+ toWriting(f);
+ assert.equal(stepOf(f).blankIds.length,2);
+ const firstId=stepOf(f).blankIds[0],firstItem=itemsOf(course).find(item=>item.id===firstId);
+ f.answer(firstId,firstItem.accepted[0]);
+ const reopened=fixture({values:f.values});
+ assert.equal(reopened.ui.draft.tableMode,'learning');
+ assert.deepEqual(clone(courseOf(reopened).filters),clone(course.filters));
+ assert.equal(courseOf(reopened).session.answers[firstId],firstItem.accepted[0]);
+ for(const count of [2,3,4]){
+  assert.equal(stepOf(reopened).blankIds.length,count);
+  assert.equal(inputTags(reopened.ui.view()).length,count);
+  fillBlanks(reopened);reopened.submit(true);reopened.button('tables-learning-next');
+ }
+ assert.equal(stepOf(reopened).kind,'done');
+ reopened.button('tables-course-test');
+ assert.deepEqual(reopened.ui.draft.tableRound.filters,course.filters);
+ assert.equal(inputTags(reopened.ui.view()).length,4);
 });
 
 test('Classic case selection grades only nominative and accusative singular masculine forms',()=>{

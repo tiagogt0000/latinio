@@ -1,3 +1,4 @@
+import {compareReviews,successfulRetry} from './review-history.js';
 const collator=new Intl.Collator('de',{numeric:true,sensitivity:'base'});
 export const sortedCollections=data=>Object.values(data.collections).filter(c=>!c.refreshSource).sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
 export const refreshDecks=data=>Object.values(data.settings).filter(x=>x?.kind==='refreshDeck').sort((a,b)=>collator.compare(a.name,b.name)||a.id.localeCompare(b.id));
@@ -5,7 +6,7 @@ const sourceActive=(data,collection)=>!!collection&&data.settings['collection-ac
 export function deckMembers(data,deck){return (deck?.members||[]).filter(m=>data.words[m.wordId]&&data.collections[data.words[m.wordId].collectionId]);}
 export function pendingMembers(data,deck,direction=null){
  const latest=new Map();
- for(const r of Object.values(data.reviews)){if(r.repeat||direction&&r.direction!==direction)continue;const p=latest.get(r.wordId);if(!p||r.at>p.at||(r.at===p.at&&r.id>p.id))latest.set(r.wordId,r);}
+ for(const r of Object.values(data.reviews)){if(successfulRetry(r)||direction&&r.direction!==direction)continue;const p=latest.get(r.wordId);if(!p||compareReviews(r,p)>0)latest.set(r.wordId,r);}
  return deckMembers(data,deck).filter(m=>{const r=latest.get(m.wordId);return !r||r.at<=m.addedAt||r.grade!=='full';});
 }
 export function selectedDeckPending(data,wordId,ids,direction=null){

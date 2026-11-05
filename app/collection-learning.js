@@ -1,12 +1,13 @@
 import {deckMembers} from './refresh-decks.js';
+import {compareReviews,successfulRetry} from './review-history.js';
 export const activityKey=id=>'collection-active_'+id;
 export const collectionActive=(data,id)=>!!data.collections[id]&&!data.collections[id].refreshSource&&data.settings[activityKey(id)]?.active!==false;
 export function forgottenWords(data){
   const latest=new Map();
   for(const r of Object.values(data.reviews)){
-    if(r.repeat)continue;
+    if(successfulRetry(r))continue;
     const old=latest.get(r.wordId);
-    if(!old||r.at>old.at||(r.at===old.at&&r.id>old.id))latest.set(r.wordId,r);
+    if(!old||compareReviews(r,old)>0)latest.set(r.wordId,r);
   }
   return Object.values(data.words).filter(w=>{
     const r=latest.get(w.id);

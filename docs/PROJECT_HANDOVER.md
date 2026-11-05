@@ -1,5 +1,15 @@
 # Latinio – Projektübergabe
 
+## 2.10.0 · Sammlung öffnen, Substantive und Lernstand
+
+`collection-opening.js` zeigt am Sammlungsstift sofort Ladepunkte und lässt sie vor der lokalen Darstellung zeichnen. Mehrfachklicks und veraltete Navigation werden abgefangen; andere Navigation bleibt verfügbar. `collection-words.js` gruppiert Bewertungen einmal pro Wortliste, berücksichtigt Suchfilter und Sprachrichtung und trennt globale Sicherheit vom Auffrischstatus Offen/Erledigt. `allWords` liest den Store einmal statt ihn für jede Vokabel vollständig zu klonen. Keine neue Serverabhängigkeit.
+
+Tabellenkatalog ohne Beispiel-Badges, Fortsetzen-Links oder Tabellen/Präfix-Umschalter. Entwürfe werden weiterhin gespeichert. Neue Tabelle `nouns` mit 40 Formen aus dem sechsten Buchfoto; Dimension `declensions` mit vier Spalten (a, o-m, o-n, third). Alle fünf fotografierten Fälle; keine zusätzliche Vokativtabelle. Vollständige Formen, optionale Längenzeichen und die fotografierten Ablativpräpositionen werden akzeptiert.
+
+`review-history.js` vereinheitlicht Reihenfolge (numerischer Aufgabencursor bei gleicher Zeit) und Erkennung richtiger Korrekturwiederholungen. Fehler/Teilantworten setzen Sicherheit zurück; richtige Fehlerwiederholungen fördern den Status nicht. Die anfängliche Inaktiv-/Selbsteinschätzung bleibt möglich, nach einem Fehler braucht es wieder reguläre richtige Antworten; explizite manuelle Einstufungen und Bewertungskorrekturen bleiben möglich. „Eine Bedeutung genügt“ akzeptiert weiterhin fehlende weitere Bedeutungen, aber keine tatsächlich falschen Zusätze. Reviews speichern repeat und retryStage auch für wiederaufgenommene Runden. Vorhandene Historie bleibt unverändert.
+
+Frontend und Offline-Shell 2.10.0, drei neue Runtime-Module im Cache. Kein Backendupdate und keine Änderung produktiver Nutzer- oder Freigabedaten. 421 automatisierte Tests bestanden, Syntax aller App-Module geprüft und 65 Offline-Dateien einschließlich vollständiger Importabdeckung validiert; Regressionen für Ladefeedback, Navigation, Verlaufsauswertung, Tabellen und Lernstatus; keine visuellen Browserchecks gemäß Projektpräferenz.
+
 ## 2.9.0 · Eingabe, Auswahl und Adminnavigation
 
 Leeres Enter wird im Tastaturhandler abgefangen; `hasAnswerContent` schützt zusätzlich die direkte Bewertung, explizites „Weiß ich noch nicht“ bleibt möglich. Neues `input-visibility.js` scrollt fokussierte Antwortfelder minimal sichtbar, berücksichtigt visualViewport und reserviert iOS-Tastaturraum per CSS-Variable. `view-state.js` erhält bei derselben Ansicht auch verschachtelte Scrollcontainer und Fokus, statt nur window.scrollY. Gemeinsame Modalfokusverwaltung verwendet preventScroll und erhält den ursprünglichen Auslöser bei Dialogwechseln.

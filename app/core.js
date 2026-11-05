@@ -1,5 +1,6 @@
 import {wordsForDecks,selectedDeckPending} from './refresh-decks.js';
 import {collectionActive} from './collection-learning.js';
+import {compareReviews,successfulRetry} from './review-history.js';
 export const uid = () => globalThis.crypto.randomUUID();
 export const clone = value => structuredClone(value);
 export const emptyData = () => ({collections:{}, words:{}, reviews:{}, sessions:{}, settings:{}});
@@ -109,17 +110,23 @@ export function evaluate(word, answers, allowTypos=true, overrides={}) {
 export function evaluateSession(word,answers,allowTypos=true,overrides={},session={}) {
   const result=evaluate(word,answers,allowTypos,overrides);
   const any=session.meaningRequirement==='any';
-  if(any&&result.rows.some(row=>row.group>=0))result.grade='full';
+  if(any&&result.grade!=='wrong'&&result.rows.some(row=>row.group>=0))result.grade='full';
   return {...result,meaningRequirement:any?'any':'all'};
 }
 export function progressFor(wordId, reviews, direction=null) {
-  const events=Object.values(reviews).filter(r=>r.wordId===wordId&&(!direction||r.direction===direction)).sort((a,b)=>a.at-b.at||a.id.localeCompare(b.id));
-  let streak=0,due=0,lastReviewedAt=0,level='new';
+  const events=Object.values(reviews).filter(r=>r.wordId===wordId&&(!direction||r.direction===direction)).sort(compareReviews);
+  let streak=0,due=0,lastReviewedAt=0,level='new',relearning=false;
   for(const r of events){
-    if(r.repeat)continue;
+    if(successfulRetry(r))continue;
     lastReviewedAt=r.at;
-    if(r.grade==='full'){streak=r.manualKnown||r.mode?.startsWith('inactive-')?Math.max(3,streak+1):streak+1;due=r.at+Math.min(90,[1,3,7,14,30,60,90][Math.min(streak-1,6)])*86400000;level=streak>=3?'known':'learning';}
-    else {streak=0;due=r.at+(r.grade==='partial'?1:.5)*86400000;level='learning';}
+    if(r.grade==='full'){
+      const assessedKnown=r.manualKnown||r.mode?.startsWith('inactive-')&&!relearning;
+      streak=assessedKnown?Math.max(3,streak+1):streak+1;
+      due=r.at+Math.min(90,[1,3,7,14,30,60,90][Math.min(streak-1,6)])*86400000;
+      level=streak>=3?'known':'learning';
+      if(level==='known')relearning=false;
+    }
+    else {streak=0;due=r.at+(r.grade==='partial'?1:.5)*86400000;level='learning';relearning=true;}
   }
   return {streak,due,level,seen:events.length,lastReviewedAt};
 }
