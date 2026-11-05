@@ -1,5 +1,11 @@
 # Latinio – Projektübergabe
 
+## 2.8.0 · Schrittweise Tabellen- und Präfixübungen
+
+Tabellen öffnen zuerst einen Katalog mit fünf Karten. Nach Auswahl folgen abgerundete Fall-/Formenoptionen und die getrennten Modi Üben / Abfragen; Präfixe bieten dieselbe Moduswahl. Üben führt durch Anschauen, Zuordnen mit Schnipseln, wachsende Schreibanteile (ca. Hälfte, drei Viertel, alles) und einen Abschluss. Eine Stufe wird nur nach vollständig richtiger Lösung verlassen; Fehler führen über eine Lösungsansicht zur Wiederholung derselben Stufe. Gleiche Formen sind beim Zuordnen austauschbar. Maus-Drag-and-drop, Touch-/Stiftziehen und antippbare Schnipsel/Ziele verwenden dieselbe Logik.
+
+Neue reine Engine `app/table-learning.js`; UI und Styles weiterhin in `table-practice.js/.css`. Separate profilbezogene Übungs-/Abfrageentwürfe für Tabellen und Präfixe; v1-Entwürfe werden übernommen. Alle Inhalte offline im Service-Worker-Shell, Frontendversion 2.8.0, kein Backendupdate oder Datenimport. Kein zusätzlicher Streak-Claim. Automatisierte Engine-, UI- und Integrationstests; keine visuellen Browserchecks gemäß Projektpräferenz.
+
 ## 2.7.0 · Tabellen und Präfixe
 
 Neue statische Lernmodule `app/table-content.js` und `app/table-practice.js/.css`, erreichbar für alle Lateinprofile über zwei Home-Karten. Inhalt aus fünf bereitgestellten Fotos: vier Kasustabellen (110 Formen), Dehnungsperfekt (9 Stamm-/Perfektaufgaben), elf Präfixe. Alle Fälle und passende weitere Dimensionen frei wählbar. Arbeitsblatt mit gemeinsamer Auswertung, Lösungen und Fehlerwiederholung; Präfixe als linke Spalte plus rechte Eingabefelder.

@@ -1,5 +1,9 @@
 # Latinio · Version 2.7.0
 
+## Neu in 2.8.0: Schrittweise üben
+
+Alle Tabellen stehen zuerst als Auswahlkarten bereit. Wähle Fälle und Formen und entscheide zwischen **Üben** und **Abfragen**. Der Übungsmodus zeigt zunächst die Lösungen, lässt dich Schnipsel zuordnen und verlangt danach immer mehr selbst geschriebene Antworten. Bei Fehlern schaust du die Lösungen erneut an und wiederholst die Stufe. Das funktioniert auch mit allen elf Präfixen, per Ziehen oder Antippen. Entwürfe bleiben auf deinem Gerät gespeichert.
+
 ## 2.7.0 · Tabellen und Präfixe üben
 
 Im Lateinbereich stehen zwei neue Lernkarten bereit: **Tabellen üben** und **Präfixe üben**. Die Tabellen aus den bereitgestellten Buchfotos umfassen Adjektive (magnus), Personalpronomen, Relativpronomen, is/ea/id und das Dehnungsperfekt. Fälle lassen sich beliebig kombinieren oder vollständig auswählen. Je nach Tabelle sind außerdem Numerus, Genus, Person oder Stamm-/Perfektspalten auswählbar.
