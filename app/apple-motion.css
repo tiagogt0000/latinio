@@ -49,22 +49,25 @@
 }
 
 /* Subject loading sits above the existing screen. The blur is static; only the
-   two logos and the final opacity change are animated. Routing owns all input. */
+   two wordmarks and the final opacity change are animated. Routing owns all input. */
 .subject-transition{
+ --transition-latin:var(--glass-latin-brand,#237a42);--transition-english:#ae2636;
  position:fixed;inset:0;z-index:600;display:grid;place-items:center;
  padding:1.5rem;background:rgba(250,250,252,.56);color:var(--text,#1c1c1e);
  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);pointer-events:none;
 }
-:root[data-theme=dark] .subject-transition{background:rgba(28,28,30,.62)}
+:root[data-theme=dark] .subject-transition{--transition-english:#ffb3b6;background:rgba(28,28,30,.62)}
 .subject-transition-content{width:min(100%,24rem);text-align:center}
-.subject-transition-icons{display:grid;place-items:center;height:9rem}
-.subject-transition-logo{grid-area:1/1;width:6.5rem;height:6.5rem;border-radius:1.5rem;box-shadow:0 12px 36px #0002}
-.subject-transition-logo.is-from{opacity:0}
-.subject-transition-logo.is-to{opacity:1}
+.subject-transition-wordmarks{display:grid;place-items:center;min-height:8rem;padding-block:1rem;overflow:hidden}
+.subject-transition-wordmark{grid-area:1/1;font-size:clamp(2.75rem,12vw,4.5rem);line-height:1.2}
+.subject-transition-wordmark[data-subject=latin]{color:var(--transition-latin)}
+.subject-transition-wordmark[data-subject=english]{color:var(--transition-english)}
+.subject-transition-wordmark>span{font-size:.55em;color:inherit;transform:translate(.08em,-.35em)}
+.subject-transition-wordmark.is-from{opacity:0}
+.subject-transition-wordmark.is-to{opacity:1}
 .subject-transition-content>p{margin-top:1rem;font-size:1rem;font-weight:600;line-height:1.5}
 @media(prefers-reduced-transparency:reduce),(prefers-contrast:more){
  :root[data-theme] .subject-transition{background:var(--bg,#fafafc);backdrop-filter:none;-webkit-backdrop-filter:none}
- .subject-transition-logo{box-shadow:none}
 }
 @media(forced-colors:active){
  .subject-transition{background:Canvas;color:CanvasText;backdrop-filter:none;-webkit-backdrop-filter:none}

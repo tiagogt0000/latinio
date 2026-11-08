@@ -1,4 +1,15 @@
 # Latinio – Projektübergabe
+## 2.15.2 · Trainingsauswahl, stille Synchronisation und gemerkte Erinnerungswahl
+Nutzerauftrag: Abstand zwischen Auswahl/Pfeil und Lektion, stimmigere Knopf-/Schriftgrößen, keine laufende Cloud-Meldung unter der Begrüßung, Fehlerdialog mit Offline-Hinweis/Retry/Ausblenden, ausgeschriebene grüne/rote Latinio-Logos beim Fachwechsel und dauerhaft gemerktes „Später“. Nur Frontend; Server und Lerndaten bleiben unverändert.
+
+Die auf Home begrenzten Regeln in apple-learning.css neutralisieren das globale Textfeld-Padding auf Checkboxen, geben Auswahl und Text 0,75rem Abstand und halten 3rem große Zeilen/Schaltflächen mit 1rem Schrift. Die zusätzliche Zählzeile auf schmalen Geräten entfällt; lange Namen dürfen weiter umbrechen. Ein eigener Details-Pfeil erhält denselben Abstand und behält die native Tastaturbedienung.
+
+cloud-notice.js meldet tatsächliche Fehler/offline einmal pro Störung, wartet bestehende Dialoge, aktive Übungen, Fachwechsel und den initialen Download ab und lässt erneute Hintergrundversuche still. Erneut laden kann einen neuen Fehler melden; erfolgreiche Synchronisation schließt nur den eigenen Hinweis und setzt die Unterdrückung zurück. Ohne lokale Sammlungen wird kein Offline-Lernen versprochen. main.js verbindet Status, Initial-/Hintergrundfehler, Retry und verzögertes Anzeigen; die bisherige Home-Statuszeile entfällt. Leere, bewusst geöffnete Lernoptionen behalten ihren Hinweis zum ersten Download und werden bei dessen Abschluss aktualisiert.
+
+Subject-Transition nutzt brandWord statt App-Icons: beim Wechsel zu Englisch fährt Grün nach links hinaus, Rot von rechts in die Mitte; zurück spiegelbildlich. Nur transform/opacity, 220ms und bestehendes Easing, statischer Blur, bestehende Zeitlimits/Entsorgung; Tastatur, reduzierte Bewegung und Reload-Fortsetzung bleiben ohne Fahrt. „Später“, Ausschalten und explizites Aktivieren speichern die Geräteentscheidung unter latinio-notification-prompt-dismissed. Die Einstellung bleibt fach-/profilübergreifend erhalten, manuelle Freigabe in Einstellungen funktioniert weiterhin; verweigerter Browser-Speicher wird abgefangen.
+
+Prüfung: 594 Node-Tests inklusive echter main.js-Status-/Aktionspfade, verzögertem Fehlerdialog und Retry, anhaltender Erinnerungsauswahl, Wordmark-Richtung, Tastatur/reduced motion und Timer-Fallbacks; 6 Installerprüfungen. Syntax, CSS, Versionsgleichstand und Offline-Assets geprüft. Keine visuellen Browserchecks gemäß bestehender Präferenz, kein reales iPhone geprüft.
+
 
 ## 2.15.1 · Cloud-Bugfix ohne Designänderung
 Nutzerauftrag: ausschließlich die weiterhin langsame/leere Cloud beheben, unnötige Abrufe entfernen, früheren funktionierenden Stand vergleichen und aktuellen Lernstand direkt speichern. Bestätigte Regression: refreshStreak verlor in d0124c4 die Versionsprüfung und lud jedes andere Fach alle 60 Sekunden komplett. Jetzt nutzt es den kleinen authentifizierten streak-Abruf; Legacy-Verbindungen prüfen zuerst die Version und laden nur bei Änderung. Versionscache ist nach Fach, Profil und Verbindung getrennt. Berechtigungsprüfungen bleiben bestehen. Keine Änderungen an CSS, Logos oder Gestaltung.

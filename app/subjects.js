@@ -19,7 +19,7 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
  const duration=parseFloat(style?.getPropertyValue('--apple-enter'))||220;
  const veil=doc.createElement('div');veil.className='subject-transition';
  veil.setAttribute('role','status');veil.setAttribute('aria-live','polite');veil.setAttribute('aria-busy','true');
- veil.innerHTML=`<div class="subject-transition-content"><div class="subject-transition-icons" aria-hidden="true"><img class="subject-transition-logo is-from" src="${source.logo}" alt="" width="104" height="104"><img class="subject-transition-logo is-to" src="${target.logo}" alt="" width="104" height="104"></div><p>${target.label} wird geladen …</p></div>`;
+ veil.innerHTML=`<div class="subject-transition-content"><div class="subject-transition-wordmarks" aria-hidden="true"><div class="brand subject-transition-wordmark is-from" data-subject="${source.id}">${brandWord(source.id)}</div><div class="brand subject-transition-wordmark is-to" data-subject="${target.id}">${brandWord(target.id)}</div></div><p>${target.label} wird geladen …</p></div>`;
  doc.body.append(veil);
  const animations=new Set();let state='loading',completeEntry=()=>{},finishTimer=null;
  function play(element,frames,options,done){
@@ -62,8 +62,8 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
  if(!keyboard&&!reducedMotion&&!resume&&source.id!==target.id){
   const direction=target.id==='english'?1:-1;
   const entering=[
-   play(veil.querySelector('.is-from'),[{opacity:1,transform:'translateX(0) scale(1)'},{opacity:0,transform:`translateX(${-direction*96}px) scale(.94)`}],{duration,fill:'backwards'}),
-   play(veil.querySelector('.is-to'),[{opacity:0,transform:`translateX(${direction*96}px) scale(.94)`},{opacity:1,transform:'translateX(0) scale(1)'}],{duration,fill:'backwards'})
+   play(veil.querySelector('.is-from'),[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${-direction*110}%)`}],{duration,fill:'backwards'}),
+   play(veil.querySelector('.is-to'),[{opacity:0,transform:`translateX(${direction*110}%)`},{opacity:1,transform:'translateX(0)'}],{duration,fill:'backwards'})
   ];
   // A stalled browser animation cannot hold navigation indefinitely.
   controller.entered=new Promise(resolve=>{

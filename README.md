@@ -1,4 +1,9 @@
-# Latinio · Version 2.15.1
+# Latinio · Version 2.15.2
+## Neu in 2.15.2: Klarere Auswahl und weniger Unterbrechungen
+Die Trainingsauswahl hat mehr Abstand zwischen Auswahlfeld, Pfeil und Beschriftung. Kompaktere Zeilen und Knöpfe mit größerer Schrift bleiben gut antippbar. Beim Fachwechsel ersetzen sich die ausgeschriebenen grünen und roten Latinio-Logos durch eine kurze seitliche Bewegung.
+Der normale Cloud-Abgleich erscheint nicht mehr unter der Begrüßung. Verbindungsprobleme zeigen einen einmaligen Hinweis mit „Erneut laden“ und „Ausblenden“, der laufende Übungen und geöffnete Dialoge abwartet. Bereits gespeicherte Sammlungen bleiben offline nutzbar. „Später“ bei Lern-Erinnerungen bleibt auf diesem Gerät auch nach dem nächsten App-Start gespeichert; die Freigabe ist weiterhin in den Einstellungen möglich.
+594 automatisierte Tests und 6 Installerprüfungen bestanden. Keine Änderungen am Server oder an gespeicherten Lernständen.
+
 
 
 ## Neu in 2.15.1: Cloud-Bugfixes

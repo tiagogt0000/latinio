@@ -5,19 +5,39 @@ import {notificationsUI} from '../app/notifications.js';
 function fixture(t,{permission='default',subscribed=false}={}){
  const originals=new Map(['navigator','Notification','PushManager','document'].map(k=>[k,Object.getOwnPropertyDescriptor(globalThis,k)]));
  t.after(()=>{for(const [key,value] of originals)value?Object.defineProperty(globalThis,key,value):delete globalThis[key];});
- const calls=[],dialogs=[];let allowed=true;
+ const calls=[],dialogs=[],saved=new Map();let allowed=true;
+ const storage={getItem:key=>saved.get(key)??null,setItem:(key,value)=>saved.set(key,value)};
  const sub={endpoint:'https://web.push.apple.com/test',toJSON:()=>({endpoint:'test',keys:{}}),unsubscribe:async()=>{}};
  const pushManager={getSubscription:async()=>subscribed?sub:null,subscribe:async()=>{calls.push('subscribe');return sub;}};
  const notification={permission,requestPermission(){calls.push('permission');notification.permission='granted';return Promise.resolve('granted');}};
  for(const [key,value] of Object.entries({Notification:notification,PushManager:function(){},navigator:{serviceWorker:{ready:Promise.resolve({pushManager})}},document:{querySelector:()=>null}}))Object.defineProperty(globalThis,key,{value,configurable:true});
- const options={sync:{async request(action){calls.push(action);return {publicKey:'public-test'};}},profile:{id:'student',role:'student'},h:String,showModal:html=>dialogs.push(html),showAdmin(){},notify(){},render(){},closeModal:()=>calls.push('close'),canPrompt:()=>allowed};
+ const options={storage,sync:{async request(action){calls.push(action);return {publicKey:'public-test'};}},profile:{id:'student',role:'student'},h:String,showModal:html=>dialogs.push(html),showAdmin(){},notify(){},render(){},closeModal:()=>calls.push('close'),canPrompt:()=>allowed};
  const ui=notificationsUI(options);return {ui,options,calls,dialogs,setAllowed:value=>allowed=value};
 }
-test('All unregistered profiles get the activation notice once per app opening, not during a round or another dialog',async t=>{
+test('Later stays dismissed after reopening, changing subject or signing in with another profile on this device',async t=>{
  const f=fixture(t);f.setAllowed(false);await f.ui.refresh();assert.equal(f.ui.maybePrompt(),false);assert.equal(f.dialogs.length,0);
  f.setAllowed(true);assert.equal(f.ui.maybePrompt(),true);assert.match(f.dialogs[0],/notification-enable/);assert.match(f.dialogs[0],/OK/);assert.equal(f.ui.maybePrompt(),false);assert.ok(!f.calls.includes('permission'));
  await f.ui.handle({dataset:{action:'notification-later'}});assert.ok(!f.calls.includes('permission'));
- const reopened=notificationsUI(f.options);await reopened.refresh();assert.equal(reopened.maybePrompt(),true);
+ const reopened=notificationsUI(f.options);await reopened.refresh();assert.equal(reopened.maybePrompt(),false);
+ const anotherProfile=notificationsUI({...f.options,profile:{id:'another',role:'student'}});await anotherProfile.refresh();assert.equal(anotherProfile.maybePrompt(),false);
+ assert.equal(f.dialogs.length,1);
+});
+test('Postponed reminders can still be enabled explicitly in settings',async t=>{
+ const f=fixture(t);await f.ui.refresh();f.ui.maybePrompt();await f.ui.handle({dataset:{action:'notification-later'}});
+ const reopened=notificationsUI(f.options);await reopened.refresh();assert.equal(reopened.maybePrompt(),false);
+ assert.match(reopened.settingsMarkup(),/data-action="notification-enable"/);
+ await reopened.handle({dataset:{action:'notification-enable'}});
+ assert.ok(f.calls.includes('permission'));assert.ok(f.calls.includes('notificationSubscribe'));
+});
+test('Explicitly disabling reminders does not cause a new activation prompt on reopening',async t=>{
+ const f=fixture(t);await f.ui.refresh();await f.ui.handle({dataset:{action:'notification-disable'}});
+ const reopened=notificationsUI(f.options);await reopened.refresh();assert.equal(reopened.maybePrompt(),false);
+});
+test('Unavailable local storage cannot break Later or the native permission gesture',async t=>{
+ const f=fixture(t);f.options.storage={getItem(){throw Error('Storage blocked');},setItem(){throw Error('Storage blocked');}};
+ const ui=notificationsUI(f.options);await ui.refresh();assert.equal(ui.maybePrompt(),true);
+ await ui.handle({dataset:{action:'notification-later'}});assert.equal(ui.maybePrompt(),false);
+ await ui.handle({dataset:{action:'notification-enable'}});assert.ok(f.calls.includes('permission'));
 });
 test('OK requests the native permission synchronously in the click handler before awaiting network or subscription work',async t=>{
  const f=fixture(t);await f.ui.refresh();f.ui.maybePrompt();f.calls.length=0;

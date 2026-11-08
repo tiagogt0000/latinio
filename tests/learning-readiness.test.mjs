@@ -11,14 +11,16 @@ const section=(start,end)=>source.slice(source.indexOf(start),source.indexOf(end
 
 for(const kind of ['vocab','predicates'])test(`An empty ${kind} options dialog becomes usable after download without closing or losing focus`,()=>{
  const d=emptyData();let removed=false,dialogs=0;
- const empty={remove(){removed=true;}};
+ const empty={remove(){removed=true;}},hint={textContent:''};
  const node={dataset:{waitingOptions:kind},innerHTML:'disabled options',removeAttribute(){delete this.dataset.waitingOptions;},closest:()=>({querySelector:()=>empty})};
- const context=vm.createContext({data:()=>d,selected:[],english:false,predicateSelected:null,trainingDecks,trainingOptionCounts,predicateDecks,predicateQueue,
-  document:{activeElement:null},modalRoot:{querySelector:()=>node},showModal(){dialogs++;}});
+ const context=vm.createContext({cloudWait:{blocked:true},data:()=>d,selected:[],english:false,predicateSelected:null,trainingDecks,trainingOptionCounts,predicateDecks,predicateQueue,
+  document:{activeElement:null},modalRoot:{querySelector:selector=>selector==='[data-options-empty] p'?hint:node},showModal(){dialogs++;}});
  vm.runInContext(section('function selectedPredicateDecks(','function predicatePracticeCard('),context);
  vm.runInContext(section('function predicateOptionButtons(','function renderPredicateTest('),context);
  vm.runInContext(section('function trainingOptions(','function startOptionsView('),context);
  context.updateWaitingOptions();assert.equal(node.innerHTML,'disabled options');assert.equal(removed,false);
+ assert.match(hint.textContent,/Sammlungen werden geladen/);context.cloudWait.blocked=false;
+ context.updateWaitingOptions();assert.doesNotMatch(hint.textContent,/werden geladen/);
  if(kind==='vocab'){
   d.collections.c={id:'c',name:'Lektion'};d.words.w={id:'w',collectionId:'c',latin:'vox',meanings:[['Stimme']]};
  }else{
@@ -40,14 +42,4 @@ test('A page render shares one snapshot and releases it on completion or an exce
  revision=2;assert.equal(ctx.data().revision,2,'an action after paint receives current data');
  ctx.confusions.view=()=>{ctx.data();throw Error('broken view');};assert.throws(()=>ctx.render(),/broken view/);
  assert.equal(reads,3);assert.equal(ctx.viewSnapshot,null,'a failed view must not retain an old snapshot');
-});
-
-test('Failed and pending first downloads expose feedback and a retry instead of a silent empty home',()=>{
- const d=emptyData();const context=vm.createContext({data:()=>d,predicateDecks,h:String,cloudWait:{blocked:true},sync:{busy:true,status:'checking'}});
- vm.runInContext(section('function learningStatus(){','function render(){'),context);
- assert.match(context.learningStatus(),/Sammlungen werden geladen/);
- context.cloudWait.blocked=false;context.sync={status:'error',message:'Verbindung nicht erreichbar'};
- assert.match(context.learningStatus(),/konnten noch nicht geladen/);assert.match(context.learningStatus(),/data-action="retry-sync"/);
- d.collections.c={id:'c',name:'Lektion'};assert.match(context.learningStatus(),/gespeicherten Stand weiterlernen/);
- context.sync={status:'synced'};assert.equal(context.learningStatus(),'');
 });

@@ -29,12 +29,12 @@ test('Offered subjects contain only Latin and English; legacy metadata resolves 
  assert.equal(subjectInfo('french').id,'latin');assert.equal(brandWord('french'),'latinio<span>✦</span>');
 });
 
-test('Switching immediately shows both logo assets and moves green left while red arrives from the right',async()=>{
+test('Switching shows two written Latinio wordmarks and moves green left while red arrives from the right',async()=>{
  const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
  const overlay=f.overlays[0];assert.equal(f.overlays.length,1);assert.equal(overlay.removed,false);
  assert.equal(overlay.attributes.get('role'),'status');assert.equal(overlay.attributes.get('aria-busy'),'true');
- assert.match(overlay.innerHTML,/icon\.svg\?v=/);assert.match(overlay.innerHTML,/icon-english\.svg\?v=/);assert.match(overlay.innerHTML,/Englisch wird geladen/);
- assert.equal(f.calls.length,2);assert.equal(f.calls[0].frames[1].transform,'translateX(-96px) scale(.94)');assert.equal(f.calls[1].frames[0].transform,'translateX(96px) scale(.94)');
+ assert.equal((overlay.innerHTML.match(/latinio<span>✦<\/span>/g)||[]).length,2);assert.match(overlay.innerHTML,/is-from\" data-subject=\"latin/);assert.match(overlay.innerHTML,/is-to\" data-subject=\"english/);assert.doesNotMatch(overlay.innerHTML,/<img/);assert.match(overlay.innerHTML,/Englisch wird geladen/);
+ assert.equal(f.calls.length,2);assert.equal(f.calls[0].frames[1].transform,'translateX(-110%)');assert.equal(f.calls[1].frames[0].transform,'translateX(110%)');
  assert.ok(f.calls.every(call=>call.options.duration===220));
  let entered=false;void transition.entered.then(()=>entered=true);await Promise.resolve();assert.equal(entered,false);
  f.calls[0].animation.finish();await Promise.resolve();assert.equal(entered,false);
@@ -45,7 +45,7 @@ test('Switching immediately shows both logo assets and moves green left while re
 
 test('Returning to Latin reverses the same logo path',async()=>{
  const f=fixture(),transition=beginSubjectTransition(f.root,'english','latin');
- assert.equal(f.calls[0].frames[1].transform,'translateX(96px) scale(.94)');assert.equal(f.calls[1].frames[0].transform,'translateX(-96px) scale(.94)');
+ assert.equal(f.calls[0].frames[1].transform,'translateX(110%)');assert.equal(f.calls[1].frames[0].transform,'translateX(-110%)');
  assert.match(f.overlays[0].innerHTML,/Latein wird geladen/);
  transition.dispose();await transition.entered;assert.ok(f.calls.every(call=>call.animation.cancelled));
 });

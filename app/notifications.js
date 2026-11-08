@@ -1,6 +1,9 @@
 import {SUBJECTS} from './subjects.js';
-export function notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView=()=>true,notify,render,closeModal=()=>{},canPrompt=()=>true}){
+const PROMPT_DISMISSED='latinio-notification-prompt-dismissed';
+export function notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView=()=>true,notify,render,closeModal=()=>{},canPrompt=()=>true,storage}){
  let state=null,catalog=null,history=[],enabled=false,checked=false,prompted=false;
+ const postponed=()=>{try{return (storage||globalThis.localStorage)?.getItem(PROMPT_DISMISSED)==='1';}catch{return false;}};
+ function rememberChoice(){prompted=true;try{(storage||globalThis.localStorage)?.setItem(PROMPT_DISMISSED,'1');}catch{}}
  const supported=()=>!!(globalThis.Notification&&navigator.serviceWorker&&globalThis.PushManager);
  const request=(action,payload={})=>sync.request(action,payload);
  async function registration(){return navigator.serviceWorker.ready;}
@@ -15,7 +18,7 @@ export function notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView=
   }catch{/* A network error must not turn an already permitted device into a new opt-in. */}
  }
  function maybePrompt(){
-  if(!checked||!state||enabled||prompted||!supported()||!canPrompt())return false;
+  if(!checked||!state||enabled||prompted||postponed()||!supported()||!canPrompt())return false;
   prompted=true;
   if(Notification.permission==='denied'){
    showModal('<h2 id="modal-title">Lern-Erinnerungen aktivieren</h2><p class="muted">Benachrichtigungen sind auf diesem Gerät blockiert. Erlaube sie bitte in den Geräte- oder Browser-Einstellungen, wenn du Lern-Erinnerungen erhalten möchtest.</p><button type="button" class="button primary wide" data-action="notification-later">Verstanden</button>');
@@ -35,12 +38,12 @@ export function notificationsUI({sync,profile,h,showModal,showAdmin,isAdminView=
   const action=button.dataset.action;if(!action?.startsWith('notification-'))return false;
   if(action==='notification-enable'){
    if(!supported())throw Error('Bitte öffne die installierte App auf dem Home-Bildschirm.');
-   prompted=true;closeModal();
+   rememberChoice();closeModal();
    const permission=await Notification.requestPermission();if(permission!=='granted')throw Error('Benachrichtigungen wurden nicht erlaubt. Du kannst das später in den Geräte-Einstellungen ändern.');
    state=state||await request('notificationStatus');const reg=await registration();const sub=await reg.pushManager.getSubscription()||await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:state.publicKey});
    try{await request('notificationSubscribe',{subscription:sub.toJSON(),zone:Intl.DateTimeFormat().resolvedOptions().timeZone});enabled=true;render();notify('Lern-Erinnerungen sind auf diesem Gerät eingeschaltet.');}catch(error){await sub.unsubscribe();throw error;}
-  }else if(action==='notification-later'){prompted=true;closeModal();}
-  else if(action==='notification-disable'){prompted=true;await disable();render();notify('Erinnerungen auf diesem Gerät ausgeschaltet.');}
+  }else if(action==='notification-later'){rememberChoice();closeModal();}
+  else if(action==='notification-disable'){rememberChoice();await disable();render();notify('Erinnerungen auf diesem Gerät ausgeschaltet.');}
   else{
    if(profile.role!=='admin')return true;
    if(action==='notification-admin'){

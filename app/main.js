@@ -1,5 +1,6 @@
 import {SUBJECTS,subjectInfo,brandWord,beginSubjectTransition,TRANSITION_KEY} from './subjects.js';
 import {notificationsUI} from './notifications.js';
+import {createCloudNotice} from './cloud-notice.js';
 import {grammarUI,grammarCard} from './grammar.js';
 import {tablePracticeUI,tablePracticeCard,prefixPracticeCard} from './table-practice.js';
 import {parseCollectionFile,importChanges} from './refresh-import.js';
@@ -55,7 +56,7 @@ let predicateSelected=null;
 let streakDemoDay=1,streakDemoVariant='orbit',streakDemoTheme='auto';
 let streakLedger=null,streakSyncTask=null,streakSyncedAt=0,streakOtherVersions=new Map(),roundEnd=null,predicateRoot=null,predicateResults=[],predicateRoundId='';
 let predicateKey='',predicateRun=[],predicateCursor=0,predicateAnswer='',predicateFeedback=null;
-let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
+let profile,sharing,cloudWait,cloudNotice,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
 const interfaceMotion=createInterfaceMotion({root:document});
 let modalReturnFocus=null;
@@ -69,11 +70,11 @@ const data=()=>viewSnapshot||store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!waitingStart&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','grammar','tables'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
 async function showResult(){const saved=store.doc.session;if(!saved?.finished)return;if(saved.mode==='inactive-check'&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}const session=store.doc.session;await offerRoundEnd({kind:'vocab',id:session.id,stats:roundStats(session,data()),errors:failedTasks(session,data().reviews)});void backgroundSync();}
 function flushCloudRender(){
- if(!pendingCloudRender||!ready||subjectTransition||working||waitingStart||modalRoot.children.length||['test','match','predicate-test','round-end','admin','grammar','tables'].includes(screen))return;
- pendingCloudRender=false;render();
+ if(pendingCloudRender&&ready&&!subjectTransition&&!working&&!waitingStart&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','admin','grammar','tables'].includes(screen)){pendingCloudRender=false;render();}
+ cloudNotice?.maybePrompt();
 }
 function renderCloudChanges(){pendingCloudRender=true;flushCloudRender();}
-async function backgroundSync(){if(!ready||cloudWait?.blocked)return;try{await settleSync(sync,store);void refreshStreak();renderCloudChanges();}catch{}finally{updateStatus();}}
+async function backgroundSync(){if(!ready||cloudWait?.blocked)return;try{await settleSync(sync,store);void refreshStreak();renderCloudChanges();}catch(error){cloudNotice?.fail(error);}finally{updateStatus();}}
 
 const prefs=()=>({daily:10,typos:true,direction:'mixed',...data().settings.general,theme:'system',accent:'green',density:'comfortable',design:'rounded'});
 const allWords=()=>{const d=data();return Object.values(d.words).filter(w=>d.collections[w.collectionId]);};
@@ -88,13 +89,7 @@ function applyColorScheme(mode='system'){
 function theme(){const p=store?prefs():{theme:'system'};document.documentElement.dataset.subject=subject;applyColorScheme(p.theme);document.documentElement.dataset.accent=p.accent||'green';document.documentElement.dataset.density=p.density||'comfortable';document.documentElement.dataset.design=p.design||'rounded';}
 function nav(){return `<nav aria-label="Hauptmenü">${[['learn','home','Lernen'],['collections','book','Sammlungen'],['classroom','search','Unterricht'],...(isAdmin()?[['admin','users','Nutzer']]:[]),['settings','settings','Einstellungen']].map(([id,i,label])=>`<button data-action="nav" data-screen="${id}" aria-label="${label}" title="${label}" class="nav-item ${(screen===id||id==='learn'&&screen==='tables'||id==='collections'&&['collection-detail','predicate-detail'].includes(screen))?'active':''}" ${screen===id?'aria-current="page"':''}>${icon(i)}<span>${label}</span></button>`).join('')}</nav>`;}
 function todayCount(){const today=new Date().toLocaleDateString('sv');return Object.values(data().reviews).filter(r=>!r.repeat&&!r.manualKnown&&new Date(r.at).toLocaleDateString('sv')===today).length;}
-function updateStatus(){setTimeout(autoUpdate,0);updateWaitingOptions();document.querySelectorAll('[data-auto-share]').forEach(el=>el.innerHTML=sharing?.autoStatusMarkup()||'');document.querySelectorAll('[data-learning-status]').forEach(el=>el.innerHTML=learningStatus());const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
-function learningStatus(){
- const d=data(),empty=!Object.keys(d.collections).length&&!predicateDecks(d).length;
- if(sync.status==='error'||sync.status==='offline')return `<p class="small muted" role="status">${empty?'Deine Sammlungen konnten noch nicht geladen werden.':'Du kannst mit deinem gespeicherten Stand weiterlernen.'} ${h(sync.message)} <button class="text-button" data-action="retry-sync">Erneut versuchen</button></p>`;
- if(sync.busy||cloudWait?.blocked)return `<p class="small muted" role="status">${empty?'Deine Sammlungen werden geladen …':'Dein Lernstand wird im Hintergrund abgeglichen …'}</p>`;
- return empty?'<p class="small muted">Hier sind noch keine Sammlungen gespeichert. <button class="text-button" data-action="nav" data-screen="collections">Sammlungen öffnen</button> oder <button class="text-button" data-action="retry-sync">erneut laden</button>.</p>':'';
-}
+function updateStatus(){setTimeout(autoUpdate,0);updateWaitingOptions();cloudNotice?.update();document.querySelectorAll('[data-auto-share]').forEach(el=>el.innerHTML=sharing?.autoStatusMarkup()||'');const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
 function render(){
  pendingCloudRender=false;
  viewSnapshot=store.data;
@@ -120,7 +115,7 @@ function adminView(){return `<div class="page-heading"><div><div class="eyebrow"
 function showAdmin(content,tab='people'){if(!isAdmin())return;closeModal();adminContent=content;adminTab=tab;screen='admin';render();}
 function learnView(){const d=data(),words=activeWords(d),streak=streakLedger?streakLedger.state(d):streakState(streakDays(d)),goal=prefs().daily;const decks=trainingDecks(d).filter(x=>x.active);selected=selected.filter(id=>decks.some(x=>x.id===id));if(!selected.length)selected=decks.map(x=>x.id);
  return `<div class="page-heading home-heading"><div><div class="eyebrow">DEIN TRAINING</div><h1>Hallo ${h(isAdmin()?'Tiago':profile.name)}!</h1><p class="muted">Was möchtest du heute üben?</p></div><div class="daily-badge streak-badge ${streak.active?'is-active':''}" aria-label="${streak.count} ${streak.count===1?'Tag':'Tage'} Streak · ${streak.active?'heute gelernt':'heute noch keine Runde abgeschlossen'}">${streakBadgeFlame()}<strong>${streak.count}</strong><span>${streak.count===1?'Tag':'Tage'}</span></div></div>
- <div data-learning-status>${learningStatus()}</div><div class="learning-grid home-practice-grid"><section class="training-card"><div class="section-top"><span class="tag">${english?directionLabel(prefs().direction).toUpperCase():'LATEIN → DEUTSCH'}</span>${icon('book','large-icon')}</div><h2>Vokabeln üben</h2><p data-compact-hide>Wähle deine Sammlungen und starte eine Runde.</p>${english?`<label class="direction-choice">Abfragerichtung<select id="direction"><option value="mixed" ${prefs().direction==='mixed'?'selected':''}>Gemischt · schwierige Richtung zuerst</option><option value="en-de" ${prefs().direction==='en-de'?'selected':''}>${languageName()} → Deutsch</option><option value="de-en" ${prefs().direction==='de-en'?'selected':''}>Deutsch → ${languageName()}</option></select></label>`:''}<details data-panel="home-decks" class="deck-picker"><summary>Trainingsauswahl · ${decks.length} aktive Sammlungen</summary><div class="bounded-list">${decks.map(c=>`<label class="collection-check"><input type="checkbox" data-select="${h(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${h(c.name)}</span><small>${wordsForDecks(d,[c.id]).length} Wörter</small></label>`).join('')||'<p>Keine aktive Sammlung. Schalte unter Sammlungen die gewünschten Lektionen ein.</p>'}</div></details><div class="word-tools"><button class="button primary wide" data-action="start" ${!words.length&&!cloudWait?.blocked?'disabled':''}>Smart lernen ${icon('arrow')}</button><button class="button secondary wide" data-action="training-options">Mehr Optionen ${icon('plus')}</button></div><div class="card-foot">${icon('target')} ${goal} Aufgaben pro Runde · beliebig weiterüben</div></section>${!english?predicatePracticeCard():''}${subject==='latin'?tablePracticeCard()+prefixPracticeCard():''}${isAdmin()&&subject==='english'?grammarCard():''}</div>`;;
+ <div class="learning-grid home-practice-grid"><section class="training-card"><div class="section-top"><span class="tag">${english?directionLabel(prefs().direction).toUpperCase():'LATEIN → DEUTSCH'}</span>${icon('book','large-icon')}</div><h2>Vokabeln üben</h2><p data-compact-hide>Wähle deine Sammlungen und starte eine Runde.</p>${english?`<label class="direction-choice">Abfragerichtung<select id="direction"><option value="mixed" ${prefs().direction==='mixed'?'selected':''}>Gemischt · schwierige Richtung zuerst</option><option value="en-de" ${prefs().direction==='en-de'?'selected':''}>${languageName()} → Deutsch</option><option value="de-en" ${prefs().direction==='de-en'?'selected':''}>Deutsch → ${languageName()}</option></select></label>`:''}<details data-panel="home-decks" class="deck-picker"><summary>Trainingsauswahl · ${decks.length} aktive Sammlungen</summary><div class="bounded-list">${decks.map(c=>`<label class="collection-check"><input type="checkbox" data-select="${h(c.id)}" ${selected.includes(c.id)?'checked':''}><span>${h(c.name)}</span><small>${wordsForDecks(d,[c.id]).length} Wörter</small></label>`).join('')||'<p>Keine aktive Sammlung. Schalte unter Sammlungen die gewünschten Lektionen ein.</p>'}</div></details><div class="word-tools"><button class="button primary wide" data-action="start" ${!words.length&&!cloudWait?.blocked?'disabled':''}>Smart lernen ${icon('arrow')}</button><button class="button secondary wide" data-action="training-options">Mehr Optionen ${icon('plus')}</button></div><div class="card-foot">${icon('target')} ${goal} Aufgaben pro Runde · beliebig weiterüben</div></section>${!english?predicatePracticeCard():''}${subject==='latin'?tablePracticeCard()+prefixPracticeCard():''}${isAdmin()&&subject==='english'?grammarCard():''}</div>`;;
 }
 function selectedPredicateDecks(d=data()){const decks=predicateDecks(d).filter(deck=>deck.active!==false);return predicateSelected===null?decks.map(deck=>deck.id):predicateSelected.filter(id=>decks.some(deck=>deck.id===id));}
 function predicatePracticeCard(){const d=data(),decks=predicateDecks(d).filter(deck=>deck.active!==false),ids=selectedPredicateDecks(d),allItems=predicateCloudItems(d),items=allItems.filter(item=>ids.includes(item.deckId));return `<section class="training-card"><div class="section-top"><span class="tag">GRUNDFORM → PERFEKTFORM</span>${icon('book','large-icon')}</div><h2>Perfektform lernen</h2><p data-compact-hide>Wähle deine Sammlungen und starte eine Runde.</p><details data-panel="home-predicates" class="deck-picker"><summary>Trainingsauswahl · ${decks.length} aktive Sammlungen</summary><div class="bounded-list">${decks.map(deck=>`<label class="collection-check"><input type="checkbox" data-predicate-select="${h(deck.id)}" ${ids.includes(deck.id)?'checked':''}><span>${h(deck.name)}</span><small>${allItems.filter(item=>item.deckId===deck.id).length} Formen</small></label>`).join('')||'<p>Keine aktive Sammlung. Schalte unter Sammlungen die gewünschten Perfekt-Sammlungen ein.</p>'}</div></details><div class="word-tools"><button class="button primary wide" data-action="predicate-start" ${!items.length&&!cloudWait?.blocked?'disabled':''}>Smart lernen ${icon('arrow')}</button><button class="button secondary wide" data-action="predicate-options">Mehr Optionen ${icon('plus')}</button></div><div class="card-foot">${icon('target')} ${prefs().daily} Aufgaben pro Runde · beliebig weiterüben</div></section>`;}
@@ -288,10 +283,12 @@ function trainingOptions(){
  const counts=trainingOptionCounts(d,selected,{direction:english?direction:null});
  showModal(`<h2 id="modal-title">Mehr Optionen</h2><p class="muted">Für deine Trainingsauswahl${english?' · '+directionLabel(direction):''}.</p>${!counts.total?emptyOptionsMarkup('Vokabeln'):''}<div class="word-tools" ${!counts.total?'data-waiting-options="vocab"':''}>${trainingOptionButtons(counts)}</div>`);
 }
-function emptyOptionsMarkup(kind){return `<div data-options-empty><p>Für diese Auswahl sind noch keine ${kind} verfügbar.</p><div data-learning-status>${learningStatus()}</div><button class="text-button" data-action="nav" data-screen="collections">Sammlungen auswählen</button></div>`;}
+function emptyOptionsMessage(kind){return cloudWait?.blocked?'Deine Sammlungen werden geladen …':`Für diese Auswahl sind noch keine ${kind} verfügbar.`;}
+function emptyOptionsMarkup(kind){return `<div data-options-empty><p>${emptyOptionsMessage(kind)}</p><button class="text-button" data-action="nav" data-screen="collections">Sammlungen auswählen</button></div>`;}
 function trainingOptionButtons({learning,known,total}){return `<button class="button secondary wide" data-action="start-refresh" ${!known?'disabled':''}>Auffrischen · ${known} sichere ${english?'Aufgaben':'Wörter'}</button><button class="button secondary wide" data-action="start-learning" ${!learning?'disabled':''}>Noch unsichere Wörter üben · ${learning}</button><button class="button secondary wide" data-action="start-all" ${!total?'disabled':''}>Alle ausgewählten ${english?'Richtungen':'Vokabeln'} üben · ${total}</button>`;}
 function updateWaitingOptions(){
  const node=modalRoot.querySelector('[data-waiting-options]');if(!node?.dataset?.waitingOptions)return;
+ const hint=modalRoot.querySelector('[data-options-empty] p');if(hint)hint.textContent=emptyOptionsMessage(node.dataset.waitingOptions==='vocab'?'Vokabeln':'Prädikate');
  const d=data();let markup;
  if(node.dataset.waitingOptions==='vocab'){
   const active=trainingDecks(d).filter(deck=>deck.active).map(deck=>deck.id);
@@ -379,7 +376,8 @@ async function actions(event){const button=event.target.closest('[data-action]')
    else void Promise.resolve(action==='notification-admin'?reminders.handle(button):sharing.handle(button)).catch(error=>notify(error.message));
   }catch(error){notify(error.message);}return;
  }
- if(action==='retry-sync'){void loadCloud();return;}
+ if(action==='cloud-dismiss'){cloudNotice.dismiss();return;}
+ if(action==='cloud-retry'||action==='retry-sync'){void cloudNotice.retry();return;}
  if(working){notify('Die vorige Aktion wird noch abgeschlossen …');return;}
  const starts=['start','start-all','start-learning','start-refresh','confirm-start','predicate-start','predicate-mode','inactive-practice','refresh-check','refresh-select-test','confusion-practice'].includes(action);
  if(starts&&waitingStart)return;
@@ -587,7 +585,8 @@ async function boot(){try{
  });
  sync.addEventListener('profile-updated',event=>{profile={...profile,...event.profile};updateActiveProfile(profile);});
  sync.addEventListener('subjects-updated',event=>{profile={...profile,allowedSubjects:event.allowedSubjects};updateActiveProfile(profile);});
- cloudWait=cloudGate({sync,store,shouldBlock:()=>!Object.keys(data().collections).length&&!predicateDecks(data()).length,onError:error=>notify(error.message+' Du kannst mit dem gespeicherten Stand üben.'),afterSync:async()=>{if(!english)await migrateLocalPredicates(store,readPredicateStore(localStorage,predicateKey));}});
+ cloudWait=cloudGate({sync,store,shouldBlock:()=>!Object.keys(data().collections).length&&!predicateDecks(data()).length,onError:error=>cloudNotice.fail(error),afterSync:async()=>{if(!english)await migrateLocalPredicates(store,readPredicateStore(localStorage,predicateKey));}});
+ cloudNotice=createCloudNotice({sync,showModal,closeModal,reload:loadCloud,isOpen:()=>!!modalRoot.querySelector('[data-cloud-connection-notice]'),hasLocalContent:()=>{const d=data();return !!Object.keys(d.collections).length||!!predicateDecks(d).length;},canPrompt:()=>ready&&!document.hidden&&!working&&!waitingStart&&!subjectTransition&&!cloudWait?.blocked&&!modalRoot.children.length&&['learn','collections','collection-detail','predicate-detail','classroom','settings'].includes(screen)});
  confusions=confusionUI({store,sync,subject,h,showModal,closeModal,notify,go:target=>{if(target==='result')void showResult();else{screen=target;render();}},render});
  store.addEventListener('change',updateStatus);
  store.addEventListener('external',async()=>{streakLedger.merge(streakDays(data()));if(screen==='test'||screen==='match'){await store.update(doc=>{doc.session=null;doc.matchRound=null;return doc;});screen='learn';notify('Die laufende Runde wurde beendet. Bereits gespeicherte Antworten bleiben erhalten.');}if(!['grammar','tables'].includes(screen))render();});
