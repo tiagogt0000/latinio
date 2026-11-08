@@ -103,6 +103,9 @@ function autoSharingApi_(request,identity){
 }
 function autoShareChanges_(ops,subject){
   if(!autoSharingEnabled_())return null;
+  // Learning activity cannot change shared lesson contents. Do not load every
+  // sharing record and recipient just to save a review, session or streak day.
+  if(!ops.some(function(op){return op.entity==='words'||op.entity==='collections'&&!op.value?.refreshSource||op.entity==='settings'&&(!op.value||op.value.kind==='predicateDeck'||op.value.kind==='predicateItem');}))return null;
   const context=autoContext_(),source=autoState_(context,'admin',subject).data,affected=new Map();
   const resource=function(kind,id,name){affected.set(kind+':'+id,{kind:kind,sourceId:id,name:name||'Sammlung'});};
   ops.forEach(function(op){

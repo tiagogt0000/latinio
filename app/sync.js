@@ -48,9 +48,12 @@ export class Sync extends EventTarget {
   }
   set(status,message){this.status=status;this.message=message;this.dispatchEvent(new Event('change'));}
   get configured(){return !!this.store.doc.config.url&&!!this.store.doc.config.token;}
+  get currentBridge(){const config=this.store.doc.config;return this.bridge?.url===config.url&&this.bridge?.token===config.token?this.bridge:null;}
+  get compactSync(){return this.currentBridge?.compactSync===true;}
+  get streakSummary(){return this.currentBridge?.streakSummary===true;}
   schedule(ms=1200){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
   async request(action,payload,requestSubject=this.subject){
-    if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
+    if(requestSubject!==this.subject&&(!['check','pull','streak'].includes(action)||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
     const config={...this.store.doc.config},profileId=this.store.profileId;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=createBridge(config.url,config.token);}
     const perform=async bridge=>{
@@ -69,6 +72,8 @@ export class Sync extends EventTarget {
           if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');
           bridge.englishVerified=true;
         }
+        bridge.compactSync=identity.compactSync===true;
+        bridge.streakSummary=identity.streakSummary===true;
         if(profileId)bridge.verifiedProfileId=profileId;
         if(action==='whoami')return identity;
       }
@@ -144,16 +149,28 @@ export class Sync extends EventTarget {
     finally{this.busy=false;this.dispatchEvent(new Event('change'));}
   }
   async fetchRemote(full=false){
-    this.remote=await this.request('pull',{since:full?0:this.store.doc.base});this.remoteFull=full;this.cloudVersion=this.remote.version;
+    const payload={since:full?0:this.store.doc.base};
+    if(this.compactSync){payload.compact=1;payload.pendingIds=this.store.doc.pending.map(op=>op.id);}
+    const remote=await this.request('pull',payload);
+    // Conflict values are the current snapshot values; deletions are absent.
+    // Keep legacy downloads intact when the server still returns full ops.
+    if(!Array.isArray(remote?.ops)){
+      const entities=['collections','words','reviews','sessions','settings'];
+      if(!Number.isSafeInteger(remote?.version)||remote.version<0||!Array.isArray(remote.changes)||!Array.isArray(remote.acknowledged)||typeof remote.hasHistory!=='boolean'||
+        !entities.every(entity=>remote.data?.[entity]&&typeof remote.data[entity]==='object'&&!Array.isArray(remote.data[entity]))||
+        remote.changes.some(change=>!change||!entities.includes(change.entity)||typeof change.key!=='string'||typeof change.id!=='string'||typeof change.device!=='string'))throw Error('Die Cloud hat keinen gültigen Lernstand geliefert. Bitte erneut versuchen.');
+    }
+    this.remote=Array.isArray(remote.ops)?remote:{...remote,ops:remote.changes.map(change=>({...change,value:remote.data[change.entity][change.key]??null}))};
+    this.remoteFull=full;this.cloudVersion=this.remote.version;
     this.set('newer',`Neuere Cloud-Version · v${this.remote.version}`);this.dispatchEvent(new Event('remote'));
   }
-  compare(choices={}){return rebase(this.remote.data,this.remote.ops,this.store.doc.pending,choices);}
+  compare(choices={}){return rebase(this.remote.data,this.remote.ops,this.store.doc.pending,choices,this.remote);}
   async accept(choices={}){
     const merged=this.compare(choices);if(merged.conflicts.length)throw Error('Bitte wähle für jede doppelt bearbeitete Angabe den gewünschten Stand.');
     this.set('loading','Cloud-Version wird geladen …');
     const remote=this.remote,full=this.remoteFull;
     await this.store.update(doc=>{
-      const latest=rebase(remote.data,remote.ops,doc.pending,choices);
+      const latest=rebase(remote.data,remote.ops,doc.pending,choices,remote);
       if(latest.conflicts.length)throw Error('Es gibt inzwischen weitere lokale Änderungen. Bitte erneut vergleichen.');
       doc.shadow=latest.shadow;doc.pending=latest.pending;doc.base=remote.version;doc.lastSync=Date.now();if(full)doc.lastFullSync=Date.now();doc.seeded=true;return doc;
     });

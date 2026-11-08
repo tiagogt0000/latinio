@@ -30,7 +30,7 @@ function latinioApi(request) {
   requestSheets_=Object.create(null);
   const subject=request&&request.subject||'latin';
   if(!['latin','english','french'].includes(subject))throw new Error('Unbekanntes Lernfach.');
-  const readOnly=request&&['check','pull','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList'].includes(request.action);
+  const readOnly=request&&['check','pull','streak','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
@@ -39,25 +39,36 @@ function latinioApi(request) {
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
     if(['autoShareCheck','autoShareApply'].includes(request.action))return autoSharingApi_(request,identity);
-    if(request.action==='whoami')return {profile:identity,apiVersion:7,subjects:['latin','english','french'],allowedSubjects:identity.allowedSubjects};
+    if(request.action==='whoami')return {profile:identity,apiVersion:7,subjects:['latin','english','french'],allowedSubjects:identity.allowedSubjects,compactSync:true,streakSummary:true};
     if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action)){const result=accountApi_(request,identity,subject);return request.action==='shareList'?autoShareDirectory_(result,subject):result;}
     if(identity.role!=='admin'&&identity.allowedSubjects.indexOf(subject)<0)throw new Error('Dieses Lernfach ist für dein Profil nicht freigeschaltet.');
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
-    const version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
+    let version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
     if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects};
-    const log=lastRow>1?sheet.getRange(2,1,lastRow-1,5).getValues().map(function(row){return {version:Number(row[0]),op:JSON.parse(row[4])};}):[];
-    const data=replay_(log);
+    if(!['pull','push','streak'].includes(request.action))throw new Error('Unbekannte Aktion.');
+    if(request.action==='push'){
+      if(!Number.isSafeInteger(request.base)||request.base<0)throw new Error('Ungültige Version.');
+      if(request.base!==version)return {conflict:true,version:version};
+      if(!Array.isArray(request.ops)||request.ops.length>200)throw new Error('Ungültige Anzahl von Änderungen.');
+    }
+    const state=readState_(identity.id,readOnly,subject),data=state.data;
+    version=state.version;
+    if(request.action==='streak')return {version:version,days:Array.from(new Set(Object.values(data.settings).filter(function(v){return v&&v.kind==='streakDay'&&typeof v.day==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v.day)&&Number.isFinite(Date.parse(v.day))&&new Date(v.day).toISOString().slice(0,10)===v.day;}).map(function(v){return v.day;}))).sort()};
     if(request.action==='pull') {
       const since=Number(request.since||0);
       if(!Number.isSafeInteger(since)||since<0||since>version)throw new Error('Ungültiger Gerätestand.');
-      return {version:version,data:data,ops:log.filter(function(row){return row.version>since;}).map(function(row){return row.op;})};
+      const log=sheet&&typeof sheet.readLog==='function'?sheet.readLog(since):state.log.filter(function(row){return row.version>since;});
+      if(request.compact===1){
+        const pending=request.pendingIds===undefined?[]:request.pendingIds;
+        if(!Array.isArray(pending)||pending.some(function(id){return typeof id!=='string'||!/^[a-zA-Z0-9_-]{1,160}$/.test(id);}))throw new Error('Ungültige Änderungskennungen.');
+        const changes=new Map();log.forEach(function(row){const op=row.op;changes.set(op.entity+':'+op.key,{id:op.id,device:op.device,entity:op.entity,key:op.key,version:row.version});});
+        const known=pending.length?new Set(sheet&&typeof sheet.operationIds==='function'?sheet.operationIds():state.log.map(function(row){return row.op.id;})):new Set();
+        return {version:version,data:data,changes:Array.from(changes.values()),acknowledged:Array.from(new Set(pending.filter(function(id){return known.has(id);}))),hasHistory:version>0};
+      }
+      return {version:version,data:data,ops:log.map(function(row){return row.op;})};
     }
-    if(request.action!=='push')throw new Error('Unbekannte Aktion.');
-    if(!Number.isSafeInteger(request.base)||request.base<0)throw new Error('Ungültige Version.');
-    if(request.base!==version)return {conflict:true,version:version};
-    if(!Array.isArray(request.ops)||request.ops.length>200)throw new Error('Ungültige Anzahl von Änderungen.');
-    const known={};log.forEach(function(row){known[row.op.id]=true;});
+    const known={};(sheet&&typeof sheet.operationIds==='function'?sheet.operationIds():state.log.map(function(row){return row.op.id;})).forEach(function(id){known[id]=true;});
     const rows=[],accepted=[];let next=version;
     request.ops.forEach(function(op){
       validateOp_(op);accepted.push(op.id);if(known[op.id])return;

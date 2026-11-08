@@ -76,7 +76,7 @@ function actionFixture(subject='latin'){
  const document={activeElement:focusable,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type),querySelector:()=>null};
  const store={doc:{pending:[]},recordActivity:async kind=>calls.activities.push(kind)};
  const context=vm.createContext({
-  document,modalRoot,modalReturnFocus:null,modalCleanup:null,interfaceMotion:{closeModal(){},openModal(){}},store,subject,english:subject!=='latin',
+  queueMicrotask,pendingCloudRender:false,document,modalRoot,modalReturnFocus:null,modalCleanup:null,interfaceMotion:{closeModal(){},openModal(){}},store,subject,english:subject!=='latin',
   data:()=>{calls.reads++;return applyOps(d,[]);},prefs:()=>({...d.settings.general}),selected:['a','b'],predicateSelected:null,
   subjectTransition:null,ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'learn',pendingStart:null,
   tablePractice:null,grammar:null,reminders:null,sharing:{handle:async()=>false,afterAction(){}},confusions:{handle:async()=>false},
@@ -86,7 +86,7 @@ function actionFixture(subject='latin'){
   notify:message=>calls.notices.push(message),render(){calls.renders++;},checkShareNotices(){},autoUpdate(){},updateStatus(){},refreshStreak:async()=>{},settleSync:async()=>{},
   predicateRun:[],predicateRoot:null,predicateResults:[],predicateRoundId:'',roundEnd:null,predicateCursor:0,predicateAnswer:'',predicateFeedback:null,
  });
- for(const code of [section('function learningStatus(','function render('),section('function selectedPredicateDecks(','function renderPredicateTest('),section('function trainingOptions(','function current('),section('function showModal(','function showStreakDemo('),section('async function actions(',"document.addEventListener('click',event=>"),source.split('\n').find(line=>line.startsWith('async function backgroundSync('))])vm.runInContext(code,context);
+ for(const code of [section('function flushCloudRender(','const prefs='),section('function learningStatus(','function render('),section('function selectedPredicateDecks(','function renderPredicateTest('),section('function trainingOptions(','function current('),section('function showModal(','function showStreakDemo('),section('async function actions(',"document.addEventListener('click',event=>"),source.split('\n').find(line=>line.startsWith('async function backgroundSync('))])vm.runInContext(code,context);
  const click=(action,id)=>context.actions({preventDefault(){},target:{closest:()=>({dataset:{action,id},isConnected:true,removeAttribute(){}})}});
  return {context,d,calls,click,get html(){return html;}};
 }

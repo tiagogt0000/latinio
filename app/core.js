@@ -159,9 +159,11 @@ export function chooseWords(data, collectionIds, limit=10, mode='smart', now=Dat
   }
   return chosen.sort((a,b)=>a.random-b.random).map(x=>x.w.id);
 }
-export function rebase(shadow, remoteOps, pending, choices={}) {
-  const acknowledged=new Set(remoteOps.map(o=>o.id));
-  const remaining=pending.filter(o=>!acknowledged.has(o.id)&&!(o.bootstrap&&(remoteOps.length||Object.keys(shadow.collections).length)));
+export function rebase(shadow, remoteOps, pending, choices={}, {acknowledged=[],hasHistory=false}={}) {
+  // Compact downloads retain only the last change per key. Acknowledgments
+  // separately confirm older uploaded operations that were later overwritten.
+  const confirmed=new Set([...remoteOps.map(o=>o.id),...acknowledged]);
+  const remaining=pending.filter(o=>!confirmed.has(o.id)&&!(o.bootstrap&&(hasHistory||remoteOps.length||Object.keys(shadow.collections).length)));
   const latestRemote=new Map(remoteOps.map(o=>[o.entity+':'+o.key,o]));
   const conflicts=[];
   for(const op of remaining){

@@ -37,7 +37,7 @@ test('Modal replacement, tab trapping and Escape never restore focus with scroll
  const first={focus:opts=>focusCalls.push(['first',opts])},last={focus:opts=>focusCalls.push(['last',opts])};
  const root={get children(){return rootHtml?[{}]:[];},set innerHTML(value){rootHtml=value;},querySelector:()=>first,querySelectorAll:()=>[first,last],contains:el=>[first,last].includes(el)};
  const document={activeElement:opener,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type)};
- const ctx=vm.createContext({document,modalRoot:root,modalCleanup:null,modalReturnFocus:null,icon:()=>'',interfaceMotion:{closeModal(){},openModal(){}}});
+ const ctx=vm.createContext({queueMicrotask,flushCloudRender(){},document,modalRoot:root,modalCleanup:null,modalReturnFocus:null,icon:()=>'',interfaceMotion:{closeModal(){},openModal(){}}});
  vm.runInContext(source.slice(source.indexOf('function showModal('),source.indexOf('function showStreakDemo(')),ctx);
  ctx.showModal('<h2 id="modal-title">One</h2>');document.activeElement=last;
  listeners.get('keydown')({key:'Tab',preventDefault(){}});assert.equal(focusCalls.at(-1)[0],'first');

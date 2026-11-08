@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
+function installCloudRender(context){context.pendingCloudRender=false;context.subjectTransition=null;vm.runInContext(source.slice(source.indexOf('function flushCloudRender('),source.indexOf('const prefs=')),context);}
 test('Initial app sync starts after ready and does not await a loading screen',()=>{
  assert.equal((source.match(/cloudWait\.run\(/g)||[]).length,1);
  assert.match(source,/ready=true;void reminders.refresh\(\).then\(\(\)=>reminders.maybePrompt\(\)\);const startup=cloudWait\.run\(\);render\(\)/);assert.doesNotMatch(source,/await cloudWait\.run/);
@@ -10,26 +11,26 @@ test('Initial app sync starts after ready and does not await a loading screen',(
 test('Results appear before cloud completion and late sync cannot reopen results',async()=>{
  let release,renders=[],updates=0;
  const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},store:{doc:{session:{id:'round',mode:'smart',finished:true}}},sync:{},modalRoot:{children:[]},screen:'test',data:()=>({reviews:{}}),roundStats:()=>({correct:1}),failedTasks:()=>[],offerRoundEnd:async()=>{ctx.screen='round-end';renders.push(ctx.screen);},refreshStreak:async()=>{},render(){renders.push(ctx.screen);},updateStatus(){updates++;},settleSync:()=>new Promise(r=>release=r)});
- vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function showResult(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
+ installCloudRender(ctx);vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function showResult(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
  await ctx.showResult();assert.equal(ctx.screen,'round-end');assert.deepEqual(renders,['round-end']);
  ctx.screen='learn';release();await new Promise(r=>setImmediate(r));assert.equal(ctx.screen,'learn');assert.deepEqual(renders,['round-end','learn']);assert.equal(updates,1);
 });
 test('Cloud return during a test never rerenders or reads away typed answers',async()=>{
  let rendered=0,checked=0;
  const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'test',sync:{lastFullSync:123},store:{doc:{session:{answers:['already saved']}}},modalRoot:{children:[]},render(){rendered++;},updateStatus(){},settleSync:async()=>checked++});
- vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function loadCloud(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
+ installCloudRender(ctx);vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function loadCloud(')||l.startsWith('async function backgroundSync(')).join('\n'),ctx);
  await ctx.loadCloud();assert.equal(checked,1);assert.equal(rendered,0);assert.equal(ctx.sync.lastFullSync,123);assert.deepEqual(ctx.store.doc.session.answers,['already saved']);
 });
 test('Offline background failure leaves result actions available',async()=>{
  const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'result',sync:{},store:{},modalRoot:{children:[]},render(){},updateStatus(){},settleSync:async()=>{throw Error('offline');}});
- vm.runInContext(source.split('\n').find(l=>l.startsWith('async function backgroundSync(')),ctx);
+ installCloudRender(ctx);vm.runInContext(source.split('\n').find(l=>l.startsWith('async function backgroundSync(')),ctx);
  await ctx.backgroundSync();assert.equal(ctx.working,false);assert.equal(ctx.cloudWait.blocked,false);assert.equal(ctx.screen,'result');
 });
 
 test('Cloud completion and available updates preserve an open table worksheet',async()=>{
  let renders=0,applied=0;
  const ctx=vm.createContext({ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'tables',sync:{busy:false},sharing:{busy:false},store:{doc:{pending:[]}},modalRoot:{children:[]},updates:{state:'available',apply(){applied++;}},settleSync:async()=>{},refreshStreak:async()=>{},render(){renders++;},updateStatus(){}});
- vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function backgroundSync(')||l.startsWith('function autoUpdate(')).join('\n'),ctx);
+ installCloudRender(ctx);vm.runInContext(source.split('\n').filter(l=>l.startsWith('async function backgroundSync(')||l.startsWith('function autoUpdate(')).join('\n'),ctx);
  await ctx.backgroundSync();ctx.autoUpdate();assert.equal(renders,0);assert.equal(applied,0);
  ctx.screen='learn';ctx.autoUpdate();assert.equal(applied,1);
 });

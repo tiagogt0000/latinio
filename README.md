@@ -1,5 +1,13 @@
-# Latinio · Version 2.15.0
+# Latinio · Version 2.15.1
 
+
+## Neu in 2.15.1: Cloud-Bugfixes
+
+Der Server hält den aktuellen Lernstand separat vor. Die App lädt ihn ohne den vollständigen Änderungsverlauf; ausstehende Änderungen und Konflikte werden weiterhin abgeglichen. Große Antworten werden zusätzlich komprimiert. Für den fachübergreifenden Streak werden nur die benötigten Tage abgerufen, unveränderte ältere Cloud-Anbindungen werden nicht erneut vollständig geladen. Reine Lernfortschritte lösen keine Prüfung sämtlicher Unterrichtsfreigaben mehr aus.
+
+Sammlungen, die während eines geöffneten Dialogs eintreffen, erscheinen anschließend zuverlässig. Dieses Update ändert kein Design.
+
+581 automatisierte Tests und 6 Installerprüfungen bestanden. Im kontrollierten Vergleich mit einer bestehenden Datenkopie übertragen die beiden Fachabrufe rund 89 beziehungsweise 90 Prozent weniger Bytes bei identischem Lernstand; das ist keine Geschwindigkeitsmessung auf einem Handy.
 
 ## Neu in 2.15.0: Zwei Fächer, schneller Start und zuverlässige Lernoptionen
 

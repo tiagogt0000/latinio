@@ -98,12 +98,13 @@ function generateProfileCode_(profile){
   throw new Error('Es konnte kein freier Zugangscode erzeugt werden. Erneut versuchen.');
 }
 function readState_(id,readOnly,subject='latin'){
-  const sheet=ensureLog_(id,readOnly,subject);if(!sheet)return {sheet:null,log:[],data:replay_([]),version:0};const last=sheet.getLastRow();
+  const sheet=ensureLog_(id,readOnly,subject);if(!sheet)return {sheet:null,log:[],data:{collections:{},words:{},reviews:{},sessions:{},settings:{}},version:0};const last=sheet.getLastRow();
+  if(typeof sheet.readState==='function'){const state=sheet.readState();return {sheet:sheet,data:state.data,version:state.version,get log(){return sheet.readLog(0);}};}
   const log=last>1?sheet.getRange(2,1,last-1,5).getValues().map(function(r){return {version:Number(r[0]),op:JSON.parse(r[4])};}):[];
   return {sheet:sheet,log:log,data:replay_(log),version:log.length?log[log.length-1].version:0};
 }
 function serverWrite_(profileId,changes,subject='latin'){
-  const state=readState_(profileId,false,subject),known=new Set(state.log.map(function(r){return r.op.id;})),rows=[];
+  const state=readState_(profileId,false,subject),known=new Set(typeof state.sheet.operationIds==='function'?state.sheet.operationIds():state.log.map(function(r){return r.op.id;})),rows=[];
   changes.forEach(function(c){
     if(known.has(c.id))return;
     const op={id:c.id,entity:c.entity,key:c.key,value:c.value,device:'sharing',seq:++state.version,at:Date.now()};

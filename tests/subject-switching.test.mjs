@@ -21,7 +21,7 @@ function fixture(t,{reducedMotion=false,allowed=['latin','english'],navigationEr
  const document={documentElement:{},defaultView:{setTimeout:setTimer,clearTimeout:clearTimer,matchMedia:()=>({matches:reducedMotion,addEventListener(){},removeEventListener(){}})},createElement:()=>veil,body:{append(){calls.push('begin');}}};
  const app={ownerDocument:document};
  const doc={pending:[{id:'saved-review',entity:'reviews'}],session:{id:'round',answers:['amavi']}};
- const context=vm.createContext({
+ const context=vm.createContext({flushCloudRender(){},
   app,document,URL,localStorage,sessionStorage,rememberSubject,TRANSITION_KEY,SUBJECT_SWITCH_KEY,beginSubjectTransition,
   subject:'latin',subjectTransition:null,ready:true,working:false,waitingStart:false,screen:'learn',
   subjectAllowed:id=>SUBJECTS.some(item=>item.id===id)&&allowed.includes(id),

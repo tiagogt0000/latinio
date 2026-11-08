@@ -1,17 +1,38 @@
 import {createServer} from 'node:http';
+import {gzip} from 'node:zlib';
+import {promisify} from 'node:util';
+const compress=promisify(gzip);
+function acceptsGzip(header='') {
+  const entries=String(header).toLowerCase().split(',').map(part=>{
+    const [name,...parameters]=part.trim().split(';');
+    const quality=parameters.map(value=>value.trim()).find(value=>value.startsWith('q='));
+    return {name:name.trim(),quality:quality===undefined?1:Number(quality.slice(2))};
+  });
+  const encoding=entries.find(entry=>entry.name==='gzip')||entries.find(entry=>entry.name==='*');
+  return encoding?.quality>0&&encoding.quality<=1;
+}
 
 export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null, grammar = null) {
   return createServer(async (req,res) => {
     res.setHeader('Cache-Control','no-store');
     res.setHeader('X-Content-Type-Options','nosniff');
-    const reply = (status,body) => {
-      res.writeHead(status,{'Content-Type':'application/json; charset=utf-8'});
-      res.end(JSON.stringify(body));
+    res.setHeader('Vary','Origin, Accept-Encoding');
+    const reply = async (status,body) => {
+      let payload=Buffer.from(JSON.stringify(body));
+      const headers={'Content-Type':'application/json; charset=utf-8'};
+      // Large initial downloads must fit mobile networks, without blocking other
+      // requests while they compress. The decoded JSON contract stays unchanged.
+      if(payload.length>=1024&&acceptsGzip(req.headers['accept-encoding'])){
+        try{payload=await compress(payload,{level:1});headers['Content-Encoding']='gzip';}catch{}
+      }
+      if(res.destroyed)return;
+      headers['Content-Length']=payload.length;
+      res.writeHead(status,headers);
+      res.end(payload);
     };
     if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true,grammarReady:grammar?.ready===true});
     if (req.headers.origin !== origin) return reply(403,{error:'Herkunft nicht erlaubt.'});
     res.setHeader('Access-Control-Allow-Origin',origin);
-    res.setHeader('Vary','Origin');
     if (req.url !== '/api') return reply(404,{error:'Nicht gefunden.'});
     if (req.method === 'OPTIONS') {
       res.setHeader('Access-Control-Allow-Methods','POST');

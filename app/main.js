@@ -53,7 +53,7 @@ const openPanels=new Set();
 let collectionTab='lessons',collectionsSearchOpen=false,refreshFlow=null,adminContent='',adminTab='people';
 let predicateSelected=null;
 let streakDemoDay=1,streakDemoVariant='orbit',streakDemoTheme='auto';
-let streakLedger=null,streakSyncTask=null,streakSyncedAt=0,streakOtherVersion=null,roundEnd=null,predicateRoot=null,predicateResults=[],predicateRoundId='';
+let streakLedger=null,streakSyncTask=null,streakSyncedAt=0,streakOtherVersions=new Map(),roundEnd=null,predicateRoot=null,predicateResults=[],predicateRoundId='';
 let predicateKey='',predicateRun=[],predicateCursor=0,predicateAnswer='',predicateFeedback=null;
 let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
@@ -64,11 +64,16 @@ updates.addEventListener('change',()=>{if(!ready&&isBootSplash()&&updates.state=
 if('serviceWorker'in navigator&&location.protocol!=='file:')void navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>{updates.watch(registration);void updates.check();}).catch(()=>{});
 const isAdmin=()=>profile?.role==='admin';
 const subjectAllowed=value=>SUBJECTS.some(s=>s.id===value)&&(isAdmin()||!Array.isArray(profile?.allowedSubjects)||profile.allowedSubjects.includes(value));
-let viewSnapshot=null,subjectTransition=null;
+let viewSnapshot=null,subjectTransition=null,pendingCloudRender=false;
 const data=()=>viewSnapshot||store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!waitingStart&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','grammar','tables'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
 async function showResult(){const saved=store.doc.session;if(!saved?.finished)return;if(saved.mode==='inactive-check'&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}const session=store.doc.session;await offerRoundEnd({kind:'vocab',id:session.id,stats:roundStats(session,data()),errors:failedTasks(session,data().reviews)});void backgroundSync();}
-async function backgroundSync(){if(!ready||cloudWait?.blocked)return;try{await settleSync(sync,store);void refreshStreak();if(!working&&!waitingStart&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','admin','grammar','tables'].includes(screen))render();}catch{}finally{updateStatus();}}
+function flushCloudRender(){
+ if(!pendingCloudRender||!ready||subjectTransition||working||waitingStart||modalRoot.children.length||['test','match','predicate-test','round-end','admin','grammar','tables'].includes(screen))return;
+ pendingCloudRender=false;render();
+}
+function renderCloudChanges(){pendingCloudRender=true;flushCloudRender();}
+async function backgroundSync(){if(!ready||cloudWait?.blocked)return;try{await settleSync(sync,store);void refreshStreak();renderCloudChanges();}catch{}finally{updateStatus();}}
 
 const prefs=()=>({daily:10,typos:true,direction:'mixed',...data().settings.general,theme:'system',accent:'green',density:'comfortable',design:'rounded'});
 const allWords=()=>{const d=data();return Object.values(d.words).filter(w=>d.collections[w.collectionId]);};
@@ -91,6 +96,7 @@ function learningStatus(){
  return empty?'<p class="small muted">Hier sind noch keine Sammlungen gespeichert. <button class="text-button" data-action="nav" data-screen="collections">Sammlungen öffnen</button> oder <button class="text-button" data-action="retry-sync">erneut laden</button>.</p>':'';
 }
 function render(){
+ pendingCloudRender=false;
  viewSnapshot=store.data;
  try{
  theme();
@@ -165,7 +171,7 @@ function showModal(content,closable=true){
  modalRoot.querySelector('input,select,button,.modal')?.focus({preventScroll:true});
  interfaceMotion.openModal(modalRoot);
 }
-function closeModal(){interfaceMotion.closeModal();modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;modalReturnFocus=null;}
+function closeModal(){interfaceMotion.closeModal();modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;modalReturnFocus=null;queueMicrotask(flushCloudRender);}
 function showStreakDemo(){
  showModal(streakDemo(streakDemoDay,streakDemoVariant,streakDemoTheme));
  const overflow=document.body.style.overflow;document.body.style.overflow='hidden';
@@ -187,7 +193,16 @@ async function refreshStreak(){
  const others=SUBJECTS.map(s=>s.id).filter(s=>s!==subject&&subjectAllowed(s));
  if(!navigator.onLine||!sync.configured||!others.length||Date.now()-streakSyncedAt<60000)return;
  if(streakSyncTask)return streakSyncTask;
- streakSyncTask=(async()=>{try{for(const other of others){const result=await sync.request('pull',{since:0},other);streakLedger.merge(streakDays(result.data));}streakSyncedAt=Date.now();}catch{/* Offline and unavailable subjects never block local completion. */}finally{streakSyncTask=null;refreshStreakBadge();}})();
+ streakSyncTask=(async()=>{try{
+  for(const other of others){
+   if(sync.streakSummary===true){const result=await sync.request('streak',{},other);streakLedger.merge(result.days);continue;}
+   const config=store.doc.config,cached=streakOtherVersions.get(other),meta=await sync.request('check',{},other);
+   if(cached&&cached.profileId===store.profileId&&cached.url===config.url&&cached.token===config.token&&cached.version===meta.version)continue;
+   const result=await sync.request('pull',{since:0},other);streakLedger.merge(streakDays(result.data));
+   streakOtherVersions.set(other,{profileId:store.profileId,url:config.url,token:config.token,version:result.version});
+  }
+  streakSyncedAt=Date.now();
+ }catch{/* Offline and unavailable subjects never block local completion. */}finally{streakSyncTask=null;refreshStreakBadge();}})();
  return streakSyncTask;
 }
 async function offerRoundEnd(completion){
@@ -474,7 +489,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
  case 'streak-demo':if(isAdmin()){streakDemoDay=Number(document.querySelector('#streak-demo-day')?.value)||1;streakDemoTheme=document.querySelector('#streak-demo-theme')?.value||'auto';streakDemoVariant=id;showStreakDemo();}break;
  case 'streak-demo-replay':if(isAdmin())showStreakDemo();break;
  case 'download-example':{const example={format:'latinio-collection',schema:1,name:'Meine neue Sammlung',words:english?[{english:'hello',german:['hallo']}]:[{latin:'exemplum',meanings:[['Beispiel']],forms:['exempla','exemplorum','exemplis']}]};const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(example,null,2)],{type:'application/json'}));a.download=english?'latinio-englisch-beispiel.json':'latinio-import-beispiel.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);break;}
- }}catch(error){notify(error.message);}finally{clearTimeout(actionDotsTimer);actionDots?.remove();button.removeAttribute?.('aria-busy');working=false;void sharing?.afterAction();checkShareNotices();reminders?.maybePrompt?.();autoUpdate();}}
+ }}catch(error){notify(error.message);}finally{clearTimeout(actionDotsTimer);actionDots?.remove();button.removeAttribute?.('aria-busy');working=false;flushCloudRender();void sharing?.afterAction();checkShareNotices();reminders?.maybePrompt?.();autoUpdate();}}
 document.addEventListener('click',event=>{
  const button=event.target.closest?.('[data-action="add-answer"]');
  if(!button||!ready||working||cloudWait?.blocked||screen!=='test'||current().session?.feedback)return;
@@ -547,7 +562,7 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
  if(form.id==='announcement-form'){
   form.querySelector('button').disabled=true;const result=await sync.request('announcementSend',{profileId:String(fd.get('profileId')),title:String(fd.get('title')),message:String(fd.get('message'))});closeModal();notify(`Nachricht gespeichert für ${result.announcement.profileId==='all'?'alle Nutzer':'den ausgewählten Nutzer'}.`);
  }
- }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;void sharing?.afterAction();checkShareNotices();reminders?.maybePrompt?.();autoUpdate();}});
+ }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;flushCloudRender();void sharing?.afterAction();checkShareNotices();reminders?.maybePrompt?.();autoUpdate();}});
 async function loadCloud(){await backgroundSync();}
 async function boot(){try{
  const parameters=new URLSearchParams(location.search);const reminded=parameters.get('from')==='reminder'&&SUBJECTS.some(x=>x.id===parameters.get('subject'))?parameters.get('subject'):null;if(reminded){const cleaned=new URL(location.href);cleaned.searchParams.delete('from');history.replaceState(null,'',cleaned.href);}const direct=consumeSubjectSwitch(sessionStorage);subject=direct||reminded||await chooseSubject(app);rememberSubject(subject,localStorage);english=subject!=='latin';
@@ -580,7 +595,7 @@ async function boot(){try{
  sync.addEventListener('authentication-required',()=>signOut());
  sync.addEventListener('remote',()=>{if(!cloudWait.blocked)void loadCloud();});
  ready=true;void reminders.refresh().then(()=>reminders.maybePrompt());const startup=cloudWait.run();render();arrive(app);subjectTransition?.finish();subjectTransition=null;
- void startup.then(async()=>{void refreshStreak();await store.recordActivity('opened');sync.schedule();if(!working&&!waitingStart&&!modalRoot.children.length&&!['test','match','predicate-test','round-end','admin','grammar','tables'].includes(screen))render();updateStatus();checkShareNotices();void checkAnnouncements();void reportAppVersion();}).catch(error=>notify(error.message));
+ void startup.then(async()=>{void refreshStreak();await store.recordActivity('opened');sync.schedule();renderCloudChanges();updateStatus();checkShareNotices();void checkAnnouncements();void reportAppVersion();}).catch(error=>notify(error.message));
  async function reportAppVersion(){if(!ready||isAdmin()||!sync?.configured||!navigator.onLine||store.doc.appVersionReported===APP_VERSION)return;try{await sync.request('profileVersion',{version:APP_VERSION});await store.update(doc=>{doc.appVersionReported=APP_VERSION;return doc;});}catch{}}
  async function resume(){if(!ready||document.hidden)return;void reminders.refresh().then(()=>reminders.maybePrompt());await store.recordActivity('opened');await loadCloud();checkShareNotices();if(screen==='learn'||screen==='collections'||screen==='collection-detail'||screen==='settings')void checkAnnouncements();void updates.check();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&!store.doc.session?.feedback)void preserveTestDraft(store,screen,readAnswers());}else void resume();});

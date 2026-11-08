@@ -11,22 +11,70 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
     CREATE TABLE IF NOT EXISTS properties (key TEXT PRIMARY KEY, value TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS sheets (name TEXT PRIMARY KEY);
     CREATE TABLE IF NOT EXISTS rows (sheet TEXT NOT NULL, position INTEGER NOT NULL,
-      value TEXT NOT NULL, PRIMARY KEY(sheet, position));`);
+      value TEXT NOT NULL, PRIMARY KEY(sheet, position));
+    CREATE TABLE IF NOT EXISTS journal_snapshots (sheet TEXT PRIMARY KEY,
+      version INTEGER NOT NULL, data TEXT NOT NULL);
+    CREATE TRIGGER IF NOT EXISTS journal_snapshot_update AFTER UPDATE ON rows BEGIN
+      DELETE FROM journal_snapshots WHERE sheet=OLD.sheet AND OLD.position<=version+1;
+      DELETE FROM journal_snapshots WHERE sheet=NEW.sheet AND NEW.position<=version+1;
+    END;
+    CREATE TRIGGER IF NOT EXISTS journal_snapshot_delete AFTER DELETE ON rows BEGIN
+      DELETE FROM journal_snapshots WHERE sheet=OLD.sheet AND OLD.position<=version+1;
+    END;
+    CREATE TRIGGER IF NOT EXISTS journal_snapshot_replace BEFORE INSERT ON rows BEGIN
+      DELETE FROM journal_snapshots WHERE sheet=NEW.sheet AND NEW.position<=version+1;
+    END;`);
   const getProp = db.prepare('SELECT value FROM properties WHERE key=?');
   const putProp = db.prepare('INSERT OR REPLACE INTO properties VALUES (?,?)');
   const getRow = db.prepare('SELECT value FROM rows WHERE sheet=? AND position=?');
+  const getRows = db.prepare('SELECT position,value FROM rows WHERE sheet=? AND position>=? AND position<? ORDER BY position');
   const putRow = db.prepare('INSERT OR REPLACE INTO rows VALUES (?,?,?)');
   const sheetExists = db.prepare('SELECT 1 FROM sheets WHERE name=?');
   const lastRow = db.prepare('SELECT COALESCE(MAX(position),0) AS n FROM rows WHERE sheet=?');
+  const getSnapshot = db.prepare('SELECT version,data FROM journal_snapshots WHERE sheet=?');
+  const putSnapshot = db.prepare('INSERT OR REPLACE INTO journal_snapshots VALUES (?,?,?)');
+  const getOperationIds = db.prepare("SELECT json_extract(value,'$[1]') AS id FROM rows WHERE sheet=? AND position>1 ORDER BY position");
+  const isJournal = name => !name.startsWith('_Latinio');
+  function journalLog(name,since=0) {
+    return getRows.all(name,since+2,lastRow.get(name).n+1).map(({value}) => {
+      const row=JSON.parse(value);return {version:Number(row[0]),op:JSON.parse(row[4])};
+    });
+  }
+  function journalState(name) {
+    const last=lastRow.get(name).n;
+    const version=last>1?Number(JSON.parse(getRow.get(name,last).value)[0]):0;
+    const saved=getSnapshot.get(name);
+    let data,from=0;
+    if(saved&&Number.isSafeInteger(saved.version)&&saved.version>=0&&saved.version<=version){
+      try {
+        data=JSON.parse(saved.data);
+        if(!data||['collections','words','reviews','sessions','settings'].some(key=>!data[key]||typeof data[key]!=='object'||Array.isArray(data[key])))data=null;
+        else from=saved.version;
+      } catch { data=null; }
+    }
+    const rebuild=!data;
+    if(rebuild)data={collections:{},words:{},reviews:{},sessions:{},settings:{}};
+    if(rebuild||from!==version){
+      for(const {op} of journalLog(name,from)){
+        if(op.value===null)delete data[op.entity][op.key];else data[op.entity][op.key]=op.value;
+      }
+      // This row is derived data. The journal remains authoritative and intact.
+      putSnapshot.run(name,version,JSON.stringify(data));
+    }
+    return {data,version};
+  }
   function sheet(name) {
     return {
       getLastRow: () => lastRow.get(name).n,
+      readState: () => journalState(name),
+      readLog: since => journalLog(name,since),
+      operationIds: () => getOperationIds.all(name).map(row=>row.id),
       getRange(r, c, n = 1, m = 1) {
         const range = {
-          getValues: () => Array.from({length:n}, (_,i) => {
-            const row = JSON.parse(getRow.get(name,r+i)?.value || '[]');
-            return Array.from({length:m}, (_,j) => row[c+j-1] ?? '');
-          }),
+          getValues: () => {
+            const rows=new Map(getRows.all(name,r,r+n).map(row=>[row.position,JSON.parse(row.value)]));
+            return Array.from({length:n},(_,i)=>Array.from({length:m},(_,j)=>rows.get(r+i)?.[c+j-1]??''));
+          },
           getValue: () => range.getValues()[0][0],
           setValues(values) {
             values.forEach((cells,i) => {
@@ -34,6 +82,9 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
               cells.forEach((v,j) => { row[c+j-1] = v; });
               putRow.run(name,r+i,JSON.stringify(row));
             });
+            // Warm snapshots follow appends in the same transaction as all
+            // recipient writes. Replaced history was invalidated by SQLite.
+            if(isJournal(name)&&getSnapshot.get(name))journalState(name);
             return range;
           },
           setFontWeight: () => range, setBackground: () => range, setFontColor: () => range
@@ -92,7 +143,9 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
     },
     notificationSnapshot(){
       enableFrench();
-      const value=vm.runInContext(`
+      db.exec('BEGIN IMMEDIATE');
+      try {
+        const value=vm.runInContext(`
         requestSheets_=Object.create(null);
         [{id:'admin',name:'Tiago',allowedSubjects:['latin','english','french']}]
         .concat(Object.values(records_('_LatinioProfiles')).filter(function(p){return p.active;}))
@@ -103,7 +156,9 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
           });
           return {id:p.id,name:p.name,subjects:normalizeSubjects_(p.allowedSubjects),days:Array.from(new Set(days))};
         });`,ctx,{timeout:10000});
-      return JSON.parse(JSON.stringify(value));
+        db.exec('COMMIT');
+        return JSON.parse(JSON.stringify(value));
+      } catch(error){db.exec('ROLLBACK');throw error;}
     },
     importSnapshot(snapshot) {
       if (db.prepare('SELECT COUNT(*) AS n FROM sheets').get().n || db.prepare('SELECT COUNT(*) AS n FROM properties').get().n) {
@@ -118,6 +173,7 @@ export function openDatabase(path,{requireStudentCodes=false,enableAutoSharing=f
       if (!snapshot.properties.ADMIN_PIN_SALT) throw Error('PIN-Salt fehlt.');
       db.exec('BEGIN IMMEDIATE');
       try {
+        db.exec('DELETE FROM journal_snapshots');
         for (const key of ['SHEET_ID','TOKEN_HASH','ADMIN_PIN_HASH','ADMIN_PIN_SALT','PIN_FAILURES','PIN_BLOCKED_UNTIL']) {
           if (snapshot.properties[key] !== undefined) putProp.run(key,String(snapshot.properties[key]));
         }
