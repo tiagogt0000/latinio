@@ -1,7 +1,7 @@
 export const SUBJECTS=[
- {id:'latin',label:'Latein',flag:'🇻🇦',code:'la',logo:'./icon.svg',brand:'latinio'},
- {id:'english',label:'Englisch',flag:'🇺🇸',code:'en',logo:'./icon-english.svg',brand:'latinio'},
- {id:'french',label:'Französisch',flag:'🇫🇷',code:'fr',logo:'./icon-vocabify.svg',brand:'Vocabify'}
+ {id:'latin',label:'Latein',flag:'🇻🇦',code:'la',logo:'./icon.svg?v=2.14.0',brand:'latinio'},
+ {id:'english',label:'Englisch',flag:'🇺🇸',code:'en',logo:'./icon-english.svg?v=2.14.0',brand:'latinio'},
+ {id:'french',label:'Französisch',flag:'🇫🇷',code:'fr',logo:'./icon-vocabify.svg?v=2.14.0',brand:'Vocabify'}
 ];
 export const subjectInfo=id=>SUBJECTS.find(s=>s.id===id)||SUBJECTS[0];
 export const brandWord=id=>id==='french'?'<span class="vocabify-word">Vocabify<span>✦</span></span>':'latinio<span>✦</span>';

@@ -10,13 +10,13 @@ export function chooseSubject(root,{reducedMotion=globalThis.matchMedia?.('(pref
   return new Promise(resolve=>{
     let selected=false;
     root.querySelectorAll('[data-enter-subject]').forEach(button=>{
-      button.addEventListener('click',async()=>{
+      button.addEventListener('click',async event=>{
         if(selected)return;selected=true;
         const subject=button.dataset.enterSubject;
         root.querySelectorAll('[data-enter-subject]').forEach(el=>{el.disabled=true;});
         const content=root.querySelector('.entrance-content');
-        if(subject!=='french'&&!reducedMotion&&content.animate){
-          const animation=content.animate([{opacity:1,transform:'translateY(0)',filter:'blur(0)'},{opacity:0,transform:'translateY(18px)',filter:'blur(6px)'}],{duration:380,easing:'cubic-bezier(.4,0,.2,1)',fill:'forwards'});
+        if(subject!=='french'&&event.detail>0&&!reducedMotion&&content.animate){
+          const animation=content.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(8px)'}],{duration:220,easing:'cubic-bezier(0.23,1,0.32,1)',fill:'forwards'});
           await animation.finished.catch(()=>{});
         }
         resolve(subject);

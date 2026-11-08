@@ -10,6 +10,7 @@ import {installKeyboardSupport} from './keyboard.js';
 import {appendAnswerField,hasAnswerContent} from './answer-fields.js';
 import {installInputVisibility,focusInput} from './input-visibility.js';
 import {captureViewState,restoreViewState} from './view-state.js';
+import {createInterfaceMotion} from './interface-motion.js';
 import {collectionWords} from './collection-words.js';
 import {trainingOptionCounts} from './training-options.js';
 import {createCollectionOpener} from './collection-opening.js';
@@ -57,6 +58,7 @@ let streakLedger=null,streakSyncTask=null,streakSyncedAt=0,streakOtherVersion=nu
 let predicateKey='',predicateRun=[],predicateCursor=0,predicateAnswer='',predicateFeedback=null;
 let profile,sharing,cloudWait,ready=false,store,sync,confusions,screen='learn',renderedScreen=null,classroomQuery='',collectionFilter='all',search='',selected=[],modalCleanup=null,toastTimer,working=false,waitingStart=false,pendingStart=null,announcementQueue=[],announcementLoading=false;
 const app=document.querySelector('#app'),modalRoot=document.querySelector('#modal-root');
+const interfaceMotion=createInterfaceMotion({root:document});
 let modalReturnFocus=null;
 const isBootSplash=()=>app.querySelector('.boot')?.textContent.includes('Deine Vokabeln werden geladen');
 updates.addEventListener('change',()=>{if(!ready&&isBootSplash()&&updates.state==='available')void updates.apply();});
@@ -84,6 +86,7 @@ function todayCount(){const today=new Date().toLocaleDateString('sv');return Obj
 function updateStatus(){setTimeout(autoUpdate,0);document.querySelectorAll('[data-auto-share]').forEach(el=>el.innerHTML=sharing?.autoStatusMarkup()||'');const detail=document.querySelector('[data-sync-details]');if(detail)detail.innerHTML=syncDetails();}
 function render(){
  theme();
+ interfaceMotion.beforeRender();
  const sameScreen=renderedScreen===screen,screenChanged=!sameScreen;
  const previousScreen=renderedScreen;renderedScreen=screen;
  if(screen==='match'){app.innerHTML=confusions.view();return;}
@@ -96,6 +99,7 @@ function render(){
  app.querySelectorAll('details[data-panel]').forEach(el=>{el.open=openPanels.has(el.dataset.panel);});
  restoreViewState(app,viewState,{preserve:sameScreen});
  if(!sameScreen&&previousScreen!==null)window.scrollTo({left:0,top:0,behavior:'instant'});
+ interfaceMotion.screen(app,{from:previousScreen,to:screen});
 }
 function adminView(){return `<div class="page-heading"><div><div class="eyebrow">VERWALTUNG</div><h1>Nutzer</h1><p class="muted">Profile, Freigaben und Nachrichten an einem Ort.</p></div></div><div class="section-tabs admin-tabs" aria-label="Nutzerverwaltung"><button class="chip ${adminTab==='people'?'selected':''}" data-action="account-profiles">Nutzer</button><button class="chip ${adminTab==='shares'?'selected':''}" data-action="share-panel">Freigaben</button><button class="chip ${adminTab==='checks'?'selected':''}" data-action="sharing-check">Freigaben prüfen</button><button class="chip ${adminTab==='messages'?'selected':''}" data-action="announcement-history">Nachrichten</button><button class="chip ${adminTab==='reminders'?'selected':''}" data-action="notification-admin">Erinnerungen</button></div><section class="admin-content">${adminContent||'<p class="muted">Nutzerverwaltung wird geladen …</p>'}</section>`;}
 function showAdmin(content,tab='people'){if(!isAdmin())return;closeModal();adminContent=content;adminTab=tab;screen='admin';render();}
@@ -133,6 +137,7 @@ function updateView(){const busy=['checking','installing'].includes(updates.stat
 updates.addEventListener('change',()=>{const area=document.querySelector('[data-app-updates]');if(area)area.innerHTML=updateView();autoUpdate();});
 function settingsView(){const p=prefs();return `<div class="page-heading"><div><div class="eyebrow">DEINE APP</div><h1>Einstellungen</h1><p class="muted">Einfach anpassen, der Reihe nach.</p></div></div><div class="settings-list">${accountCard(profile)}${reminders?.settingsMarkup()||''}<section class="settings-section"><h2>Training</h2><label class="setting-row"><span><strong>Tagesziel</strong><small>Aufgaben pro Runde · kein Tageslimit</small></span><select id="daily">${[5,10,15,20,30].map(n=>`<option value="${n}" ${p.daily===n?'selected':''}>${n} Wörter</option>`).join('')}</select></label><label class="setting-row"><span><strong>Tippfehler tolerieren</strong><small>Deutsche Tippfehler tolerieren; Fremdsprachige Antworten werden streng bewertet. Bewertungen kannst du korrigieren.</small></span><input class="switch" id="typos" type="checkbox" ${p.typos?'checked':''}></label></section><section class="settings-section"><h2>App-Updates</h2><div data-app-updates>${updateView()}</div></section><section class="settings-section"><h2>Vokabeln & Installation</h2><div class="settings-actions"><button class="button secondary wide" data-action="import">${icon('upload')} Sammlung importieren</button><button class="text-button wide" data-action="download-example">Beispiel für das Importformat</button>${!english?'<button class="text-button wide" data-action="predicate-example">Beispiel für Perfekt-Sammlungen</button>':''}</div><p class="muted install-hint"><strong>Auf deinem iPhone oder iPad:</strong> Safari → Teilen → „Zum Home-Bildschirm“.</p></section>${isAdmin()?`<section class="settings-section"><h2>Admin Tests</h2><p class="small muted">Streak-Animationen als Vorschau ausprobieren.</p><div class="settings-actions"><button class="button secondary wide" data-action="admin-tests">Streak-Animationen testen</button></div></section><section class="settings-section cloud-settings"><h2>Cloud & Versionen</h2><div data-sync-details>${syncDetails()}</div><div class="settings-actions"><button class="button secondary wide" data-action="sync-now" ${!sync.configured?'disabled':''}>${icon('repeat')} Jetzt abgleichen</button>${sync.remote?'<button class="button primary wide" data-action="remote">Cloud-Version ansehen</button>':''}</div></section>`:''}</div><p class="small muted app-version">Latinio ${APP_VERSION} · ${english?languageName()+' ↔ Deutsch':'Latein → Deutsch'}</p>`;}
 function showModal(content,closable=true){
+ interfaceMotion.closeModal();
  const previous=modalRoot.children.length?modalReturnFocus:document.activeElement;
  modalCleanup?.(false);modalReturnFocus=previous;
  modalRoot.innerHTML=`<div class="modal-overlay"><section role="dialog" aria-modal="true" class="modal" tabindex="-1" aria-labelledby="modal-title">${closable?`<button class="icon-button modal-close" data-action="close-modal" aria-label="Schließen">${icon('close')}</button>`:''}${content}</section></div>`;
@@ -148,8 +153,9 @@ function showModal(content,closable=true){
  document.addEventListener('keydown',listener);
  modalCleanup=(restore=true)=>{document.removeEventListener('keydown',listener);if(restore&&previous?.isConnected!==false)previous?.focus({preventScroll:true});};
  modalRoot.querySelector('input,select,button,.modal')?.focus({preventScroll:true});
+ interfaceMotion.openModal(modalRoot);
 }
-function closeModal(){modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;modalReturnFocus=null;}
+function closeModal(){interfaceMotion.closeModal();modalRoot.innerHTML='';modalCleanup?.();modalCleanup=null;modalReturnFocus=null;}
 function showStreakDemo(){
  showModal(streakDemo(streakDemoDay,streakDemoVariant,streakDemoTheme));
  const overflow=document.body.style.overflow;document.body.style.overflow='hidden';

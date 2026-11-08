@@ -67,10 +67,10 @@ test('refresh collections do not duplicate the JSON import action and collection
  assert.match(css,/\.collection-search input\{text-align:center\}/);
  assert.match(css,/\.collection-list-toolbar \.text-button[^}]*border:0/);
 });
-test('both home cards use the same controls and subject options have no raised shadow',()=>{
+test('both home cards use the same controls and subject menu items remain flat inside the floating menu',()=>{
  const css=fs.readFileSync(new URL('../app/style.css',import.meta.url),'utf8');
  assert.match(css,/\.home-practice-grid \.word-tools>\.button\{[^}]*min-height:52px[^}]*padding:14px 18px/);
- assert.match(css,/\.subject-options,\.subject-options>button,\.subject-options>button:active\{box-shadow:none!important;transform:none!important/);
+ assert.match(css,/\.subject-options>button,\.subject-options>button:active\{box-shadow:none!important;transform:none!important/);
 });
 
 test('Vocabify French home renders the shared trainer with French labels and no Latin perfect card',()=>{

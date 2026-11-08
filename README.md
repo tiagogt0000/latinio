@@ -1,6 +1,18 @@
 # Latinio · Version 2.12.0
 
 
+## Neu in 2.14.0: Neue Logos, Liquid Glass und flüssigere Wechsel
+
+Die drei App-Logos haben jetzt eine gemeinsame Glasoptik: Grün und Rot mit dem Latinio-Zeichen, warmes Ocker mit Buch und Häkchen für Vocabify. Auch die Symbole für den Home-Bildschirm und installierte Apps sind aktualisiert.
+
+Eine schwebende Navigation, reflektierende Fachmenüs und leicht durchscheinende Dialoge ergänzen das Design. Lernfelder und Antworten bleiben deckend und gut lesbar. Bei reduzierter Transparenz oder erhöhtem Kontrast werden die Glasflächen durch klare, deckende Flächen ersetzt.
+
+Seitenwechsel zeigen ihre Richtung, Startkarten erscheinen kurz versetzt und Menüs öffnen vom Auslöser aus. Die Effekte halten keine Bedienung auf und werden bei Tastatureingabe sofort beendet. Erneute Antworten, Hintergrundabgleich und reduzierte Bewegung lösen keine neuen Einblendungen aus.
+
+482 automatisierte Tests bestanden; Logos und ausgelieferte Dateien werden separat geprüft. Reines Frontendupdate, ohne Änderung gespeicherter Lernstände. Keine visuelle Browser- oder reale Handyprüfung.
+
+
+
 ## Neu in 2.13.0: Apple-inspirierte Oberfläche und schnelle Lernoptionen
 
 Latinio verwendet jetzt die Systemschrift, ruhige helle und dunkle Flächen, klar gruppierte Einstellungen und einheitliche Lernkarten. Navigation und Bedienelemente sind dezenter; die Fachfarben bleiben als Orientierung. Richtige Antworten erscheinen in jedem Fach grün. Große Schrift, schmale Ansichten, stärkere Kontraste und reduzierte Transparenz werden berücksichtigt.

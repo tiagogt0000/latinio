@@ -189,8 +189,8 @@ input:focus,select:focus{border-color:var(--accent)}
  vertical-align:middle;transition:background .15s,border-color .15s
 }
 .button.primary,:root[data-subject=english] .button.primary{background:var(--green);border-color:var(--green);color:#fff;box-shadow:none}
-.subject-dropdown>summary{box-shadow:none!important;border:1px solid var(--border)!important;border-radius:12px!important;min-height:48px!important;padding:12px 18px!important;background:var(--surface)!important;color:var(--text);font:inherit;font-weight:650;line-height:1.35;}
-.subject-dropdown>summary:active{transform:none!important}
+.subject-dropdown>summary{box-shadow:none;border:1px solid var(--border);border-radius:12px;min-height:48px;padding:12px 18px;background:var(--surface);color:var(--text);font:inherit;font-weight:650;line-height:1.35;}
+.subject-dropdown>summary:active{transform:none}
 .predicate-share-block{margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}.predicate-share-block>p{margin-top:8px}.predicate-share-block form{max-width:620px}
 .button.secondary,.text-button{background:var(--surface);border-color:var(--border)}
 .button.danger{background:var(--red);border-color:var(--red);color:white}
@@ -374,7 +374,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 @media(max-width:600px){.home-practice-grid .predicate-practice>.button-row{grid-template-columns:minmax(0,1fr)}.home-practice-grid .predicate-practice>.button-row>.button.primary{grid-column:auto}}
 
 /* 2.0.5: matching training cards, flat subject choices and quiet cloud status. */
-.subject-options,.subject-options>button,.subject-options>button:active{box-shadow:none!important;transform:none!important;background-image:none!important}
+.subject-options>button,.subject-options>button:active{box-shadow:none!important;transform:none!important;background-image:none!important}
 .subject-options{border:1px solid var(--border);padding:6px}
 .subject-options>button{min-height:48px;padding:12px 18px;line-height:1.35}
 .topbar-actions{display:flex;align-items:center;gap:12px;margin-left:auto}
@@ -394,7 +394,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 @media(prefers-reduced-motion:reduce){.sync-spinner,.button-loading i{animation:none}}
 
 /* 2.0.6 — text navigation, balanced search and a compact access directory. */
-.subject-dropdown>summary{border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important;padding:10px 4px!important;gap:7px}
+.subject-dropdown>summary{border:0;box-shadow:none;background:transparent;border-radius:0;padding:10px 4px;gap:7px}
 .collection-tabs-nav{display:flex!important;flex-wrap:wrap;gap:4px 22px;border-bottom:1px solid var(--border);padding:0}
 .collection-tabs-nav>.chip{flex:0 0 auto;min-width:0;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:12px 0!important;color:var(--muted);position:relative}
 .collection-tabs-nav>.chip.selected{color:var(--green-dark)}
@@ -403,7 +403,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .collection-search>.icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);pointer-events:none}
 .collection-search input{display:block;width:100%;min-width:0;margin:0;padding:16px 48px!important;text-align:center;box-sizing:border-box}
 .confusions-panel{padding-block:12px}.confusions-panel>.muted{margin-block:12px 20px}
-.home-practice-grid .word-tools>.button.primary{border:0!important;box-shadow:none!important;background:var(--green);color:#fff;justify-content:space-between;padding:14px 20px!important;border-radius:16px;letter-spacing:.01em;transition:background .18s,filter .18s}
+.home-practice-grid .word-tools>.button.primary{border:0!important;box-shadow:none;background:var(--green);color:#fff;justify-content:space-between;padding:14px 20px!important;border-radius:16px;letter-spacing:.01em;transition:background .18s,filter .18s}
 :root:not([data-subject=english]) .home-practice-grid .word-tools>.button.primary{background:color-mix(in srgb,var(--green) 85%,#16320d)}
 .home-practice-grid .word-tools>.button.primary>.icon{width:30px;height:30px;padding:6px;border-radius:50%;background:#ffffff24}
 @media(hover:hover) and (pointer:fine){.home-practice-grid .word-tools>.button.primary:hover:not(:disabled){filter:brightness(1.1)}}
