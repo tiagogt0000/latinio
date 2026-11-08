@@ -385,6 +385,23 @@ test('Classic case selection grades only nominative and accusative singular masc
  assert.match(f.ui.view(),/2 von 2 richtig/);assert.doesNotMatch(f.ui.view(),/Nur Fehler wiederholen/);
 });
 
+test('One selected noun form keeps singular labels from setup through learning and testing',()=>{
+ const f=fixture();select(f,'nouns');
+ f.button('tables-filter-all',{dimension:'cases'});f.filter('cases','nom',true);
+ f.filter('numbers','pl',false);
+ for(const id of ['o-m','o-n','third'])f.filter('declensions',id,false);
+ assert.match(f.ui.view(),/>1 Form ausgewählt</);
+ f.button('tables-choose-mode');assert.match(f.calls.modals.at(-1),/ · 1 Form</);
+ f.button('tables-learn');assert.equal(courseOf(f).session.itemIds.length,1);
+ f.button('tables-learning-next');assert.match(f.ui.view(),/0 von 1 Schnipsel zugeordnet/);
+ matchAll(f);assert.match(f.ui.view(),/1 von 1 Antwort schreibst du jetzt selbst/);
+ fillBlanks(f);f.submit(true);f.button('tables-learning-next');
+ assert.equal(stepOf(f).kind,'done');assert.match(f.ui.view(),/ · 1 Form</);
+ f.button('tables-course-test');assert.match(f.ui.view(),/>1 Antwort kontrollieren</);
+ assert.equal(inputTags(f.ui.view()).length,1);
+ assert.doesNotMatch(f.ui.view(),/table-scroll-hint/);
+});
+
 test('An empty selection blocks both learning modes and each table keeps its applicable dimensions',()=>{
  const f=fixture();select(f);
  f.button('tables-case-basic');
@@ -651,6 +668,64 @@ test('Touch dragging places a token, cleans up its ghost, and suppresses the fol
  assert.equal(courseOf(f).session.placements[targetId],tokenId,'synthetic click must not undo the drop');
 });
 
+test('A second finger cannot replace or cancel the captured answer drag',t=>{
+ const original=Object.getOwnPropertyDescriptor(globalThis,'document');
+ const f=fixture(),course=dativeCourse(f),[tokenId,secondId,targetId]=course.session.itemIds;
+ f.button('tables-learning-next');
+ const source=fakeNode({tokenId},'cui'),second=fakeNode({tokenId:secondId},'cui'),slot=fakeNode({targetId}),outside=fakeNode();
+ const captured=new Set(),captures=[],releases=[];
+ source.setPointerCapture=id=>{captured.add(id);captures.push(id);};
+ source.hasPointerCapture=id=>captured.has(id);
+ source.releasePointerCapture=id=>{captured.delete(id);releases.push(id);};
+ Object.defineProperty(globalThis,'document',{configurable:true,value:{querySelector:()=>null,querySelectorAll:()=>[],elementFromPoint:()=>slot}});
+ t.after(()=>original?Object.defineProperty(globalThis,'document',original):delete globalThis.document);
+ const pointer=(type,target,id=7,extra={})=>dragEvent(type,target,{pointerType:'touch',pointerId:id,clientX:30,clientY:20,...extra});
+ assert.equal(f.ui.drag(pointer('pointerdown',source,7,{isPrimary:false})),false);
+ assert.equal(f.ui.drag(pointer('pointerdown',source,7,{button:2})),false);
+ assert.equal(f.ui.drag(pointer('pointerdown',source)),true);
+ assert.deepEqual(captures,[7]);
+ assert.equal(f.ui.drag(pointer('pointerdown',second,8,{isPrimary:false})),false);
+ f.ui.drag(pointer('pointercancel',second,8));
+ f.ui.drag(pointer('lostpointercapture',second,8));
+ assert.equal(f.ui.drag(pointer('pointermove',outside,8,{clientX:50})),false);
+ assert.equal(f.ui.drag(pointer('pointermove',outside,7,{clientX:50})),true);
+ assert.equal(f.ui.drag(pointer('pointerup',outside,7,{clientX:50})),true);
+ assert.deepEqual(releases,[7]);
+ assert.equal(courseOf(f).session.placements[targetId],tokenId);
+ assert.ok(!Object.values(courseOf(f).session.placements).includes(secondId));
+});
+
+test('Cancelled or lost pointer capture releases the drag and never commits an answer',t=>{
+ const descriptors=Object.fromEntries(['document','requestAnimationFrame','cancelAnimationFrame'].map(key=>[key,Object.getOwnPropertyDescriptor(globalThis,key)]));
+ t.after(()=>{for(const [key,descriptor] of Object.entries(descriptors))descriptor?Object.defineProperty(globalThis,key,descriptor):delete globalThis[key];});
+ for(const ending of ['pointercancel','lostpointercapture','navigate','disconnect']){
+  const f=fixture(),course=dativeCourse(f),[tokenId,targetId]=course.session.itemIds;
+  f.button('tables-learning-next');
+  const source=fakeNode({tokenId},'cui'),slot=fakeNode({targetId});
+  let captured=false,released=0,removed=0,cancelled=0,nextFrame;
+  source.setPointerCapture=()=>{captured=true;};source.hasPointerCapture=()=>captured;
+  source.releasePointerCapture=()=>{captured=false;released++;};
+  Object.defineProperty(globalThis,'document',{configurable:true,value:{
+   querySelector:()=>null,querySelectorAll:()=>[],elementFromPoint:()=>slot,
+   createElement:()=>({style:{},setAttribute(){},remove(){removed++;}}),body:{append(){}}
+  }});
+  Object.defineProperty(globalThis,'requestAnimationFrame',{configurable:true,value:callback=>{nextFrame=callback;return 17;}});
+  Object.defineProperty(globalThis,'cancelAnimationFrame',{configurable:true,value:id=>{assert.equal(id,17);cancelled++;}});
+  const pointer=(type,x=0)=>dragEvent(type,source,{pointerType:'pen',pointerId:7,clientX:x,clientY:0});
+  f.ui.drag(pointer('pointerdown'));f.ui.drag(pointer('pointermove',20));
+  if(ending==='navigate')f.button('tables-config');
+  else if(ending==='disconnect'){source.isConnected=false;nextFrame();}
+  else f.ui.drag(pointer(ending,20));
+  assert.equal(released,1,ending);assert.equal(removed,1,ending);assert.equal(cancelled,1,ending);
+  assert.equal(f.ui.drag(pointer('pointerup',20)),false);
+  assert.deepEqual(Object.keys(f.ui.draft.tableLearning.session.placements),[]);
+  if(ending!=='navigate'){
+   assert.equal(f.ui.drag(pointer('pointerdown')),true,'the next drag must remain usable');
+   f.ui.drag(pointer('pointercancel'));
+  }
+ }
+});
+
 test('User input remains escaped in both worksheet and learning drafts',()=>{
  const answer='"><img src=x onerror=alert(1)>',f=fixture(),round=basicRound(f);
  f.answer(round.itemIds[0],answer);
@@ -695,7 +770,7 @@ test('Main delegates drag and touch only to the ready, unobstructed Latin table 
  const context=vm.createContext({ready:true,working:false,modalRoot:{children:[]},subject:'latin',screen:'tables',cloudWait:{blocked:true},
   document:{addEventListener:(type,listener)=>listeners.set(type,listener)},tablePractice:{drag:event=>received.push(event.type)}});
  vm.runInContext(source.slice(start,end),context);
- const types=['dragstart','dragover','drop','dragend','pointerdown','pointermove','pointerup','pointercancel'];
+ const types=['dragstart','dragover','drop','dragend','pointerdown','pointermove','pointerup','pointercancel','lostpointercapture'];
  for(const type of types){assert.ok(listeners.has(type));listeners.get(type)({type});}
  assert.deepEqual(received,types,'static practice must work while the initial cloud sync is pending');
  for(const blocked of [{ready:false},{working:true},{subject:'english'},{screen:'learn'},{modalRoot:{children:[{}]}}]){

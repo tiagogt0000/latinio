@@ -38,9 +38,12 @@ export function refreshCardView(session,word,h,icon,subject='english'){
 
 export function bindRefreshSwipe(card,onRate){
  let start=null,moved=false;
+ const reset=()=>{start=null;card.classList.remove('is-dragging');card.style.transform='';};
+ const cancel=event=>{if(!start||start.id!==event.pointerId)return;reset();moved=true;};
  card.addEventListener('pointerdown',e=>{if(!e.isPrimary||e.button!==0)return;start={id:e.pointerId,x:e.clientX,y:e.clientY};moved=false;card.setPointerCapture?.(e.pointerId);});
- card.addEventListener('pointermove',e=>{if(!start||start.id!==e.pointerId)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)>12)moved=true;if(card.classList.contains('is-flipped')&&Math.abs(dx)>Math.abs(dy))card.style.transform=`translateX(${dx*.65}px) rotate(${dx/30}deg)`;});
- card.addEventListener('pointerup',e=>{if(!start||start.id!==e.pointerId)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;start=null;card.style.transform='';if(card.classList.contains('is-flipped')&&Math.abs(dx)>=60&&Math.abs(dx)>Math.abs(dy)*1.3){moved=true;onRate(dx>0);}});
- card.addEventListener('pointercancel',()=>{start=null;moved=true;card.style.transform='';});
- card.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();moved=false;}},true);
+ card.addEventListener('pointermove',e=>{if(!start||start.id!==e.pointerId)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.abs(dx)>12)moved=true;if(card.classList.contains('is-flipped')&&Math.abs(dx)>Math.abs(dy)){card.classList.add('is-dragging');card.style.transform=`translateX(${dx*.65}px) rotate(${dx/30}deg)`;}});
+ card.addEventListener('pointerup',e=>{if(!start||start.id!==e.pointerId)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;reset();if(card.classList.contains('is-flipped')&&Math.abs(dx)>=60&&Math.abs(dx)>Math.abs(dy)*1.3){moved=true;onRate(dx>0);}});
+ card.addEventListener('pointercancel',cancel);
+ card.addEventListener('lostpointercapture',cancel);
+ card.addEventListener('click',e=>{if(moved){moved=false;if(e.detail===0)return;e.preventDefault();e.stopPropagation();}},true);
 }

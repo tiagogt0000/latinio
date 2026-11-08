@@ -3,6 +3,7 @@ import {createLearning, learningStep, learningResult, learningAnswer, learningPl
 
 const DIMENSIONS={cases:{label:'Welche Fälle?',options:CASES},numbers:{label:'Singular / Plural',options:NUMBERS},genders:{label:'Welches Geschlecht?',options:GENDERS},persons:{label:'Welche Person?',options:PERSONS},targets:{label:'Welche Formen?',options:TARGETS},declensions:{label:'Welche Deklinationen?',options:DECLENSIONS}};
 const MAX_ANSWER=300;
+const formCount=(count,prefix=false)=>`${count} ${prefix?(count===1?'Präfix':'Präfixe'):(count===1?'Form':'Formen')}`;
 const own=(object,key)=>Object.hasOwn(object,key);
 const getTable=id=>TABLES.find(table=>table.id===id);
 const defaults=table=>Object.fromEntries(table.dimensions.map(key=>[key,DIMENSIONS[key].options.map(option=>String(option.id))]));
@@ -63,7 +64,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   return `<fieldset class="table-filter ${primary?'table-filter-primary':''}" data-table-filter-group="${h(key)}"><legend>${h(label)}</legend><div class="table-filter-tools"><button type="button" class="text-button" data-action="tables-filter-all" data-dimension="${h(key)}">${all?'Auswahl aufheben':'Alle wählen'}</button>${key==='cases'?'<button type="button" class="text-button" data-action="tables-case-basic">Nur Nominativ &amp; Akkusativ</button>':''}</div><div class="table-options">${options.map(option=>`<label class="table-option ${selected.includes(String(option.id))?'selected':''}"><input type="checkbox" data-table-filter="${h(key)}" value="${h(String(option.id))}" ${selected.includes(String(option.id))?'checked':''}><span>${h(option.label)}</span></label>`).join('')}</div></fieldset>`;
  }
  function modeChoices(prefix=false,enabled=true){return `<div class="table-mode-choices" aria-label="Lernmodus wählen"><button class="table-mode-card" data-action="${prefix?'prefixes':'tables'}-learn" ${enabled?'':'disabled'}><span class="tag">SCHRITT FÜR SCHRITT</span><strong>Üben</strong><span>Anschauen → zuordnen → Lücken ergänzen → alles selbst schreiben</span></button><button class="table-mode-card" data-action="${prefix?'prefixes':'tables'}-start" ${enabled?'':'disabled'}><span class="tag">WISSEN PRÜFEN</span><strong>Abfragen</strong><span>Alle Antworten direkt selbst eintragen und gemeinsam kontrollieren</span></button></div>`;}
- function selectionText(table){const count=selectTableItems(table.id,state.filters[table.id]).length;return count?`${count} Formen ausgewählt`:'Wähle in jedem Bereich mindestens eine Möglichkeit.';}
+ function selectionText(table){const count=selectTableItems(table.id,state.filters[table.id]).length;return count?`${formCount(count)} ausgewählt`:'Wähle in jedem Bereich mindestens eine Möglichkeit.';}
  function secondaryDimensions(table){return table.dimensions.filter(key=>!['cases','targets'].includes(key));}
  function settingsText(table){return secondaryDimensions(table).some(key=>state.filters[table.id][key].length!==DIMENSIONS[key].options.length)?'Auswahl angepasst':'Singular und Plural sowie alle weiteren Formen';}
  function refreshSelection(){
@@ -89,7 +90,7 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
  function modeDialog(prefix=false){
   const table=prefix?null:getTable(state.tableId),items=prefix?PREFIXES:selectTableItems(table.id,state.filters[table.id]);
   if(!items.length){notify('Wähle in jedem Bereich mindestens eine Möglichkeit.');return;}
-  showModal(`<div class="table-mode-dialog"><h2 id="modal-title">Wie möchtest du lernen?</h2><p class="muted">${h(prefix?'Präfixe':table.label)} · ${items.length} ${prefix?'Präfixe':'Formen'}</p>${modeChoices(prefix)}</div>`);
+  showModal(`<div class="table-mode-dialog"><h2 id="modal-title">Wie möchtest du lernen?</h2><p class="muted">${h(prefix?'Präfixe':table.label)} · ${formCount(items.length,prefix)}</p>${modeChoices(prefix)}</div>`);
  }
  function setupView(prefix=false){
   if(prefix)return `<section class="table-panel"><span class="tag">11 PRÄFIXE</span><h2 id="table-step-heading" tabindex="-1">Präfixe und ihre Bedeutung</h2><p class="muted">Die Präfixe stehen links, ihre Bedeutungen rechts. Wähle im nächsten Schritt, ob du mit Hilfe üben oder dich direkt abfragen möchtest.</p><div class="table-setup-actions"><button class="button primary wide" data-action="prefixes-choose-mode">Weiter →</button></div></section>`;
@@ -106,14 +107,14 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   const [key,columns]=table.dimensions.includes('declensions')?['declension',DECLENSIONS]:table.dimensions.includes('persons')?['person',PERSONS]:['gender',GENDERS];
   return NUMBERS.filter(number=>items.some(item=>item.number===number.id)).map(number=>{
    const shownColumns=columns.filter(column=>items.some(item=>item.number===number.id&&String(item[key])===String(column.id)));
-   return `<section class="table-number-group"><h3>${h(number.label)}</h3><div class="table-scroll" role="region" aria-label="${h(number.label)} – Formen" tabindex="0"><table class="table-matrix" style="--table-columns:${shownColumns.length}"><caption class="table-sr-only">${h(table.label)} · ${h(number.label)}</caption><thead><tr><th scope="col">Fall</th>${shownColumns.map(column=>`<th scope="col">${h(column.label)}${column.example?`<small class="table-column-example" lang="la">${h(column.example)}</small>`:''}</th>`).join('')}</tr></thead><tbody>${CASES.filter(caseItem=>items.some(item=>item.number===number.id&&item.case===caseItem.id)).map(caseItem=>`<tr><th scope="row">${h(caseItem.label)}</th>${shownColumns.map(column=>{const item=items.find(item=>item.number===number.id&&item.case===caseItem.id&&String(item[key])===String(column.id));return `<td>${item?cell(item):'<span class="muted" aria-label="Nicht Teil dieser Runde">—</span>'}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div></section>`;
+   return `<section class="table-number-group"><h3>${h(number.label)}</h3>${shownColumns.length>1?'<p class="table-scroll-hint">Bei Bedarf seitlich wischen für weitere Spalten <span aria-hidden="true">↔</span></p>':''}<div class="table-scroll" role="region" aria-label="${h(number.label)} – Formen${shownColumns.length>1?', bei Bedarf seitlich scrollbar':''}" tabindex="0"><table class="table-matrix" style="--table-columns:${shownColumns.length}"><caption class="table-sr-only">${h(table.label)} · ${h(number.label)}</caption><thead><tr><th scope="col">Fall</th>${shownColumns.map(column=>`<th scope="col">${h(column.label)}${column.example?`<small class="table-column-example" lang="la">${h(column.example)}</small>`:''}</th>`).join('')}</tr></thead><tbody>${CASES.filter(caseItem=>items.some(item=>item.number===number.id&&item.case===caseItem.id)).map(caseItem=>`<tr><th scope="row">${h(caseItem.label)}</th>${shownColumns.map(column=>{const item=items.find(item=>item.number===number.id&&item.case===caseItem.id&&String(item[key])===String(column.id));return `<td>${item?cell(item):'<span class="muted" aria-label="Nicht Teil dieser Runde">—</span>'}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div></section>`;
   }).join('');
  }
  function worksheetView(prefix=false){
   const round=prefix?state.prefixRound:state.tableRound;if(!round)return setupView(prefix);
   const items=roundItems(round,prefix),checked=round.checked,correct=checked?items.filter(item=>checkAnswer(round.answers[item.id],item,{prefix})).length:0,title=prefix?'Präfixe und ihre Bedeutung':getTable(round.tableId).label;
   const explanation=prefix?'Schreibe rechts die deutsche Bedeutung. Eine richtige Bedeutung pro Präfix genügt; mehrere Bedeutungen kannst du mit Komma trennen.':'Trage die lateinischen Formen ein. Längenzeichen und Trennstriche sind freiwillig. Bei mehreren Formen genügt eine passende Variante.';
-  return `<section class="table-panel ${checked?'table-results':''}"><span class="tag">${checked?'DEINE AUSWERTUNG':'ABFRAGEN'}</span><h2 id="table-result-heading" tabindex="-1">${checked?`${correct} von ${items.length} richtig`:h(title)}</h2><p class="muted">${checked?(correct===items.length?'Alles richtig!':'Die Lösungen stehen direkt bei deinen Antworten.'):h(explanation)}</p><form id="table-practice-form">${formGrid(round,items,item=>answerCell(item,round,prefix),prefix)}${checked?`<div class="table-actions">${correct<items.length?'<button type="button" class="button primary" data-action="tables-repeat-wrong">Nur Fehler wiederholen</button>':''}<button type="button" class="button secondary" data-action="tables-repeat">Abfrage wiederholen</button></div>`:`<button class="button primary wide" type="submit">${items.length} Antworten kontrollieren</button>`}</form><div class="table-actions"><button class="text-button" data-action="${prefix?'prefixes-config':'tables-config'}">Auswahl &amp; Lernmodus ändern</button></div></section>`;
+  return `<section class="table-panel ${checked?'table-results':''}"><span class="tag">${checked?'DEINE AUSWERTUNG':'ABFRAGEN'}</span><h2 id="table-result-heading" tabindex="-1">${checked?`${correct} von ${items.length} richtig`:h(title)}</h2><p class="muted">${checked?(correct===items.length?'Alles richtig!':'Die Lösungen stehen direkt bei deinen Antworten.'):h(explanation)}</p><form id="table-practice-form">${formGrid(round,items,item=>answerCell(item,round,prefix),prefix)}${checked?`<div class="table-actions">${correct<items.length?'<button type="button" class="button primary" data-action="tables-repeat-wrong">Nur Fehler wiederholen</button>':''}<button type="button" class="button secondary" data-action="tables-repeat">Abfrage wiederholen</button></div>`:`<button class="button primary wide" type="submit">${items.length} ${items.length===1?'Antwort':'Antworten'} kontrollieren</button>`}</form><div class="table-actions"><button class="text-button" data-action="${prefix?'prefixes-config':'tables-config'}">Auswahl &amp; Lernmodus ändern</button></div></section>`;
  }
  function caseList(ids){
   const labels=ids.map(id=>CASES.find(item=>item.id===id)?.label).filter(Boolean);
@@ -132,14 +133,14 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
  function learningView(){
   const prefix=isPrefix(),course=currentCourse();if(!course)return setupView(prefix);
   const session=course.session,step=learningStep(session),allItems=courseItems(course),activeIds=new Set(step.itemIds),items=allItems.filter(item=>activeIds.has(item.id)),result=learningResult(session,allItems),title=prefix?'Präfixe und ihre Bedeutung':getTable(course.tableId).label;
-  if(step.kind==='done')return `<section class="table-panel table-learning-complete"><span class="tag">GESCHAFFT</span><h2 id="table-step-heading" tabindex="-1">Du hast alles selbst ausgefüllt!</h2><p>${h(title)} · ${items.length} ${prefix?'Präfixe':'Formen'}</p><p class="muted">Vom Anschauen bis zum Schreiben ohne Hilfe: Alle Stufen sind geschafft.</p><div class="table-actions"><button class="button primary" data-action="tables-course-test">Jetzt abfragen</button><button class="button secondary" data-action="tables-course-restart">Noch einmal üben</button><button class="text-button" data-action="${prefix?'prefixes-config':'tables-catalog'}">${prefix?'Zur Präfixauswahl':'Andere Tabelle wählen'}</button></div></section>`;
+  if(step.kind==='done')return `<section class="table-panel table-learning-complete"><span class="tag">GESCHAFFT</span><h2 id="table-step-heading" tabindex="-1">Du hast alles selbst ausgefüllt!</h2><p>${h(title)} · ${formCount(items.length,prefix)}</p><p class="muted">Vom Anschauen bis zum Schreiben ohne Hilfe: Alle Stufen sind geschafft.</p><div class="table-actions"><button class="button primary" data-action="tables-course-test">Jetzt abfragen</button><button class="button secondary" data-action="tables-course-restart">Noch einmal üben</button><button class="text-button" data-action="${prefix?'prefixes-config':'tables-catalog'}">${prefix?'Zur Präfixauswahl':'Andere Tabelle wählen'}</button></div></section>`;
   const preview=step.kind==='study'||session.reviewing,blanks=new Set(step.blankIds);
-  const instructions=preview?(session.reviewing?'Schau dir die Lösungen noch einmal an. Die markierten Felder waren noch nicht richtig. Danach versuchst du dieselbe Stufe erneut.':'Schau dir die gezeigten Formen in Ruhe an. Tippe unten auf Weiter, sobald du bereit bist.'):step.kind==='match'?'Ziehe die Schnipsel in die passenden Lücken. Du kannst auch zuerst einen Schnipsel und dann seine Lücke antippen. Tippe ein belegtes Feld an, um es wieder zu leeren.':`${blanks.size} von ${items.length} Antworten schreibst du jetzt selbst. ${blanks.size<items.length?'Die übrigen sind schon eingetragen.':'Diesmal ohne Vorgaben.'} Längenzeichen sind freiwillig.`;
+  const instructions=preview?(session.reviewing?'Schau dir die Lösungen noch einmal an. Die markierten Felder waren noch nicht richtig. Danach versuchst du dieselbe Stufe erneut.':'Schau dir die gezeigten Formen in Ruhe an. Tippe unten auf Weiter, sobald du bereit bist.'):step.kind==='match'?'Ziehe die Schnipsel in die passenden Lücken. Du kannst auch zuerst einen Schnipsel und dann seine Lücke antippen. Tippe ein belegtes Feld an, um es wieder zu leeren.':`${blanks.size} von ${items.length} ${items.length===1?'Antwort':'Antworten'} schreibst du jetzt selbst. ${blanks.size<items.length?'Die übrigen sind schon eingetragen.':'Diesmal ohne Vorgaben.'} Längenzeichen sind freiwillig.`;
   const progress=`<progress class="table-learning-meter" value="${step.number-1}" max="${step.total}" aria-label="Lernfortschritt: Schritt ${step.number} von ${step.total}"></progress>`;
   let bank='';
   if(step.kind==='match'&&!preview){
    const used=new Set(Object.entries(session.placements).filter(([id])=>activeIds.has(id)).map(([,id])=>id));
-   bank=`<div class="table-token-bank" role="group" aria-label="Schnipsel zum Zuordnen">${session.order.filter(id=>activeIds.has(id)).map(id=>{const item=items.find(item=>item.id===id),taken=used.has(id);return `<button type="button" class="table-token ${selectedToken===id?'selected':''} ${taken?'used':''}" data-action="tables-token" data-token-id="${h(id)}" draggable="${!taken&&!session.checked}" aria-pressed="${selectedToken===id}" ${taken||session.checked?'disabled':''}>${h(item.answer)}</button>`;}).join('')}</div><p class="small muted" data-table-placement role="status">${selectedToken?'Schnipsel ausgewählt. Tippe jetzt auf die passende Lücke.':`${used.size} von ${items.length} Schnipseln zugeordnet`}</p>`;
+   bank=`<div class="table-token-bank" role="group" aria-label="Schnipsel zum Zuordnen">${session.order.filter(id=>activeIds.has(id)).map(id=>{const item=items.find(item=>item.id===id),taken=used.has(id);return `<button type="button" class="table-token ${selectedToken===id?'selected':''} ${taken?'used':''}" data-action="tables-token" data-token-id="${h(id)}" draggable="${!taken&&!session.checked}" aria-pressed="${selectedToken===id}" ${taken||session.checked?'disabled':''}>${h(item.answer)}</button>`;}).join('')}</div><p class="small muted" data-table-placement role="status">${selectedToken?'Schnipsel ausgewählt. Tippe jetzt auf die passende Lücke.':`${used.size} von ${items.length} ${items.length===1?'Schnipsel':'Schnipseln'} zugeordnet`}</p>`;
   }
   const cell=item=>{
    if(preview||step.kind==='write'&&!blanks.has(item.id))return `<div class="table-study-value ${session.reviewing&&result.wrongIds.includes(item.id)?'is-wrong':''}"><span lang="${prefix?'de':'la'}">${h(item.answer)}</span>${session.reviewing&&result.wrongIds.includes(item.id)?'<small>Noch einmal merken</small>':''}</div>`;
@@ -222,8 +223,16 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
   }
   const round=currentRound();if(!round||round.checked)return true;for(const field of form.querySelectorAll?.('[data-table-answer]')||[])input(field);round.checked=true;persist();paint(true);return true;
  }
- function cleanupDrag(){if(scrollFrame!==null)globalThis.cancelAnimationFrame?.(scrollFrame);scrollFrame=null;ghost?.remove();ghost=null;pointer=null;dragToken=null;globalThis.document?.querySelectorAll?.('.table-drop-slot.drag-over').forEach(node=>node.classList.remove('drag-over'));}
+ function cleanupDrag(){
+  const previous=pointer;pointer=null;
+  if(scrollFrame!==null)globalThis.cancelAnimationFrame?.(scrollFrame);scrollFrame=null;
+  ghost?.remove();ghost=null;dragToken=null;
+  // A second finger must neither take over nor release the active answer's drag.
+  try{if(previous?.source?.hasPointerCapture?.(previous.id))previous.source.releasePointerCapture(previous.id);}catch{}
+  globalThis.document?.querySelectorAll?.('.table-drop-slot.drag-over').forEach(node=>node.classList.remove('drag-over'));
+ }
  function scrollWhileDragging(){
+  if(pointer?.source?.isConnected===false){cleanupDrag();return;}
   if(!pointer?.moved)return;
   const viewport=globalThis.innerHeight||0,y=pointer.lastY,x=pointer.lastX;
   if(viewport){const dy=y<64?-12:y>viewport-64?12:0;if(dy)globalThis.scrollBy?.(0,dy);}
@@ -235,10 +244,12 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
  function validToken(id){return validTarget(id);}
  function drag(event){
   const source=event.target?.closest?.('[data-token-id]'),target=event.target?.closest?.('[data-target-id]');
-  if(event.type==='dragend'||event.type==='pointercancel'){cleanupDrag();return false;}
+  if(event.type==='dragend'){if(dragToken!==null)cleanupDrag();return false;}
+  if(event.type==='pointercancel'||event.type==='lostpointercapture'){if(pointer?.id===event.pointerId)cleanupDrag();return false;}
   if(!matchActive()){cleanupDrag();return false;}
   if(event.type==='dragstart'){
    if(!source||source.disabled||!validToken(source.dataset.tokenId))return false;
+   cleanupDrag();
    dragToken=source.dataset.tokenId;event.dataTransfer?.setData('application/x-latinio-table-token',dragToken);if(event.dataTransfer)event.dataTransfer.effectAllowed='move';return true;
   }
   if(event.type==='dragover'){if(!target||!validTarget(target.dataset.targetId)||!validToken(dragToken))return false;event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='move';return true;}
@@ -246,8 +257,11 @@ export function tablePracticeUI({profile,h,go,render,showModal=()=>{},closeModal
    if(!target||!validTarget(target.dataset.targetId)||!validToken(dragToken))return false;event.preventDefault();const token=dragToken;cleanupDrag();place(target.dataset.targetId,token);return true;
   }
   if(event.type==='pointerdown'){
-   if(!['touch','pen'].includes(event.pointerType)||!source||source.disabled||!validToken(source.dataset.tokenId))return false;
-   pointer={id:event.pointerId,token:source.dataset.tokenId,x:event.clientX,y:event.clientY,moved:false,text:source.textContent};return true;
+   if(pointer||event.isPrimary===false||event.button>0||!['touch','pen'].includes(event.pointerType)||!source||source.disabled||!validToken(source.dataset.tokenId))return false;
+   pointer={id:event.pointerId,source,token:source.dataset.tokenId,x:event.clientX,y:event.clientY,moved:false,text:source.textContent};
+   // Keep receiving moves and the release when a pen or finger leaves the token.
+   try{source.setPointerCapture?.(event.pointerId);}catch{}
+   return true;
   }
   if(!pointer||pointer.id!==event.pointerId)return false;
   if(event.type==='pointermove'){

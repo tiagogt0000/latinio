@@ -59,15 +59,18 @@ export function mountStreakDemo(stage,{reducedMotion=false,schedule=setTimeout,c
    error.textContent='Gib bitte „Test“ ein. Dann startet die Vorschau.';input.setAttribute('aria-invalid','true');input.focus({preventScroll:true});return;
   }
   started=true;clearError();input.blur();input.disabled=true;submit.disabled=true;onStart();
-  stage.dataset.phase='leaving';status.textContent='Richtig. Die Animationsvorschau beginnt.';
-  later(()=>{question.hidden=true;stage.dataset.phase='blank';},reducedMotion?100:920);
-  later(()=>{
+  const finish=()=>{
+   controls.hidden=false;controls.querySelectorAll('button').forEach(button=>{button.disabled=false;button.focus({preventScroll:true});});
+   status.textContent=`Vorschau: Tag ${stage.dataset.day}. ${stage.querySelector('.streak-caption').textContent}`;
+  };
+  const reveal=()=>{
    celebration.hidden=false;celebration.setAttribute('aria-hidden','false');stage.dataset.phase='celebrate';
-   later(()=>{
-    controls.hidden=false;controls.querySelectorAll('button').forEach(button=>{button.disabled=false;button.focus({preventScroll:true});});
-    status.textContent=`Vorschau: Tag ${stage.dataset.day}. ${stage.querySelector('.streak-caption').textContent}`;
-   },reducedMotion?100:3600);
-  },reducedMotion?220:1200);
+   if(reducedMotion)finish();else later(finish,3600);
+  };
+  if(reducedMotion){question.hidden=true;reveal();return;}
+  stage.dataset.phase='leaving';status.textContent='Richtig. Die Animationsvorschau beginnt.';
+  later(()=>{question.hidden=true;stage.dataset.phase='blank';},920);
+  later(reveal,1200);
  }
  form.addEventListener('submit',start);input.addEventListener('input',clearError);input.focus({preventScroll:true});
  return ()=>{disposed=true;timers.forEach(cancel);timers.clear();form.removeEventListener('submit',start);input.removeEventListener('input',clearError);};
@@ -80,14 +83,17 @@ export function mountStreakFinish(stage,{celebrate=true,reducedMotion=false,sche
  let disposed=false;const timers=new Set();
  const later=(fn,delay)=>{const id=schedule(()=>{timers.delete(id);if(!disposed)fn();},delay);timers.add(id);};
  stage.dataset.reducedMotion=String(reducedMotion);
- later(()=>{
+ const finish=()=>{
+  const controls=stage.querySelector('.streak-finish-controls');controls.hidden=false;
+  const button=controls.querySelector('button');button.disabled=false;button.focus({preventScroll:true});
+  stage.querySelector('[data-streak-status]').textContent=celebrate?`Streak fortgesetzt: Tag ${stage.dataset.day}.`:'Runde abgeschlossen.';
+ };
+ const reveal=()=>{
   const scene=stage.querySelector('.streak-celebration');scene.hidden=false;scene.setAttribute('aria-hidden','false');
   stage.dataset.phase=celebrate?'celebrate':'settled';
-  later(()=>{
-   const controls=stage.querySelector('.streak-finish-controls');controls.hidden=false;
-   const button=controls.querySelector('button');button.disabled=false;button.focus({preventScroll:true});
-   stage.querySelector('[data-streak-status]').textContent=celebrate?`Streak fortgesetzt: Tag ${stage.dataset.day}.`:'Runde abgeschlossen.';
-  },celebrate&&!reducedMotion?3600:100);
- },reducedMotion?0:240);
+  if(reducedMotion)finish();else later(finish,celebrate?3600:100);
+ };
+ // Static celebration and Continue appear together when motion is reduced.
+ if(reducedMotion)reveal();else later(reveal,240);
  return ()=>{disposed=true;timers.forEach(cancel);timers.clear();};
 }

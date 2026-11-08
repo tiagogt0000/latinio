@@ -1,5 +1,18 @@
 # Latinio – Projektübergabe
 
+## 2.12.0 · Mobile Eingaben, robuste Gesten und ruhigeres Lernen
+
+`input-visibility.js` berücksichtigt jetzt Vokabel-, Prädikat-, Tabellen-/Präfix- und Grammatikantworten; `main.js` aktiviert den Guard in den passenden vier Ansichten. Horizontale Sichtbarkeit wird im Viewport und in scrollbaren Vorfahren geprüft. Nur verdeckte Felder werden mit nearest sichtbar gemacht; readonly/disabled/entfernte Felder und Fokuswechsel geben den Tastaturinset frei. Pinch-Zoom löst weder Tastaturinset noch automatisches Nachpannen aus. CSS reserviert den zusätzlichen Raum jeweils einmal in Test-, Tabellen- oder Grammatik-Shells und setzt die Touch-Schriftuntergrenze auf 16px. Der bestehende Viewport-Meta bleibt unverändert: `interactive-widget=resizes-content` würde die feste mobile Navigation über die Android-Tastatur heben, ohne dass die Eingabehilfe diese Überdeckung berücksichtigt.
+
+Tabellen-Ziehgesten halten genau einen Pointer, nutzen Capture und räumen bei cancel/lost capture oder entferntem Ausgangselement auf. `main.js` leitet lostpointercapture weiter. Inaktive Schnipsel blockieren das Scrollen nicht mehr. Kleine Layoutkorrekturen betreffen Umbruch, Filter-Tippflächen und den schmalen Scrollhinweis; keine neue Tabellenstruktur. Einzahl-/Mehrzahltexte stimmen für eine Form. Lernengine, Inhalt und 2→4→5-Fallgruppen unverändert.
+
+Häufig neu gerenderte Wort-/Antwortbereiche und die Matching-Fläche bleiben ruhig. `round-transition.js` entfernt untergeordnete und doppelte Animationsziele, während die absichtlich gestaffelten 400ms-Ausgänge mit 0/140/280ms Versatz erhalten bleiben. `streak-demo.js` zeigt bei reduced motion Szene, Status und Weiter sofort ohne dekorative Timer. Normaler Tagesabschluss behält Flamme, rote Atmosphäre, Meilensteine und bestehende Zeitfolge. `refresh-cards.js` markiert direktes Ziehen mit is-dragging, ohne Transform-Tween; Rückkehr 160ms cubic-bezier(0.23,1,0.32,1). Abbruch und verlorener Capture ändern keine Bewertung und blockieren spätere Tastaturaktivierung nicht.
+
+Verwendete Leitlinien: emilkowalski/skills mobile-native, break-ui, improve-animations und choreograph. Diese sowie prototype sind unter /home/tiago/.codex/skills installiert; Variantenvergleich und größeres Apple-Design sind für später vorgesehen.
+
+Prüfung: 458 automatisierte Tests bestanden, einschließlich neuer Tastatur-/Fokus-, Multitouch-/Abbruch-, Wisch- und Reduced-Motion-Regressionen. Isolierter 40-Formen-Belastungstest mit 300 Zeichen, Unicode, HTML-Zeichen, leerem Feld, Wiederherstellung und gezielter Fehlerwiederholung bestanden. Keine produktiven Nutzer-/Lerndaten verändert. Kein Backendupdate und keine neuen Runtime-Abhängigkeiten. Keine visuellen Browserchecks gemäß Projektpräferenz; reale iOS-/Android-Tastatur und Touchwirkung bleiben am Gerät zu prüfen.
+
+
 ## 2.11.0 · Fälle in wachsenden Gruppen
 
 Kasusübungen führen höchstens zwei ausgewählte Fälle auf einmal ein, in Buchreihenfolge Nominativ/Genitiv/Dativ/Akkusativ/Ablativ. Die Schritte sind Anschauen + Zuordnen für die ersten zwei, Anschauen + Zuordnen für die ersten vier, anschließend gegebenenfalls alle fünf. Jede nächste Gruppe enthält sämtliche zuvor eingeführten Formen. Erst nach erfolgreichem Zuordnen aller ausgewählten Fälle folgen die bestehenden Schreibstufen (Hälfte, drei Viertel, alle Lücken). Bei bis zu zwei Fällen sowie Präfixen und Dehnungsperfekt bleibt der bisherige Ablauf. Direkte Abfragen verwenden weiterhin sofort die gesamte Auswahl.

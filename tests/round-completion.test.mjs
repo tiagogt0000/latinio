@@ -115,3 +115,14 @@ test('later rounds and reduced motion have no long wait, and disposal cancels pe
  }
  const f=animationFixture();f.tick(240);f.cleanup();f.tick(10000);assert.equal(f.controls.hidden,true);assert.equal(f.tasks.size,0);
 });
+
+test('reduced-motion completion reveals a static scene and usable Continue without timers',()=>{
+ for(const celebrate of [true,false]){
+  const f=animationFixture({reducedMotion:true,celebrate});
+  assert.equal(f.scene.hidden,false);assert.equal(f.controls.hidden,false);
+  assert.equal(f.button.disabled,false);assert.equal(f.button.focused,true);
+  assert.equal(f.stage.dataset.phase,celebrate?'celebrate':'settled');
+  assert.equal(f.tasks.size,0);assert.match(f.status.textContent,celebrate?/Tag 42/:/Runde abgeschlossen/);
+  f.cleanup();f.tick(10000);assert.equal(f.tasks.size,0);
+ }
+});

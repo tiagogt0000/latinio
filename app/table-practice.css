@@ -59,7 +59,7 @@
 .table-practice-shell .table-list-row>.table-study-value{font-size:1rem}
 .table-practice-shell .table-list-row>strong,.table-practice-shell .table-list-row>span{align-self:center;overflow-wrap:anywhere;line-height:1.5}
 
-@media(hover:hover){
+@media(hover:hover) and (pointer:fine){
  .table-choice-card:hover:not(:disabled),.table-mode-card:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft)}
  .table-token:hover:not(:disabled):not(.used){border-color:var(--accent);background:var(--accent-soft)}
  .table-drop-slot:hover:not(:disabled){border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark)}
@@ -97,7 +97,7 @@
 /* Touch dragging is limited to movable answers; the table still scrolls normally. */
 .table-practice-shell,.table-panel,.table-number-group,.table-scroll{min-width:0}
 .table-learning-progress li{overflow-wrap:anywhere}
-.table-token,.table-drop-slot[data-token-id]{touch-action:none}
+.table-token:not(:disabled),.table-drop-slot[data-token-id]:not(:disabled){touch-action:none}
 .table-drag-ghost{position:fixed;z-index:1000;pointer-events:none;transform:translate(-50%,-120%);max-width:calc(100vw - 32px);min-width:58px;margin:0;background:var(--accent-soft);border-color:var(--accent);color:var(--accent-dark);box-shadow:0 6px 18px color-mix(in srgb,var(--text) 20%,transparent);opacity:.96;transition:none}
 .table-study-value{flex-direction:column;gap:5px}
 .table-study-value.is-wrong{border:2px solid var(--red);background:var(--red-soft);color:var(--red)}
@@ -127,6 +127,13 @@
 @media(max-width:600px){.table-filter-primary .table-option{min-height:56px;padding:12px 14px}.table-filter-primary .table-option span{font-size:.9rem}.table-settings-button{padding:13px 14px}.table-mode-dialog .table-mode-card{min-height:128px}}
 
 .table-column-example{display:block;margin-top:6px;font-size:.85rem;font-weight:750;color:var(--accent-dark);line-height:1.4}
+
+/* Keep complete labels readable at narrow widths and enlarged text sizes. */
+.table-answer-cell,.table-list-row>*{min-width:0}
+.table-matrix th,.table-choice-copy strong,.table-mode-card strong,.table-option span{overflow-wrap:anywhere}
+.table-filter-tools .text-button{min-height:44px;text-align:left}
+.table-scroll-hint{display:none;margin:-4px 0 10px;font-size:.78rem;color:var(--muted);line-height:1.5}
+@media(max-width:700px){.table-scroll-hint{display:block}}
 
 
 /* Cumulative rounds show one compact meter instead of a long step list. */

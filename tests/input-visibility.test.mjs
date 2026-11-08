@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import vm from 'node:vm';
 import {ensureInputVisible,focusInput,installInputVisibility} from '../app/input-visibility.js';
 
 function eventTarget(){
@@ -11,21 +13,21 @@ function eventTarget(){
   listenerCount(){return [...listeners.values()].reduce((count,set)=>count+set.size,0);},
  };
 }
-function harness({height=800,offsetTop=0,top=650,bottom=705,initialInset='',visual=true}={}){
+function harness({height=800,offsetTop=0,top=650,bottom=705,left=40,right=240,initialInset='',visual=true,fieldSelector='#answer-form input[name="answer"]'}={}){
  const calls=[],frames=new Map(),timers=new Map(),properties=new Map();let nextId=0,enabled=true;
  if(initialInset)properties.set('--answer-keyboard-inset',initialInset);
  const style={getPropertyValue:key=>properties.get(key)||'',getPropertyPriority:()=>'',setProperty:(key,value)=>properties.set(key,value),removeProperty:key=>properties.delete(key)};
- const viewport=Object.assign(eventTarget(),{height,offsetTop});
+ const viewport=Object.assign(eventTarget(),{height,offsetTop,width:390,offsetLeft:0,scale:1});
  const view=Object.assign(eventTarget(),{
-  innerHeight:800,...(visual?{visualViewport:viewport}:{}),
+  innerHeight:800,innerWidth:390,...(visual?{visualViewport:viewport}:{}),getComputedStyle:element=>element.computedStyle||{},
   requestAnimationFrame:callback=>{const id=++nextId;frames.set(id,callback);return id;},
   cancelAnimationFrame:id=>frames.delete(id),
   setTimeout:callback=>{const id=++nextId;timers.set(id,callback);return id;},
   clearTimeout:id=>timers.delete(id),
-  scrollBy(options){calls.push(['scroll',options]);input.rect.top-=options.top;input.rect.bottom-=options.top;},
+  scrollBy(options){calls.push(['scroll',options]);const target=root.activeElement?.rect?root.activeElement:input;target.rect.top-=options.top;target.rect.bottom-=options.top;},
  });
  const root=Object.assign(eventTarget(),{defaultView:view,documentElement:{style},activeElement:null});
- const input={ownerDocument:root,isConnected:true,rect:{top,bottom},getBoundingClientRect(){return {...this.rect};},matches:selector=>selector.includes('input[name="answer"]'),scrollIntoView:options=>calls.push(['nearest',options]),focus(options){root.activeElement=this;calls.push(['focus',options]);root.fire('focusin',{target:this});}};
+ const input={ownerDocument:root,isConnected:true,rect:{top,bottom,left,right},getBoundingClientRect(){return {...this.rect};},matches:selector=>selector.split(',').map(part=>part.trim()).includes(fieldSelector),scrollIntoView:options=>calls.push(['nearest',options]),focus(options){root.activeElement=this;calls.push(['focus',options]);root.fire('focusin',{target:this});}};
  const dispose=installInputVisibility({root,active:()=>enabled});
  const flush=()=>{const pending=[...frames.values()];frames.clear();pending.forEach(callback=>callback());};
  return {root,view,viewport,input,calls,frames,timers,properties,dispose,flush,set active(value){enabled=value;},settle(){const pending=[...timers.values()];timers.clear();pending.forEach(callback=>callback());flush();}};
@@ -95,4 +97,81 @@ test('unrelated inputs are ignored and invalid geometry cannot cause scrolling',
  const h=harness();const other={matches:()=>false};h.root.activeElement=other;h.root.fire('focusin',{target:other});h.root.fire('input',{target:other});
  assert.equal(h.frames.size,0);h.input.rect={top:NaN,bottom:NaN};assert.equal(ensureInputVisible(h.input),false);
  h.input.rect={top:0,bottom:900};assert.equal(ensureInputVisible(h.input),false);h.dispose();
+});
+
+test('every editable training answer receives keyboard space and visibility checks',()=>{
+ for(const fieldSelector of ['#answer-form input[name="answer"]','#predicate-answer-form input[name="answer"]','#table-practice-form input[data-table-answer]','#table-learning-form input[data-table-answer]','.grammar-shell textarea[data-grammar-answer]']){
+  const h=harness({height:400,fieldSelector});
+  h.input.focus({preventScroll:true});h.flush();
+  assert.equal(h.input.rect.bottom,384,fieldSelector);
+  assert.equal(h.properties.get('--answer-keyboard-inset'),'400px',fieldSelector);h.dispose();
+ }
+});
+test('readonly results and disabled answers do not reserve keyboard space or scroll',()=>{
+ for(const state of [{readOnly:true},{disabled:true}]){
+  const h=harness({height:400,fieldSelector:'#table-practice-form input[data-table-answer]'});
+  Object.assign(h.input,state);h.input.focus({preventScroll:true});h.flush();h.settle();
+  assert.equal(h.calls.some(call=>call[0]==='nearest'||call[0]==='scroll'),false);
+  assert.equal(h.properties.has('--answer-keyboard-inset'),false);h.dispose();
+ }
+});
+test('focusout restores space even if the answer became readonly or was removed',()=>{
+ for(const state of [{readOnly:true},{disabled:true},{isConnected:false}]){
+  const h=harness({height:400,initialInset:'9px'});h.input.focus({preventScroll:true});h.flush();
+  assert.equal(h.properties.get('--answer-keyboard-inset'),'400px');
+  h.root.fire('input',{target:h.input});Object.assign(h.input,state);h.root.activeElement=null;h.root.fire('focusout',{target:h.input});
+  assert.equal(h.frames.size,0);assert.equal(h.timers.size,0);assert.equal(h.properties.get('--answer-keyboard-inset'),'9px');h.dispose();
+ }
+});
+test('changing table fields cancels stale work and checks the newly focused answer',()=>{
+ const h=harness({height:400,fieldSelector:'#table-learning-form input[data-table-answer]'});
+ h.input.focus({preventScroll:true});h.flush();
+ const first=h.input,second={...first,rect:{top:480,bottom:535,left:40,right:240}};
+ h.root.activeElement=second;h.root.fire('focusout',{target:first,relatedTarget:second});h.root.fire('focusin',{target:second,relatedTarget:first});
+ h.flush();assert.equal(h.frames.size,0);assert.equal(h.timers.size,1);
+ assert.deepEqual(h.calls.filter(call=>call[0]==='scroll').at(-1),['scroll',{top:151,left:0,behavior:'instant'}]);
+ assert.equal(second.rect.bottom,384);const count=h.calls.length;h.settle();assert.equal(h.calls.length,count);
+ assert.equal(h.properties.get('--answer-keyboard-inset'),'400px');h.dispose();
+});
+test('a horizontally clipped table column is revealed without changing the page scroll',()=>{
+ const h=harness({top:180,bottom:235,left:250,right:370,fieldSelector:'#table-practice-form input[data-table-answer]'});
+ const container={clientWidth:250,scrollWidth:800,clientLeft:1,scrollLeft:190,computedStyle:{overflowX:'auto'},getBoundingClientRect:()=>({left:20})};
+ h.input.parentElement=container;
+ h.input.scrollIntoView=options=>{h.calls.push(['nearest',options]);const delta=h.input.rect.right-271;container.scrollLeft+=delta;h.input.rect.left-=delta;h.input.rect.right-=delta;};
+ h.input.focus({preventScroll:true});h.flush();
+ assert.equal(container.scrollLeft,289);
+ assert.deepEqual(h.calls.filter(call=>call[0]!=='focus'),[['nearest',{block:'nearest',inline:'nearest',behavior:'instant'}]]);
+ h.root.fire('input',{target:h.input});h.flush();h.settle();
+ assert.equal(h.calls.filter(call=>call[0]==='nearest').length,1,'typing into an already visible column must not pan the table');h.dispose();
+});
+test('keyboard scrolling preserves an already visible table column',()=>{
+ const h=harness({height:400,left:55,right:205,fieldSelector:'#table-learning-form input[data-table-answer]'});
+ const container={clientWidth:250,scrollWidth:800,clientLeft:0,scrollLeft:450,computedStyle:{overflowX:'auto'},getBoundingClientRect:()=>({left:20})};
+ h.input.parentElement=container;h.input.focus({preventScroll:true});h.flush();
+ assert.equal(container.scrollLeft,450);
+ assert.deepEqual(h.calls.find(call=>call[0]==='nearest'),['nearest',{block:'nearest',inline:'nearest',behavior:'instant'}]);
+ assert.deepEqual(h.calls.find(call=>call[0]==='scroll'),['scroll',{top:321,left:0,behavior:'instant'}]);h.dispose();
+});
+test('pinch zoom restores keyboard space and leaves zoomed panning to the user',()=>{
+ const h=harness({height:400});h.input.focus({preventScroll:true});h.flush();
+ assert.equal(h.properties.get('--answer-keyboard-inset'),'400px');
+ h.viewport.scale=2;h.viewport.height=200;h.input.rect={top:500,bottom:555,left:300,right:500};
+ const count=h.calls.length;h.viewport.fire('resize');h.flush();h.settle();
+ assert.equal(h.properties.has('--answer-keyboard-inset'),false);
+ assert.equal(ensureInputVisible(h.input),false);
+ h.viewport.fire('scroll');h.root.fire('input',{target:h.input});h.flush();assert.equal(h.calls.length,count);
+ h.viewport.scale=1;h.viewport.height=400;h.input.rect={top:500,bottom:555,left:40,right:240};h.viewport.fire('resize');h.flush();
+ assert.equal(h.input.rect.bottom,384);assert.equal(h.properties.get('--answer-keyboard-inset'),'400px');h.dispose();
+});
+test('the main screen guard enables all training views and suspends for dialogs',()=>{
+ const source=readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
+ const line=source.split('\n').find(line=>line.startsWith('installInputVisibility('));
+ let options;
+ const context=vm.createContext({document:{},screen:'learn',modalRoot:{children:[]},installInputVisibility:value=>{options=value;}});
+ vm.runInContext(line,context);
+ for(const screen of ['test','predicate-test','tables','grammar']){
+  context.screen=screen;assert.equal(options.active(),true,screen);
+  context.modalRoot.children=[{}];assert.equal(options.active(),false,screen);context.modalRoot.children=[];
+ }
+ for(const screen of ['learn','collections','settings','admin','round-end']){context.screen=screen;assert.equal(options.active(),false,screen);}
 });

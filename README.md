@@ -1,4 +1,15 @@
-# Latinio · Version 2.11.0
+# Latinio · Version 2.12.0
+
+## Neu in 2.12.0: Handy-Eingaben und ruhigere Lernschritte
+
+Die Eingabehilfe hält jetzt auch Antworten in Tabellen, Präfixübungen, Perfektformen und Grammatikaufgaben im sichtbaren Bereich. Breite Tabellen können beim Fokuswechsel seitlich zum passenden Feld scrollen. Vergrößern mit zwei Fingern bleibt möglich; kompakte Eingabefelder erhalten auf Touchgeräten mindestens 16 Pixel Schriftgröße, damit Safari beim Antippen nicht ungewollt hineinzoomt.
+
+Beim Zuordnen bleibt der aktive Schnipsel bei seinem Finger oder Stift. Weitere Berührungen übernehmen die Bewegung nicht. Abgebrochene Ziehbewegungen und verlassene Übungen räumen ihre Vorschau und das automatische Scrollen auf. Bereits verwendete Schnipsel lassen normales Scrollen zu. Lange Tabellenüberschriften können umbrechen, kleine Filteraktionen sind leichter antippbar und mehrspaltige Tabellen zeigen auf schmalen Bildschirmen einen Hinweis zum seitlichen Verschieben. Die Beschriftungen passen auch bei genau einer Form.
+
+Wortkarten, Rückmeldungen und die Zuordnungsfläche bewegen sich nicht mehr bei jeder Antwort erneut. Auffrischkarten folgen beim Wischen direkt dem Finger und gleiten nach dem Loslassen zurück. Der gewohnte Tagesabschluss mit Flamme bleibt erhalten; mit aktivierter Bewegungsreduktion erscheinen Abschluss und Weiter-Knopf sofort gemeinsam. Verschachtelte Rückmeldungen werden beim Rundenende nur einmal ausgeblendet.
+
+Lerninhalte, Bewertungen, gespeicherte Übungen und die wachsenden Fallgruppen bleiben erhalten. Reines Frontendupdate, kein Pi-Installer nötig. 458 automatisierte Tests bestanden; echtes Handyverhalten und visuelle Wirkung wurden nicht am Gerät geprüft.
+
 
 ## Neu in 2.11.0: Fälle nach und nach lernen
 

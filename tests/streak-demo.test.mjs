@@ -59,9 +59,14 @@ test('replaying has its own question and old timers cannot change the new previe
 });
 
 test('reduced motion preserves the same interaction without the long animated wait',()=>{
- const demo=fixture({reducedMotion:true});assert.equal(demo.stage.dataset.reducedMotion,'true');demo.answer('Test');demo.tick(100);
- assert.equal(demo.stage.dataset.phase,'blank');demo.tick(120);assert.equal(demo.stage.dataset.phase,'celebrate');demo.tick(100);
- assert.equal(demo.controls.hidden,false);demo.dispose();
+ const demo=fixture({reducedMotion:true});assert.equal(demo.stage.dataset.reducedMotion,'true');
+ demo.answer('wrong');assert.equal(demo.stage.dataset.phase,'question');assert.equal(demo.timers.size,0);
+ demo.answer('Test');
+ assert.equal(demo.stage.dataset.phase,'celebrate');assert.equal(demo.elements['.streak-question'].hidden,true);
+ assert.equal(demo.celebration.hidden,false);assert.equal(demo.celebration.attrs['aria-hidden'],'false');
+ assert.equal(demo.controls.hidden,false);assert.ok(demo.buttons.every(button=>!button.disabled&&button.focused));
+ assert.equal(demo.timers.size,0);assert.match(demo.elements['[data-streak-status]'].textContent,/Tag 30/);
+ demo.answer('Test');assert.equal(demo.started,1);demo.dispose();
 });
 
 test('all demo combinations start at a question; theme and day values cannot inject markup',()=>{

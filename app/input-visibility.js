@@ -1,10 +1,39 @@
-const ANSWER_SELECTOR = '#answer-form input[name="answer"]';
+const ANSWER_SELECTOR = [
+  '#answer-form input[name="answer"]',
+  '#predicate-answer-form input[name="answer"]',
+  '#table-practice-form input[data-table-answer]',
+  '#table-learning-form input[data-table-answer]',
+  '.grammar-shell textarea[data-grammar-answer]',
+].join(', ');
 const KEYBOARD_INSET = '--answer-keyboard-inset';
+const isZoomed = viewport => Number(viewport?.scale) > 1.01;
+
+function horizontallyClipped(input, view, rect) {
+  if (!Number.isFinite(rect.left) || !Number.isFinite(rect.right)) return false;
+  const viewport = view.visualViewport;
+  const left = Number(viewport?.offsetLeft) || 0;
+  const width = Number(viewport?.width) || Number(view.innerWidth);
+  const clipped = (start, end) => !(rect.left < start && rect.right > end) && (rect.left < start || rect.right > end);
+  if (width > 0 && clipped(left, left + width)) return true;
+  // A table can clip a column while that column still lies inside the page viewport.
+  for (let parent = input.parentElement; parent; parent = parent.parentElement) {
+    if (!(parent.clientWidth > 0 && parent.scrollWidth > parent.clientWidth)) continue;
+    const overflow = view.getComputedStyle?.(parent)?.overflowX;
+    if (!['auto', 'scroll', 'hidden'].includes(overflow)) continue;
+    const bounds = parent.getBoundingClientRect?.();
+    if (!bounds || !Number.isFinite(bounds.left)) continue;
+    const start = bounds.left + (parent.clientLeft || 0);
+    if (clipped(start, start + parent.clientWidth)) return true;
+  }
+  return false;
+}
 
 /** Reveal only the clipped edge, including the space hidden by an on-screen keyboard. */
 export function ensureInputVisible(input, { view = input?.ownerDocument?.defaultView || globalThis.window, margin = 16 } = {}) {
   if (!input?.getBoundingClientRect || input.isConnected === false || !view) return false;
   const viewport = view.visualViewport;
+  // Pinch zoom shrinks the visual viewport too; leave the user's zoom/panning alone.
+  if (isZoomed(viewport)) return false;
   const top = Number(viewport?.offsetTop) || 0;
   const height = Number(viewport?.height) || Number(view.innerHeight);
   if (!(height > 0)) return false;
@@ -17,7 +46,8 @@ export function ensureInputVisible(input, { view = input?.ownerDocument?.default
     if (rect.top < bounds.top) return rect.top - bounds.top;
     return 0;
   };
-  if (!deltaFor(input.getBoundingClientRect())) return false;
+  const rect = input.getBoundingClientRect();
+  if (!deltaFor(rect) && !horizontallyClipped(input, view, rect)) return false;
   // Native nearest scrolling also handles a nested scrolling container.
   input.scrollIntoView?.({ block: 'nearest', inline: 'nearest', behavior: 'instant' });
   const delta = deltaFor(input.getBoundingClientRect());
@@ -53,7 +83,7 @@ export function installInputVisibility({
   const relevant = input => Boolean(input?.matches?.(selector) && !input.disabled && !input.readOnly && input.isConnected !== false);
   const focused = () => {
     const input = document.activeElement;
-    return active() && relevant(input) && (root === document || root.contains?.(input)) ? input : null;
+    return active() && !isZoomed(viewport) && relevant(input) && (root === document || root.contains?.(input)) ? input : null;
   };
   const restoreInset = () => {
     if (!insetApplied || !style) return;
@@ -92,7 +122,8 @@ export function installInputVisibility({
   };
   const onFocus = event => { if (relevant(event.target)) schedule(true); };
   const onInput = event => { if (event.target === focused()) schedule(); };
-  const onBlur = event => { if (relevant(event.target)) { cancel(); restoreInset(); } };
+  // A submitted field can become readonly or detached before its focusout event.
+  const onBlur = event => { if (event.target?.matches?.(selector)) { cancel(); restoreInset(); } };
   const onViewport = () => schedule();
   root.addEventListener('focusin', onFocus);
   root.addEventListener('focusout', onBlur);
