@@ -314,7 +314,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--green)}
 .settings-section .setting-row>span{flex:1;min-width:0;padding-right:20px}
 .settings-section .setting-row small{max-width:560px}
 .settings-section .setting-row>select{flex:0 0 auto;width:auto;min-width:142px}
-.profile-settings{padding-top:0!important;border-top:0!important}
+.profile-settings{padding-top:0;border-top:0}
 .profile-settings>[data-action=account-logout]{width:100%;margin:15px 0 8px}
 .settings-actions{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:14px 0}
 .settings-actions>.button,.settings-actions>.text-button{width:100%;min-width:0}

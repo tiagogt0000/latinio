@@ -1,0 +1,375 @@
+/* Learning surfaces share the system's quiet materials; answers keep semantic colors. */
+:root {
+  --learning-success: #237b41;
+  --learning-success-soft: #edf7ef;
+  --learning-error-soft: #fff0ef;
+}
+:root[data-theme=dark] {
+  --learning-success: #8bd7a0;
+  --learning-success-soft: #1c3325;
+  --learning-error-soft: #3c2426;
+}
+
+/* Home: consistent cards, a clear starting action, and secondary choices below it. */
+.home-heading { --home-card-padding: 1.75rem; margin-bottom: 2rem; }
+.home-heading > .streak-badge { margin-inline-end: calc(var(--home-card-padding) + 1px); gap: .5rem; font-variant-numeric: tabular-nums; }
+.home-heading .streak-badge > strong { font-size: 1.125rem; font-weight: 650; }
+.home-practice-grid { gap: 1.25rem; align-items: stretch; }
+:root .home-practice-grid > .training-card {
+  min-width: 0;
+  padding: 1.75rem;
+  border: 1px solid var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius, 22px);
+  background: var(--surface);
+  box-shadow: var(--apple-shadow, none);
+}
+.home-practice-grid .section-top { gap: 1rem; align-items: center; }
+.home-practice-grid .training-card .tag {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: .6875rem;
+  font-weight: 600;
+  letter-spacing: .065em;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.home-practice-grid :is(.large-icon, .table-card-mark, .grammar-spark) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: .625rem;
+  border-radius: .875rem;
+  background: var(--green-soft);
+  color: var(--green-dark);
+  font-size: 1.125rem;
+  font-weight: 650;
+  line-height: 1;
+}
+.home-practice-grid .training-card h2 {
+  margin: 1.25rem 0 .625rem;
+  color: var(--text);
+  font-size: clamp(1.375rem, 1.15rem + .65vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -.025em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.home-practice-grid .training-card > p { font-size: .9375rem; line-height: 1.65; }
+.home-practice-grid .direction-choice { margin-top: 1.25rem; font-size: .8125rem; font-weight: 600; }
+.home-practice-grid .deck-picker {
+  min-width: 0;
+  margin: 1.25rem 0;
+  padding: .125rem .875rem;
+  border: 1px solid var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius-small, 14px);
+  background: var(--apple-inset, var(--soft));
+}
+.home-practice-grid .deck-picker > summary {
+  min-height: 3rem;
+  padding-block: .625rem;
+  font-size: .8125rem;
+  font-weight: 550;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.home-practice-grid .deck-picker .bounded-list { padding-bottom: .5rem; }
+.home-practice-grid .collection-check {
+  display: grid;
+  grid-template-columns: 1.375rem minmax(0, 1fr) auto;
+  gap: .625rem;
+  margin: 0;
+  padding: .875rem 0;
+  border: 0;
+  border-top: 1px solid var(--apple-separator, var(--border));
+  border-radius: 0;
+  background: transparent;
+  font-size: .875rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.home-practice-grid .collection-check > span { min-width: 0; overflow-wrap: anywhere; }
+.home-practice-grid .collection-check > small { font-size: .75rem; font-variant-numeric: tabular-nums; }
+.home-practice-grid .word-tools { gap: .5rem; margin-top: auto; padding-top: 1.5rem; }
+:root[data-subject] .home-practice-grid .word-tools > .button.primary {
+  background: var(--green);
+  border-radius: var(--apple-radius-small, 14px);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.home-practice-grid .word-tools > .button.primary > .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.home-practice-grid .word-tools > .button.secondary {
+  border-color: transparent;
+  background: transparent;
+  color: var(--green-dark);
+  font-weight: 550;
+}
+.home-practice-grid .table-practice-card > .button,
+.home-practice-grid .grammar-card > .button { margin-top: 1.5rem; justify-content: space-between; }
+.home-practice-grid .card-foot {
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: .5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-color: var(--apple-separator, var(--border));
+  font-size: .75rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.home-practice-grid .card-foot > .icon { margin-top: .125rem; }
+
+/* The word is the focal point. Frequent answers appear immediately and stay still. */
+.test-shell {
+  width: 100%;
+  max-width: 52rem;
+  padding-top: max(1.75rem, env(safe-area-inset-top, 0px));
+  padding-inline: max(1.5rem, env(safe-area-inset-left, 0px)) max(1.5rem, env(safe-area-inset-right, 0px));
+}
+.test-shell .test-top { gap: 1rem; }
+.test-shell .test-top > span { font-variant-numeric: tabular-nums; font-size: .8125rem; }
+.test-shell .test-progress { min-width: 1rem; height: .375rem; background: var(--apple-separator, var(--border)); }
+.test-shell .test-progress > div { transition: none; }
+.test-shell .test-content { max-width: 40rem; margin: clamp(1.75rem, 6vh, 4rem) auto 0; }
+.test-shell .test-title { align-items: flex-start; gap: 1rem; }
+.test-shell .test-title h1,
+.test-shell .test-content > h1 { font-size: clamp(1.25rem, 1.05rem + .7vw, 1.625rem); font-weight: 600; line-height: 1.35; letter-spacing: -.02em; }
+.test-shell .test-content > .latin-word {
+  margin: 1.5rem 0;
+  padding: 2rem;
+  border: 1px solid var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius, 22px);
+  background: var(--surface);
+  box-shadow: var(--apple-shadow, none);
+  font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem);
+  font-weight: 650;
+  letter-spacing: -.025em;
+  line-height: 1.35;
+  text-align: left;
+}
+.test-shell .test-content > .translation-card {
+  margin-top: -.5rem;
+  padding: 1.125rem 1.25rem;
+  border-color: transparent;
+  background: var(--apple-inset, var(--soft));
+  box-shadow: none;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.65;
+}
+.test-shell .test-help { margin-bottom: 1.25rem; font-size: .875rem; line-height: 1.6; }
+.test-shell .answer-row { gap: .625rem; margin-bottom: .75rem; }
+.test-shell .answer-row > span { width: 1.25rem; font-size: .75rem; font-variant-numeric: tabular-nums; }
+:root .test-shell .answer-row > input,
+.test-shell #predicate-answer {
+  min-width: 0;
+  min-height: 3.25rem;
+  padding: .875rem 1rem;
+  border-width: 1px;
+  border-radius: var(--apple-radius-small, 14px);
+  background: var(--surface);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.test-shell .add-answer { margin-left: 1.875rem; min-height: 2.75rem; font-size: .875rem; font-weight: 550; }
+.test-shell .test-footer {
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--apple-separator, var(--border));
+}
+.test-shell .test-footer > :is(.button, .text-button) { flex: 1 1 10rem; min-width: 0; }
+.test-shell .test-footer.compact-footer { margin-top: 1rem; padding-top: 0; border: 0; }
+.test-shell .graded-answer { border-width: 1px; border-radius: var(--apple-radius-small, 14px); padding: .875rem 1rem; margin-bottom: .75rem; }
+.test-shell .graded-content { align-items: baseline; flex-wrap: nowrap; gap: .625rem; font-weight: 550; line-height: 1.6; }
+.test-shell .graded-content > .answer-mark { flex: none; }
+.test-shell .graded-content > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+:root[data-subject] .test-shell .graded-answer.correct,
+:root[data-subject] .test-shell .feedback.full {
+  border-color: color-mix(in srgb, var(--learning-success) 25%, transparent);
+  background: var(--learning-success-soft);
+  color: var(--learning-success);
+}
+.test-shell .graded-answer.incorrect { border-color: color-mix(in srgb, var(--red) 30%, transparent); background: var(--learning-error-soft); }
+.test-shell .feedback { border-radius: var(--apple-radius-small, 14px); padding: 1rem; margin-top: 1rem; }
+.test-shell .compact-feedback { gap: .75rem; }
+.test-shell .compact-feedback h2 { min-width: 0; overflow-wrap: anywhere; }
+.test-shell .feedback h2 { font-size: .9375rem; font-weight: 600; line-height: 1.5; }
+.test-shell .feedback h2 > .icon { width: 1.125rem; height: 1.125rem; }
+.test-shell .correction-practice { margin-block: 1rem; padding: 1rem; border-color: var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); background: var(--apple-inset, var(--soft)); }
+.test-shell .correction-practice > p:first-child { margin-bottom: .75rem; }
+.test-shell .practice-result.correct { color: var(--learning-success); }
+.test-shell .refresh-card {
+  min-height: 18rem;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  margin-block: 1.5rem;
+  border-color: var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius, 22px);
+  box-shadow: var(--apple-shadow, none);
+}
+.test-shell .refresh-card .latin-word { border: 0; background: transparent; box-shadow: none; padding: 0; margin: 0; font-size: clamp(1.75rem, 1.3rem + 1.4vw, 2.5rem); font-weight: 650; line-height: 1.35; }
+.test-shell .refresh-card-meanings { max-width: 100%; color: var(--text); font-size: 1.125rem; line-height: 1.65; }
+.test-shell .refresh-card-actions { flex-wrap: wrap; margin-block: 1rem; }
+.test-shell .refresh-card-actions > .button { flex: 1 1 11rem; }
+.round-complete-simple { gap: 1.25rem; padding-block: .5rem; }
+.round-complete-simple > h2 { font-weight: 650; letter-spacing: -.025em; }
+
+/* Tables retain real columns and scrolling; only their visual weight changes. */
+.table-practice-shell { max-width: 62rem; }
+:root .table-practice-shell .table-panel,
+.grammar-shell .grammar-panel {
+  min-width: 0;
+  padding: 1.75rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius, 22px);
+  background: var(--surface);
+  box-shadow: var(--apple-shadow, none);
+}
+.table-practice-shell .table-panel h2 { font-weight: 650; letter-spacing: -.025em; line-height: 1.35; overflow-wrap: anywhere; }
+.table-catalog { gap: .75rem; margin-block: 1.5rem; }
+:root .table-choice-card {
+  min-height: 5.5rem;
+  gap: 1rem;
+  padding: 1.25rem;
+  border: 1px solid var(--apple-separator, var(--border));
+  border-radius: var(--apple-radius-small, 14px);
+  background: var(--surface);
+  box-shadow: none;
+  transition: background-color 140ms var(--ease-out), border-color 140ms var(--ease-out);
+}
+.table-choice-copy { gap: .375rem; }
+.table-choice-copy :is(strong, h2, h3) { font-size: 1rem; font-weight: 600; letter-spacing: -.015em; }
+.table-choice-copy :is(p, small), .table-choice-copy > span { font-size: .8125rem; line-height: 1.6; }
+.table-choice-card > .table-choice-arrow { color: var(--muted); }
+.table-mode-dialog .table-mode-card {
+  min-height: 8rem;
+  padding: 1.25rem;
+  gap: .625rem;
+  border-width: 1px;
+  border-radius: var(--apple-radius-small, 14px);
+  box-shadow: none;
+}
+.table-mode-dialog .table-mode-card:first-child { border-color: color-mix(in srgb, var(--green) 30%, var(--apple-separator, var(--border))); background: var(--green-soft); box-shadow: none; }
+.table-mode-dialog .table-mode-card strong { font-size: 1.25rem; font-weight: 650; }
+.table-choice-card:active:not(:disabled), .table-mode-card:active:not(:disabled) { transform: none; filter: brightness(.97); }
+.table-filter-primary .table-options { gap: 0; border: 1px solid var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); }
+.table-filter-primary .table-option {
+  min-height: 3.5rem;
+  padding: .875rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--apple-separator, var(--border));
+  border-radius: 0;
+  background: var(--surface);
+}
+.table-filter-primary .table-option:first-child { border-start-start-radius: var(--apple-radius-small, 14px); border-start-end-radius: var(--apple-radius-small, 14px); }
+.table-filter-primary .table-option:last-child { border-bottom: 0; border-end-start-radius: var(--apple-radius-small, 14px); border-end-end-radius: var(--apple-radius-small, 14px); }
+.table-filter-primary .table-option.selected { background: var(--green-soft); }
+.table-filter-primary .table-option span { font-size: .9375rem; font-weight: 500; }
+.table-practice-shell .table-settings-button { padding: 1rem; border-width: 1px; border-color: var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); background: var(--apple-inset, var(--soft)); }
+.table-practice-shell .table-setup-actions { margin-top: 1.5rem; padding-top: 1.25rem; border-color: var(--apple-separator, var(--border)); }
+.table-practice-shell .table-number-group { margin-top: 1.75rem; }
+.table-practice-shell .table-number-group > h3 { margin-bottom: .75rem; color: var(--text); font-size: .9375rem; font-weight: 600; }
+.table-practice-shell .table-scroll,
+.table-practice-shell .table-list { border-color: var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); }
+.table-practice-shell .table-matrix { min-width: calc(6.5rem + var(--table-columns, 3) * 8.25rem); }
+.table-practice-shell .table-matrix th:first-child { width: 6.5rem; }
+.table-practice-shell .table-matrix :is(th, td) { padding: .875rem .625rem; border-bottom-color: var(--apple-separator, var(--border)); }
+.table-practice-shell .table-matrix th { font-size: .8125rem; font-weight: 600; line-height: 1.5; }
+.table-practice-shell .table-matrix tbody th { padding-top: 1.5rem; }
+.table-practice-shell .table-matrix thead,
+.table-practice-shell .table-list-heading { background: var(--apple-inset, var(--soft)); color: var(--muted); }
+.table-practice-shell .table-column-example { font-size: .875rem; font-weight: 550; }
+:root .table-practice-shell .table-answer-cell input { min-height: 3rem; padding: .75rem .625rem; border-radius: .625rem; }
+.table-practice-shell .table-answer-cell input[readonly] { background: var(--apple-inset, var(--soft)); }
+.table-practice-shell .table-list-row { padding: 1rem; border-color: var(--apple-separator, var(--border)); }
+.table-practice-shell .table-list-heading { padding: .875rem 1rem; font-weight: 600; line-height: 1.5; }
+.table-practice-shell .table-list-row > :is(span, strong) { font-size: 1rem; font-weight: 550; }
+.table-practice-shell .table-learning-meter { height: .375rem; margin-bottom: 1.5rem; }
+.table-practice-shell .table-learning-heading { margin-bottom: 1.5rem; }
+.table-practice-shell .table-learning-heading h2 { font-size: clamp(1.25rem, 1.05rem + .7vw, 1.625rem); }
+.table-practice-shell .table-learning-heading .table-learning-cases { padding: .875rem 1rem; border-radius: var(--apple-radius-small, 14px); font-size: .875rem; font-weight: 500; }
+.table-practice-shell .table-token-bank { gap: .625rem; margin-block: 1.5rem; padding: 1rem; border-width: 1px; border-color: var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); background: var(--apple-inset, var(--soft)); }
+.table-token { border-width: 1px; border-radius: .75rem; box-shadow: none; font-weight: 600; }
+.table-token.selected, .table-token[aria-pressed=true] { box-shadow: 0 0 0 1px var(--accent); }
+.table-token.used, .table-token:disabled { box-shadow: none; }
+.table-token.table-drag-ghost { box-shadow: 0 .5rem 1.5rem color-mix(in srgb, var(--text) 18%, transparent); }
+.table-practice-shell .table-drop-slot { border-width: 1px; border-radius: .625rem; font-weight: 500; }
+.table-practice-shell .table-study-value { border-width: 1px; border-radius: .625rem; font-size: 1rem; font-weight: 600; }
+.table-practice-shell .table-study-value:not(.is-wrong) { border-color: transparent; background: var(--apple-inset, var(--soft)); color: var(--text); }
+.table-practice-shell .table-learning-feedback { padding: 1rem; border-radius: var(--apple-radius-small, 14px); font-size: .875rem; }
+.table-practice-shell .table-learning-complete { padding-block: 2.5rem; }
+.table-practice-shell .table-learning-complete h2 { font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem); }
+.table-practice-shell .table-save { margin-top: 1.5rem; font-size: .75rem; line-height: 1.6; }
+
+/* Grammar uses the same grouped surfaces without recoloring success as its subject. */
+.grammar-shell { max-width: 54rem; }
+.grammar-shell .grammar-tools { gap: .5rem; margin-bottom: 1.5rem; }
+.grammar-shell .grammar-panel h2 { font-size: 1.375rem; font-weight: 650; line-height: 1.4; letter-spacing: -.02em; }
+.grammar-shell .grammar-question h2 { font-size: clamp(1.25rem, 1.05rem + .7vw, 1.625rem); line-height: 1.5; }
+:root .grammar-shell .grammar-panel :is(textarea, input) { padding: .875rem 1rem; border-color: var(--apple-separator, var(--border)); border-radius: var(--apple-radius-small, 14px); background: var(--apple-inset, var(--soft)); font-size: 1rem; line-height: 1.6; }
+:root .grammar-shell .grammar-panel :is(textarea, input):focus { border-color: var(--green); }
+.grammar-shell .grammar-panel textarea { min-height: 7rem; }
+.grammar-shell .grammar-review-row { padding-block: 1.25rem; border-color: var(--apple-separator, var(--border)); }
+.grammar-shell :is(.grammar-rules, .grammar-answer-copy, .grammar-stats article) { padding: 1.125rem; border-radius: var(--apple-radius-small, 14px); background: var(--apple-inset, var(--soft)); }
+.grammar-shell .grammar-correction { padding: 1.125rem; border-radius: var(--apple-radius-small, 14px); background: var(--learning-success-soft); }
+.grammar-shell .grammar-result[data-grade=correct] .grammar-grade { color: var(--learning-success); }
+.grammar-shell .grammar-result[data-grade=incorrect] .grammar-correction { background: var(--apple-inset, var(--soft)); }
+.grammar-shell .grammar-result[data-grade=uncertain] .grammar-correction { background: var(--apple-inset, var(--soft)); }
+.grammar-shell .grammar-grade { min-width: 0; font-weight: 600; line-height: 1.5; }
+.grammar-shell .grammar-dimensions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; font-size: .8125rem; }
+.grammar-shell .grammar-dimensions dd { font-weight: 600; }
+.grammar-shell .grammar-rule { border-left-width: 2px; padding-left: 1rem; }
+.grammar-shell .grammar-history-row { padding-block: 1.125rem; border-color: var(--apple-separator, var(--border)); line-height: 1.5; }
+.grammar-shell .grammar-history-row > span { min-width: 0; overflow-wrap: anywhere; }
+.grammar-shell .grammar-history-row > span:last-child { flex: none; }
+.grammar-shell .grammar-sizes { flex-wrap: wrap; }
+.grammar-shell .grammar-foot { margin-block: 1.5rem; font-size: .75rem; }
+
+@media (hover: hover) and (pointer: fine) {
+  :root .table-choice-card:hover:not(:disabled) { background: var(--apple-inset, var(--soft)); border-color: color-mix(in srgb, var(--green) 35%, var(--apple-separator, var(--border))); }
+}
+@media (max-width: 48rem) {
+  :root .home-practice-grid > .training-card { padding: 1.375rem; }
+  .home-heading { --home-card-padding: 1.375rem; margin-bottom: 1.5rem; }
+  .test-shell { padding-top: max(1rem, env(safe-area-inset-top, 0px)); padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px)); }
+  .test-shell .test-content > .latin-word { padding: 1.5rem; }
+  :root .table-practice-shell .table-panel,
+  .grammar-shell .grammar-panel { padding: 1.25rem; }
+}
+@media (max-width: 26rem) {
+  .home-practice-grid .collection-check { grid-template-columns: 1.375rem minmax(0, 1fr); }
+  .home-practice-grid .collection-check > small { grid-column: 2; margin-top: -.375rem; }
+  .test-shell .test-content > .latin-word { padding: 1.25rem; }
+  .test-shell .test-footer > :is(.button, .text-button) { flex-basis: 100%; }
+  :root .table-practice-shell .table-panel,
+  .grammar-shell .grammar-panel { padding: 1rem; }
+  .table-practice-shell .table-prefix-list .table-list-heading,
+  .table-practice-shell .table-prefix-list .table-list-row { grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr); gap: .625rem; padding-inline: .75rem; }
+  .grammar-shell .grammar-dimensions { grid-template-columns: minmax(0, 1fr); }
+  .grammar-shell .grammar-result > .section-top { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root .table-choice-card { transition: none; }
+}
+@media (prefers-contrast: more) {
+  :root .home-practice-grid > .training-card,
+  :root .table-practice-shell .table-panel,
+  .grammar-shell .grammar-panel,
+  .test-shell .test-content > .latin-word { border-color: var(--text); box-shadow: none; }
+}

@@ -1,5 +1,15 @@
 # Latinio · Version 2.12.0
 
+
+## Neu in 2.13.0: Apple-inspirierte Oberfläche und schnelle Lernoptionen
+
+Latinio verwendet jetzt die Systemschrift, ruhige helle und dunkle Flächen, klar gruppierte Einstellungen und einheitliche Lernkarten. Navigation und Bedienelemente sind dezenter; die Fachfarben bleiben als Orientierung. Richtige Antworten erscheinen in jedem Fach grün. Große Schrift, schmale Ansichten, stärkere Kontraste und reduzierte Transparenz werden berücksichtigt.
+
+**Mehr Optionen** öffnet ohne die bisherigen wiederholten Datenkopien. Die verfügbaren Aufgaben werden einmal gemeinsam ausgewertet; Smart-Lernen und die Lernregeln bleiben erhalten. Auffrischkarten folgen dem Finger unmittelbar und kehren bei unvollständigem Wischen weich zurück. Die Bewegung kann direkt erneut gegriffen werden; ein abgebrochener Wisch bewertet keine Antwort.
+
+472 automatisierte Tests bestanden. Reines Frontendupdate mit Offline-Unterstützung; kein Pi-Installer nötig. Visuelle Wirkung und Bedienung auf echten iOS-/Android-Geräten wurden nicht geprüft.
+
+
 ## Neu in 2.12.0: Handy-Eingaben und ruhigere Lernschritte
 
 Die Eingabehilfe hält jetzt auch Antworten in Tabellen, Präfixübungen, Perfektformen und Grammatikaufgaben im sichtbaren Bereich. Breite Tabellen können beim Fokuswechsel seitlich zum passenden Feld scrollen. Vergrößern mit zwei Fingern bleibt möglich; kompakte Eingabefelder erhalten auf Touchgeräten mindestens 16 Pixel Schriftgröße, damit Safari beim Antippen nicht ungewollt hineinzoomt.

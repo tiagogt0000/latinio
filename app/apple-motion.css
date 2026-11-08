@@ -1,0 +1,50 @@
+/* Feedback follows the press; frequent questions and data stay still. */
+#app :is(.button,.icon-button,.chip,.match-card,.table-choice-card,.table-mode-card),
+#modal-root :is(.button,.icon-button,.chip){
+ transition:transform var(--apple-fast,160ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1)),opacity var(--apple-fast,160ms) ease,background-color var(--apple-fast,160ms) ease,color var(--apple-fast,160ms) ease;
+}
+#app :is(.button,.icon-button,.chip,.match-card,.table-choice-card,.table-mode-card):active:not(:disabled):not(:focus-visible),
+#modal-root :is(.button,.icon-button,.chip):active:not(:disabled):not(:focus-visible){
+ transform:scale(.97);
+}
+
+/* Drag and return share a JS-owned position; CSS must not tween it again. */
+.refresh-card,.refresh-card.is-dragging{
+ transition:background-color var(--apple-fast,160ms) ease;
+}
+.refresh-card.is-dragging{cursor:grabbing}
+
+/* A dialog moves as one surface. Streak artwork owns its own choreography. */
+#modal-root .modal-overlay:not(:has(.streak-stage)){
+ animation:apple-fade-in var(--apple-fast,160ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1)) both;
+}
+#modal-root .modal:not(:has(.streak-stage)){
+ animation:apple-dialog-enter var(--apple-enter,220ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1)) both;
+}
+.subject-dropdown[open]>.subject-options{
+ animation:apple-fade-in var(--apple-fast,160ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1)) both;
+}
+.subject-dropdown:has(>summary:focus-visible)>.subject-options{animation:none}
+#toast{
+ transition:opacity var(--apple-fast,160ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1)),transform var(--apple-fast,160ms) var(--ease-out,cubic-bezier(0.23,1,0.32,1));
+}
+@keyframes apple-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes apple-dialog-enter{from{opacity:0;transform:translateY(6px) scale(.97)}to{opacity:1;transform:none}}
+
+/* Mounting the app must not replay entrances on both chrome and page content. */
+.app-arriving>:is(.login-shell,.workspace,.sidebar,.mobile-nav),
+.app-arriving :is(.page-heading,.home-greeting){animation:none}
+.app-arriving::before{display:none;animation:none}
+
+@media(prefers-reduced-motion:reduce){
+ #app :is(.button,.icon-button,.chip,.match-card,.table-choice-card,.table-mode-card):active:not(:disabled):not(:focus-visible),
+ #modal-root :is(.button,.icon-button,.chip):active:not(:disabled):not(:focus-visible){transform:none;opacity:.78}
+ #modal-root .modal-overlay:not(:has(.streak-stage)),
+ #modal-root .modal:not(:has(.streak-stage)),
+ .subject-dropdown[open]>.subject-options{animation:none}
+ #toast{transform:translate(-50%,0)}
+}
+@media(prefers-contrast:more){
+ #app :is(.button,.icon-button,.chip,.match-card,.table-choice-card,.table-mode-card):active:not(:disabled),
+ #modal-root :is(.button,.icon-button,.chip):active:not(:disabled){opacity:1;outline:2px solid currentColor;outline-offset:2px}
+}
