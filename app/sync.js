@@ -3,6 +3,16 @@ import {rebase} from './core.js';
 export function createBridge(url,token){return /\/api$/.test(url)?new RestBridge(url,token):new GoogleBridge(url,token);}
 export const FULL_SYNC_INTERVAL=86400000;
 export function needsFullSync(doc,now=Date.now()){const last=Number(doc.lastFullSync)||0;return !last||now-last>FULL_SYNC_INTERVAL;}
+const authenticationRequired=error=>/Bitte erneut anmelden|Zugangscode neu an|Dieses Profil ist nicht freigeschaltet/i.test(error?.message||'');
+const identityRequests=new WeakMap();
+function requestIdentity(bridge,subject){
+  let pending=identityRequests.get(bridge);
+  if(!pending){pending=new Map();identityRequests.set(bridge,pending);}
+  if(pending.has(subject))return pending.get(subject);
+  // Share only the request in flight. An explicit later whoami must be fresh.
+  const task=Promise.resolve().then(()=>bridge.request('whoami',{subject})).finally(()=>pending.delete(subject));
+  pending.set(subject,task);return task;
+}
 export class GoogleBridge {
   constructor(url,token){this.url=url;this.token=token;this.callbacks=new Map();}
   async connect(){
@@ -41,24 +51,41 @@ export class Sync extends EventTarget {
   schedule(ms=1200){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
   async request(action,payload,requestSubject=this.subject){
     if(requestSubject!==this.subject&&(!['check','pull'].includes(action)||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
-    const config=this.store.doc.config;
+    const config={...this.store.doc.config},profileId=this.store.profileId;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=createBridge(config.url,config.token);}
-    try{
-      if(['profileCreate','profileUpdate','profileUpdateSubjects'].includes(action)){
-        const identity=await this.bridge.request('whoami');
-        if(identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
+    const perform=async bridge=>{
+      const profileMutation=['profileCreate','profileUpdate','profileUpdateSubjects'].includes(action);
+      const needsSubject=requestSubject==='french'&&!bridge.frenchVerified||requestSubject==='english'&&!bridge.englishVerified;
+      if(action==='whoami'||profileMutation||needsSubject||profileId&&bridge.verifiedProfileId!==profileId){
+        const identity=await requestIdentity(bridge,requestSubject);
+        if(this.bridge!==bridge||this.store.doc.config.url!==config.url||this.store.doc.config.token!==config.token||this.store.profileId!==profileId)throw Error('Die Cloud-Verbindung wurde geändert.');
+        if(profileId&&identity.profile?.id!==profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte erneut anmelden.');
+        if(profileMutation&&identity.apiVersion<4)throw Error('Für die Lernfach-Freigabe muss das aktualisierte Google-Skript bereitgestellt werden.');
+        if(requestSubject==='french'){
+          if(identity.apiVersion<7||!identity.subjects?.includes('french'))throw Error('Bitte zuerst das neue Pi-Backend installieren. Französisch wurde noch nicht freigeschaltet.');
+          bridge.frenchVerified=true;
+        }
+        if(requestSubject==='english'){
+          if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');
+          bridge.englishVerified=true;
+        }
+        if(profileId)bridge.verifiedProfileId=profileId;
+        if(action==='whoami')return identity;
       }
-      if(requestSubject==='french'&&!this.bridge.frenchVerified){const identity=await this.bridge.request('whoami',{subject:'french'});if(identity.apiVersion<7||!identity.subjects?.includes('french'))throw Error('Bitte zuerst das neue Pi-Backend installieren. Französisch wurde noch nicht freigeschaltet.');this.bridge.frenchVerified=true;}
-      if(requestSubject==='english'&&!this.bridge.englishVerified){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript. Es wurden keine englischen Daten in die Latein-Cloud übertragen.');this.bridge.englishVerified=true;}
-      return await this.bridge.request(action,{...payload,subject:requestSubject});
+      return bridge.request(action,{...payload,subject:requestSubject});
+    };
+    try{
+      try{return await perform(this.bridge);}
+      catch(error){
+        // A long-lived Apps Script iframe may still point at the previous deployment.
+        // Retry only an unknown-action rejection: the server has not performed it.
+        if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
+        this.bridge.destroy();this.bridge=createBridge(config.url,config.token);
+        return await perform(this.bridge);
+      }
     }catch(error){
-      if(/Zugangscode neu an/.test(error.message))this.dispatchEvent(new Event('authentication-required'));
-      // A long-lived Apps Script iframe may still point at the previous deployment.
-      // Retry only an unknown-action rejection: the server has not performed it.
-      if(!/Unbekannte.*Aktion/i.test(error.message))throw error;
-      this.bridge.destroy();this.bridge=createBridge(config.url,config.token);
-      if(requestSubject==='english'){const identity=await this.bridge.request('whoami',{subject:'english'});if(identity.apiVersion<3||!identity.subjects?.includes('english'))throw Error('Die Englisch-Cloud benötigt das aktualisierte Google-Skript.');this.bridge.englishVerified=true;}
-      return this.bridge.request(action,{...payload,subject:requestSubject});
+      if(authenticationRequired(error))this.dispatchEvent(new Event('authentication-required'));
+      throw error;
     }
   }
   run(){if(this.inFlight)return this.inFlight;this.inFlight=this.performRun().finally(()=>{this.inFlight=null;});return this.inFlight;}
@@ -72,7 +99,18 @@ export class Sync extends EventTarget {
       // Reconcile the entire journal once a day. On normal app openings, a
       // version-only check is enough; download operations only if it changed.
       const full=needsFullSync(this.store.doc);
-      if(full&&this.store.profileId){const identity=await this.request('whoami');if(identity.profile?.id!==this.store.profileId)throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte abmelden und mit der richtigen E-Mail erneut anmelden.');}
+      const config=this.store.doc.config,verified=this.verifiedIdentity;
+      if(this.store.profileId&&(full||!verified||verified.url!==config.url||verified.token!==config.token||verified.profileId!==this.store.profileId)){
+        const identity=await this.request('whoami');
+        if(identity.profile?.id!==this.store.profileId){
+          this.dispatchEvent(new Event('authentication-required'));
+          throw Error('Die Cloud-Anmeldung gehört zu einem anderen Profil. Bitte erneut anmelden.');
+        }
+        const profile={...(this.store.doc.profile||{}),...identity.profile};
+        if(JSON.stringify(this.store.doc.profile)!==JSON.stringify(profile))await this.store.update(doc=>{doc.profile={...(doc.profile||{}),...identity.profile};return doc;});
+        const event=new Event('profile-updated');event.profile=this.store.doc.profile;this.dispatchEvent(event);
+        this.verifiedIdentity={url:config.url,token:config.token,profileId:this.store.profileId};
+      }
       const meta=await this.request('check');this.cloudVersion=meta.version;
       if(Array.isArray(meta.allowedSubjects)){
         this.allowedSubjects=meta.allowedSubjects;

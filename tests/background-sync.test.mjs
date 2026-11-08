@@ -56,3 +56,20 @@ test('Unread share notices survive initial sync without delaying learning',async
  const x=gateFixture();x.store.data.settings.n={id:'n',kind:'shareNotice',at:1,collections:[{id:'c',name:'Lektion 1'}]};
  await x.gate.run();assert.equal(x.gate.blocked,false);assert.equal(x.store.data.settings.n.kind,'shareNotice');assert.equal(x.store.data.settings.read_n,undefined);
 });
+
+test('Cached lessons remain available while the initial network reconciliation is still pending',async()=>{
+ const x=gateFixture();let release,finished=false;
+ x.sync.run=()=>new Promise(resolve=>release=resolve);
+ const gate=cloudGate({store:x.store,sync:x.sync,shouldBlock:()=>false,onReady:()=>{finished=true;}});
+ const task=gate.run();await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(gate.blocked,false);assert.equal(finished,false);
+ const button={innerHTML:'Smart lernen',disabled:false};
+ await waitForInitialSync(gate,button);assert.equal(button.innerHTML,'Smart lernen');assert.equal(button.disabled,false);
+ release();await task;assert.equal(finished,true);
+});
+
+test('An empty shared inbox does not traverse the unrelated full learning history',()=>{
+ const data=emptyData();
+ Object.defineProperty(data,'reviews',{enumerable:true,get(){throw Error('Review history must not be copied for an empty inbox');}});
+ assert.deepEqual(incomingChanges(data),{changes:[],conflicts:[]});
+});

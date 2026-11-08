@@ -1,3 +1,20 @@
+async function playExit(element,frames,options){
+ const view=element?.ownerDocument?.defaultView||globalThis;
+ let animation,timer;
+ const cancel=()=>{try{animation?.cancel?.();}catch{}};
+ try{
+  animation=element?.animate?.(frames,options);
+  if(!animation)return;
+  const finished=animation.finished;
+  if(typeof finished?.then!=='function'){cancel();return;}
+  await Promise.race([
+   Promise.resolve(finished).catch(()=>{}),
+   new Promise(resolve=>{timer=view.setTimeout(()=>{cancel();resolve();},options.duration+(options.delay||0)+100);})
+  ]);
+ }catch{cancel();}
+ finally{view.clearTimeout(timer);}
+}
+
 export async function fadeRound(root,reducedMotion=false){
  root.querySelector('input:focus')?.blur();
  if(reducedMotion)return;
@@ -14,11 +31,9 @@ export async function fadeRound(root,reducedMotion=false){
   seen.add(element);
   return !candidates.some(candidate=>candidate.element!==element&&candidate.element.contains?.(element));
  });
- const animations=targets.map(({element,delay})=>element.animate?.([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-5px)'}],{duration:400,delay,easing:'ease',fill:'forwards'})).filter(Boolean);
- await Promise.all(animations.map(animation=>animation.finished.catch(()=>{})));
+ await Promise.all(targets.map(({element,delay})=>playExit(element,[{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-5px)'}],{duration:400,delay,easing:'ease',fill:'forwards'})));
 }
 export async function fadeDialog(element,reducedMotion=false){
  if(reducedMotion||!element?.animate)return;
- const animation=element.animate([{opacity:1},{opacity:0}],{duration:250,easing:'ease',fill:'forwards'});
- await animation.finished.catch(()=>{});
+ await playExit(element,[{opacity:1},{opacity:0}],{duration:250,easing:'ease',fill:'forwards'});
 }

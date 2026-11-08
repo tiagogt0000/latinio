@@ -117,3 +117,14 @@ test('Completed animation handles are released instead of being cancelled on eve
  f.calls[0].animation.finish();await Promise.resolve();f.motion.beforeRender();
  assert.equal(f.calls[0].animation.cancelled,false);f.motion.dispose();
 });
+
+test('An animation API failure cannot stop rendering, modal opening or cleanup',()=>{
+ const f=fixture();f.click();
+ f.content.animate=()=>{throw new TypeError('Animation unavailable');};
+ assert.doesNotThrow(()=>f.motion.screen(f.app,{from:'learn',to:'collections'}));
+ const modal=f.modalRoot.querySelector('.modal');modal.animate=f.content.animate;
+ assert.doesNotThrow(()=>f.motion.openModal(f.modalRoot));
+ f.motion.screen(f.app,{from:'collections',to:'learn'});
+ for(const call of f.calls)call.animation.cancel=()=>{throw new Error('Already disposed');};
+ assert.doesNotThrow(()=>f.motion.beforeRender());assert.doesNotThrow(()=>f.motion.dispose());
+});

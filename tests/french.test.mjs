@@ -15,10 +15,10 @@ test('French Vocabify text and JSON imports split German meanings and refuse for
  assert.equal(parseImport(frenchImport({name:'Test',lang:'fr',vocab:[{f:'la sœur',d:'die Schwester'}]}),emptyData()).words[0].latin,'la sœur');
  assert.throws(()=>frenchImport({lang:'en',vocab:[]}),/französische/);assert.throws(()=>frenchTextImport('# Sprache: la\nvox ; Stimme'),/nicht zu Französisch/);
 });
-test('French has an explicit third entrance, remembered preference and a single-use direct switch',()=>{
- const storage=disk();rememberSubject('french',storage);assert.equal(currentSubject('',storage),'french');
- assert.equal(currentSubject('?subject=french',storage),'french');assert.match(entranceMarkup(),/data-enter-subject="french"/);assert.match(entranceMarkup(),/Vocabify/i);
- storage.setItem(SUBJECT_SWITCH_KEY,'french');assert.equal(consumeSubjectSwitch(storage),'french');assert.equal(consumeSubjectSwitch(storage),null);
+test('Removed French links and remembered choices return to Latin without offering a third subject',()=>{
+ const storage=disk();rememberSubject('french',storage);assert.equal(currentSubject('',storage),'latin');
+ assert.equal(currentSubject('?subject=french',storage),'latin');assert.doesNotMatch(entranceMarkup(),/data-enter-subject="french"|Vocabify/i);
+ storage.setItem(SUBJECT_SWITCH_KEY,'french');assert.equal(consumeSubjectSwitch(storage),'latin');assert.equal(consumeSubjectSwitch(storage),null);
 });
 test('French modes use both directions, preserve reviews and filter older, unseen and incorrect words',()=>{
  const d=emptyData(),now=Date.now();d.collections.c={id:'c',name:'Unité 1'};
@@ -29,10 +29,6 @@ test('French modes use both directions, preserve reviews and filter older, unsee
  assert.deepEqual(new Set(frenchTasks(d,['c'],'newest',10,'mixed',now).map(t=>t.wordId)),new Set(['new']));
  assert.deepEqual(new Set(frenchTasks(d,['c'],'errors',10,'mixed',now).map(t=>t.wordId)),new Set(['wrong']));
  assert.equal(frenchTasks(d,['c'],'all',10,'mixed',now).length,6);assert.equal(JSON.stringify(d.reviews),before);assert.match(frenchHome(d,3,10,h),/Vocabify/i);
-});
-test('French classroom inputs disable correction and use French language markup',()=>{
- const d=emptyData();d.collections.c={id:'c',name:'FR'};d.words.w={id:'w',collectionId:'c',latin:'la maison',meanings:[['das Haus']]};
- const html=classroomView(d,'maison',h,true,'french');assert.match(html,/autocorrect="off"/);assert.match(html,/lang="fr"/);assert.doesNotMatch(html,/Mögliche gebeugte Form/);
 });
 test('French journals, automatic shares and checker preserve Latin and English and enforce subject permissions',()=>{
  const h=harness();h.ctx.AUTOMATIC_SHARING_ENABLED=true;
@@ -46,9 +42,10 @@ test('French journals, automatic shares and checker preserve Latin and English a
  assert.throws(()=>h.request({action:'pull',subject:'latin',token:user.token}),/nicht freigeschaltet/);
  assert.equal(h.request({action:'shareList',subject:'french'}).shares[0].automatic,true);
 });
-test('Vocabify runtime never loads the attachment’s independent Firebase authentication',()=>{
- const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');assert.doesNotMatch(main,/firebase|gstatic/);assert.match(main,/new Store\(\)\.open\(profile.id,subject\)/);
- const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');for(const name of ['french.js','notifications.js','subjects.js','icon-vocabify.svg'])assert.ok(sw.includes(name));
+test('Active app and offline shell no longer load the archived French feature',()=>{
+ const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');assert.doesNotMatch(main,/firebase|gstatic|french|Vocabify/);
+ const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');assert.doesNotMatch(sw,/french\.js|icon-vocabify/);
+ for(const name of ['notifications.js','subjects.js','icon-english.svg'])assert.ok(sw.includes(name));
 });
 test('The French starter imports only the eight French demo words, once, without sample users or progress',async()=>{
  const data=emptyData();let commits=0;const store={data,subject:'french',profileId:'admin',async commit(changes){commits++;for(const [entity,key,value] of changes)data[entity][key]=value;}};

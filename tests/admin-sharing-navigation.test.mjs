@@ -88,7 +88,7 @@ test('Checker failures stay in the checker with retry and restore usable control
  assert.equal(f.ui.busy,false);
 });
 
-test('A check synchronizes all three subjects and reads differences without changing any grant',async t=>{
+test('A check synchronizes both supported subjects and reads differences without changing any grant',async t=>{
  const otherSubjects=[],contexts=[];
  const f=setup(t,{openShareSubject:async subject=>{
   otherSubjects.push(subject);
@@ -96,7 +96,7 @@ test('A check synchronizes all three subjects and reads differences without chan
   contexts.push(context);return context;
  }});
  await openChecker(f);await check(f,[diff('d1')]);
- assert.deepEqual(otherSubjects,['english','french']);
+ assert.deepEqual(otherSubjects,['english']);
  assert.deepEqual(f.requests.map(request=>request.action),['profiles','autoShareCheck']);
  assert.deepEqual(f.requests[1].args,{profileIds:['p1','p2']});
  assert.match(f.views.at(-1).html,/1 Unterschiede/);
@@ -153,8 +153,8 @@ test('Directory loading failures offer a retry and subject switching does not tr
  await f.action('share-panel');f.requests[0].reject(Error('Offline'));f.requests[1].resolve({shares:[]});await tick();
  assert.match(f.nodes.get('[data-directory-status]').innerHTML,/data-action="share-panel"/);
  assert.match(f.nodes.get('[data-directory-status]').innerHTML,/Erneut versuchen/);
- assert.equal(await f.action('share-subject','french'),true);
- assert.match(f.views.at(-1).html,/Freigaben · Französisch/);
+ assert.equal(await f.action('share-subject','english'),true);
+ assert.match(f.views.at(-1).html,/Freigaben · Englisch/);
  f.navigate('messages');const count=f.views.length;
  release({store:f.store,sync:f.sync});await tick();
  assert.equal(f.views.length,count);assert.equal(f.visible,'messages');

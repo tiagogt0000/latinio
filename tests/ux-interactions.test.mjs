@@ -16,7 +16,7 @@ test('Empty normal vocabulary submissions never grade; explicit skip still recor
 test('Collection navigation paints loading immediately while an unrelated operation is busy',async()=>{
  let paint,rendered=0;const attrs=new Map(),classes=new Set();
  const button={dataset:{action:'collection-open',id:'lesson9'},innerHTML:'pencil',classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)},getAttribute:k=>attrs.get(k)??null,setAttribute:(k,v)=>attrs.set(k,v),removeAttribute:k=>attrs.delete(k)};
- const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},ready:true,working:true,screen:'collections',collectionFilter:'all',search:'old',collectionTab:'lessons',closeModal(){},render(){rendered++;},sharing:{handle(){throw Error('navigation waited for sharing');}},notify(message){throw Error(message);}});
+ const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},subjectTransition:null,ready:true,working:true,screen:'collections',collectionFilter:'all',search:'old',collectionTab:'lessons',closeModal(){},render(){rendered++;},sharing:{handle(){throw Error('navigation waited for sharing');}},notify(message){throw Error(message);}});
  vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',event=>")),ctx);
  const task=ctx.actions({preventDefault(){},target:{closest:()=>button}});
  assert.match(button.innerHTML,/button-loading/);assert.equal(rendered,0);assert.equal(ctx.screen,'collections');
@@ -25,7 +25,7 @@ test('Collection navigation paints loading immediately while an unrelated operat
 test('A dialog opened after tapping the pencil is not closed by delayed collection navigation',async()=>{
  let paint,dialog='',rendered=0;const classes=new Set();
  const pencil={dataset:{action:'collection-open',id:'lesson'},innerHTML:'pencil',getAttribute:()=>null,setAttribute(){},removeAttribute(){},classList:{add:c=>classes.add(c),remove:c=>classes.delete(c),contains:c=>classes.has(c)}};
- const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},ready:true,working:false,screen:'collections',isAdmin:()=>true,collectionFilter:'all',search:'',collectionTab:'lessons',closeModal(){dialog='';},render(){rendered++;},sharing:{handle(){dialog='Freigaben';}},notify(message){throw Error(message);}});
+ const ctx=vm.createContext({collectionOpener:createCollectionOpener({waitForPaint:()=>new Promise(resolve=>paint=resolve)}),store:{},subjectTransition:null,ready:true,working:false,screen:'collections',isAdmin:()=>true,collectionFilter:'all',search:'',collectionTab:'lessons',closeModal(){dialog='';},render(){rendered++;},sharing:{handle(){dialog='Freigaben';}},notify(message){throw Error(message);}});
  vm.runInContext(source.slice(source.indexOf('async function actions('),source.indexOf("document.addEventListener('click',event=>")),ctx);
  const opening=ctx.actions({preventDefault(){},target:{closest:()=>pencil}});
  await ctx.actions({preventDefault(){},target:{closest:()=>({dataset:{action:'share-panel'}})}});

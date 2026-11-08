@@ -12,17 +12,24 @@ export function createInterfaceMotion({root=globalThis.document}={}){
  const active=new Set(),detailsIntent=new WeakMap();
  let pointerActivation=false;
 
+ function stop(item){
+  active.delete(item);
+  try{item.animation.cancel();}catch{/* Optional motion must never block an interaction. */}
+ }
  function cancel(kind){
   for(const item of active){
    if(kind&&item.kind!==kind)continue;
-   active.delete(item);item.animation.cancel();
+   stop(item);
   }
  }
  function animate(element,frames,{kind,duration=enter,delay=0}={}){
   if(!element?.animate||element.isConnected===false||!pointerActivation||preference?.matches)return;
-  const animation=element.animate(frames,{duration,delay,easing,fill:'backwards'});
-  const item={animation,element,kind};active.add(item);
-  animation.finished.then(()=>active.delete(item),()=>active.delete(item));
+  let item;
+  try{
+   const animation=element.animate(frames,{duration,delay,easing,fill:'backwards'});
+   item={animation,element,kind};active.add(item);
+   animation.finished.then(()=>active.delete(item),()=>active.delete(item));
+  }catch{if(item)stop(item);}
  }
  function click(event){
   pointerActivation=event.detail>0;
@@ -31,7 +38,7 @@ export function createInterfaceMotion({root=globalThis.document}={}){
   const details=summary?.parentElement;
   if(!details?.matches('.subject-dropdown, .deck-picker'))return;
   detailsIntent.set(details,pointerActivation&&!details.open);
-  for(const item of active)if(details.contains(item.element)){active.delete(item);item.animation.cancel();}
+  for(const item of active)if(details.contains(item.element))stop(item);
  }
  function keyboard(){pointerActivation=false;cancel();}
  function toggle(event){

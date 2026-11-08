@@ -1,19 +1,17 @@
 import {createHash,randomInt,randomUUID} from 'node:crypto';
 
 export const defaultMessages=[
- ['english','Frau Clodius wäre stolz auf dich. Fünf Minuten Englisch? 🇺🇸'],
- ['english','Your vocabulary misses you. Komm, eine kleine Runde geht noch 🥺'],
- ['english','Plot twist: Heute gewinnst du gegen die unregelmäßigen Verben. 🇺🇸'],
- ['latin','Deine Vokabeln warten schon länger als Caesar auf den Senat. Eine Runde? 🏛️'],
- ['latin','Carpe diem … und vielleicht fünf Vokabeln. Deine Flamme zählt auf dich 🥺'],
- ['latin','Auch Rom wurde nicht an einem Tag gelernt. Aber heute geht ein kleines Stück. 🇻🇦'],
- ['french','Bonjour! Deine Vokabeln hätten gern ein kleines Rendezvous. 🇫🇷'],
- ['french','Ein Croissant fürs Gehirn? Fünf Minuten Französisch, s’il te plaît 🥐'],
- ['french','Dein Französisch wartet. Très traurig ohne dich 🥺'],
- ['all','Deine Streak-Flamme hat die Kuscheldecke bereit. Wärmst du sie kurz auf? 🔥'],
- ['all','Nur eine kleine Runde. Deine zukünftige Klassenarbeit sagt schon mal danke. ✨'],
- ['all','Die Vokabeln haben nach dir gefragt. Ich hab gesagt, du kommst gleich 🥺']
-].map(([subject,text],i)=>({id:'starter-'+i,subject,text,enabled:true}));
+ [0,'english','Frau Clodius wäre stolz auf dich. Fünf Minuten Englisch? 🇺🇸'],
+ [1,'english','Your vocabulary misses you. Komm, eine kleine Runde geht noch 🥺'],
+ [2,'english','Plot twist: Heute gewinnst du gegen die unregelmäßigen Verben. 🇺🇸'],
+ [3,'latin','Deine Vokabeln warten schon länger als Caesar auf den Senat. Eine Runde? 🏛️'],
+ [4,'latin','Carpe diem … und vielleicht fünf Vokabeln. Deine Flamme zählt auf dich 🥺'],
+ [5,'latin','Auch Rom wurde nicht an einem Tag gelernt. Aber heute geht ein kleines Stück. 🇻🇦'],
+ [9,'all','Deine Streak-Flamme hat die Kuscheldecke bereit. Wärmst du sie kurz auf? 🔥'],
+ [10,'all','Nur eine kleine Runde. Deine zukünftige Klassenarbeit sagt schon mal danke. ✨'],
+ [11,'all','Die Vokabeln haben nach dir gefragt. Ich hab gesagt, du kommst gleich 🥺']
+].map(([id,subject,text])=>({id:'starter-'+id,subject,text,enabled:true}));
+const activeSubjects=new Set(['latin','english']);
 export function localClock(now,zone='Europe/Berlin'){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(now)).map(x=>[x.type,x.value]));
  return {day:`${p.year}-${p.month}-${p.day}`,minute:Number(p.hour)*60+Number(p.minute)};
@@ -78,14 +76,16 @@ export function createNotifications(database,transport,{now=Date.now,random=rand
    const devices=db.prepare('SELECT * FROM notification_devices ORDER BY updated DESC').all(),snapshot=database.notificationSnapshot();
    for(const profileId of new Set(devices.map(d=>d.profile))){
     const person=snapshot.find(p=>p.id===profileId);if(!person)continue;
+    // Archived subjects and catalog rows stay stored, but never create a reminder.
+    const subjects=person.subjects.filter(subject=>activeSubjects.has(subject));if(!subjects.length)continue;
     const targets=devices.filter(d=>d.profile===profileId),{day,minute}=localClock(now(),targets[0].zone);
     db.prepare('INSERT OR IGNORE INTO notification_daily VALUES(?,?,?,?)').run(profileId,day,config.start+random(config.end-config.start+1),'waiting');
     const job=db.prepare('SELECT * FROM notification_daily WHERE profile=? AND day=?').get(profileId,day);
     if(job.state!=='waiting')continue;
     if(learned(person,day)){db.prepare("UPDATE notification_daily SET state='learned' WHERE profile=? AND day=?").run(profileId,day);continue;}
     if(minute<Math.max(job.minute,config.start)||minute>config.end)continue;
-    const choices=config.messages.filter(m=>m.enabled&&(m.subject==='all'||person.subjects.includes(m.subject)));if(!choices.length)continue;
-    const message=choices[random(choices.length)],subject=message.subject==='all'?person.subjects[0]:message.subject;
+    const choices=config.messages.filter(m=>m.enabled&&(m.subject==='all'||subjects.includes(m.subject)));if(!choices.length)continue;
+    const message=choices[random(choices.length)],subject=message.subject==='all'?subjects[0]:message.subject;
     // Reserve before I/O. A restart never produces a second reminder for this day.
     const claimed=db.prepare("UPDATE notification_daily SET state='sending' WHERE profile=? AND day=? AND state='waiting'").run(profileId,day);if(!claimed.changes)continue;
     const logId=randomUUID();db.prepare('INSERT INTO notification_history VALUES(?,?,?,?,?,?,?)').run(logId,profileId,person.name,now(),subject,message.text,'Versand gestartet');
@@ -93,7 +93,7 @@ export function createNotifications(database,transport,{now=Date.now,random=rand
     for(const target of targets){
      const fresh=database.notificationSnapshot().find(p=>p.id===profileId);if(!fresh||learned(fresh,day)||!fresh.subjects.includes(subject)||!get('catalog').enabled)break;
      if(!db.prepare('SELECT 1 FROM notification_devices WHERE endpoint=? AND profile=?').get(target.endpoint,profileId))continue;
-     const payload={title:subject==='french'?'🇫🇷 Vocabify':subject==='english'?'🇺🇸 Latinio · Englisch':'🇻🇦 Latinio · Latein',body:message.text,tag:'latinio-learn-'+day,url:'./?subject='+subject,day};
+     const payload={title:subject==='english'?'🇺🇸 Latinio · Englisch':'🇻🇦 Latinio · Latein',body:message.text,tag:'latinio-learn-'+day,url:'./?subject='+subject,day};
      try{await transport.sendNotification(JSON.parse(target.subscription),JSON.stringify(payload),{vapidDetails:{subject:'https://tiagogt0000.github.io/latinio/',...vapid},TTL:1800,timeout:10000,urgency:'normal',topic:createHash('sha256').update(profileId+day).digest('base64url').slice(0,32)});accepted++;}
      catch(error){failed++;if([404,410].includes(error.statusCode))db.prepare('DELETE FROM notification_devices WHERE endpoint=?').run(target.endpoint);}
     }

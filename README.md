@@ -1,5 +1,15 @@
-# Latinio · Version 2.12.0
+# Latinio · Version 2.15.0
 
+
+## Neu in 2.15.0: Zwei Fächer, schneller Start und zuverlässige Lernoptionen
+
+Die App bietet Latein und Englisch. Französisch entfällt aus Startauswahl, Fachwechsel, Import, Nutzerverwaltung und Erinnerungen; alte Lernstände werden nicht gelöscht. Die mobile Navigation zeigt nur Symbole mit weiterhin zugänglichen Beschriftungen. Der sanfte Hintergrund läuft durch den transparenten Header und geht am oberen Bildschirmrand weich in die passende Systemfarbe über.
+
+Gespeicherte Inhalte sind sofort nutzbar. Ein Fachwechsel wartet auf keinen Cloud-Abgleich mehr und zeigt unmittelbar den grünen/roten Logoübergang vor weichgezeichnetem Hintergrund. Mehr Optionen bleibt während des Ladens erreichbar; leere Dialoge erhalten Ladehinweise und werden nach eintreffenden Sammlungen automatisch nutzbar. Verbindungsfehler lassen sich gezielt wiederholen, ungültige Anmeldungen führen zur Anmeldung zurück. Rein visuelle Animationsfehler können die Bedienung nicht mehr abbrechen.
+
+Die Auswahl der Perfekt-Aufgaben verwendet einen gemeinsamen Verlaufsindex. Ein synthetischer lokaler Vergleich mit 500 Formen und 2.000 Reviews ergab bei identischer Auswahl einen Median von zuvor 5.831 ms und jetzt 3,21 ms; dies ist keine Messung der gesamten App auf einem Handy.
+
+550 automatisierte Tests und 6 Installerprüfungen bestanden. Der private Erinnerungsdienst wurde nach einer geprüften SQLite-Sicherung aktualisiert. Keine visuellen Browserchecks oder reale iPhone-Prüfung.
 
 ## Neu in 2.14.0: Neue Logos, Liquid Glass und flüssigere Wechsel
 

@@ -81,12 +81,43 @@ export function predicateProgress(data,item){
  const reviews=Object.values(data.settings||{}).filter(row=>row?.kind==='predicateReview'&&(row.itemId?row.itemId===item.id:key(row.grundform)===key(item.grundform))).sort((a,b)=>b.at-a.at);
  return {seen:reviews.length>0,known:reviews[0]?.correct===true,at:reviews[0]?.at||0};
 }
+export function predicateProgressIndex(data,items){
+ const byId=new Map(),byBase=new Map();let order=0;
+ const ids=new Set(items.map(item=>item.id)),bases=new Set(items.map(item=>key(item.grundform)));
+ for(const row of Object.values(data.settings||{})){
+  if(row?.kind!=='predicateReview')continue;
+  const groups=row.itemId?byId:byBase,groupKey=row.itemId||key(row.grundform);
+  if(!(row.itemId?ids:bases).has(groupKey))continue;
+  let group=groups.get(groupKey);
+  if(!group){group={records:[],latest:null,invalidTime:false};groups.set(groupKey,group);}
+  const record={row,order:order++,time:Number(row.at)};
+  group.records.push(record);group.invalidTime||=!Number.isFinite(record.time);
+  if(!group.latest||record.time>group.latest.time)group.latest=record;
+ }
+ const progress=new Map();
+ for(const item of items){
+  const direct=byId.get(item.id),legacy=byBase.get(key(item.grundform));
+  let latest=direct?.latest||legacy?.latest;
+  if(direct?.invalidTime||legacy?.invalidTime){
+   // A malformed timestamp compares as a stable tie in the original sorter.
+   // Keep that exact legacy behavior without rescanning unrelated settings.
+   latest=[...(direct?.records||[]),...(legacy?.records||[])]
+    .sort((a,b)=>a.order-b.order).sort((a,b)=>b.row.at-a.row.at)[0];
+  }else if(direct&&legacy){
+   const a=direct.latest,b=legacy.latest;
+   latest=b.time>a.time||b.time===a.time&&b.order<a.order?b:a;
+  }
+  progress.set(item.id,{seen:!!latest,known:latest?.row.correct===true,at:latest?.row.at||0});
+ }
+ return progress;
+}
 export function predicateQueue(data,deckIds,mode='smart',limit=10,random=Math.random){
  let items=shufflePredicates(predicateCloudItems(data).filter(item=>deckIds.includes(item.deckId)),random);
- if(mode==='learning')return items.filter(item=>!predicateProgress(data,item).known);
- if(mode==='refresh')return items.filter(item=>predicateProgress(data,item).known);
- if(mode==='all')return items;
- return items.sort((a,b)=>{const pa=predicateProgress(data,a),pb=predicateProgress(data,b);return Number(pa.known)-Number(pb.known)||pa.at-pb.at;}).slice(0,limit);
+ if(mode==='all'||!items.length)return items;
+ const progress=predicateProgressIndex(data,items);
+ if(mode==='learning')return items.filter(item=>!progress.get(item.id).known);
+ if(mode==='refresh')return items.filter(item=>progress.get(item.id).known);
+ return items.sort((a,b)=>{const pa=progress.get(a.id),pb=progress.get(b.id);return Number(pa.known)-Number(pb.known)||pa.at-pb.at;}).slice(0,limit);
 }
 
 export async function predicateChanges(items,name='Prädikate'){

@@ -7,8 +7,10 @@ export async function acknowledgeShareNotices(store,sync,notices){
 // Incoming shared edits are independent of regular progress synchronization.
 export function incoming(data){return Object.values(data.settings).filter(x=>x?.kind==='incomingShare').sort((a,b)=>(a.order??a.at)-(b.order??b.at)||a.id.localeCompare(b.id));}
 export function incomingChanges(data){
+  const deliveries=incoming(data);
+  if(!deliveries.length)return {changes:[],conflicts:[]};
   const changes=[],conflicts=[],copy=structuredClone(data);
-  for(const item of incoming(data)){
+  for(const item of deliveries){
     const current=copy[item.entity]?.[item.key]??null;
     const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
     const parentMissing=item.entity==='words'&&item.value&&!copy.collections[item.collectionId];
@@ -44,7 +46,7 @@ async function settle(sync,store){
 }
 // Only the first reconciliation is awaited by learning actions. Navigation and
 // editing remain available, and a failed/offline check releases cached lessons.
-export function cloudGate({sync,store,onReady,onError,afterSync}){
+export function cloudGate({sync,store,onReady,onError,afterSync,shouldBlock=()=>true}){
  let running=null,finished=false;
  function execute(){
   if(running)return running;
@@ -55,7 +57,7 @@ export function cloudGate({sync,store,onReady,onError,afterSync}){
   }).catch(error=>{onError?.(error);}).finally(()=>{running=null;finished=true;onReady?.();});
   return running;
  }
- return {run:execute,wait:()=>running||Promise.resolve(),get blocked(){return !!running;}};
+ return {run:execute,wait:()=>running||Promise.resolve(),get blocked(){return !!running&&shouldBlock();}};
 }
 
 export async function waitForInitialSync(gate,button){

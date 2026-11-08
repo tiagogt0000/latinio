@@ -5,7 +5,7 @@ import vm from 'node:vm';
 import {emptyData,applyOps,progressFor} from '../app/core.js';
 import {englishTasks} from '../app/english.js';
 import {wordsForDecks,selectedDeckPending} from '../app/refresh-decks.js';
-import {predicateDecks,predicateCloudItems,predicateQueue,predicateProgress} from '../app/predicates.js';
+import {predicateDecks,predicateCloudItems,predicateQueue,predicateProgress,predicateProgressIndex} from '../app/predicates.js';
 import {trainingOptionCounts} from '../app/training-options.js';
 
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
@@ -78,27 +78,27 @@ function actionFixture(subject='latin'){
  const context=vm.createContext({
   document,modalRoot,modalReturnFocus:null,modalCleanup:null,interfaceMotion:{closeModal(){},openModal(){}},store,subject,english:subject!=='latin',
   data:()=>{calls.reads++;return applyOps(d,[]);},prefs:()=>({...d.settings.general}),selected:['a','b'],predicateSelected:null,
-  ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'learn',pendingStart:null,
+  subjectTransition:null,ready:true,working:false,waitingStart:false,cloudWait:{blocked:false},screen:'learn',pendingStart:null,
   tablePractice:null,grammar:null,reminders:null,sharing:{handle:async()=>false,afterAction(){}},confusions:{handle:async()=>false},
   collectionOpener:{cancel(){}},setTimeout,clearTimeout,icon:()=>'',h:String,directionLabel:value=>value,
-  trainingOptionCounts,predicateDecks,predicateCloudItems,predicateQueue,predicateProgress,
+  trainingOptionCounts,predicateDecks,predicateCloudItems,predicateQueue,predicateProgress,predicateProgressIndex,
   uid:()=> 'test-round',sync:{schedule(){calls.schedules++;}},
   notify:message=>calls.notices.push(message),render(){calls.renders++;},checkShareNotices(){},autoUpdate(){},updateStatus(){},refreshStreak:async()=>{},settleSync:async()=>{},
   predicateRun:[],predicateRoot:null,predicateResults:[],predicateRoundId:'',roundEnd:null,predicateCursor:0,predicateAnswer:'',predicateFeedback:null,
  });
- for(const code of [section('function selectedPredicateDecks(','function renderPredicateTest('),section('function trainingOptions(','function current('),section('function showModal(','function showStreakDemo('),section('async function actions(',"document.addEventListener('click',event=>"),source.split('\n').find(line=>line.startsWith('async function backgroundSync('))])vm.runInContext(code,context);
+ for(const code of [section('function learningStatus(','function render('),section('function selectedPredicateDecks(','function renderPredicateTest('),section('function trainingOptions(','function current('),section('function showModal(','function showStreakDemo('),section('async function actions(',"document.addEventListener('click',event=>"),source.split('\n').find(line=>line.startsWith('async function backgroundSync('))])vm.runInContext(code,context);
  const click=(action,id)=>context.actions({preventDefault(){},target:{closest:()=>({dataset:{action,id},isConnected:true,removeAttribute(){}})}});
  return {context,d,calls,click,get html(){return html;}};
 }
 
-test('Actual More Options and Smart clicks open usable dialogs in Latin, English and French',async()=>{
- for(const subject of ['latin','english','french']){
+test('Actual More Options and Smart clicks open usable dialogs in Latin and English',async()=>{
+ for(const subject of ['latin','english']){
   const f=actionFixture(subject);
   await f.click('training-options');
   assert.match(f.html,/role="dialog"/);assert.match(f.html,/>Mehr Optionen</);
   assert.equal(f.calls.reads,1,'one coherent store snapshot per options dialog');
   for(const action of ['start-refresh','start-learning','start-all'])assert.ok(f.html.includes('data-action="'+action+'"'));
-  assert.equal(f.html.includes('data-action="french-mode"'),subject==='french');
+  assert.doesNotMatch(f.html,/data-action="french-mode"/);
   assert.equal(f.context.working,false);assert.deepEqual(f.calls.notices,[]);
   await f.click('start-learning');assert.equal(f.context.pendingStart.mode,'learning');assert.match(f.html,/>Vor der Runde</);
   await f.click('close-modal');assert.equal(f.html,'');
@@ -115,6 +115,26 @@ test('Predicate More Options uses one snapshot and Smart still starts its select
  await f.click('predicate-mode','learning');assert.equal(f.context.screen,'predicate-test');assert.equal(f.context.predicateRun.length,1);assert.equal(f.context.predicateRun[0].id,'pj');
  f.context.screen='learn';await f.click('predicate-start');
  assert.equal(f.context.screen,'predicate-test');assert.equal(f.context.predicateRun.length,2);assert.deepEqual(f.calls.notices,[]);
+});
+
+test('Both More Options actions remain usable while initial sync is blocked',async()=>{
+ for(const action of ['training-options','predicate-options']){
+  const f=actionFixture();f.context.cloudWait.blocked=true;
+  f.context.waitForInitialSync=()=>{throw Error('Opening options must not wait for a download');};
+  await f.click(action);
+  assert.match(f.html,/>Mehr Optionen</);assert.match(f.html,/role="dialog"/);
+  assert.equal(f.context.waitingStart,false);assert.equal(f.context.working,false);assert.deepEqual(f.calls.notices,[]);
+ }
+});
+
+test('An empty vocabulary options dialog explains pending download and offers collection navigation',async()=>{
+ const f=actionFixture();f.d.collections={};f.d.words={};f.d.settings={};f.context.selected=[];
+ f.context.cloudWait.blocked=true;f.context.sync.busy=true;
+ f.context.waitForInitialSync=()=>{throw Error('Empty options should open immediately');};
+ await f.click('training-options');
+ assert.match(f.html,/Sammlungen werden geladen/);assert.match(f.html,/data-screen="collections"/);
+ assert.match(f.html,/data-action="start-all" disabled/);assert.equal(f.context.working,false);
+ assert.deepEqual(f.calls.notices,[]);assert.equal(f.calls.schedules,0);assert.equal(f.calls.activities.length,0);
 });
 
 test('Background sync cannot remove or replace an open More Options or Smart dialog',async()=>{

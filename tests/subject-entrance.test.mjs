@@ -22,3 +22,9 @@ test('Keyboard subject selection has no animation or waiting period',async()=>{
  const root={querySelectorAll:()=>[button],querySelector:()=>({animate:()=>{throw Error('Keyboard selection must be immediate');}})};
  const result=chooseSubject(root,{reducedMotion:false});await click({detail:0});assert.equal(await result,'latin');
 });
+
+test('A browser animation exception cannot leave the subject selection disabled forever',async()=>{
+ let click;const button={dataset:{enterSubject:'english'},addEventListener:(_name,fn)=>{click=fn;}};
+ const root={querySelectorAll:()=>[button],querySelector:()=>({animate(){throw Error('Unavailable animation implementation');}})};
+ const result=chooseSubject(root,{reducedMotion:false});await click({detail:1});assert.equal(await result,'english');
+});

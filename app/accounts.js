@@ -1,23 +1,34 @@
 import {createBridge} from './sync.js';
 import {Store} from './store.js';
 import {CLOUD_URL} from './cloud-config.js';
+import {SUBJECTS} from './subjects.js';
 const ACTIVE='latinio-account-v2',MIGRATED='latinio-account-migrated-v2';
 export const needsCodeLogin=profile=>profile?.id!=='admin'&&profile?.role!=='admin'&&!profile?.codeAuthVersion;
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-export async function openAccount(root){
+export async function openAccount(root,{onLogin=()=>{}}={}){
   let active;try{active=JSON.parse(localStorage.getItem(ACTIVE));}catch{}
   if(active?.id){
     const store=await new Store().open(active.id);
     if(store.doc.config.token){
       const saved=store.doc.profile?.id===active.id?store.doc.profile:{};
       let profile={...saved,...active},valid=!needsCodeLogin(profile);
-      if(CLOUD_URL)await store.update(doc=>{doc.config.url=CLOUD_URL;return doc;});
-      if(valid&&profile.role!=='admin'&&navigator.onLine){
-        const bridge=createBridge(store.doc.config.url,store.doc.config.token);
-        try{const result=await bridge.request('whoami');if(result.profile?.id!==active.id)valid=false;else profile={...profile,...result.profile};}
-        catch(error){if(/erneut anmelden|Zugangscode neu an|nicht freigeschaltet/.test(error.message))valid=false;}
-        finally{bridge.destroy();}
+      if(CLOUD_URL&&store.doc.config.url!==CLOUD_URL)await store.update(doc=>{doc.config.url=CLOUD_URL;return doc;});
+      // A profile with no current subject cannot reach background sync. Refresh
+      // this rare case here so a newly granted subject can unlock the app.
+      if(valid&&profile.role!=='admin'&&Array.isArray(profile.allowedSubjects)&&!SUBJECTS.some(subject=>profile.allowedSubjects.includes(subject.id))&&navigator.onLine){
+        let bridge,verified=false;
+        try{
+          bridge=createBridge(store.doc.config.url,store.doc.config.token);
+          const identity=await bridge.request('whoami');
+          if(identity.profile?.id!==active.id)valid=false;
+          else{profile={...profile,...identity.profile};verified=true;}
+        }catch(error){if(/Bitte erneut anmelden|Zugangscode neu an|Dieses Profil ist nicht freigeschaltet/i.test(error?.message||''))valid=false;}
+        finally{bridge?.destroy();}
+        if(verified&&JSON.stringify(store.doc.profile)!==JSON.stringify(profile))await store.update(doc=>{doc.profile=profile;return doc;});
+        if(!valid){localStorage.removeItem(ACTIVE);localStorage.setItem(MIGRATED,'1');}
       }
+      // Existing local lessons are available immediately. Sync verifies this
+      // session in the background before it reads or uploads the cloud journal.
       if(valid){localStorage.setItem(ACTIVE,JSON.stringify(profile));return {store,profile};}
     }
     store.close();
@@ -50,7 +61,7 @@ export async function openAccount(root){
         finally{bridge?.destroy();}
       };
     }
-    show();
+    onLogin();show();
   });
 }
 export function signOut(){localStorage.removeItem(ACTIVE);localStorage.setItem(MIGRATED,'1');location.reload();}

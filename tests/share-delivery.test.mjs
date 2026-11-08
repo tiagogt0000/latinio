@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {harness} from './google-harness.mjs';
 import {Sync} from '../app/sync.js';
 import {emptyData,applyOps} from '../app/core.js';
-import {settleSync} from '../app/multiuser-sync.js';
+import {settleSync,cloudGate} from '../app/multiuser-sync.js';
 Object.defineProperty(globalThis,'navigator',{value:{onLine:true},configurable:true});globalThis.window={addEventListener(){}};
 let seq=0;
 function push(h,e,k,v,token){return h.request({action:'push',...(token?{token}:{}),base:h.request({action:'check',...(token?{token}:{})}).version,ops:[{id:'delivery-'+(++seq),entity:e,key:k,value:v,at:Date.now(),seq,device:'test'}]});}
@@ -36,4 +36,39 @@ test('Startup full pull repairs a stale snapshot despite equal version counters 
 test('Profile mismatch blocks downloading and uploading another account journal',async()=>{
  const {h,token}=fixture(),store=localStore('wrong-profile',token),sync=new Sync(store),calls=[];
  sync.request=async(action,payload)=>{calls.push(action);return h.request({action,...payload,token});};await sync.run();assert.equal(sync.status,'error');assert.match(sync.message,/anderen Profil/);assert.deepEqual(calls,['whoami']);assert.equal(Object.keys(store.data.collections).length,0);
+});
+
+test('Cached learning during the initial pull preserves new answers and a remote event joins the same reconciliation',async()=>{
+ const {h,profile,token,pull}=fixture(),store=localStore(profile.id,token),sync=new Sync(store),calls=[];
+ store.doc.shadow=pull();store.doc.session={id:'current-round',answers:['Stimme']};
+ let releasePull,pullStarted;
+ const started=new Promise(resolve=>pullStarted=resolve),waiting=new Promise(resolve=>releasePull=resolve);
+ sync.bridge={url:'test',token,async request(action,payload){calls.push(action);if(action==='pull'){pullStarted();await waiting;}return h.request({action,...payload,token});},destroy(){}};
+ const gate=cloudGate({sync,store,shouldBlock:()=>false}),joined=[];
+ sync.addEventListener('remote',()=>{if(!gate.blocked)joined.push(settleSync(sync,store));});
+ try{
+  const startup=gate.run();await started;assert.equal(gate.blocked,false);
+  const review={id:'new-answer',wordId:Object.keys(store.data.words)[0],grade:'full',at:Date.now()};
+  await store.commit([['reviews',review.id,review]]);releasePull();await startup;await Promise.all(joined);
+  assert.equal(calls.filter(action=>action==='pull').length,1);
+  assert.equal(calls.filter(action=>action==='push').length,1);
+  assert.equal(store.doc.pending.length,0);assert.deepEqual(store.data.reviews[review.id],review);
+  assert.deepEqual(store.doc.session,{id:'current-round',answers:['Stimme']});
+  assert.equal(pull().reviews[review.id].grade,'full');
+ }finally{clearTimeout(sync.timer);}
+});
+
+test('A lost upload reply leaves saved answers queued and retry acknowledges each operation only once',async()=>{
+ const {h,profile,token}=fixture(),store=localStore(profile.id,token),sync=new Sync(store);
+ const review={id:'new-answer',wordId:'fixture',grade:'full',at:Date.now()};await store.commit([['reviews',review.id,review]]);
+ let loseReply=true;
+ sync.bridge={url:'test',token,async request(action,payload){const result=h.request({action,...payload,token});if(action==='push'&&loseReply){loseReply=false;throw Error('Connection closed during subject switch');}return result;},destroy(){}};
+ try{
+  await assert.rejects(settleSync(sync,store),/Connection closed/);
+  assert.equal(store.doc.pending.length,1);assert.deepEqual(store.data.reviews[review.id],review);
+  await settleSync(sync,store);assert.equal(store.doc.pending.length,0);
+  const remote=h.request({action:'pull',token,since:0});
+  assert.equal(remote.ops.filter(op=>op.entity==='reviews'&&op.key===review.id).length,1);
+  assert.equal(remote.data.reviews[review.id].grade,'full');
+ }finally{clearTimeout(sync.timer);}
 });
