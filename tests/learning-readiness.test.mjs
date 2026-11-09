@@ -35,7 +35,7 @@ for(const kind of ['vocab','predicates'])test(`An empty ${kind} options dialog b
 test('A page render shares one snapshot and releases it on completion or an exception',()=>{
  let reads=0,revision=0;
  const ctx=vm.createContext({simpleMode:()=>false,store:{get data(){reads++;return {revision};}},viewSnapshot:null,screen:'test',renderedScreen:null,
-  interfaceMotion:{beforeRender(){}},theme(){for(let i=0;i<10;i++)ctx.data();},renderTest(){for(let i=0;i<10;i++)ctx.data();ctx.app.innerHTML='exercise';},app:{innerHTML:''}});
+  interfaceMotion:{beforeRender(){},screen(){}},theme(){for(let i=0;i<10;i++)ctx.data();},renderTest(){for(let i=0;i<10;i++)ctx.data();ctx.app.innerHTML='exercise';},app:{innerHTML:''}});
  vm.runInContext('const data=()=>viewSnapshot||store.data;this.data=data;',ctx);
  vm.runInContext(section('function render(){','function adminView()'),ctx);
  ctx.render();assert.equal(reads,1);assert.equal(ctx.viewSnapshot,null);assert.equal(ctx.app.innerHTML,'exercise');

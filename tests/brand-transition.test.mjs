@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {beginSubjectTransition,SUBJECTS,subjectInfo,brandWord} from '../app/subjects.js';
+import {beginSubjectTransition,beginSubjectIntro,SUBJECTS,subjectInfo,brandWord} from '../app/subjects.js';
 
 const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
 function fixture({broken=false,missing=false,handoff=null}={}){
@@ -76,6 +76,49 @@ test('Every subject pair sends the old written logo left and brings the new one 
   assert.match(entry.frames[0].transform,/translateX\(130%\)/,from.id+' → '+to.id);
   assert.match(f.overlays[0].innerHTML,new RegExp('data-subject="'+to.id+'"'));
   transition.dispose();await transition.entered;assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.listenerCount(),0);
+ }
+});
+test('Initial subject selection introduces one centered written wordmark and gives it a readable hold',async()=>{
+ for(const subject of SUBJECTS){
+  const f=fixture(),intro=beginSubjectIntro(f.root,subject.id),overlay=f.overlays[0];
+  assert.equal((overlay.innerHTML.match(/latinio<span>✦<\/span>/g)||[]).length,1);
+  assert.doesNotMatch(overlay.innerHTML,/is-from|<img/);assert.match(overlay.innerHTML,new RegExp('is-to" data-subject="'+subject.id+'"'));
+  const backdrop=f.calls.find(call=>call.element.name==='backdrop'),wordmark=f.calls.find(call=>call.element.name==='target');
+  assert.equal(f.calls.length,2);assert.equal(backdrop.options.duration,360);assert.deepEqual(backdrop.frames.map(frame=>frame.opacity),[0,1]);
+  assert.equal(wordmark.options.delay,100);assert.equal(wordmark.options.duration,850);assert.equal(wordmark.options.fill,'backwards');
+  assert.equal(wordmark.frames[0].opacity,0);assert.match(wordmark.frames[0].transform,/scale\(\.95\)/);
+  assert.equal(wordmark.frames[1].opacity,1);assert.equal(wordmark.frames[1].transform,'scale(1)');
+  assert.equal(wordmark.options.duration*wordmark.frames[1].offset,500,'the name softly enters over500ms');
+  assert.equal(wordmark.options.duration*(1-wordmark.frames[1].offset),350,'the final frame holds for350ms');
+  assert.equal(wordmark.frames.at(-1).opacity,1);assert.equal(wordmark.frames.at(-1).transform,'scale(1)');
+  assert.ok(f.calls.every(call=>call.frames.every(frame=>!('filter' in frame)&&!('backdropFilter' in frame)&&!String(frame.transform).includes('translate'))));
+  let entered=false;void intro.entered.then(()=>entered=true);
+  backdrop.animation.finish();await flush();assert.equal(entered,false,'fast readiness cannot skip the written name');
+  f.advance(600);await flush();assert.equal(entered,false,'the hold remains part of the entry before reveal');
+  wordmark.animation.finish();await intro.entered;assert.equal(overlay.removed,false);
+  const start=f.calls.length,finished=intro.finish();
+  assert.deepEqual(f.calls.slice(start).map(call=>[call.element.name,call.options.duration]),[['content',400],['backdrop',600]]);
+  f.finishAnimations();await finished;assert.equal(overlay.removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
+ }
+});
+test('Initial wordmark respects immediate navigation and interrupted or unavailable animation paths',async()=>{
+ for(const options of [{keyboard:true},{reducedMotion:true}]){
+  const f=fixture(),intro=beginSubjectIntro(f.root,'french',options);
+  await intro.entered;await intro.finish();assert.equal(f.calls.length,0);assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
+ }
+ for(const interrupt of ['hidden','reduced','pagehide','replacement','failure','timeout']){
+  const f=fixture(),intro=beginSubjectIntro(f.root,'english');
+  if(interrupt==='hidden')f.hide();else if(interrupt==='reduced')f.reduce();else if(interrupt==='pagehide')f.viewEvent('pagehide');
+  else if(interrupt==='replacement')beginSubjectTransition(f.root,'english','french').dispose();
+  else if(interrupt==='failure')intro.fail();
+  else {f.advance(1100);await flush();assert.equal(intro.disposed,false);f.advance(10);}
+  await intro.entered;
+  if(interrupt==='timeout'){const finished=intro.finish();f.advance(760);await finished;}else await intro.finish();
+  assert.equal(f.overlays[0].removed,true,interrupt);assert.equal(f.timers.size,0,interrupt);assert.equal(f.listenerCount(),0,interrupt);
+ }
+ for(const options of [{broken:true},{missing:true}]){
+  const f=fixture(options),intro=beginSubjectIntro(f.root,'latin');await intro.entered;await intro.finish();
+  assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
  }
 });
 test('Keyboard and reduced motion skip the visual wait and remove the overlay immediately',async()=>{

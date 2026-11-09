@@ -97,6 +97,22 @@ test('A cloud update waits for the subject arrival, then renders downloaded coll
  f.ctx.flushCloudRender();assert.equal(f.renders,1,'the deferred refresh is consumed exactly once');
 });
 
+test('Another tab can update local data during the intro without rendering over its centered wordmark',async()=>{
+ const f=fixture();let external,merged=0;
+ f.ctx.ready=false;f.ctx.screen='learn';f.ctx.subjectTransition={};
+ Object.assign(f.ctx,{data:()=>f.data,streakDays:()=>['2026-11-09'],streakLedger:{merge(){merged++;}}});
+ f.ctx.store.addEventListener=(name,handler)=>{if(name==='external')external=handler;};
+ f.ctx.store.update=()=>{throw Error('Intro refresh must not change the local learning session');};
+ vm.runInContext(source.split('\n').find(line=>line.includes("store.addEventListener('external',")),f.ctx);
+ f.download();await external();
+ assert.equal(merged,1,'streak data still reconciles immediately');assert.equal(f.renders,0);assert.equal(f.ctx.pendingCloudRender,true);
+ f.ctx.ready=true;f.ctx.flushCloudRender();assert.equal(f.renders,0,'the remaining wordmark still owns the display');
+ f.ctx.subjectTransition=null;f.ctx.arrivalPending=true;f.ctx.flushCloudRender();assert.equal(f.renders,0,'the card wave also remains intact');
+ f.ctx.arrivalPending=false;f.ctx.flushCloudRender();
+ assert.deepEqual(f.visible,['Neue Lektion']);assert.equal(f.renders,1);assert.equal(f.ctx.pendingCloudRender,false);
+ f.ctx.flushCloudRender();assert.equal(f.renders,1);
+});
+
 test('Initial download also refreshes a formerly empty screen after Escape closes its dialog',async()=>{
  const f=fixture();f.ctx.showModal('<h2 id="modal-title">Lernfach wechseln</h2>');f.download();f.ctx.startup=Promise.resolve();
  vm.runInContext(source.split('\n').find(line=>line.trim().startsWith('void startup.then(')),f.ctx);

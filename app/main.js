@@ -1,4 +1,4 @@
-import {SUBJECTS,subjectInfo,brandWord,beginSubjectTransition,TRANSITION_KEY} from './subjects.js';
+import {SUBJECTS,subjectInfo,brandWord,beginSubjectTransition,beginSubjectIntro,TRANSITION_KEY} from './subjects.js';
 import {notificationsUI} from './notifications.js';
 import {createCloudNotice} from './cloud-notice.js';
 import {grammarUI,grammarCard} from './grammar.js';
@@ -36,7 +36,7 @@ import {englishTasks,directionsFor,answerWord,promptFor,englishImport} from './e
 import {answerFeedback,evaluationCorrection,translationCard} from './feedback.js';
 import {AppUpdates,APP_VERSION} from './updates.js';
 import {preserveTestDraft} from './app-lifecycle.js';
-import {chooseSubject,arrive,consumeSubjectSwitch,SUBJECT_SWITCH_KEY} from './subject-entrance.js';
+import {chooseSubject,subjectChoiceUsesKeyboard,arrive,consumeSubjectSwitch,SUBJECT_SWITCH_KEY} from './subject-entrance.js';
 import {currentSubject,rememberSubject} from './subject-preference.js';
 const updates=new AppUpdates(navigator.serviceWorker);
 const collectionOpener=createCollectionOpener();
@@ -100,7 +100,7 @@ function render(){
  interfaceMotion.beforeRender();
  const sameScreen=renderedScreen===screen,screenChanged=!sameScreen;
  const previousScreen=renderedScreen;renderedScreen=screen;
- if(screen==='test'){renderTest();return;}
+ if(screen==='test'){renderTest();if(screen==='test')interfaceMotion.screen(app,{from:previousScreen,to:screen});return;}
  if(screen==='predicate-test'){renderPredicateTest();return;}
  if(screen==='round-end')return;
  const viewState=captureViewState(app);
@@ -569,10 +569,25 @@ document.addEventListener('submit',async event=>{event.preventDefault();if(!read
  }catch(error){notify(error.message);form.querySelectorAll('button').forEach(b=>b.disabled=false);}finally{working=false;flushCloudRender();void sharing?.afterAction();checkShareNotices();reminders?.maybePrompt?.();autoUpdate();}});
 async function loadCloud(){await backgroundSync();}
 async function boot(){try{
- const parameters=new URLSearchParams(location.search);const reminded=parameters.get('from')==='reminder'&&SUBJECTS.some(x=>x.id===parameters.get('subject'))?parameters.get('subject'):null;if(reminded){const cleaned=new URL(location.href);cleaned.searchParams.delete('from');history.replaceState(null,'',cleaned.href);}const direct=consumeSubjectSwitch(sessionStorage);let directKeyboard;try{directKeyboard=direct?sessionStorage.getItem('latinio-subject-keyboard')==='1':undefined;sessionStorage.removeItem('latinio-subject-keyboard');}catch{}subject=direct||reminded||await chooseSubject(app);rememberSubject(subject,localStorage);english=subject!=='latin';
+ const parameters=new URLSearchParams(location.search);const reminded=parameters.get('from')==='reminder'&&SUBJECTS.some(x=>x.id===parameters.get('subject'))?parameters.get('subject'):null;if(reminded){const cleaned=new URL(location.href);cleaned.searchParams.delete('from');history.replaceState(null,'',cleaned.href);}const direct=consumeSubjectSwitch(sessionStorage);let directKeyboard;try{directKeyboard=direct?sessionStorage.getItem('latinio-subject-keyboard')==='1':undefined;sessionStorage.removeItem('latinio-subject-keyboard');}catch{}const selectedAtEntrance=!direct&&!reminded;subject=direct||reminded||await chooseSubject(app);if(selectedAtEntrance)directKeyboard=subjectChoiceUsesKeyboard(app);rememberSubject(subject,localStorage);english=subject!=='latin';
  const from=sessionStorage.getItem(TRANSITION_KEY);sessionStorage.removeItem(TRANSITION_KEY);
- subjectTransition=direct&&from!==subject&&SUBJECTS.some(item=>item.id===from)?beginSubjectTransition(app,from,subject,{resume:true,keyboard:directKeyboard}):null;subjectMetadata();
- ({store,profile}=await openAccount(app,{onLogin:()=>{subjectTransition?.dispose();subjectTransition=null;app.removeAttribute('data-subject-handoff');queueMicrotask(()=>arrive(app,{keyboard:directKeyboard}));}}));predicateKey=predicateStorageKey(profile.id);streakLedger=createStreakLedger({profileId:profile.id,storage:localStorage,locks:navigator.locks});
+ subjectTransition=direct&&from!==subject&&SUBJECTS.some(item=>item.id===from)?beginSubjectTransition(app,from,subject,{resume:true,keyboard:directKeyboard}):selectedAtEntrance?beginSubjectIntro(app,subject,{keyboard:directKeyboard}):null;subjectMetadata();
+ ({store,profile}=await openAccount(app,{onLogin:()=>{
+  const loginTransition=subjectTransition;
+  if(!selectedAtEntrance){loginTransition?.dispose();subjectTransition=null;app.removeAttribute('data-subject-handoff');queueMicrotask(()=>arrive(app,{keyboard:directKeyboard}));return;}
+  // The account screen is rendered synchronously after this callback. Keep its
+  // surfaces out of the intro, then reveal them under the departing wordmark.
+  queueMicrotask(async()=>{
+   const login=app.querySelector('.login-shell');
+   if(login&&loginTransition&&!loginTransition.disposed)login.style.visibility='hidden';
+   await loginTransition?.entered;
+   if(login)login.style.visibility='';
+   if(!login?.isConnected){loginTransition?.dispose();if(subjectTransition===loginTransition)subjectTransition=null;return;}
+   app.removeAttribute('data-subject-handoff');
+   await Promise.all([arrive(app,{keyboard:directKeyboard,delay:loginTransition&&!loginTransition.disposed?300:0}),loginTransition?.finish()]);
+   if(subjectTransition===loginTransition)subjectTransition=null;
+  });
+ }}));predicateKey=predicateStorageKey(profile.id);streakLedger=createStreakLedger({profileId:profile.id,storage:localStorage,locks:navigator.locks});
  if(profile.role!=='admin'&&Array.isArray(profile.allowedSubjects)&&!profile.allowedSubjects.includes(subject)){
   const allowed=profile.allowedSubjects.filter(id=>SUBJECTS.some(s=>s.id===id));const fallback=allowed.includes(english?'latin':'english')?(english?'latin':'english'):allowed[0];
   if(fallback){subjectTransition?.dispose();subjectTransition=null;document.getElementById('subject-transition-handoff')?.remove();app.removeAttribute('data-subject-handoff');subject=fallback;english=subject!=='latin';rememberSubject(subject,localStorage);subjectMetadata();}else throw Error('Für dein Profil ist noch kein Lernfach freigeschaltet. Bitte wende dich an den Admin.');
@@ -594,11 +609,15 @@ async function boot(){try{
  cloudWait=cloudGate({sync,store,shouldBlock:()=>!Object.keys(data().collections).length&&!predicateDecks(data()).length,onError:error=>cloudNotice.fail(error),afterSync:async()=>{if(!english)await migrateLocalPredicates(store,readPredicateStore(localStorage,predicateKey));}});
  cloudNotice=createCloudNotice({sync,showModal,closeModal,reload:loadCloud,isOpen:()=>!!modalRoot.querySelector('[data-cloud-connection-notice]'),hasLocalContent:()=>{const d=data();return !!Object.keys(d.collections).length||!!predicateDecks(d).length;},canPrompt:()=>ready&&!document.hidden&&!working&&!waitingStart&&!subjectTransition&&!cloudWait?.blocked&&!modalRoot.children.length&&['learn','collections','collection-detail','predicate-detail','classroom','settings'].includes(screen)});
  store.addEventListener('change',updateStatus);
- store.addEventListener('external',async()=>{streakLedger.merge(streakDays(data()));if(screen==='test'){await store.update(doc=>{doc.session=null;return doc;});screen='learn';notify('Die laufende Runde wurde beendet. Bereits gespeicherte Antworten bleiben erhalten.');}if(!['grammar','tables'].includes(screen))render();});
+ store.addEventListener('external',async()=>{streakLedger.merge(streakDays(data()));if(!ready){pendingCloudRender=true;return;}if(screen==='test'){await store.update(doc=>{doc.session=null;return doc;});screen='learn';notify('Die laufende Runde wurde beendet. Bereits gespeicherte Antworten bleiben erhalten.');}if(!['grammar','tables'].includes(screen))render();});
  sync.addEventListener('change',updateStatus);
  sync.addEventListener('authentication-required',()=>signOut());
  sync.addEventListener('remote',()=>{if(!cloudWait.blocked)void loadCloud();});
- ready=true;void reminders.refresh().then(()=>reminders.maybePrompt());const startup=cloudWait.run();render();app.removeAttribute('data-subject-handoff');arrivalPending=true;const arrivalTransition=subjectTransition;
+ const startup=cloudWait.run();void startup.catch(()=>{});
+ // Local setup and cloud loading proceed while the selected wordmark settles.
+ // The first screen is revealed only after that deliberate intro has completed.
+ await subjectTransition?.entered;
+ ready=true;void reminders.refresh().then(()=>reminders.maybePrompt());render();app.removeAttribute('data-subject-handoff');arrivalPending=true;const arrivalTransition=subjectTransition;
  void Promise.all([arrive(app,{keyboard:directKeyboard,delay:arrivalTransition&&!arrivalTransition.disposed?300:0}),arrivalTransition?.finish()]).finally(()=>{arrivalPending=false;if(subjectTransition===arrivalTransition)subjectTransition=null;flushCloudRender();});
  void startup.then(async()=>{void refreshStreak();await store.recordActivity('opened');sync.schedule();renderCloudChanges();updateStatus();checkShareNotices();void checkAnnouncements();void reportAppVersion();}).catch(error=>notify(error.message));
  async function reportAppVersion(){if(!ready||isAdmin()||!sync?.configured||!navigator.onLine||store.doc.appVersionReported===APP_VERSION)return;try{await sync.request('profileVersion',{version:APP_VERSION});await store.update(doc=>{doc.appVersionReported=APP_VERSION;return doc;});}catch{}}

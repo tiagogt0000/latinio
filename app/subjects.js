@@ -10,7 +10,7 @@ const transitions=new WeakMap();
 
 // Deliberate subject changes use a single wordmark story. Data loading stays
 // independent; the destination adopts the final frame before its first paint.
-export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotion,resume=false}={}){
+export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotion,resume=false,intro=false}={}){
  transitions.get(root)?.dispose();
  const doc=root.ownerDocument||globalThis.document,view=doc.defaultView||globalThis;
  const preference=view.matchMedia?.('(prefers-reduced-motion: reduce)');
@@ -24,12 +24,12 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
  const blurOut=parseFloat(token('--subject-blur-out','600'))||600;
  const lead=300,total=lead+move;
  const handoff=doc.getElementById?.('subject-transition-handoff');
- const adopted=resume&&handoff?.getAttribute('data-from')===source.id&&handoff?.getAttribute('data-to')===target.id;
+ const adopted=!intro&&resume&&handoff?.getAttribute('data-from')===source.id&&handoff?.getAttribute('data-to')===target.id;
  if(handoff&&!adopted)handoff.remove();
  const veil=adopted?handoff:doc.createElement('div');veil.className='subject-transition';
  veil.setAttribute('role','status');veil.setAttribute('aria-live','polite');veil.setAttribute('aria-busy','true');
  if(!adopted){
-  veil.innerHTML=`<div class="subject-transition-backdrop" aria-hidden="true"></div><div class="subject-transition-content"><div class="subject-transition-wordmarks" aria-hidden="true"><div class="brand subject-transition-wordmark is-from" data-subject="${source.id}">${brandWord(source.id)}</div><div class="brand subject-transition-wordmark is-to" data-subject="${target.id}">${brandWord(target.id)}</div></div><p>${target.label} wird geladen …</p></div>`;
+  veil.innerHTML=`<div class="subject-transition-backdrop" aria-hidden="true"></div><div class="subject-transition-content"><div class="subject-transition-wordmarks" aria-hidden="true">${intro?'':`<div class="brand subject-transition-wordmark is-from" data-subject="${source.id}">${brandWord(source.id)}</div>`}<div class="brand subject-transition-wordmark is-to" data-subject="${target.id}">${brandWord(target.id)}</div></div><p>${target.label} wird geladen …</p></div>`;
   doc.body.append(veil);
  }
  const backdrop=veil.querySelector('.subject-transition-backdrop'),content=veil.querySelector('.subject-transition-content');
@@ -83,10 +83,21 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
  view.addEventListener?.('pagehide',dispose);view.addEventListener?.('pageshow',restored);
  if(keyboard||reducedMotion||doc.hidden){dispose();return controller;}
  statusTimer=view.setTimeout(()=>{if(state==='loading')veil.classList?.add('is-waiting');},1800);
- if(!resume&&source.id!==target.id){
+ if(!resume&&(intro||source.id!==target.id)){
+  const introLead=100,introEnter=500,introHold=350;
+  const entryDuration=intro?introLead+introEnter+introHold:total;
   // The old name leaves left and gets smaller; the new name arrives from the
   // right and grows to take its place, regardless of the subject ordering.
-  const entering=[
+  // First selection instead introduces only the chosen name, then holds it
+  // briefly in the center even when the local learning data is already ready.
+  const entering=intro?[
+   play(backdrop,[{opacity:0},{opacity:1}],{duration:blurIn,fill:'backwards'}),
+   play(veil.querySelector('.is-to'),[
+    {opacity:0,transform:'scale(.95)',offset:0,easing:drawer},
+    {opacity:1,transform:'scale(1)',offset:introEnter/(introEnter+introHold),easing:'linear'},
+    {opacity:1,transform:'scale(1)',offset:1}
+   ],{delay:introLead,duration:introEnter+introHold,easing:'linear',fill:'backwards'})
+  ]:[
    play(backdrop,[{opacity:0},{opacity:1}],{duration:blurIn,fill:'backwards'}),
    play(veil.querySelector('.is-from'),[
     {opacity:0,transform:'translateX(0) scale(.96)',offset:0,easing:'linear'},
@@ -102,10 +113,11 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
   controller.entered=new Promise(resolve=>{
    let settled=false;
    completeEntry=()=>{if(settled)return;settled=true;view.clearTimeout(entryTimer);resolve();};
-   entryTimer=view.setTimeout(()=>{cancelAnimations();completeEntry();},total+160);
+   entryTimer=view.setTimeout(()=>{cancelAnimations();completeEntry();},entryDuration+160);
    Promise.all(entering).then(completeEntry);
   });
  }
  return controller;
 }
+export function beginSubjectIntro(root,subject,options){return beginSubjectTransition(root,subject,subject,{...options,intro:true,resume:false});}
 export async function brandTransition(root,from,to,options){if(from!==to){const transition=beginSubjectTransition(root,from,to,options);await transition.entered;await transition.finish();}}

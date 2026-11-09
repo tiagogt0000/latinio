@@ -67,19 +67,14 @@ test('Reduced-motion and keyboard switches navigate without animation or timer w
   assert.equal(f.context.working,false);
  }
 });
-test('Boot consumes keyboard intent once and starts arrival only after account preparation',()=>{
- const start=source.indexOf('let directKeyboard;'),end=source.indexOf('subject=direct',start);
+test('Boot consumes direct-switch keyboard intent once without inventing picker intent',()=>{
+ const start=source.indexOf('let directKeyboard;'),end=source.indexOf('const selectedAtEntrance',start);
  const consume=source.slice(start,end)+';directKeyboard';
  assert.ok(start>=0&&end>start);
  const sessionStorage=storage();sessionStorage.setItem('latinio-subject-keyboard','1');
  assert.equal(vm.runInNewContext(consume,{direct:'english',sessionStorage}),true);
  assert.equal(sessionStorage.getItem('latinio-subject-keyboard'),null);
  assert.equal(vm.runInNewContext(consume,{direct:null,sessionStorage}),undefined,'initial selection keeps its local keyboard intent');
- assert.equal(source.match(/arrive\(app,\{keyboard:directKeyboard\b/g)?.length,2,'only the login callback and final ready screen receive arrival motion');
- const account=source.indexOf('await openAccount(app',end),arrival=source.indexOf('arrive(app,{keyboard:directKeyboard})',end);
- assert.ok(account>0&&arrival>account,'no arrival animation runs on the intermediate account-loading view');
- assert.match(source.slice(account,arrival),/onLogin:.*queueMicrotask\(\(\)=>$/,'the optional login form arrives after its own render');
- assert.match(source.slice(end,account),/subjectTransition=direct&&from!==subject&&SUBJECTS\.some/,'initial subject selection must not flash an unrelated loading wordmark');
 });
 
 test('Duplicate switching clicks cannot replace the pending subject or navigate twice',async t=>{
@@ -143,4 +138,95 @@ test('Navigation failure removes the loading surface and releases the action loc
  const f=fixture(t,{reducedMotion:true,navigationError:true});await f.click();
  assert.ok(f.calls.includes('dispose'));assert.equal(f.context.subjectTransition,null);assert.equal(f.context.working,false);
  assert.ok(f.calls.some(call=>Array.isArray(call)&&call[0]==='notice'&&call[1]==='Navigation failed'));
+});
+
+function deferred(){let resolve,reject;const promise=new Promise((yes,no)=>{resolve=yes;reject=no;});return {promise,resolve,reject};}
+
+function bootStartFixture({direct=null,reminded=null,picker='latin',keyboard=false,login=false}={}){
+ const calls=[],entry=deferred(),account=deferred(),sessionStorage=storage(),localStorage=storage();
+ if(direct){sessionStorage.setItem(SUBJECT_SWITCH_KEY,direct);sessionStorage.setItem(TRANSITION_KEY,direct==='latin'?'english':'latin');sessionStorage.setItem('latinio-subject-keyboard',keyboard?'1':'0');}
+ let loginNode;
+ const app={innerHTML:'',removeAttribute(){},querySelector:selector=>selector==='.login-shell'?loginNode:null};
+ const transition={entered:entry.promise,disposed:false,dispose(){this.disposed=true;entry.resolve();calls.push(['dispose']);},fail(){this.dispose();},finish(){calls.push(['finish']);this.disposed=true;return Promise.resolve();}};
+ const location={search:reminded?`?from=reminder&subject=${reminded}`:direct?`?subject=${direct}`:'',href:'https://example.test/app/'};
+ const context=vm.createContext({
+  app,document:{getElementById:()=>null},subject:'latin',subjectTransition:null,english:false,SUBJECTS,URL,URLSearchParams,location,history:{replaceState(){}},
+  sessionStorage,localStorage,consumeSubjectSwitch,TRANSITION_KEY,rememberSubject,queueMicrotask,
+  chooseSubject:async()=>{calls.push(['choose']);return picker;},subjectChoiceUsesKeyboard:()=>keyboard,
+  beginSubjectIntro(_root,subject,options){calls.push(['intro',subject,options]);return transition;},
+  beginSubjectTransition(_root,from,to,options){calls.push(['switch',from,to,options]);return transition;},
+  subjectMetadata(){calls.push(['metadata']);},
+  openAccount(_root,{onLogin}){calls.push(['account']);if(login){onLogin();loginNode={style:{},isConnected:true};}return account.promise;},
+  arrive(_root,options){calls.push(['arrive',options]);return Promise.resolve();},h:String,
+ });
+ const bootSource=source.slice(source.indexOf('async function boot()'),source.indexOf('// Keep the browser chrome'));
+ const running=vm.runInContext(bootSource+'\nboot();',context);
+ return {context,calls,entry,transition,get loginNode(){return loginNode;},async stop(){account.reject(Error('Controlled account stop'));await running;await flush();}};
+}
+
+test('Only a fresh picker selection starts the centered intro while local account preparation continues',async()=>{
+ for(const options of [{picker:'french'},{picker:'english',keyboard:true},{direct:'english'},{direct:'french',keyboard:true},{reminded:'french'}]){
+  const f=bootStartFixture(options);
+  try{
+   await flush();assert.ok(f.calls.some(call=>call[0]==='account'),'local preparation starts before the intro promise resolves');
+   const intro=f.calls.find(call=>call[0]==='intro'),swap=f.calls.find(call=>call[0]==='switch');
+   if(options.direct){assert.equal(intro,undefined);assert.equal(swap[2],options.direct);assert.equal(swap[3].resume,true);assert.equal(swap[3].keyboard,!!options.keyboard);}
+   else if(options.reminded){assert.equal(intro,undefined);assert.equal(swap,undefined);assert.equal(f.calls.some(call=>call[0]==='choose'),false);}
+   else{assert.equal(intro[1],options.picker);assert.equal(intro[2].keyboard,!!options.keyboard);assert.equal(swap,undefined);}
+   assert.equal(f.calls.some(call=>call[0]==='arrive'),false,'no incomplete loading view starts the card wave');
+  }finally{await f.stop();}
+ }
+});
+
+test('The first login form waits under the intro and receives the original picker keyboard intent',async()=>{
+ for(const keyboard of [false,true]){
+  const f=bootStartFixture({picker:'french',keyboard,login:true});
+  try{
+   await flush();assert.equal(f.loginNode.style.visibility,'hidden');assert.equal(f.transition.disposed,false);
+   assert.equal(f.calls.some(call=>call[0]==='arrive'),false);
+   f.entry.resolve();await flush();assert.equal(f.loginNode.style.visibility,'');
+   const arrival=f.calls.find(call=>call[0]==='arrive');assert.equal(arrival[1].keyboard,keyboard);assert.equal(arrival[1].delay,300);
+   assert.equal(f.calls.filter(call=>call[0]==='finish').length,1);assert.equal(f.context.subjectTransition,null);
+  }finally{await f.stop();}
+ }
+});
+
+test('A login replaced during the intro never animates its replacement or leaves a pending transition',async()=>{
+ for(const replacedController of [false,true]){
+  const f=bootStartFixture({picker:'english',login:true}),replacement={fail(){}};
+  try{
+   await flush();f.loginNode.isConnected=false;if(replacedController)f.context.subjectTransition=replacement;
+   f.entry.resolve();await flush();
+   assert.equal(f.loginNode.style.visibility,'');assert.equal(f.transition.disposed,true);assert.equal(f.context.subjectTransition,replacedController?replacement:null);
+   assert.equal(f.calls.some(call=>call[0]==='arrive'||call[0]==='finish'),false);
+  }finally{await f.stop();}
+ }
+});
+
+test('Direct-switch login keeps its immediate cleanup and never waits for a new centered intro',async()=>{
+ const f=bootStartFixture({direct:'english',login:true,keyboard:true});
+ try{
+  await flush();assert.equal(f.transition.disposed,true);assert.equal(f.context.subjectTransition,null);
+  assert.equal(f.calls.some(call=>call[0]==='intro'),false);assert.equal(f.loginNode.style.visibility,undefined);
+  const arrival=f.calls.find(call=>call[0]==='arrive');assert.equal(arrival[1].keyboard,true);
+ }finally{await f.stop();}
+});
+
+test('Cloud loading starts during the intro but the first render waits and background renders wait through arrival',async()=>{
+ const start=source.indexOf(' const startup=cloudWait.run();'),end=source.indexOf(' void startup.then(',start);
+ assert.ok(start>=0&&end>start);
+ const calls=[],entry=deferred(),cloud=deferred(),arrival=deferred(),closing=deferred();
+ const transition={entered:entry.promise,disposed:false,finish(){calls.push('finish');return closing.promise;}};
+ const context=vm.createContext({
+  cloudWait:{run(){calls.push('cloud');return cloud.promise;}},subjectTransition:transition,ready:false,arrivalPending:false,directKeyboard:false,
+  reminders:{refresh(){calls.push('reminders');return Promise.resolve();},maybePrompt(){}},render(){calls.push('render');},app:{removeAttribute(){}},
+  arrive(_app,options){calls.push(['arrival',options]);return arrival.promise;},flushCloudRender(){calls.push('flush');},
+ });
+ const running=vm.runInContext('(async()=>{'+source.slice(start,end)+'})()',context);
+ await flush();assert.deepEqual(calls,['cloud']);assert.equal(context.ready,false);
+ entry.resolve();await running;await flush();assert.equal(context.ready,true);assert.equal(context.arrivalPending,true);
+ assert.ok(calls.includes('render'));assert.equal(calls.find(call=>Array.isArray(call))[1].delay,300);
+ assert.equal(calls.includes('flush'),false);
+ closing.resolve();await flush();assert.equal(context.arrivalPending,true,'decorative overlay completion must not replace still-arriving content');
+ arrival.resolve();await flush();assert.equal(context.arrivalPending,false);assert.equal(context.subjectTransition,null);assert.ok(calls.includes('flush'));
 });

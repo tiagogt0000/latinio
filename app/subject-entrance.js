@@ -1,6 +1,7 @@
 import {SUBJECTS} from './subjects.js';
 export const subjectChoices=SUBJECTS;
 const arrivals=new WeakMap(),keyboardChoices=new WeakMap();
+export const subjectChoiceUsesKeyboard=root=>keyboardChoices.get(root)||false;
 
 export function entranceMarkup(){
   return `<main class="subject-entrance" aria-labelledby="entrance-title"><div class="entrance-content"><div class="entrance-wordmark brand">latinio<span>✦</span></div><p class="entrance-eyebrow">ZEIT FÜR EINE KLEINE RUNDE</p><h1 id="entrance-title">Was möchtest du heute lernen?</h1><p class="entrance-subtitle">Latein, Englisch und Französisch. In deinem Tempo.</p><div class="entrance-choices" role="group" aria-label="Lernfach wählen">${subjectChoices.map(choice=>`<button type="button" class="entrance-choice" data-subject="${choice.id}" data-enter-subject="${choice.id}"><img src="${choice.logo}" alt="" width="72" height="72"><span class="entrance-choice-copy"><strong class="entrance-choice-title">${choice.label}</strong><small class="entrance-choice-description">${choice.id==='latin'?'Vokabeln und Formen festigen.':'Deinen Wortschatz erweitern.'}</small></span><span class="entrance-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div></main>`;

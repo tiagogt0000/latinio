@@ -1,4 +1,8 @@
-# Latinio · Version 2.17.2
+# Latinio · Version 2.17.3
+## Neu in 2.17.3: Sanfter Einstieg und Vokabelstart
+Nach der ersten Fachauswahl erscheint der ausgeschriebene Latinio-Schriftzug in der gewählten Fachfarbe weich in der Mitte, bleibt kurz stehen und blendet mit der Unschärfe wieder aus. Anschließend erscheinen die Felder wie beim Fachwechsel. Der bereits abgestimmte Wechsel zwischen zwei Fachfarben bleibt erhalten.
+Auch beim Start einer Vokabelrunde erscheinen Kopfzeile, Frage, Eingabe und Schaltflächen in einer ruhigen, überlappenden Bewegung von oben nach unten. Antworten und folgende Vokabeln bleiben direkt bedienbar. Hintergrund und feste Bedienelemente bleiben an ihrem Platz; Tastaturbedienung und reduzierte Bewegung werden berücksichtigt.
+671 automatisierte Tests bestanden. Kein visueller Browser- oder Gerätetest; die Wirkung auf dem iPhone bleibt am Gerät zu beurteilen.
 ## Neu in 2.17.2: Ruhigere Übergänge zwischen den Fächern
 Die Sprachauswahl blendet in 440 ms weich aus; danach erscheinen die Inhalte in einer überlappenden Bewegung von oben nach unten über 640 ms. Das kurz aufblitzende Lade-Logo zwischen Auswahl und Startseite entfällt.
 Beim Fachwechsel nimmt die Unschärfe zunächst allmählich zu. Der ausgeschriebene bisherige Latinio-Schriftzug gleitet dann in 720 ms kleiner nach links hinaus, während der neue farbige Schriftzug von rechts in die Mitte wächst. Nach dem Seitenwechsel bleibt dessen Endbild erhalten; Schriftzug und Unschärfe blenden weich aus und die neuen Felder erscheinen. Der gesamte Ablauf dauert ohne zusätzliche Ladezeit rund zwei Sekunden. Hintergrundgestaltung, feste Navigation, Daten und Serverfunktionen bleiben unverändert. Reduzierte Bewegung und Tastaturbedienung werden berücksichtigt.

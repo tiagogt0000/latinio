@@ -8,6 +8,7 @@ export function createInterfaceMotion({root=globalThis.document}={}){
  const preference=view.matchMedia?.('(prefers-reduced-motion: reduce)');
  const style=view.getComputedStyle?.(root.documentElement);
  const easing=style?.getPropertyValue('--ease-out').trim()||'cubic-bezier(0.23,1,0.32,1)';
+ const drawer=style?.getPropertyValue('--ease-drawer').trim()||'cubic-bezier(0.32,0.72,0,1)';
  const enter=parseFloat(style?.getPropertyValue('--apple-enter'))||220;
  const fast=parseFloat(style?.getPropertyValue('--apple-fast'))||160;
  const active=new Set(),detailsIntent=new WeakMap();
@@ -35,6 +36,7 @@ export function createInterfaceMotion({root=globalThis.document}={}){
 
  function stop(item){
   active.delete(item);
+  if(item.timer!==undefined)view.clearTimeout(item.timer);
   try{item.animation.cancel();}catch{/* Optional motion must never block an interaction. */}
  }
  function cancel(kind){
@@ -43,15 +45,39 @@ export function createInterfaceMotion({root=globalThis.document}={}){
    stop(item);
   }
  }
- function animate(element,frames,{kind,duration=enter,delay=0}={}){
+ function animate(element,frames,{kind,duration=enter,delay=0,curve=easing,bounded=false}={}){
   if(!element?.animate||element.isConnected===false||!pointerActivation||preference?.matches)return;
   let item;
   try{
-   const animation=element.animate(frames,{duration,delay,easing,fill:'backwards'});
+   const animation=element.animate(frames,{duration,delay,easing:curve,fill:'backwards'});
    item={animation,element,kind};active.add(item);
-   animation.finished.then(()=>active.delete(item),()=>active.delete(item));
+   const release=()=>{active.delete(item);if(item.timer!==undefined)view.clearTimeout(item.timer);};
+   animation.finished.then(release,release);
+   if(bounded)item.timer=view.setTimeout(()=>stop(item),delay+duration+120);
   }catch{if(item)stop(item);}
  }
+ function trainingEntrance(container){
+  const shell=container.querySelector('.test-shell');
+  if(!shell||root.hidden)return;
+  const reveal=(selector,delay,duration=400,distance=6)=>{
+   shell.querySelectorAll(selector).forEach(element=>animate(element,distance===null?[{opacity:0},{opacity:1}]:[
+    {opacity:0,transform:`translateY(${distance}px) scale(.98)`},
+    {opacity:1,transform:'none'}
+   ],{kind:'training',delay,duration,curve:drawer,bounded:true}));
+  };
+  // One wave on round entry; the shell, form and footer positioning never move.
+  reveal(':scope > .test-top',0,500,8);
+  reveal('.test-content > .eyebrow, .test-content > .test-title, .test-content > h1',60,520,8);
+  reveal('.test-content > h1 + p',90);
+  reveal('.test-content > .latin-word',120);
+  // The card's transform belongs to its swipe interaction.
+  reveal('.test-content > .refresh-card',120,400,null);
+  reveal('.test-content > .test-help',150);
+  reveal('#answer-form > #answers, .refresh-card + p',180);
+  reveal('#answer-form > .add-answer, .refresh-card-actions > button',210);
+  reveal('.test-footer > button, .refresh-card-actions + p',240,400,4);
+ }
+ function pointerDown(){cancel('training');}
  function click(event){
   pointerActivation=event.detail>0;
   if(!pointerActivation)cancel();
@@ -81,6 +107,7 @@ export function createInterfaceMotion({root=globalThis.document}={}){
  function resume(){suspend();lastNav=null;scheduleViewport();}
  function visibilityChanged(){suspend();if(!root.hidden)scheduleViewport();}
  root.addEventListener('click',click,true);
+ root.addEventListener('pointerdown',pointerDown,true);
  root.addEventListener('keydown',keyboard,true);
  root.addEventListener('toggle',toggle,true);
  root.addEventListener('visibilitychange',visibilityChanged);
@@ -93,10 +120,11 @@ export function createInterfaceMotion({root=globalThis.document}={}){
  preference?.addEventListener?.('change',preferenceChanged);
 
  return {
-  beforeRender(){cancel('page');cancel('details');settleArrival(root.getElementById?.('app'));},
+  beforeRender(){cancel('page');cancel('details');cancel('training');settleArrival(root.getElementById?.('app'));},
   screen(container,{from,to}){
    syncViewport();
    if(from===null||from===to||!pointerActivation||preference?.matches)return;
+   if(to==='test'){trainingEntrance(container);return;}
    const content=container.querySelector('.content');
    if(!content)return;
    if(to==='learn'){
@@ -120,7 +148,7 @@ export function createInterfaceMotion({root=globalThis.document}={}){
   closeModal(){cancel('modal');},
   dispose(){
    suspend();root.querySelector?.('#app > .mobile-nav')?.style?.removeProperty('--mobile-nav-bottom');
-   cancel();root.removeEventListener('click',click,true);root.removeEventListener('keydown',keyboard,true);root.removeEventListener('toggle',toggle,true);
+   cancel();root.removeEventListener('click',click,true);root.removeEventListener('pointerdown',pointerDown,true);root.removeEventListener('keydown',keyboard,true);root.removeEventListener('toggle',toggle,true);
    root.removeEventListener('visibilitychange',visibilityChanged);
    view.removeEventListener?.('pagehide',suspend);view.removeEventListener?.('pageshow',resume);view.removeEventListener?.('resize',scheduleViewport);view.removeEventListener?.('scroll',scheduleViewport);
    viewport?.removeEventListener?.('resize',scheduleViewport);viewport?.removeEventListener?.('scroll',scheduleViewport);

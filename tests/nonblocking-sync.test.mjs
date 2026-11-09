@@ -4,9 +4,11 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
 function installCloudRender(context){context.pendingCloudRender=false;context.subjectTransition=null;context.arrivalPending=false;context.cloudNotice=null;vm.runInContext(source.slice(source.indexOf('function flushCloudRender('),source.indexOf('const prefs=')),context);}
-test('Initial app sync starts after ready and does not await a loading screen',()=>{
+test('Initial cloud sync starts alongside the intro and never holds the first local render',()=>{
  assert.equal((source.match(/cloudWait\.run\(/g)||[]).length,1);
- assert.match(source,/ready=true;void reminders.refresh\(\).then\(\(\)=>reminders.maybePrompt\(\)\);const startup=cloudWait\.run\(\);render\(\)/);assert.doesNotMatch(source,/await cloudWait\.run/);
+ const startup=source.indexOf('const startup=cloudWait.run();'),intro=source.indexOf('await subjectTransition?.entered;',startup),ready=source.indexOf('ready=true;',startup);
+ assert.ok(startup>=0&&intro>startup&&ready>intro);
+ assert.doesNotMatch(source.slice(startup,source.indexOf('render();',ready)),/await\s+(?:startup\b|cloudWait\.run)/);
 });
 test('Results appear before cloud completion and late sync cannot reopen results',async()=>{
  let release,renders=[],updates=0;
