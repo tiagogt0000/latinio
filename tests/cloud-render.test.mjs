@@ -13,7 +13,7 @@ function fixture(){
  const data={collections:{}},focusable={focus(){}},listeners=new Map();
  const modalRoot={get children(){return html?[{}]:[];},set innerHTML(value){html=value;},querySelector:selector=>selector==='[data-cloud-connection-notice]'?(html.includes('data-cloud-connection-notice')?focusable:null):focusable,querySelectorAll:()=>[],contains:()=>false};
  const ctx=vm.createContext({vocabularyAdminUI:null,simpleMode:()=>false,
-  queueMicrotask,setTimeout,clearTimeout,pendingCloudRender:false,ready:true,working:false,waitingStart:false,screen:'collections',subjectTransition:null,
+  queueMicrotask,setTimeout,clearTimeout,pendingCloudRender:false,ready:true,working:false,waitingStart:false,screen:'collections',subjectTransition:null,arrivalPending:false,
   cloudNotice:null,cloudWait:{blocked:false},store:{doc:{pending:[]},data,recordActivity:async()=>{}},sync:{schedule(){}},modalRoot,modalCleanup:null,modalReturnFocus:null,
   document:{activeElement:focusable,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type)},
   icon:()=>'',interfaceMotion:{closeModal(){},openModal(){}},settleSync:async()=>{},refreshStreak:async()=>{},updateStatus(){},checkShareNotices(){},checkAnnouncements:async()=>{},reportAppVersion:async()=>{},autoUpdate(){},
@@ -82,6 +82,19 @@ test('Downloaded collections appear immediately after closing a dialog, without 
  f.ctx.closeModal();await tick();
  assert.deepEqual(f.visible,['Neue Lektion']);assert.equal(f.renders,1);
  f.ctx.closeModal();await tick();assert.equal(f.renders,1,'one refresh consumes the pending download');
+});
+test('A cloud update waits for the subject arrival, then renders downloaded collections without another request',async()=>{
+ const f=fixture();let downloads=0;
+ f.ctx.arrivalPending=true;
+ f.ctx.settleSync=async()=>{downloads++;f.download();};
+ await f.ctx.backgroundSync();
+ assert.equal(downloads,1);assert.equal(f.ctx.pendingCloudRender,true);
+ assert.equal(f.renders,0);assert.deepEqual(f.visible,[],'new data must not replace animating surfaces');
+ f.ctx.flushCloudRender();assert.equal(f.renders,0,'flushing during arrival preserves its surfaces');
+ f.ctx.arrivalPending=false;f.ctx.flushCloudRender();
+ assert.deepEqual(f.visible,['Neue Lektion']);assert.equal(f.renders,1);assert.equal(downloads,1);
+ assert.equal(f.ctx.pendingCloudRender,false);
+ f.ctx.flushCloudRender();assert.equal(f.renders,1,'the deferred refresh is consumed exactly once');
 });
 
 test('Initial download also refreshes a formerly empty screen after Escape closes its dialog',async()=>{

@@ -66,12 +66,12 @@ if('serviceWorker'in navigator&&location.protocol!=='file:')void navigator.servi
 const isAdmin=()=>profile?.role==='admin';
 const simpleMode=()=>!isAdmin()&&profile?.simplifiedMode===true;
 const subjectAllowed=value=>SUBJECTS.some(s=>s.id===value)&&(isAdmin()||!Array.isArray(profile?.allowedSubjects)||profile.allowedSubjects.includes(value));
-let viewSnapshot=null,subjectTransition=null,pendingCloudRender=false;
+let viewSnapshot=null,subjectTransition=null,pendingCloudRender=false,arrivalPending=false;
 const data=()=>viewSnapshot||store.data;
 function autoUpdate(){if(ready&&updates.state==='available'&&!working&&!waitingStart&&!cloudWait?.blocked&&!modalRoot.children.length&&!['test','predicate-test','round-end','grammar','tables'].includes(screen)&&!sync.busy&&!sharing?.busy&&!store.doc.pending.length)void updates.apply();}
 async function showResult(){const saved=store.doc.session;if(!saved?.finished)return;if(saved.mode==='inactive-check'&&saved.refreshSavedCount===undefined){const session=clone(saved);await store.commit([finishRefresh(data(),session)],session);sync.schedule(0);}const session=store.doc.session;await offerRoundEnd({kind:'vocab',id:session.id,stats:roundStats(session,data()),errors:failedTasks(session,data().reviews)});void backgroundSync();}
 function flushCloudRender(){
- if(pendingCloudRender&&ready&&!subjectTransition&&!working&&!waitingStart&&!modalRoot.children.length&&!['test','predicate-test','round-end','admin','grammar','tables'].includes(screen)){pendingCloudRender=false;render();}
+ if(pendingCloudRender&&ready&&!subjectTransition&&!arrivalPending&&!working&&!waitingStart&&!modalRoot.children.length&&!['test','predicate-test','round-end','admin','grammar','tables'].includes(screen)){pendingCloudRender=false;render();}
  cloudNotice?.maybePrompt();
 }
 function renderCloudChanges(){pendingCloudRender=true;flushCloudRender();}
@@ -352,7 +352,8 @@ async function rateCard(known){const transition=rateRefresh(data(),store.doc.ses
 
 async function changePrefs(changes){await store.commit([['settings','general',{...prefs(),...changes}]]);sync.schedule();render();}
 async function actions(event){const button=event.target.closest('[data-action]');if(!button)return;event.preventDefault();const action=button.dataset.action,id=button.dataset.id;
- if(!ready||subjectTransition)return;
+ if(!ready||subjectTransition&&!subjectTransition.closing&&!subjectTransition.disposed)return;
+ if(subjectTransition&&(subjectTransition.closing||subjectTransition.disposed)){subjectTransition.dispose();subjectTransition=null;}
  if(simpleMode()&&(action==='collection-search-toggle'||action==='nav'&&!['learn','collections'].includes(button.dataset.screen)))return;
  if(!['collection-open','refresh-tools','predicate-open'].includes(action))collectionOpener.cancel();
  if(['collection-open','refresh-tools','predicate-open','collection-tab','nav','close-modal'].includes(action)){
@@ -406,7 +407,7 @@ async function actions(event){const button=event.target.closest('[data-action]')
    rememberSubject(id,localStorage);sessionStorage.setItem(TRANSITION_KEY,subject);sessionStorage.setItem(SUBJECT_SWITCH_KEY,id);sessionStorage.setItem('latinio-subject-keyboard',event.detail===0?'1':'0');
    // Local edits are already journaled. A cloud round trip is never a prerequisite for navigation.
    const url=new URL(location.href);url.searchParams.set('subject',id);await subjectTransition.entered;location.assign(url.href);
-  }catch(error){subjectTransition.fail();subjectTransition=null;throw error;}
+  }catch(error){subjectTransition.fail();subjectTransition=null;try{sessionStorage.removeItem(TRANSITION_KEY);sessionStorage.removeItem(SUBJECT_SWITCH_KEY);sessionStorage.removeItem('latinio-subject-keyboard');}catch{}throw error;}
   break;
  }
  case 'announcement-compose':await composeAnnouncement();break;
@@ -570,12 +571,11 @@ async function loadCloud(){await backgroundSync();}
 async function boot(){try{
  const parameters=new URLSearchParams(location.search);const reminded=parameters.get('from')==='reminder'&&SUBJECTS.some(x=>x.id===parameters.get('subject'))?parameters.get('subject'):null;if(reminded){const cleaned=new URL(location.href);cleaned.searchParams.delete('from');history.replaceState(null,'',cleaned.href);}const direct=consumeSubjectSwitch(sessionStorage);let directKeyboard;try{directKeyboard=direct?sessionStorage.getItem('latinio-subject-keyboard')==='1':undefined;sessionStorage.removeItem('latinio-subject-keyboard');}catch{}subject=direct||reminded||await chooseSubject(app);rememberSubject(subject,localStorage);english=subject!=='latin';
  const from=sessionStorage.getItem(TRANSITION_KEY);sessionStorage.removeItem(TRANSITION_KEY);
- subjectTransition=beginSubjectTransition(app,from||subject,subject,{resume:true});subjectMetadata();
- arrive(app,{keyboard:directKeyboard});
- ({store,profile}=await openAccount(app,{onLogin:()=>subjectTransition?.dispose()}));predicateKey=predicateStorageKey(profile.id);streakLedger=createStreakLedger({profileId:profile.id,storage:localStorage,locks:navigator.locks});
+ subjectTransition=direct&&from!==subject&&SUBJECTS.some(item=>item.id===from)?beginSubjectTransition(app,from,subject,{resume:true,keyboard:directKeyboard}):null;subjectMetadata();
+ ({store,profile}=await openAccount(app,{onLogin:()=>{subjectTransition?.dispose();subjectTransition=null;app.removeAttribute('data-subject-handoff');queueMicrotask(()=>arrive(app,{keyboard:directKeyboard}));}}));predicateKey=predicateStorageKey(profile.id);streakLedger=createStreakLedger({profileId:profile.id,storage:localStorage,locks:navigator.locks});
  if(profile.role!=='admin'&&Array.isArray(profile.allowedSubjects)&&!profile.allowedSubjects.includes(subject)){
   const allowed=profile.allowedSubjects.filter(id=>SUBJECTS.some(s=>s.id===id));const fallback=allowed.includes(english?'latin':'english')?(english?'latin':'english'):allowed[0];
-  if(fallback){subject=fallback;english=subject!=='latin';rememberSubject(subject,localStorage);subjectMetadata();}else throw Error('Für dein Profil ist noch kein Lernfach freigeschaltet. Bitte wende dich an den Admin.');
+  if(fallback){subjectTransition?.dispose();subjectTransition=null;document.getElementById('subject-transition-handoff')?.remove();app.removeAttribute('data-subject-handoff');subject=fallback;english=subject!=='latin';rememberSubject(subject,localStorage);subjectMetadata();}else throw Error('Für dein Profil ist noch kein Lernfach freigeschaltet. Bitte wende dich an den Admin.');
  }
  if(subject!=='latin'){const latinStore=store,config=latinStore.doc.config;store=await new Store().open(profile.id,subject);await store.update(doc=>{doc.config={...config};doc.profile=profile;doc.seeded=true;return doc;});latinStore.close();}
  subjectMetadata();await store.seed();await store.listDeletedCollections();if(store.doc.session)await store.update(doc=>{doc.session=null;return doc;});sync=new Sync(store);
@@ -598,16 +598,17 @@ async function boot(){try{
  sync.addEventListener('change',updateStatus);
  sync.addEventListener('authentication-required',()=>signOut());
  sync.addEventListener('remote',()=>{if(!cloudWait.blocked)void loadCloud();});
- ready=true;void reminders.refresh().then(()=>reminders.maybePrompt());const startup=cloudWait.run();render();arrive(app,{keyboard:directKeyboard});subjectTransition?.finish();subjectTransition=null;
+ ready=true;void reminders.refresh().then(()=>reminders.maybePrompt());const startup=cloudWait.run();render();app.removeAttribute('data-subject-handoff');arrivalPending=true;const arrivalTransition=subjectTransition;
+ void Promise.all([arrive(app,{keyboard:directKeyboard,delay:arrivalTransition&&!arrivalTransition.disposed?300:0}),arrivalTransition?.finish()]).finally(()=>{arrivalPending=false;if(subjectTransition===arrivalTransition)subjectTransition=null;flushCloudRender();});
  void startup.then(async()=>{void refreshStreak();await store.recordActivity('opened');sync.schedule();renderCloudChanges();updateStatus();checkShareNotices();void checkAnnouncements();void reportAppVersion();}).catch(error=>notify(error.message));
  async function reportAppVersion(){if(!ready||isAdmin()||!sync?.configured||!navigator.onLine||store.doc.appVersionReported===APP_VERSION)return;try{await sync.request('profileVersion',{version:APP_VERSION});await store.update(doc=>{doc.appVersionReported=APP_VERSION;return doc;});}catch{}}
  async function resume(){if(!ready||document.hidden)return;void reminders.refresh().then(()=>reminders.maybePrompt());await store.recordActivity('opened');await loadCloud();checkShareNotices();if(screen==='learn'||screen==='collections'||screen==='collection-detail'||screen==='settings')void checkAnnouncements();void updates.check();}
  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(screen==='test'&&!store.doc.session?.feedback)void preserveTestDraft(store,screen,readAnswers());}else void resume();});
- window.addEventListener('pageshow',event=>{if(event.persisted)void resume();});
+ window.addEventListener('pageshow',event=>{if(event.persisted){subjectTransition?.dispose();subjectTransition=null;arrivalPending=false;void resume();}});
  setInterval(()=>{if(!document.hidden){if(screen==='learn'&&!modalRoot.children.length)render();void backgroundSync();void updates.check();autoUpdate();}},60000);
  window.addEventListener('storage',event=>{if(event.key===streakLedger.key&&screen==='learn'&&!modalRoot.children.length)render();});
  window.addEventListener('online',()=>{void updates.check();void reportAppVersion();void resume();});
- }catch(error){subjectTransition?.fail();subjectTransition=null;app.innerHTML=`<main class="boot"><h1>Die App konnte nicht starten.</h1><p>Deine gespeicherten Lernstände bleiben erhalten. Lade die App erneut, um es noch einmal zu versuchen.</p><p class="muted">${h(error.message)}</p><button class="button primary" onclick="location.reload()">Erneut laden</button></main>`;}}
+ }catch(error){subjectTransition?.fail();subjectTransition=null;document.getElementById('subject-transition-handoff')?.remove();app.removeAttribute('data-subject-handoff');app.innerHTML=`<main class="boot"><h1>Die App konnte nicht starten.</h1><p>Deine gespeicherten Lernstände bleiben erhalten. Lade die App erneut, um es noch einmal zu versuchen.</p><p class="muted">${h(error.message)}</p><button class="button primary" onclick="location.reload()">Erneut laden</button></main>`;}}
 // Keep the browser chrome in sync during subject selection, login and startup errors too.
 theme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',theme);

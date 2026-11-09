@@ -17,9 +17,9 @@ function fixture(t,{reducedMotion=false,allowed=['latin','english'],navigationEr
  const setTimer=(callback,delay)=>{timers.set(++timerId,{callback,delay});return timerId;};
  const clearTimer=id=>timers.delete(id);
  const animate=()=>{let resolve;const animation={finished:new Promise(done=>resolve=done),finish:()=>resolve(),cancel:()=>resolve()};animations.push(animation);return animation;};
- const veil={setAttribute(){},querySelector:()=>({animate}),animate,remove(){calls.push('dispose');}};
- const document={documentElement:{},defaultView:{setTimeout:setTimer,clearTimeout:clearTimer,matchMedia:()=>({matches:reducedMotion,addEventListener(){},removeEventListener(){}})},createElement:()=>veil,body:{append(){calls.push('begin');}}};
- const app={ownerDocument:document};
+ const veil={setAttribute(){},removeAttribute(){},querySelector:()=>({animate}),animate,remove(){calls.push('dispose');}};
+ const document={hidden:false,visibilityState:'visible',documentElement:{},getElementById:()=>null,addEventListener(){},removeEventListener(){},defaultView:{setTimeout:setTimer,clearTimeout:clearTimer,addEventListener(){},removeEventListener(){},matchMedia:()=>({matches:reducedMotion,addEventListener(){},removeEventListener(){}})},createElement:()=>veil,body:{append(){calls.push('begin');}}};
+ const app={ownerDocument:document,removeAttribute(){}};
  const doc={pending:[{id:'saved-review',entity:'reviews'}],session:{id:'round',answers:['amavi']}};
  const context=vm.createContext({vocabularyAdminUI:null,simpleMode:()=>false,flushCloudRender(){},
   app,document,URL,localStorage,sessionStorage,rememberSubject,TRANSITION_KEY,SUBJECT_SWITCH_KEY,beginSubjectTransition,
@@ -45,8 +45,8 @@ test('Actual subject action shows transition before waiting, preserves local wor
  const f=fixture(t),saved=structuredClone(f.doc);
  const switching=f.click();await flush();
  assert.ok(f.calls.includes('begin'),'the loading surface appears while cloud sync remains pending');
- assert.equal(f.calls.some(call=>Array.isArray(call)&&call[0]==='navigate'),false,'the visible icon transition finishes before navigation');
- assert.equal(f.animations.length,2);
+ assert.equal(f.calls.some(call=>Array.isArray(call)&&call[0]==='navigate'),false,'the written wordmark transition finishes before navigation');
+ assert.equal(f.animations.length,3,'background, outgoing wordmark and incoming wordmark animate independently');
  assert.equal(f.localStorage.getItem(LAST_SUBJECT_KEY),'english');
  assert.equal(f.sessionStorage.getItem(TRANSITION_KEY),'latin');
  assert.equal(f.sessionStorage.getItem(SUBJECT_SWITCH_KEY),'english');
@@ -67,7 +67,7 @@ test('Reduced-motion and keyboard switches navigate without animation or timer w
   assert.equal(f.context.working,false);
  }
 });
-test('Boot consumes keyboard intent once and uses it for both startup arrival calls',()=>{
+test('Boot consumes keyboard intent once and starts arrival only after account preparation',()=>{
  const start=source.indexOf('let directKeyboard;'),end=source.indexOf('subject=direct',start);
  const consume=source.slice(start,end)+';directKeyboard';
  assert.ok(start>=0&&end>start);
@@ -75,7 +75,11 @@ test('Boot consumes keyboard intent once and uses it for both startup arrival ca
  assert.equal(vm.runInNewContext(consume,{direct:'english',sessionStorage}),true);
  assert.equal(sessionStorage.getItem('latinio-subject-keyboard'),null);
  assert.equal(vm.runInNewContext(consume,{direct:null,sessionStorage}),undefined,'initial selection keeps its local keyboard intent');
- assert.equal(source.match(/arrive\(app,\{keyboard:directKeyboard\}\)/g)?.length,2);
+ assert.equal(source.match(/arrive\(app,\{keyboard:directKeyboard\b/g)?.length,2,'only the login callback and final ready screen receive arrival motion');
+ const account=source.indexOf('await openAccount(app',end),arrival=source.indexOf('arrive(app,{keyboard:directKeyboard})',end);
+ assert.ok(account>0&&arrival>account,'no arrival animation runs on the intermediate account-loading view');
+ assert.match(source.slice(account,arrival),/onLogin:.*queueMicrotask\(\(\)=>$/,'the optional login form arrives after its own render');
+ assert.match(source.slice(end,account),/subjectTransition=direct&&from!==subject&&SUBJECTS\.some/,'initial subject selection must not flash an unrelated loading wordmark');
 });
 
 test('Duplicate switching clicks cannot replace the pending subject or navigate twice',async t=>{
@@ -99,6 +103,27 @@ test('An active subject transition blocks navigation and admin actions until the
  f.animations.forEach(animation=>animation.finish());await switching;
  assert.equal(f.calls.filter(call=>Array.isArray(call)&&call[0]==='navigate').length,1);
 });
+test('A ready destination accepts navigation immediately while the remaining backdrop fades',async t=>{
+ const f=fixture(t);
+ const transition=beginSubjectTransition(f.context.app,'latin','english');f.context.subjectTransition=transition;
+ f.animations.forEach(animation=>animation.finish());await transition.entered;
+ const closing=transition.finish();assert.equal(transition.closing,true);
+ f.context.render=()=>f.calls.push('render');
+ await f.context.actions({detail:1,preventDefault(){},target:{closest:()=>({dataset:{action:'nav',screen:'settings'}})}});
+ await closing;
+ assert.equal(f.context.screen,'settings');assert.equal(f.context.subjectTransition,null);assert.ok(f.calls.includes('render'));
+ assert.equal(f.timers.size,0,'the interrupted decorative exit releases its fallback timer');
+});
+test('A completed overlay cannot block controls while delayed destination cards are still arriving',async t=>{
+ const f=fixture(t);
+ const transition=beginSubjectTransition(f.context.app,'latin','english');f.context.subjectTransition=transition;
+ f.animations.forEach(animation=>animation.finish());await transition.entered;
+ const closing=transition.finish();f.animations.forEach(animation=>animation.finish());await closing;
+ assert.equal(transition.disposed,true);assert.equal(transition.closing,false);
+ f.context.arrivalPending=true;f.context.render=()=>f.calls.push('render');
+ await f.context.actions({detail:1,preventDefault(){},target:{closest:()=>({dataset:{action:'nav',screen:'settings'}})}});
+ assert.equal(f.context.screen,'settings');assert.equal(f.context.subjectTransition,null);assert.ok(f.calls.includes('render'));
+});
 
 test('Unavailable subjects and the already selected subject do not start a transition',async t=>{
  const f=fixture(t,{allowed:['latin']});
@@ -107,9 +132,9 @@ test('Unavailable subjects and the already selected subject do not start a trans
  assert.equal(f.localStorage.getItem(LAST_SUBJECT_KEY),null);assert.equal(f.context.working,false);
 });
 
-test('A stalled icon animation cannot prevent the actual action from navigating',async t=>{
+test('A stalled wordmark animation cannot prevent the actual action from navigating',async t=>{
  const f=fixture(t),switching=f.click();await flush();
- const timeout=[...f.timers.values()].find(timer=>timer.delay>140);
+ const timeout=[...f.timers.values()].find(timer=>timer.delay>=1020&&timer.delay<1500);
  assert.ok(timeout,'a finite transition fallback is registered');timeout.callback();await switching;
  assert.ok(f.calls.some(call=>Array.isArray(call)&&call[0]==='navigate'));assert.equal(f.context.working,false);
 });

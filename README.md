@@ -1,4 +1,8 @@
-# Latinio · Version 2.17.1
+# Latinio · Version 2.17.2
+## Neu in 2.17.2: Ruhigere Übergänge zwischen den Fächern
+Die Sprachauswahl blendet in 440 ms weich aus; danach erscheinen die Inhalte in einer überlappenden Bewegung von oben nach unten über 640 ms. Das kurz aufblitzende Lade-Logo zwischen Auswahl und Startseite entfällt.
+Beim Fachwechsel nimmt die Unschärfe zunächst allmählich zu. Der ausgeschriebene bisherige Latinio-Schriftzug gleitet dann in 720 ms kleiner nach links hinaus, während der neue farbige Schriftzug von rechts in die Mitte wächst. Nach dem Seitenwechsel bleibt dessen Endbild erhalten; Schriftzug und Unschärfe blenden weich aus und die neuen Felder erscheinen. Der gesamte Ablauf dauert ohne zusätzliche Ladezeit rund zwei Sekunden. Hintergrundgestaltung, feste Navigation, Daten und Serverfunktionen bleiben unverändert. Reduzierte Bewegung und Tastaturbedienung werden berücksichtigt.
+657 automatisierte Node-Tests und sechs Installerprüfungen bestanden. Kein visueller Browser- oder Gerätetest gemäß Nutzerpräferenz; das Bewegungsgefühl auf dem iPhone bleibt am Gerät zu beurteilen.
 ## Neu in 2.17.1: Fach-Admins und schnelle, feste Navigation
 
 Unter **Nutzer → Bearbeiten → Fach-Admin** kann das Hauptadmin-Profil einzelne freigegebene Fächer zuweisen. Standardmäßig hat niemand diese Berechtigung. Fach-Admins können bei einer bestehenden geteilten Vokabel zwischen **Nur für mich speichern** und **Ja, für alle übernehmen** wählen. Bestätigte Korrekturen aktualisieren die gemeinsame Quelle und die Einträge aller berechtigten Empfänger, einschließlich zuvor privat bearbeiteter Varianten; Lernstände und andere Vokabeln bleiben erhalten. Andere Admin-Rechte werden nicht vergeben.

@@ -2,98 +2,142 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {beginSubjectTransition,SUBJECTS,subjectInfo,brandWord} from '../app/subjects.js';
 
-function fixture({broken=false}={}){
- const calls=[],overlays=[],timers=new Map(),listeners=new Set();let now=0,nextId=0;
+const flush=async()=>{for(let i=0;i<12;i++)await Promise.resolve();};
+function fixture({broken=false,missing=false,handoff=null}={}){
+ const calls=[],overlays=[],timers=new Map(),listeners=new Set(),documentListeners=new Map(),viewListeners=new Map();let now=0,nextId=0;
  const preference={matches:false,addEventListener(_type,listener){listeners.add(listener);},removeEventListener(_type,listener){listeners.delete(listener);}};
- const view={matchMedia:()=>preference,setTimeout(callback,delay){timers.set(++nextId,{callback,at:now+delay});return nextId;},clearTimeout:id=>timers.delete(id)};
+ const eventTarget=registry=>({addEventListener(type,listener){if(!registry.has(type))registry.set(type,new Set());registry.get(type).add(listener);},removeEventListener(type,listener){registry.get(type)?.delete(listener);}});
+ const view={...eventTarget(viewListeners),matchMedia:()=>preference,setTimeout(callback,delay){timers.set(++nextId,{callback,at:now+delay,delay});return nextId;},clearTimeout:id=>timers.delete(id)};
  function element(name){
-  return {name,animate(frames,options){
+  const attributes=new Map(),dataset={},style={setProperty(name,value){this[name]=value;},removeProperty(name){delete this[name];}};
+  const node={name,attributes,dataset,style,removed:false,classList:{add(){},remove(){}},
+   setAttribute(name,value){attributes.set(name,String(value));if(name.startsWith('data-'))dataset[name.slice(5).replace(/-([a-z])/g,(_,letter)=>letter.toUpperCase())]=String(value);},
+   getAttribute:name=>attributes.get(name)??null,removeAttribute(name){attributes.delete(name);},remove(){this.removed=true;},
+  };
+  if(!missing)node.animate=function(frames,options){
    if(broken)throw new TypeError('Animation not available');
    let finish,reject;
    const animation={cancelled:false,finished:new Promise((yes,no)=>{finish=yes;reject=no;}),finish(){finish();},cancel(){this.cancelled=true;reject();}};
    calls.push({element:this,frames,options,animation});return animation;
-  }};
+  };
+  return node;
  }
- const doc={defaultView:view,body:{append:overlay=>overlays.push(overlay)},createElement(){
-  const source=element('source'),target=element('target');
-  return {...element('overlay'),attributes:new Map(),removed:false,setAttribute(name,value){this.attributes.set(name,value);},querySelector:selector=>selector==='.is-from'?source:target,remove(){this.removed=true;}};
- }};
- const root={ownerDocument:doc};
+ function overlay(){
+  const node=element('overlay'),source=element('source'),target=element('target'),backdrop=element('backdrop'),content=element('content');
+  node.querySelector=selector=>({'.is-from':source,'.is-to':target,'.subject-transition-backdrop':backdrop,'.subject-transition-content':content}[selector]||null);
+  return node;
+ }
+ const doc={...eventTarget(documentListeners),defaultView:view,hidden:false,visibilityState:'visible',documentElement:element('html'),body:{append:node=>overlays.push(node)},createElement:overlay,getElementById:id=>overlays.find(node=>node.id===id&&!node.removed)||null};
+ const root={...element('root'),ownerDocument:doc};
+ if(handoff){const node=overlay();node.id='subject-transition-handoff';node.setAttribute('data-from',handoff.from);node.setAttribute('data-to',handoff.to);overlays.push(node);root.setAttribute('data-subject-handoff','');}
  function advance(ms){now+=ms;for(const [id,timer] of [...timers])if(timer.at<=now){timers.delete(id);timer.callback();}}
  function reduce(){preference.matches=true;for(const listener of listeners)listener({matches:true});}
- return {root,calls,overlays,timers,listeners,advance,reduce};
+ function hide(){doc.hidden=true;doc.visibilityState='hidden';for(const listener of documentListeners.get('visibilitychange')||[])listener();}
+ function viewEvent(type,event={}){for(const listener of [...viewListeners.get(type)||[]])listener(event);}
+ function finishAnimations(){calls.forEach(call=>call.animation.finish());}
+ const listenerCount=()=>listeners.size+[...documentListeners.values(),...viewListeners.values()].reduce((total,set)=>total+set.size,0);
+ return {root,calls,overlays,timers,listeners,advance,reduce,hide,viewEvent,finishAnimations,listenerCount};
 }
 
 test('All three subjects use the Latinio brand and distinct metadata',()=>{
  assert.deepEqual(SUBJECTS.map(subject=>subject.id),['latin','english','french']);
  assert.equal(subjectInfo('french').id,'french');assert.equal(subjectInfo('french').code,'fr');assert.equal(brandWord('french'),'latinio<span>✦</span>');
 });
-
-test('Switching shows two written Latinio wordmarks and moves green left while red arrives from the right',async()=>{
+test('A switch gradually softens the background before written wordmarks exchange scale and position',async()=>{
  const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
  const overlay=f.overlays[0];assert.equal(f.overlays.length,1);assert.equal(overlay.removed,false);
  assert.equal(overlay.attributes.get('role'),'status');assert.equal(overlay.attributes.get('aria-busy'),'true');
  assert.equal((overlay.innerHTML.match(/latinio<span>✦<\/span>/g)||[]).length,2);assert.match(overlay.innerHTML,/is-from\" data-subject=\"latin/);assert.match(overlay.innerHTML,/is-to\" data-subject=\"english/);assert.doesNotMatch(overlay.innerHTML,/<img/);assert.match(overlay.innerHTML,/Englisch wird geladen/);
- assert.equal(f.calls.length,2);assert.equal(f.calls[0].frames[1].transform,'translateX(-110%)');assert.equal(f.calls[1].frames[0].transform,'translateX(110%)');
- assert.ok(f.calls.every(call=>call.options.duration===220));
- let entered=false;void transition.entered.then(()=>entered=true);await Promise.resolve();assert.equal(entered,false);
- f.calls[0].animation.finish();await Promise.resolve();assert.equal(entered,false);
- f.calls[1].animation.finish();await transition.entered;assert.equal(overlay.removed,false);assert.equal(f.timers.size,0);
- transition.finish();assert.equal(f.calls.at(-1).options.duration,200);assert.equal(overlay.removed,false);
- f.calls.at(-1).animation.finish();await Promise.resolve();assert.equal(overlay.removed,true);assert.equal(f.timers.size,0);
+ const backdrop=f.calls.find(call=>call.element.name==='backdrop'),source=f.calls.find(call=>call.element.name==='source'),target=f.calls.find(call=>call.element.name==='target');
+ assert.deepEqual(backdrop.frames.map(frame=>frame.opacity),[0,1]);assert.equal(backdrop.options.duration,360);
+ assert.equal(f.calls.filter(call=>call.element.name==='source').length,1,'one source animation avoids overlapping backwards-fill transforms');
+ assert.equal(source.frames[0].opacity,0);assert.equal(source.options.duration,1020);
+ const appeared=source.frames.find(frame=>frame.opacity===1);assert.ok(appeared.offset>0&&appeared.offset<1);assert.match(appeared.transform,/scale\(1\)/);
+ assert.match(source.frames.at(-1).transform,/translateX\(-130%\).*scale\(0?\.68\)/);assert.equal(source.frames.at(-1).opacity,0);
+ assert.match(target.frames[0].transform,/translateX\(130%\).*scale\(0?\.76\)/);assert.match(target.frames.at(-1).transform,/scale\(1\)/);assert.equal(target.frames.at(-1).opacity,1);
+ assert.equal(target.options.delay,300);assert.equal(target.options.duration,720);
+ assert.ok(f.calls.every(call=>call.frames.every(frame=>!('filter' in frame)&&!('backdropFilter' in frame))),'blur remains on its own layer and is introduced by opacity');
+ let entered=false;void transition.entered.then(()=>entered=true);await flush();assert.equal(entered,false);
+ for(const call of f.calls.filter(call=>call!==target))call.animation.finish();await flush();assert.equal(entered,false,'navigation waits for the incoming wordmark to settle');
+ target.animation.finish();await transition.entered;assert.equal(overlay.removed,false);assert.ok([...f.timers.values()].every(timer=>timer.delay===1800),'only the delayed loading status may remain');
+ const beforeClose=f.calls.length,finished=transition.finish();assert.equal(typeof finished?.then,'function');assert.equal(transition.closing,true);
+ const closing=f.calls.slice(beforeClose),content=closing.find(call=>call.element.name==='content'),background=closing.find(call=>call.element.name==='backdrop');
+ assert.equal(content.options.duration,400);assert.equal(background.options.duration,600);assert.equal(background.frames.at(-1).opacity,0);
+ content.animation.finish();await flush();assert.equal(overlay.removed,false,'the background fade must not be cut off by the shorter wordmark exit');
+ assert.equal(content.options.fill,'forwards');assert.equal(content.animation.cancelled,false,'the completed wordmark fade must stay hidden while the backdrop is still fading');
+ background.animation.finish();await finished;assert.equal(overlay.removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
 });
-
-test('Returning to Latin reverses the same logo path',async()=>{
- const f=fixture(),transition=beginSubjectTransition(f.root,'english','latin');
- assert.equal(f.calls[0].frames[1].transform,'translateX(110%)');assert.equal(f.calls[1].frames[0].transform,'translateX(-110%)');
- assert.match(f.overlays[0].innerHTML,/Latein wird geladen/);
- transition.dispose();await transition.entered;assert.ok(f.calls.every(call=>call.animation.cancelled));
+test('Every subject pair sends the old written logo left and brings the new one from the right',async()=>{
+ for(const from of SUBJECTS)for(const to of SUBJECTS){
+  if(from.id===to.id)continue;
+  const f=fixture(),transition=beginSubjectTransition(f.root,from.id,to.id);
+  const exit=f.calls.find(call=>call.element.name==='source'),entry=f.calls.find(call=>call.element.name==='target');
+  assert.match(exit.frames.at(-1).transform,/translateX\(-130%\)/,from.id+' → '+to.id);
+  assert.match(entry.frames[0].transform,/translateX\(130%\)/,from.id+' → '+to.id);
+  assert.match(f.overlays[0].innerHTML,new RegExp('data-subject="'+to.id+'"'));
+  transition.dispose();await transition.entered;assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.listenerCount(),0);
+ }
 });
-
-test('Keyboard, reduced motion and reload-resume do not replay the logo swap or wait',async()=>{
- for(const options of [{keyboard:true},{reducedMotion:true},{resume:true}]){
+test('Keyboard and reduced motion skip the visual wait and remove the overlay immediately',async()=>{
+ for(const options of [{keyboard:true},{reducedMotion:true}]){
   const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english',options);
-  await transition.entered;assert.equal(f.calls.length,0);assert.equal(f.timers.size,0);assert.equal(f.overlays[0].removed,false);
-  transition.finish();
-  if(options.resume){assert.equal(f.calls.length,1);f.calls[0].animation.finish();await Promise.resolve();}
-  assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);
+  await transition.entered;assert.equal(f.calls.length,0);assert.equal(f.timers.size,0);assert.equal(f.overlays[0].removed,true);
+  await transition.finish();assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
  }
 });
-
-test('Ready can finish before the logo movement; failures and replacement release every handle',async()=>{
+test('Reload resumes the matching destination handoff without replaying the outgoing wordmark',async()=>{
+ const f=fixture({handoff:{from:'latin',to:'french'}}),handoff=f.overlays[0];
+ const transition=beginSubjectTransition(f.root,'latin','french',{resume:true});
+ await transition.entered;assert.equal(f.overlays.length,1);assert.equal(f.overlays[0],handoff);assert.equal(handoff.removed,false);assert.equal(f.calls.length,0);assert.ok([...f.timers.values()].every(timer=>timer.delay===1800));
+ const finished=transition.finish();assert.ok(f.calls.length>0);assert.ok(f.calls.every(call=>['content','backdrop'].includes(call.element.name)));
+ f.finishAnimations();await finished;assert.equal(handoff.removed,true);assert.equal(f.root.getAttribute('data-subject-handoff'),null);assert.equal(f.listenerCount(),0);
+});
+test('A mismatched handoff is removed instead of keeping a stale subject above the new one',async()=>{
+ const f=fixture({handoff:{from:'latin',to:'french'}}),stale=f.overlays[0];
+ const transition=beginSubjectTransition(f.root,'latin','english',{resume:true});
+ await transition.entered;assert.equal(stale.removed,true);assert.equal(f.overlays.length,2);assert.match(f.overlays[1].innerHTML,/data-subject="english"/);
+ transition.dispose();assert.equal(f.listenerCount(),0);
+});
+test('An early finish, failure and replacement release their animations and promises',async()=>{
  const f=fixture(),first=beginSubjectTransition(f.root,'latin','english');
- first.finish();f.calls.at(-1).animation.finish();await first.entered;
- assert.equal(f.overlays[0].removed,true);assert.ok(f.calls.slice(0,2).every(call=>call.animation.cancelled));
- const second=beginSubjectTransition(f.root,'english','latin'),third=beginSubjectTransition(f.root,'latin','english');
+ const early=first.finish();f.finishAnimations();await early;await first.entered;assert.equal(f.overlays[0].removed,true);
+ const second=beginSubjectTransition(f.root,'english','latin'),third=beginSubjectTransition(f.root,'latin','french');
  await second.entered;assert.equal(f.overlays[1].removed,true);assert.equal(f.overlays[2].removed,false);
- third.fail();third.dispose();third.finish();await third.entered;
- assert.equal(f.overlays[2].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listeners.size,0);
+ third.fail();third.dispose();await third.finish();await third.entered;
+ assert.equal(f.overlays[2].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
 });
-
-test('Switching reduced motion on cancels travel and removes the final fade immediately',async()=>{
- const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
- f.reduce();await transition.entered;assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.overlays[0].removed,false);
- transition.finish();assert.equal(f.overlays[0].removed,true);assert.equal(f.calls.length,2);assert.equal(f.timers.size,0);
-});
-
-test('Unavailable animation APIs cannot hold loading or leave an overlay after finish',async()=>{
- const f=fixture({broken:true}),transition=beginSubjectTransition(f.root,'latin','english');
- await transition.entered;assert.equal(f.timers.size,0);transition.finish();
- assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listeners.size,0);
-});
-
-test('A stuck animation fails open after its short bound and cleanup cannot wait forever',async()=>{
- const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
- f.advance(320);await transition.entered;assert.equal(f.timers.size,0);
- transition.finish();f.advance(300);assert.equal(f.overlays[0].removed,true);
- assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.timers.size,0);assert.equal(f.listeners.size,0);
-});
-
-test('French takes part in the same directional written-wordmark transitions as Latin and English',async()=>{
- for(const [from,to,direction] of [['latin','french',1],['english','french',1],['french','english',-1],['french','latin',-1]]){
-  const f=fixture(),transition=beginSubjectTransition(f.root,from,to);
-  assert.match(f.overlays[0].innerHTML,new RegExp('data-subject="'+to+'"'));
-  const entry=f.calls.find(call=>call.frames?.[0]?.transform===`translateX(${direction*110}%)`);
-  assert.ok(entry,from+' → '+to);transition.dispose();await transition.entered;
+test('Enabling reduced motion settles the travel and also interrupts an active closing fade',async()=>{
+ for(const duringClose of [false,true]){
+  const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
+  if(duringClose){f.finishAnimations();await transition.entered;transition.finish();}
+  f.reduce();await transition.entered;
+  if(!duringClose)await transition.finish();
+  assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
  }
+});
+test('Backgrounding a tab settles entry without waiting for suspended browser animation clocks',async()=>{
+ const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
+ f.hide();await transition.entered;await transition.finish();assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
+});
+test('Pagehide and a persisted pageshow cannot retain an old transition or its listeners',async()=>{
+ for(const event of ['pagehide','pageshow']){
+  const f=fixture(),transition=beginSubjectTransition(f.root,'latin','french');
+  if(event==='pageshow'){f.viewEvent(event,{persisted:false});assert.equal(transition.disposed,false);}
+  f.viewEvent(event,{persisted:true});await transition.entered;await transition.finish();
+  assert.equal(transition.disposed,true);assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
+ }
+});
+test('Unavailable or throwing animation APIs cannot hold loading or leave an overlay after finish',async()=>{
+ for(const options of [{broken:true},{missing:true}]){
+  const f=fixture(options),transition=beginSubjectTransition(f.root,'latin','english');
+  await transition.entered;assert.ok([...f.timers.values()].every(timer=>timer.delay===1800));await transition.finish();
+  assert.equal(f.overlays[0].removed,true);assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
+ }
+});
+test('Stalled animation promises have finite entry and closing bounds without shortening normal motion',async()=>{
+ const f=fixture(),transition=beginSubjectTransition(f.root,'latin','english');
+ let entered=false;void transition.entered.then(()=>entered=true);f.advance(1000);await flush();assert.equal(entered,false,'the former 300 ms bound must not cut the requested choreography short');
+ f.advance(250);await transition.entered;assert.ok([...f.timers.values()].every(timer=>timer.delay===1800));
+ const finished=transition.finish();f.advance(800);await finished;assert.equal(f.overlays[0].removed,true);
+ assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.timers.size,0);assert.equal(f.listenerCount(),0);
 });

@@ -9,8 +9,8 @@ function fixture({dark=false,mode='system',account=false}={}){
  const meta={content:'old'},favicon={href:''},dataset={},listeners=new Map(),media={matches:dark,addEventListener:(type,handler)=>listeners.set(type,handler)};
  let preference=mode,booted=false;
  const context=vm.createContext({
-  document:{documentElement:{dataset},querySelector:selector=>selector==='meta[name="theme-color"]'?meta:favicon,title:''},
-  store:account?{}:null,prefs:()=>({theme:preference}),subject:'latin',english:false,
+  document:{documentElement:{dataset},getElementById:()=>null,querySelector:selector=>selector==='meta[name="theme-color"]'?meta:favicon,title:''},
+  subjectTransition:null,app:{removeAttribute(){}},store:account?{}:null,prefs:()=>({theme:preference}),subject:'latin',english:false,
   matchMedia:()=>media,SUBJECTS,subjectInfo,languageName:()=>subjectInfo(context.subject).label,
   rememberSubject(){},localStorage:{},boot(){booted=true;assert.notEqual(meta.content,'old','apply theme before asynchronous startup');},
  });

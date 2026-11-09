@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
-function installCloudRender(context){context.pendingCloudRender=false;context.subjectTransition=null;context.cloudNotice=null;vm.runInContext(source.slice(source.indexOf('function flushCloudRender('),source.indexOf('const prefs=')),context);}
+function installCloudRender(context){context.pendingCloudRender=false;context.subjectTransition=null;context.arrivalPending=false;context.cloudNotice=null;vm.runInContext(source.slice(source.indexOf('function flushCloudRender('),source.indexOf('const prefs=')),context);}
 test('Initial app sync starts after ready and does not await a loading screen',()=>{
  assert.equal((source.match(/cloudWait\.run\(/g)||[]).length,1);
  assert.match(source,/ready=true;void reminders.refresh\(\).then\(\(\)=>reminders.maybePrompt\(\)\);const startup=cloudWait\.run\(\);render\(\)/);assert.doesNotMatch(source,/await cloudWait\.run/);
