@@ -183,9 +183,10 @@ export function parseImport(input, existing) {
   for(const item of input.words){
     if(typeof item.latin!=='string'||!item.latin.trim()||!Array.isArray(item.meanings)||!item.meanings.length||item.meanings.some(g=>!Array.isArray(g)||!g.length||g.some(s=>typeof s!=='string'||!s.trim()||s.length>300)))throw Error('Ein Eintrag braucht ein lateinisches Wort und mindestens eine deutsche Bedeutung.');
     if(item.forms!==undefined&&(!Array.isArray(item.forms)||item.forms.length>300||item.forms.some(f=>typeof f!=='string'||!f.trim()||f.length>100)))throw Error('Suchformen müssen eine Liste mit höchstens 300 kurzen Texten sein.');
+    if(item.answerVariants!==undefined&&(!Array.isArray(item.answerVariants)||!item.answerVariants.length||item.answerVariants.length>40||item.answerVariants.some(value=>typeof value!=='string'||!value.trim()||value.length>200)))throw Error('Antwortvarianten müssen eine Liste mit 1 bis 40 kurzen Texten sein.');
     const key=normalize(item.latin);
     if(seen.has(key)){skipped++;continue;}seen.add(key);
-    words.push({id:uid(),collectionId,latin:item.latin.trim().slice(0,200),meanings:item.meanings,...(item.forms?{forms:[...new Set(item.forms.map(f=>f.trim()))]}:{})});
+    words.push({id:uid(),collectionId,latin:item.latin.trim().slice(0,200),meanings:item.meanings,...(item.forms?{forms:[...new Set(item.forms.map(f=>f.trim()))]}:{}),...(item.answerVariants?{answerVariants:[...new Set(item.answerVariants.map(value=>value.trim()))]}:{})});
   }
   return {collection:{id:collectionId,name:input.name.trim().slice(0,100)},words,skipped};
 }

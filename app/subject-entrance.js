@@ -2,7 +2,7 @@ import {SUBJECTS} from './subjects.js';
 export const subjectChoices=SUBJECTS;
 
 export function entranceMarkup(){
-  return `<main class="subject-entrance" aria-labelledby="entrance-title"><div class="entrance-content"><div class="entrance-wordmark brand">latinio<span>✦</span></div><p class="entrance-eyebrow">ZEIT FÜR EINE KLEINE RUNDE</p><h1 id="entrance-title">Was möchtest du heute lernen?</h1><p class="entrance-subtitle">Latein und Englisch. In deinem Tempo.</p><div class="entrance-choices" role="group" aria-label="Lernfach wählen">${subjectChoices.map(choice=>`<button type="button" class="entrance-choice" data-subject="${choice.id}" data-enter-subject="${choice.id}"><img src="${choice.logo}" alt="" width="72" height="72"><span class="entrance-choice-copy"><strong class="entrance-choice-title">${choice.label}</strong><small class="entrance-choice-description">${choice.id==='latin'?'Vokabeln und Formen festigen.':'Deinen Wortschatz erweitern.'}</small></span><span class="entrance-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div></main>`;
+  return `<main class="subject-entrance" aria-labelledby="entrance-title"><div class="entrance-content"><div class="entrance-wordmark brand">latinio<span>✦</span></div><p class="entrance-eyebrow">ZEIT FÜR EINE KLEINE RUNDE</p><h1 id="entrance-title">Was möchtest du heute lernen?</h1><p class="entrance-subtitle">Latein, Englisch und Französisch. In deinem Tempo.</p><div class="entrance-choices" role="group" aria-label="Lernfach wählen">${subjectChoices.map(choice=>`<button type="button" class="entrance-choice" data-subject="${choice.id}" data-enter-subject="${choice.id}"><img src="${choice.logo}" alt="" width="72" height="72"><span class="entrance-choice-copy"><strong class="entrance-choice-title">${choice.label}</strong><small class="entrance-choice-description">${choice.id==='latin'?'Vokabeln und Formen festigen.':'Deinen Wortschatz erweitern.'}</small></span><span class="entrance-arrow" aria-hidden="true">↗</span></button>`).join('')}</div></div></main>`;
 }
 
 export function chooseSubject(root,{reducedMotion=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches}={}){
@@ -33,4 +33,4 @@ export function arrive(root){
 }
 
 export const SUBJECT_SWITCH_KEY='latinio-direct-subject-switch';
-export function consumeSubjectSwitch(storage){let value;try{value=storage.getItem(SUBJECT_SWITCH_KEY);storage.removeItem(SUBJECT_SWITCH_KEY);}catch{}return value==='french'?'latin':['latin','english'].includes(value)?value:null;}
+export function consumeSubjectSwitch(storage){let value;try{value=storage.getItem(SUBJECT_SWITCH_KEY);storage.removeItem(SUBJECT_SWITCH_KEY);}catch{}return SUBJECTS.some(subject=>subject.id===value)?value:null;}

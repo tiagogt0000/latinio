@@ -1,0 +1,261 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_7",
+  "name": "Lernwoche 7",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      7
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_ebd67ef0a2ffc3c8567f",
+      "latin": "le handball",
+      "meanings": [
+        [
+          "Handball",
+          "(das) Handballspielen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_96286e854d5cc4d74c20",
+      "latin": "la batterie",
+      "meanings": [
+        [
+          "(das) Schlagzeug"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_fe0c1ba2f23e2cd361cc",
+      "latin": "le repas",
+      "meanings": [
+        [
+          "(das) Essen",
+          "(die) Mahlzeit"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_6e0f137eb36928ed516a",
+      "latin": "presque (adv.)",
+      "meanings": [
+        [
+          "fast",
+          "beinahe"
+        ]
+      ],
+      "answerVariants": [
+        "presque"
+      ]
+    },
+    {
+      "id": "fr_2026_0aba53cfec8ace0e04c4",
+      "latin": "sauf",
+      "meanings": [
+        [
+          "außer",
+          "abgesehen von"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_fd0d45a53b70f884c428",
+      "latin": "végan/végane",
+      "meanings": [
+        [
+          "vegan"
+        ]
+      ],
+      "answerVariants": [
+        "végan",
+        "végane"
+      ]
+    },
+    {
+      "id": "fr_2026_923699c6de058e8d5d5c",
+      "latin": "les céréales (f. pl.)",
+      "meanings": [
+        [
+          "(das) Getreide",
+          "(das) Müsli",
+          "(die) Cornflakes"
+        ]
+      ],
+      "answerVariants": [
+        "les céréales"
+      ]
+    },
+    {
+      "id": "fr_2026_2ff503fb8a822c960bcd",
+      "latin": "le petit-déjeuner",
+      "meanings": [
+        [
+          "(das) Frühstück"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a1cfe261ac9aabcb7797",
+      "latin": "porter qc",
+      "meanings": [
+        [
+          "(etwas) tragen (Kleidung, Lasten)"
+        ]
+      ],
+      "answerVariants": [
+        "porter (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_ff44a2d9d73faba8f1df",
+      "latin": "les vêtements (m. pl.)",
+      "meanings": [
+        [
+          "(die) Kleidung"
+        ]
+      ],
+      "answerVariants": [
+        "les vêtements"
+      ]
+    },
+    {
+      "id": "fr_2026_531bfe6def25ae955884",
+      "latin": "les sneakers (m. pl.)",
+      "meanings": [
+        [
+          "(die) Sneakers"
+        ]
+      ],
+      "answerVariants": [
+        "les sneakers"
+      ]
+    },
+    {
+      "id": "fr_2026_736fb5c426f8bd58cb13",
+      "latin": "les lunettes (f. pl.)",
+      "meanings": [
+        [
+          "(die) Brille"
+        ]
+      ],
+      "answerVariants": [
+        "les lunettes"
+      ]
+    },
+    {
+      "id": "fr_2026_238841c7ed9eca2db4f2",
+      "latin": "le mois",
+      "meanings": [
+        [
+          "(der) Monat"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_33e7668097a794b6f70b",
+      "latin": "un appareil dentaire",
+      "meanings": [
+        [
+          "(eine) Zahnspange"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_114479a8c6a850639782",
+      "latin": "le caractère",
+      "meanings": [
+        [
+          "(der) Charakter"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_5913bf3bdd62039ee4f9",
+      "latin": "plutôt (adv.)",
+      "meanings": [
+        [
+          "eher",
+          "lieber"
+        ]
+      ],
+      "answerVariants": [
+        "plutôt"
+      ]
+    },
+    {
+      "id": "fr_2026_f08304aee08d3ee82728",
+      "latin": "timide (m./f.)",
+      "meanings": [
+        [
+          "schüchtern"
+        ]
+      ],
+      "answerVariants": [
+        "timide"
+      ]
+    },
+    {
+      "id": "fr_2026_eb08f1e742f83d962c74",
+      "latin": "l’avenir (m.)",
+      "meanings": [
+        [
+          "(die) Zukunft"
+        ]
+      ],
+      "answerVariants": [
+        "l’avenir"
+      ]
+    },
+    {
+      "id": "fr_2026_6f3d74994dd05b0f61b1",
+      "latin": "plus tard (adv.)",
+      "meanings": [
+        [
+          "später"
+        ]
+      ],
+      "answerVariants": [
+        "plus tard"
+      ]
+    },
+    {
+      "id": "fr_2026_b701daeccdfee447797c",
+      "latin": "le gamer / la gameuse",
+      "meanings": [
+        [
+          "(der) Gamer",
+          "(die) Gamerin"
+        ]
+      ],
+      "answerVariants": [
+        "le gamer",
+        "la gameuse"
+      ]
+    },
+    {
+      "id": "fr_2026_63a62e17f12d2118034a",
+      "latin": "gagner de l’argent",
+      "meanings": [
+        [
+          "Geld verdienen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_50c5775c285c6b26a21c",
+      "latin": "la blague",
+      "meanings": [
+        [
+          "(der) Witz",
+          "(der) Scherz"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+import {subjectInfo} from './subjects.js';
 export const activityLabels={opened:'App geöffnet / zurückgekehrt',started:'Lernrunde gestartet',paused:'Lernrunde pausiert',finished:'Lernrunde beendet',words:'Vokabeleinträge bearbeitet',collections:'Sammlungen bearbeitet',refresh:'Auffrisch-Sammlung bearbeitet',settings:'Lerneinstellungen geändert'};
 export function activityKinds(changes,previous){
  const kinds=new Set();
@@ -10,4 +11,4 @@ export function activityKinds(changes,previous){
  }
  return [...kinds];
 }
-export function activityRows(events,h){return events.map(e=>`<li><time>${h(new Date(e.at).toLocaleString('de-DE',{timeZone:'Europe/Berlin',dateStyle:'medium',timeStyle:'short'}))}</time><br><span class="small muted">${e.subject==='english'?'Englisch':'Latein'}</span> · ${h(activityLabels[e.action]||'Aktivität')}</li>`).join('');}
+export function activityRows(events,h){return events.map(e=>`<li><time>${h(new Date(e.at).toLocaleString('de-DE',{timeZone:'Europe/Berlin',dateStyle:'medium',timeStyle:'short'}))}</time><br><span class="small muted">${subjectInfo(e.subject).label}</span> · ${h(activityLabels[e.action]||'Aktivität')}</li>`).join('');}

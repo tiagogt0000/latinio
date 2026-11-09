@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Latinio Französisch</title>
+  <defs>
+    <linearGradient id="color" x1="56" y1="0" x2="438" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6c9fd7"/><stop offset=".48" stop-color="#2c6099"/><stop offset="1" stop-color="#173c66"/>
+    </linearGradient>
+    <radialGradient id="light" cx="76" cy="4" r="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#eef5ff" stop-opacity=".45"/><stop offset="1" stop-color="#eef5ff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="refraction" cx="412" cy="512" r="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#a9d0ff" stop-opacity=".34"/><stop offset="1" stop-color="#a9d0ff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="glass" x1="114" y1="36" x2="376" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".19"/><stop offset=".46" stop-color="#fff" stop-opacity=".035"/><stop offset="1" stop-color="#fff" stop-opacity=".1"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="106" y1="36" x2="398" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff" stop-opacity=".66"/><stop offset=".48" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#dcecff" stop-opacity=".35"/>
+    </linearGradient>
+    <linearGradient id="glyph" x1="256" y1="126" x2="256" y2="386" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/><stop offset="1" stop-color="#f1f7ff"/>
+    </linearGradient>
+    <filter id="lens-shadow" x="-15%" y="-15%" width="130%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+    <path id="letter" d="M194 158v144c0 35 19 56 54 56h42"/>
+    <path id="spark" d="M320 126c7 32 18 43 50 50-32 7-43 18-50 50-7-32-18-43-50-50 32-7 43-18 50-50Z"/>
+  </defs>
+  <rect width="512" height="512" fill="url(#color)"/>
+  <rect width="512" height="512" fill="url(#light)"/>
+  <rect width="512" height="512" fill="url(#refraction)"/>
+  <rect x="40" y="48" width="432" height="432" rx="110" fill="#122b49" opacity=".17" filter="url(#lens-shadow)"/>
+  <rect x="40" y="36" width="432" height="432" rx="110" fill="url(#glass)" stroke="url(#edge)" stroke-width="2"/>
+  <g transform="translate(0 5)" opacity=".15">
+    <use href="#letter" fill="none" stroke="#122b49" stroke-width="56" stroke-linecap="round"/>
+    <use href="#spark" fill="#122b49"/>
+  </g>
+  <use href="#letter" fill="none" stroke="url(#glyph)" stroke-width="56" stroke-linecap="round"/>
+  <use href="#spark" fill="url(#glyph)"/>
+</svg>

@@ -1,3 +1,4 @@
+import {subjectInfo} from './subjects.js';
 import {pairs,pairId,suggestions,makeRound,matchRound} from './confusions.js';
 export function confusionUI({store,sync,h,showModal,closeModal,notify,go,render,subject='latin'}){
   const d=()=>store.data;
@@ -23,13 +24,13 @@ export function confusionUI({store,sync,h,showModal,closeModal,notify,go,render,
   async function offer(wordIds,returnScreen='result',force=false){
     if(store.doc.matchRound){go('match');return true;}
     const round=makeRound(d(),wordIds,force);if(!round)return false;
-    round.returnScreen=returnScreen;if(subject==='english')round.message='Wähle ein englisches Wort und danach seine deutschen Bedeutungen.';await store.update(doc=>{doc.matchRound=round;return doc;});closeModal();go('match');return true;
+    round.returnScreen=returnScreen;if(subject!=='latin')round.message='Wähle zuerst ein Wort auf '+subjectInfo(subject).label+' und danach seine deutschen Bedeutungen.';await store.update(doc=>{doc.matchRound=round;return doc;});closeModal();go('match');return true;
   }
   function view(){
     const r=store.doc.matchRound;if(!r)return '<main class="test-shell"><h1>Keine Zuordnungsrunde offen.</h1><button class="button primary" data-action="nav" data-screen="collections">Zu den Sammlungen</button></main>';
     const complete=r.doneLeft.length===r.words.length;
     const cards=(side)=>r[side].map(id=>{const w=r.words.find(w=>w.id===id),done=r[side==='left'?'doneLeft':'doneRight'].includes(id),chosen=side==='left'&&r.selected===id,bad=r.bad?.[side]===id;return `<button class="match-card ${done?'matched':''} ${chosen?'chosen':''} ${bad?'mismatch':''}" data-action="confusion-card" data-side="${side}" data-id="${h(id)}" ${done?'disabled':''} ${side==='left'?`aria-pressed="${chosen}"`:''}>${done?'<span aria-label="Zugeordnet">✓ </span>':''}${side==='left'?h(w.latin):w.meanings.map(g=>h(g.join(' / '))).join(' · ')}</button>`;}).join('');
-    return `<main class="test-shell"><div class="eyebrow">VERWECHSLUNGEN FESTIGEN</div><h1>Was gehört zusammen?</h1><p class="muted match-help">Tippe zuerst auf ${subject==='english'?'Englisch':'Latein'}, dann auf die passenden deutschen Bedeutungen. Jede deutsche Karte zeigt alle Bedeutungen des Wortes.</p><div class="match-grid"><section aria-label="${subject==='english'?'Englisch':'Latein'}"><h2>${subject==='english'?'Englisch':'Latein'}</h2>${cards('left')}</section><section aria-label="Deutsch"><h2>Deutsch</h2>${cards('right')}</section></div><p role="status" class="match-message">${h(complete?'Alle Wörter zugeordnet!':r.message)}</p><p class="small muted">${r.doneLeft.length} / ${r.words.length} zugeordnet</p>${complete?'<button class="button primary wide" data-action="confusion-complete">Weiter</button>':'<button class="text-button" data-action="confusion-leave">Später üben</button>'}</main>`;
+    return `<main class="test-shell"><div class="eyebrow">VERWECHSLUNGEN FESTIGEN</div><h1>Was gehört zusammen?</h1><p class="muted match-help">Tippe zuerst auf ${subjectInfo(subject).label}, dann auf die passenden deutschen Bedeutungen. Jede deutsche Karte zeigt alle Bedeutungen des Wortes.</p><div class="match-grid"><section aria-label="${subjectInfo(subject).label}"><h2>${subjectInfo(subject).label}</h2>${cards('left')}</section><section aria-label="Deutsch"><h2>Deutsch</h2>${cards('right')}</section></div><p role="status" class="match-message">${h(complete?'Alle Wörter zugeordnet!':r.message)}</p><p class="small muted">${r.doneLeft.length} / ${r.words.length} zugeordnet</p>${complete?'<button class="button primary wide" data-action="confusion-complete">Weiter</button>':'<button class="text-button" data-action="confusion-leave">Später üben</button>'}</main>`;
   }
   async function handle(button){
     const action=button.dataset.action;if(!action.startsWith('confusion-'))return false;
@@ -42,7 +43,7 @@ export function confusionUI({store,sync,h,showModal,closeModal,notify,go,render,
     if(action==='confusion-card'){
       await store.update(doc=>{let r=doc.matchRound;if(!r)return doc;const id=button.dataset.id;
         if(button.dataset.side==='left'){if(!r.doneLeft.includes(id)){r.selected=id;r.bad=null;r.message='Wähle jetzt die passende deutsche Karte.';}}
-        else if(!r.selected)r.message='Wähle zuerst ein '+(subject==='english'?'englisches':'lateinisches')+' Wort.';
+        else if(!r.selected)r.message='Wähle zuerst ein Wort auf '+subjectInfo(subject).label+'.';
         else r=matchRound(r,id);doc.matchRound=r;return doc;});render();
     }
     if(action==='confusion-complete'||action==='confusion-leave'){

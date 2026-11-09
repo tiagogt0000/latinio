@@ -1,0 +1,285 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_1_4",
+  "name": "Lernwoche 1 bis 4",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      3
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_7f508b7aa091c4f8d01d",
+      "latin": "la finale",
+      "meanings": [
+        [
+          "(das) Finale"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_833e478bf32f6d674b23",
+      "latin": "le match",
+      "meanings": [
+        [
+          "(das) Spiel"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_edb270a3f2a04bcf9c20",
+      "latin": "le/la Croate",
+      "meanings": [
+        [
+          "(der) Kroate",
+          "(die) Kroatin"
+        ]
+      ],
+      "answerVariants": [
+        "le Croate",
+        "la Croate"
+      ]
+    },
+    {
+      "id": "fr_2026_d18b79b3c1e43771185e",
+      "latin": "fort/forte",
+      "meanings": [
+        [
+          "stark"
+        ]
+      ],
+      "answerVariants": [
+        "fort",
+        "forte"
+      ]
+    },
+    {
+      "id": "fr_2026_183745a559a91055d060",
+      "latin": "le but",
+      "meanings": [
+        [
+          "(das) Ziel",
+          "(das) Tor"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e3cb6f859b5dc99ecf3a",
+      "latin": "tirer",
+      "meanings": [
+        [
+          "ziehen",
+          "schießen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a8acfb958ec0e6f0c14d",
+      "latin": "défendre (qn/qc)",
+      "meanings": [
+        [
+          "(jemanden) verteidigen",
+          "(etwas) verteidigen"
+        ]
+      ],
+      "answerVariants": [
+        "défendre (qn)",
+        "défendre (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_9e4d8a316935bda1b632",
+      "latin": "marquer un but",
+      "meanings": [
+        [
+          "(ein) Tor schießen",
+          "treffen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_4eab0ddf000cb2287339",
+      "latin": "mener",
+      "meanings": [
+        [
+          "führen",
+          "in Führung liegen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_f6e85c99356312c57040",
+      "latin": "(1) à (0)",
+      "meanings": [
+        [
+          "(1) zu (0)"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_c101a595d089a63b889c",
+      "latin": "un/une arbitre",
+      "meanings": [
+        [
+          "(ein) Schiedsrichter",
+          "(eine) Schiedsrichterin"
+        ]
+      ],
+      "answerVariants": [
+        "un arbitre",
+        "une arbitre"
+      ]
+    },
+    {
+      "id": "fr_2026_9a3868b61c77f2e11c8e",
+      "latin": "le carton (jaune/rouge)",
+      "meanings": [
+        [
+          "(die) (gelbe) Karte",
+          "(die) (rote) Karte"
+        ]
+      ],
+      "answerVariants": [
+        "le carton (jaune)",
+        "le carton (rouge)"
+      ]
+    },
+    {
+      "id": "fr_2026_f2fd5069bb72b2abc844",
+      "latin": "le score",
+      "meanings": [
+        [
+          "(der) Spielstand"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_2fd7e7808ba78d0ad45d",
+      "latin": "le score est de… à…",
+      "meanings": [
+        [
+          "es steht … zu …"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_dcd47f76425ca3aa55c2",
+      "latin": "partout (adv.)",
+      "meanings": [
+        [
+          "unentschieden"
+        ]
+      ],
+      "answerVariants": [
+        "partout"
+      ]
+    },
+    {
+      "id": "fr_2026_2ed390d0e3364a788147",
+      "latin": "attaquer (qn)",
+      "meanings": [
+        [
+          "(jemanden) angreifen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_25eb4b5f26efe61b757b",
+      "latin": "la faute",
+      "meanings": [
+        [
+          "(der) Fehler",
+          "(das) Foul"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_368d1d3e8dff1bf3998e",
+      "latin": "parler à qn",
+      "meanings": [
+        [
+          "mit (jemandem) sprechen"
+        ]
+      ],
+      "answerVariants": [
+        "parler à (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_749725973c24aab0fc25",
+      "latin": "le penalty",
+      "meanings": [
+        [
+          "(der) Strafstoß",
+          "(der) Elfmeter"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_fade0964925bbbb877ef",
+      "latin": "la mi-temps",
+      "meanings": [
+        [
+          "(die) Halbzeit"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_733eb4bb0b450cf29e47",
+      "latin": "le ballon",
+      "meanings": [
+        [
+          "(der) Ball"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a2bcd108baa35f6ec441",
+      "latin": "passer le ballon à qn",
+      "meanings": [
+        [
+          "(jemandem) den Ball zuspielen"
+        ]
+      ],
+      "answerVariants": [
+        "passer le ballon à (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_e05cdb046e39698d71a0",
+      "latin": "le gardien / la gardienne (de but)",
+      "meanings": [
+        [
+          "(der) Torwart",
+          "(die) Torwartin"
+        ]
+      ],
+      "answerVariants": [
+        "le gardien",
+        "la gardienne (de but)"
+      ]
+    },
+    {
+      "id": "fr_2026_2110de41770c8bed8373",
+      "latin": "faire attention",
+      "meanings": [
+        [
+          "aufpassen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_6fe340ab823d4f5a3fda",
+      "latin": "il reste…",
+      "meanings": [
+        [
+          "(nur) noch …"
+        ]
+      ]
+    }
+  ]
+}

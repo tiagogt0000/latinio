@@ -1,0 +1,206 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_11",
+  "name": "Lernwoche 11",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      10
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_d2d389ef012a62ddab82",
+      "latin": "(être) né/née",
+      "meanings": [
+        [
+          "geboren (sein)"
+        ]
+      ],
+      "answerVariants": [
+        "(être) né",
+        "(être) née"
+      ]
+    },
+    {
+      "id": "fr_2026_9691d5bf83c12e121ffd",
+      "latin": "à… ans",
+      "meanings": [
+        [
+          "mit … Jahren"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_4df7cddd67f59f0255df",
+      "latin": "le prix / les prix",
+      "meanings": [
+        [
+          "(der) Preis"
+        ]
+      ],
+      "answerVariants": [
+        "le prix",
+        "les prix"
+      ]
+    },
+    {
+      "id": "fr_2026_a9a568dde729d7af5434",
+      "latin": "finir qc",
+      "meanings": [
+        [
+          "(etwas) beenden",
+          "enden"
+        ]
+      ],
+      "answerVariants": [
+        "finir (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_9f745da2a357e7e64522",
+      "latin": "grandir",
+      "meanings": [
+        [
+          "aufwachsen",
+          "wachsen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_3dec561a109ff338c0de",
+      "latin": "réussir (qc)",
+      "meanings": [
+        [
+          "es schaffen",
+          "(etwas) schaffen",
+          "gelingen",
+          "(etwas) bestehen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_55dc2b82dc1b0a2a910b",
+      "latin": "choisir qn/qc",
+      "meanings": [
+        [
+          "(jemanden) aussuchen",
+          "(etwas) aussuchen",
+          "(jemanden) auswählen",
+          "(etwas) auswählen"
+        ]
+      ],
+      "answerVariants": [
+        "choisir (qn)",
+        "choisir (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_ab62b4404d8140f840fe",
+      "latin": "quitter qn/qc",
+      "meanings": [
+        [
+          "(jemanden) verlassen",
+          "(etwas) verlassen"
+        ]
+      ],
+      "answerVariants": [
+        "quitter (qn)",
+        "quitter (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_306422783d6d98fb55a2",
+      "latin": "participer à qc",
+      "meanings": [
+        [
+          "an (etwas) teilnehmen"
+        ]
+      ],
+      "answerVariants": [
+        "participer à (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_21869d70e078af5f8c58",
+      "latin": "baisser les bras",
+      "meanings": [
+        [
+          "aufgeben (wörtlich: die Arme senken)"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_6a9e99ae2ec9bbba2f50",
+      "latin": "encourager qn",
+      "meanings": [
+        [
+          "(jemanden) ermutigen"
+        ]
+      ],
+      "answerVariants": [
+        "encourager (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_db09ef10ad9fa60f4b3b",
+      "latin": "perdre (qn/qc)",
+      "meanings": [
+        [
+          "(jemanden) verlieren",
+          "(etwas) verlieren"
+        ]
+      ],
+      "answerVariants": [
+        "perdre (qn)",
+        "perdre (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_4e582321f39e2638a081",
+      "latin": "les médias (m. pl.)",
+      "meanings": [
+        [
+          "(die) Medien"
+        ]
+      ],
+      "answerVariants": [
+        "les médias"
+      ]
+    },
+    {
+      "id": "fr_2026_6af897fbac17fd491587",
+      "latin": "un album",
+      "meanings": [
+        [
+          "(ein) Album"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_21543ee10f07f39033b9",
+      "latin": "le concert",
+      "meanings": [
+        [
+          "(das) Konzert"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e00155c4080d8698ee6a",
+      "latin": "les hauts et les bas (m. pl.)",
+      "meanings": [
+        [
+          "(die) Höhen und Tiefen",
+          "(das) Auf und Ab"
+        ]
+      ],
+      "answerVariants": [
+        "les hauts et les bas"
+      ]
+    }
+  ]
+}

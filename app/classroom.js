@@ -1,3 +1,4 @@
+import {subjectInfo} from './subjects.js';
 import {formMatch} from './morphology.js';
 import {normalize} from './core.js';
 const key=s=>normalize(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[.,;:!?()[\]«»„“"']/g,' ').replace(/\s+/g,' ').trim();
@@ -15,7 +16,7 @@ export function lookupWords(data,query,english=false,subject=english?'english':'
 export function classroomView(data,query,h,english=false,subject=english?'english':'latin'){return `<div class="page-heading"><div><div class="eyebrow">SCHNELL NACHSCHLAGEN</div><h1>Unterricht</h1><p class="muted"></p></div></div><section class="card"><label for="classroom-search">${english?'Englisches':'Lateinisches'} Wort oder deutsche Bedeutung</label><input id="classroom-search" type="search" value="${h(query)}" placeholder="${english?'Zum Beispiel hello oder hallo':'Zum Beispiel vox, vocis oder Stimme'}" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" style="width:100%;margin-top:12px"><p class="small muted" data-compact-hide>Alle Lektionen · auch offline.</p></section><section id="classroom-results" class="lookup-results" aria-live="polite">${classroomResults(data,query,h,english,subject)}</section>`;}
 export function classroomResults(data,query,h,english=false,subject=english?'english':'latin'){
  if(!query.trim())return '<p class="muted">Wort eingeben.</p>';
- const words=lookupWords(data,query,english);
+ const words=lookupWords(data,query,english,subject);
  if(!words.length)return '<p class="muted">Kein Treffer. Versuche die Grundform oder einen kürzeren Wortteil.</p>';
- return `<p class="small muted">${words.length} Treffer${words.length>80?' · die ersten 80 werden angezeigt':''}</p>`+words.slice(0,80).map(w=>`<article class="card lookup-word"><h2 lang="${english?'en':'la'}">${h(w.latin)}</h2>${!english&&formMatch(w,query)==='inferred'&&!key(w.latin).split(' ').includes(key(query))?'<span class="tag">Mögliche gebeugte Form · Grundbedeutungen</span>':''}<p>${w.meanings.map(g=>h(g.join(' / '))).join(', ')}</p><small class="muted">${h(data.collections[w.collectionId].name)}</small></article>`).join('');
+ return `<p class="small muted">${words.length} Treffer${words.length>80?' · die ersten 80 werden angezeigt':''}</p>`+words.slice(0,80).map(w=>`<article class="card lookup-word"><h2 lang="${subjectInfo(subject).code}">${h(w.latin)}</h2>${!english&&formMatch(w,query)==='inferred'&&!key(w.latin).split(' ').includes(key(query))?'<span class="tag">Mögliche gebeugte Form · Grundbedeutungen</span>':''}<p>${w.meanings.map(g=>h(g.join(' / '))).join(', ')}</p><small class="muted">${h(data.collections[w.collectionId].name)}</small></article>`).join('');
 }

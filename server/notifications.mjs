@@ -11,7 +11,7 @@ export const defaultMessages=[
  [10,'all','Nur eine kleine Runde. Deine zukünftige Klassenarbeit sagt schon mal danke. ✨'],
  [11,'all','Die Vokabeln haben nach dir gefragt. Ich hab gesagt, du kommst gleich 🥺']
 ].map(([id,subject,text])=>({id:'starter-'+id,subject,text,enabled:true}));
-const activeSubjects=new Set(['latin','english']);
+const activeSubjects=new Set(['latin','english','french']);
 export function localClock(now,zone='Europe/Berlin'){
  const p=Object.fromEntries(new Intl.DateTimeFormat('en-CA',{timeZone:zone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(now)).map(x=>[x.type,x.value]));
  return {day:`${p.year}-${p.month}-${p.day}`,minute:Number(p.hour)*60+Number(p.minute)};
@@ -93,7 +93,7 @@ export function createNotifications(database,transport,{now=Date.now,random=rand
     for(const target of targets){
      const fresh=database.notificationSnapshot().find(p=>p.id===profileId);if(!fresh||learned(fresh,day)||!fresh.subjects.includes(subject)||!get('catalog').enabled)break;
      if(!db.prepare('SELECT 1 FROM notification_devices WHERE endpoint=? AND profile=?').get(target.endpoint,profileId))continue;
-     const payload={title:subject==='english'?'🇺🇸 Latinio · Englisch':'🇻🇦 Latinio · Latein',body:message.text,tag:'latinio-learn-'+day,url:'./?subject='+subject,day};
+     const payload={title:subject==='french'?'🇫🇷 Latinio · Französisch':subject==='english'?'🇺🇸 Latinio · Englisch':'🇻🇦 Latinio · Latein',body:message.text,tag:'latinio-learn-'+day,url:'./?subject='+subject,day};
      try{await transport.sendNotification(JSON.parse(target.subscription),JSON.stringify(payload),{vapidDetails:{subject:'https://tiagogt0000.github.io/latinio/',...vapid},TTL:1800,timeout:10000,urgency:'normal',topic:createHash('sha256').update(profileId+day).digest('base64url').slice(0,32)});accepted++;}
      catch(error){failed++;if([404,410].includes(error.statusCode))db.prepare('DELETE FROM notification_devices WHERE endpoint=?').run(target.endpoint);}
     }

@@ -1,4 +1,9 @@
-# Latinio · Version 2.15.2
+# Latinio · Version 2.16.0
+## Neu in 2.16.0: Französisches Vokabeltraining und vereinfachte Nutzeransicht
+Französisch ist als dunkelblaue Latinio-Version verfügbar. Es nutzt wie Englisch das Vokabeltraining in beiden Richtungen, mit getrennten Lernständen und ohne Tabellen oder Grammatikbereich. Die angezeigte Lösung hat wieder dieselbe Schrift, Fläche und Abstände wie der Fragekasten.
+Im Adminbereich lässt sich unter „Nutzer bearbeiten“ der vereinfachte Modus einschalten. Er ist standardmäßig aus und wird pro Nutzer in der Cloud gespeichert. Eingeschaltet bleiben nur Startseite und Sammlungen in der Navigation; Einstellungen, Unterrichtssuche und die Suchfelder in Sammlungen entfallen. Laufende Übungen werden beim Eintreffen einer Änderung nicht unterbrochen.
+Aus den bereitgestellten PDFs sind elf Sammlungen mit 231 eindeutigen Vokabeleinträgen in die Cloud importiert. Module 3 ist gemeinsam „Lernwoche 1 bis 4“ zugeordnet; reine Wiederholungswochen und fünf bereits früher zugeordnete Einträge erzeugen keine Duplikate. Die [Importnotizen](data/french-2026/README.md) dokumentieren Quellen, Zuordnung und Abgrenzung.
+
 ## Neu in 2.15.2: Klarere Auswahl und weniger Unterbrechungen
 Die Trainingsauswahl hat mehr Abstand zwischen Auswahlfeld, Pfeil und Beschriftung. Kompaktere Zeilen und Knöpfe mit größerer Schrift bleiben gut antippbar. Beim Fachwechsel ersetzen sich die ausgeschriebenen grünen und roten Latinio-Logos durch eine kurze seitliche Bewegung.
 Der normale Cloud-Abgleich erscheint nicht mehr unter der Begrüßung. Verbindungsprobleme zeigen einen einmaligen Hinweis mit „Erneut laden“ und „Ausblenden“, der laufende Übungen und geöffnete Dialoge abwartet. Bereits gespeicherte Sammlungen bleiben offline nutzbar. „Später“ bei Lern-Erinnerungen bleibt auf diesem Gerät auch nach dem nächsten App-Start gespeichert; die Freigabe ist weiterhin in den Einstellungen möglich.

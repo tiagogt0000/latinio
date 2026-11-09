@@ -15,5 +15,5 @@ export function evaluationCorrection(word,index,selected=[]){
 
 export function translationCard(word,feedback,language='de'){
  if(!feedback)return '';
- return `<div class="latin-word translation-card" lang="${language}" aria-label="${language==='en'?'Englische':'Deutsche'} Übersetzung" aria-live="polite">${word.meanings.flat().map(escape).join(', ')}</div>`;
+ return `<div class="latin-word translation-card" lang="${language}" aria-label="${language==='fr'?'Französische':language==='en'?'Englische':'Deutsche'} Übersetzung" aria-live="polite">${word.meanings.flat().map(escape).join(', ')}</div>`;
 }

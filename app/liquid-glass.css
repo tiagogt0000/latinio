@@ -7,7 +7,7 @@
   --glass-label: #414149;
   --glass-muted: #595962;
   --glass-latin-brand: #237a42;
-  --glass-french-brand: #a05a16;
+  --glass-french-brand: #245a91;
   --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, .65), rgba(255, 255, 255, .08) 45%, rgba(255, 255, 255, .32));
   --glass-shadow: inset 0 1px 0 var(--glass-rim), inset 0 -1px 0 rgba(255, 255, 255, .3), 0 8px 24px rgba(30, 40, 50, .08), 0 1px 4px rgba(30, 40, 50, .05);
   --glass-blur: none;
@@ -18,7 +18,7 @@
   --glass-label: #eeeef2;
   --glass-muted: #bfbfc8;
   --glass-latin-brand: #81d59b;
-  --glass-french-brand: #edb97e;
+  --glass-french-brand: #9cbff0;
   --glass-sheen: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .01) 45%, rgba(255, 255, 255, .045));
   --glass-shadow: inset 0 1px 0 var(--glass-rim), inset 0 -1px 0 rgba(255, 255, 255, .04), 0 8px 28px rgba(0, 0, 0, .24), 0 1px 4px rgba(0, 0, 0, .15);
 }
@@ -174,8 +174,10 @@ body {
   color: var(--text);
 }
 .subject-entrance .entrance-choice[data-subject=english] { --entrance-accent: #c53645; }
+.subject-entrance .entrance-choice[data-subject=french] { --entrance-accent: #245a91; }
 :root[data-theme=dark] .subject-entrance .entrance-choice { --entrance-accent: #81d59b; }
 :root[data-theme=dark] .subject-entrance .entrance-choice[data-subject=english] { --entrance-accent: #ff9b9f; }
+:root[data-theme=dark] .subject-entrance .entrance-choice[data-subject=french] { --entrance-accent: #9cbff0; }
 .entrance-choice img { width: 4.5rem; height: 4.5rem; border-radius: 1.25rem; }
 .entrance-choice-description { color: var(--glass-muted); }
 .entrance-app-name, .entrance-arrow { color: var(--glass-muted); }

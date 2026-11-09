@@ -1,0 +1,167 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_13",
+  "name": "Lernwoche 13",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      12
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_02ee7522742761bad957",
+      "latin": "nouveau/nouvel/nouvelle/nouveaux/nouvelles",
+      "meanings": [
+        [
+          "neu"
+        ]
+      ],
+      "answerVariants": [
+        "nouveau",
+        "nouvel",
+        "nouvelle",
+        "nouveaux",
+        "nouvelles"
+      ]
+    },
+    {
+      "id": "fr_2026_a0384612ffd3089d9bdf",
+      "latin": "le paysage",
+      "meanings": [
+        [
+          "(die) Landschaft"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_db92dccc31a1de23764b",
+      "latin": "la course",
+      "meanings": [
+        [
+          "(der) Lauf",
+          "(das) Rennen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_70f63fa1f1ccd6bbcd07",
+      "latin": "fou/folle",
+      "meanings": [
+        [
+          "verrückt",
+          "wahnsinnig"
+        ]
+      ],
+      "answerVariants": [
+        "fou",
+        "folle"
+      ]
+    },
+    {
+      "id": "fr_2026_8994c3217c7ba144c590",
+      "latin": "la région",
+      "meanings": [
+        [
+          "(die) Gegend",
+          "(die) Region"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_fa8e1bd177cc93102a8f",
+      "latin": "la capitale",
+      "meanings": [
+        [
+          "(die) Hauptstadt"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_10c5300d8b5bcfda123e",
+      "latin": "un habitant / une habitante",
+      "meanings": [
+        [
+          "(ein) Bewohner",
+          "(eine) Bewohnerin",
+          "(ein) Einwohner",
+          "(eine) Einwohnerin"
+        ]
+      ],
+      "answerVariants": [
+        "un habitant",
+        "une habitante"
+      ]
+    },
+    {
+      "id": "fr_2026_4dcafbe0303aa465452a",
+      "latin": "l’été (m.)",
+      "meanings": [
+        [
+          "(der) Sommer"
+        ]
+      ],
+      "answerVariants": [
+        "l’été"
+      ]
+    },
+    {
+      "id": "fr_2026_6c4119ecb32193b85f2f",
+      "latin": "le printemps",
+      "meanings": [
+        [
+          "(der) Frühling"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_749ffc14402cc896b7ff",
+      "latin": "l’automne (m.)",
+      "meanings": [
+        [
+          "(der) Herbst"
+        ]
+      ],
+      "answerVariants": [
+        "l’automne"
+      ]
+    },
+    {
+      "id": "fr_2026_d0cf90fc185728ff2387",
+      "latin": "l’hiver (m.)",
+      "meanings": [
+        [
+          "(der) Winter"
+        ]
+      ],
+      "answerVariants": [
+        "l’hiver"
+      ]
+    },
+    {
+      "id": "fr_2026_ce569053a84e50817303",
+      "latin": "actif/active",
+      "meanings": [
+        [
+          "aktiv"
+        ]
+      ],
+      "answerVariants": [
+        "actif",
+        "active"
+      ]
+    },
+    {
+      "id": "fr_2026_9db070d1ad2bdcad8494",
+      "latin": "le centre",
+      "meanings": [
+        [
+          "(das) Zentrum"
+        ]
+      ]
+    }
+  ]
+}

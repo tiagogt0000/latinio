@@ -45,7 +45,7 @@ function latinioApi(request) {
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
     let version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
-    if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects};
+    if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects,simplifiedMode:identity.simplifiedMode===true};
     if(!['pull','push','streak'].includes(request.action))throw new Error('Unbekannte Aktion.');
     if(request.action==='push'){
       if(!Number.isSafeInteger(request.base)||request.base<0)throw new Error('Ungültige Version.');
@@ -94,7 +94,7 @@ function authorize_(request){
   const profile=records_('_LatinioProfiles')[session.profileId];
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
   if((studentCodesRequired_()||profile.loginCodeHash)&&(!profile.loginCodeHash||!session.codeAuthVersion||session.codeAuthVersion!==profile.codeAuthVersion))throw new Error('Bitte melde dich mit deinem Zugangscode neu an.');
-  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),codeAuthVersion:session.codeAuthVersion||null};
+  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),simplifiedMode:profile.simplifiedMode===true,codeAuthVersion:session.codeAuthVersion||null};
 }
 function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english'||s==='french';}))):['latin','english','french'];}
 function ensureLog_(profileId,readOnly,subject='latin'){
@@ -116,6 +116,7 @@ function validateOp_(op){
   if(!op.value||typeof op.value!=='object'||Array.isArray(op.value))throw new Error('Ungültige Daten.');
   const v=op.value;
   if(op.entity==='words'&&(v.id!==op.key||typeof v.latin!=='string'||typeof v.collectionId!=='string'||!Array.isArray(v.meanings)||!v.meanings.length||v.meanings.some(function(g){return !Array.isArray(g)||!g.length||g.some(function(s){return typeof s!=='string'||!s.trim()||s.length>300;});})))throw new Error('Ungültige Vokabel.');
+  if(op.entity==='words'&&v.answerVariants!==undefined&&(!Array.isArray(v.answerVariants)||!v.answerVariants.length||v.answerVariants.length>40||v.answerVariants.some(function(value){return typeof value!=='string'||!value.trim()||value.length>200;})))throw new Error('Ungültige Antwortvarianten.');
   if(op.entity==='collections'&&(v.id!==op.key||typeof v.name!=='string'||!v.name.trim()))throw new Error('Ungültige Sammlung.');
   if(op.entity==='reviews'&&(v.id!==op.key||typeof v.wordId!=='string'||!['full','partial','wrong'].includes(v.grade)||!Number.isFinite(v.at)))throw new Error('Ungültige Bewertung.');
 }

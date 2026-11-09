@@ -19,12 +19,12 @@ export function englishTasks(data,ids,mode='smart',limit=10,direction='mixed',no
   const rank=x=>x.level!=='known'?(x.p.seen&&x.p.due<=now?0:!x.p.seen?1:2):(x.p.due<=now?3:4);
   return tasks.sort((a,b)=>rank(a)-rank(b)||oldest(a,b)).slice(0,limit).map(({wordId,direction})=>({wordId,direction}));
 }
-export function answerWord(word,direction){return direction==='de-en'?{...word,meanings:[[word.latin]]}:word;}
+export function answerWord(word,direction){return direction==='de-en'?{...word,meanings:[word.answerVariants?.length?word.answerVariants:[word.latin]]}:word;}
 export function promptFor(word,direction){return direction==='de-en'?word.meanings.map(g=>g.join(' / ')).join(' · '):word.latin;}
-export function englishImport(input){
+export function englishImport(input,language='english'){
  if(!input||!Array.isArray(input.words))return input;
  return {...input,words:input.words.map(item=>{
   const meanings=item.meanings??(Array.isArray(item.german)?item.german:typeof item.german==='string'?[item.german]:null);
-  return {...item,latin:item.latin??item.english,meanings:meanings?.map(group=>Array.isArray(group)?group:[group])};
+  return {...item,latin:item.latin??item[language],meanings:meanings?.map(group=>Array.isArray(group)?group:[group])};
  })};
 }

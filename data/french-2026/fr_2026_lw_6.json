@@ -1,0 +1,241 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_6",
+  "name": "Lernwoche 6",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      6
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_ffc0d555b8e1fa32c022",
+      "latin": "le système",
+      "meanings": [
+        [
+          "(das) System"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_c89b6c3d164a65091170",
+      "latin": "sur",
+      "meanings": [
+        [
+          "von"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_30ee431787c3ea32c2c2",
+      "latin": "le stress",
+      "meanings": [
+        [
+          "(der) Stress"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_702e1f3ab2c67f96e36c",
+      "latin": "la lettre",
+      "meanings": [
+        [
+          "(der) Buchstabe"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_6fd83c7d0f6e664c6de0",
+      "latin": "comme",
+      "meanings": [
+        [
+          "als"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_1c3f0c88531ab0318bfa",
+      "latin": "calculer qc",
+      "meanings": [
+        [
+          "(etwas) berechnen",
+          "(etwas) ausrechnen"
+        ]
+      ],
+      "answerVariants": [
+        "calculer (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_781b278644577b9a05d7",
+      "latin": "précis/précise",
+      "meanings": [
+        [
+          "genau",
+          "exakt",
+          "klar"
+        ]
+      ],
+      "answerVariants": [
+        "précis",
+        "précise"
+      ]
+    },
+    {
+      "id": "fr_2026_08817560c2a04b84d416",
+      "latin": "exister",
+      "meanings": [
+        [
+          "existieren"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_2ab75d5dfb9306ef53c9",
+      "latin": "le/la même (m./f.)",
+      "meanings": [
+        [
+          "derselbe",
+          "dieselbe",
+          "dasselbe",
+          "(der) Gleiche",
+          "(die) Gleiche",
+          "(das) Gleiche"
+        ]
+      ],
+      "answerVariants": [
+        "le même",
+        "la même"
+      ]
+    },
+    {
+      "id": "fr_2026_b175a4e1bcb44f5c8795",
+      "latin": "juste (m./f.)",
+      "meanings": [
+        [
+          "gerecht"
+        ]
+      ],
+      "answerVariants": [
+        "juste"
+      ]
+    },
+    {
+      "id": "fr_2026_35f147f6f534ad21f6ed",
+      "latin": "autre (m./f.)",
+      "meanings": [
+        [
+          "anderer",
+          "andere",
+          "anderes"
+        ]
+      ],
+      "answerVariants": [
+        "autre"
+      ]
+    },
+    {
+      "id": "fr_2026_7b2f8da27e30096c25b5",
+      "latin": "penser",
+      "meanings": [
+        [
+          "denken"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_9b017a59f6a3b1798302",
+      "latin": "motivant/motivante",
+      "meanings": [
+        [
+          "motivierend"
+        ]
+      ],
+      "answerVariants": [
+        "motivant",
+        "motivante"
+      ]
+    },
+    {
+      "id": "fr_2026_ca630bd5c7f71ff8fd8e",
+      "latin": "les gens (m. pl.)",
+      "meanings": [
+        [
+          "(die) Leute"
+        ]
+      ],
+      "answerVariants": [
+        "les gens"
+      ]
+    },
+    {
+      "id": "fr_2026_6dcb432bec610fad7831",
+      "latin": "dur/dure",
+      "meanings": [
+        [
+          "hart",
+          "schwer"
+        ]
+      ],
+      "answerVariants": [
+        "dur",
+        "dure"
+      ]
+    },
+    {
+      "id": "fr_2026_95179323278dd5bc814a",
+      "latin": "ça veut dire",
+      "meanings": [
+        [
+          "(das) heißt"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_80a398eef1f3f56266af",
+      "latin": "la catastrophe",
+      "meanings": [
+        [
+          "(die) Katastrophe"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_eed01419d9f648fcc833",
+      "latin": "par contre",
+      "meanings": [
+        [
+          "jedoch",
+          "allerdings"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_102c5877ac52661c3c0c",
+      "latin": "entendre qn/qc",
+      "meanings": [
+        [
+          "(jemanden) hören",
+          "(etwas) hören"
+        ]
+      ],
+      "answerVariants": [
+        "entendre (qn)",
+        "entendre (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_59f811848b331f188e17",
+      "latin": "avoir la moyenne",
+      "meanings": [
+        [
+          "bestehen"
+        ]
+      ]
+    }
+  ]
+}

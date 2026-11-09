@@ -39,7 +39,7 @@ test('Previously verified student and admin accounts open their local store with
 });
 
 test('A student with no current cached subject can pick up a newly granted subject before boot checks access',async t=>{
- for(const allowedSubjects of [[],['french']])await t.test(JSON.stringify(allowedSubjects),async t=>{
+ for(const allowedSubjects of [[],['retired-subject']])await t.test(JSON.stringify(allowedSubjects),async t=>{
   const profile={id:'student',name:'Cached',role:'student',codeAuthVersion:'v1',allowedSubjects},identity={...profile,name:'Verified',allowedSubjects:['english']};
   const f=fixture(t,{profile,identity});let login=0;
   const result=await openAccount(f.root,{onLogin(){login++;}});
@@ -50,7 +50,7 @@ test('A student with no current cached subject can pick up a newly granted subje
 });
 
 test('Offline or unavailable identity lookup keeps the restricted cached profile for the retry screen',async t=>{
- const profile={id:'student',role:'student',codeAuthVersion:'v1',allowedSubjects:['french']};
+ const profile={id:'student',role:'student',codeAuthVersion:'v1',allowedSubjects:['retired-subject']};
  for(const options of [{online:false},{identityError:new TypeError('Load failed')}])await t.test(options.online===false?'offline':'network error',async t=>{
   const f=fixture(t,{profile,...options});const result=await openAccount(f.root);
   assert.deepEqual(result.profile,profile);assert.equal(f.updates,0);assert.equal(f.shown,0);

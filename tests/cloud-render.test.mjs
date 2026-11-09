@@ -12,7 +12,7 @@ function fixture(){
  let html='',visible=[],renders=0;
  const data={collections:{}},focusable={focus(){}},listeners=new Map();
  const modalRoot={get children(){return html?[{}]:[];},set innerHTML(value){html=value;},querySelector:selector=>selector==='[data-cloud-connection-notice]'?(html.includes('data-cloud-connection-notice')?focusable:null):focusable,querySelectorAll:()=>[],contains:()=>false};
- const ctx=vm.createContext({
+ const ctx=vm.createContext({simpleMode:()=>false,
   queueMicrotask,setTimeout,clearTimeout,pendingCloudRender:false,ready:true,working:false,waitingStart:false,screen:'collections',subjectTransition:null,
   cloudNotice:null,cloudWait:{blocked:false},store:{doc:{pending:[]},data,recordActivity:async()=>{}},sync:{schedule(){}},modalRoot,modalCleanup:null,modalReturnFocus:null,
   document:{activeElement:focusable,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type)},

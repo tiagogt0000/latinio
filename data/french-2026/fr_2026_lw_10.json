@@ -1,0 +1,320 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_10",
+  "name": "Lernwoche 10",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      9
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_96076f888dca8b2406bc",
+      "latin": "intelligent/intelligente",
+      "meanings": [
+        [
+          "intelligent"
+        ]
+      ],
+      "answerVariants": [
+        "intelligent",
+        "intelligente"
+      ]
+    },
+    {
+      "id": "fr_2026_465386786a0762456f7b",
+      "latin": "normal/normale/normaux/normales",
+      "meanings": [
+        [
+          "normal"
+        ]
+      ],
+      "answerVariants": [
+        "normal",
+        "normale",
+        "normaux",
+        "normales"
+      ]
+    },
+    {
+      "id": "fr_2026_1516b23b61d58729e5ed",
+      "latin": "la culture",
+      "meanings": [
+        [
+          "(die) Kultur"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_821ced5b90e053eb3007",
+      "latin": "le cliché",
+      "meanings": [
+        [
+          "(das) Klischee"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_2028aa7c73677cf5b013",
+      "latin": "chinois/chinoise",
+      "meanings": [
+        [
+          "chinesisch"
+        ]
+      ],
+      "answerVariants": [
+        "chinois",
+        "chinoise"
+      ]
+    },
+    {
+      "id": "fr_2026_7810cebaf74e5d7c0ee0",
+      "latin": "génial/géniale/géniaux/géniales",
+      "meanings": [
+        [
+          "toll",
+          "genial"
+        ]
+      ],
+      "answerVariants": [
+        "génial",
+        "géniale",
+        "géniaux",
+        "géniales"
+      ]
+    },
+    {
+      "id": "fr_2026_08641f6f0140b8a1ffa0",
+      "latin": "voir qn/qc",
+      "meanings": [
+        [
+          "(jemanden) sehen",
+          "(etwas) sehen"
+        ]
+      ],
+      "answerVariants": [
+        "voir (qn)",
+        "voir (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_6223a1fbe68c9c7ec0f8",
+      "latin": "être d’origine (allemande/française)",
+      "meanings": [
+        [
+          "(deutscher) Herkunft sein",
+          "(französischer) Herkunft sein"
+        ]
+      ],
+      "answerVariants": [
+        "être d’origine (allemande)",
+        "être d’origine (française)"
+      ]
+    },
+    {
+      "id": "fr_2026_1a91f7b2668c649bbb3e",
+      "latin": "asiatique (m./f.)",
+      "meanings": [
+        [
+          "asiatisch"
+        ]
+      ],
+      "answerVariants": [
+        "asiatique"
+      ]
+    },
+    {
+      "id": "fr_2026_88217e55bf07b5f9f2c2",
+      "latin": "l’Asie (f.)",
+      "meanings": [
+        [
+          "Asien"
+        ]
+      ],
+      "answerVariants": [
+        "l’Asie"
+      ]
+    },
+    {
+      "id": "fr_2026_89dc0e574967e287722f",
+      "latin": "le thème",
+      "meanings": [
+        [
+          "(das) Thema"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_8fb7927aec9dd6a0c84d",
+      "latin": "critiquer (qn/qc)",
+      "meanings": [
+        [
+          "(jemanden) kritisieren",
+          "(etwas) kritisieren"
+        ]
+      ],
+      "answerVariants": [
+        "critiquer (qn)",
+        "critiquer (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_bf137d1410e2d06b252b",
+      "latin": "national/nationale/nationaux/nationales",
+      "meanings": [
+        [
+          "national",
+          "National-"
+        ]
+      ],
+      "answerVariants": [
+        "national",
+        "nationale",
+        "nationaux",
+        "nationales"
+      ]
+    },
+    {
+      "id": "fr_2026_de33cee69b0962c31dea",
+      "latin": "l’humour (m.)",
+      "meanings": [
+        [
+          "(der) Humor"
+        ]
+      ],
+      "answerVariants": [
+        "l’humour"
+      ]
+    },
+    {
+      "id": "fr_2026_0b5111a04af8d5924859",
+      "latin": "avant (adv.)",
+      "meanings": [
+        [
+          "früher",
+          "vorher"
+        ]
+      ],
+      "answerVariants": [
+        "avant"
+      ]
+    },
+    {
+      "id": "fr_2026_bc935a0f886273f12e1d",
+      "latin": "faire des études",
+      "meanings": [
+        [
+          "studieren"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_27b959b013f28bd14bff",
+      "latin": "un ingénieur / une ingénieure",
+      "meanings": [
+        [
+          "(ein) Ingenieur",
+          "(eine) Ingenieurin"
+        ]
+      ],
+      "answerVariants": [
+        "un ingénieur",
+        "une ingénieure"
+      ]
+    },
+    {
+      "id": "fr_2026_7b4fe020c0f0bb4cf557",
+      "latin": "original/originale/originaux/originales",
+      "meanings": [
+        [
+          "originell"
+        ]
+      ],
+      "answerVariants": [
+        "original",
+        "originale",
+        "originaux",
+        "originales"
+      ]
+    },
+    {
+      "id": "fr_2026_9da284486d8845bae975",
+      "latin": "adulte (m./f.)",
+      "meanings": [
+        [
+          "erwachsen"
+        ]
+      ],
+      "answerVariants": [
+        "adulte"
+      ]
+    },
+    {
+      "id": "fr_2026_26cfaa126ce863243ec4",
+      "latin": "polonais/polonaise",
+      "meanings": [
+        [
+          "polnisch"
+        ]
+      ],
+      "answerVariants": [
+        "polonais",
+        "polonaise"
+      ]
+    },
+    {
+      "id": "fr_2026_9c56e7c7d02864440d9e",
+      "latin": "la beauté",
+      "meanings": [
+        [
+          "(die) Schönheit"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_1ba754c2b5f453b16824",
+      "latin": "le policier / la policière",
+      "meanings": [
+        [
+          "(der) Polizist",
+          "(die) Polizistin"
+        ]
+      ],
+      "answerVariants": [
+        "le policier",
+        "la policière"
+      ]
+    },
+    {
+      "id": "fr_2026_364a7d4a44db37783908",
+      "latin": "une émission",
+      "meanings": [
+        [
+          "(eine) Sendung"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_75c67c3477f0655bb737",
+      "latin": "un avis",
+      "meanings": [
+        [
+          "(eine) Meinung"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_4b71427949ff9118cbaa",
+      "latin": "autre chose",
+      "meanings": [
+        [
+          "(etwas) anderes"
+        ]
+      ]
+    }
+  ]
+}

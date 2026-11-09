@@ -24,9 +24,9 @@ function fixture({broken=false}={}){
  return {root,calls,overlays,timers,listeners,advance,reduce};
 }
 
-test('Offered subjects contain only Latin and English; legacy metadata resolves to Latin',()=>{
- assert.deepEqual(SUBJECTS.map(subject=>subject.id),['latin','english']);
- assert.equal(subjectInfo('french').id,'latin');assert.equal(brandWord('french'),'latinio<span>✦</span>');
+test('All three subjects use the Latinio brand and distinct metadata',()=>{
+ assert.deepEqual(SUBJECTS.map(subject=>subject.id),['latin','english','french']);
+ assert.equal(subjectInfo('french').id,'french');assert.equal(subjectInfo('french').code,'fr');assert.equal(brandWord('french'),'latinio<span>✦</span>');
 });
 
 test('Switching shows two written Latinio wordmarks and moves green left while red arrives from the right',async()=>{
@@ -87,4 +87,13 @@ test('A stuck animation fails open after its short bound and cleanup cannot wait
  f.advance(320);await transition.entered;assert.equal(f.timers.size,0);
  transition.finish();f.advance(300);assert.equal(f.overlays[0].removed,true);
  assert.ok(f.calls.every(call=>call.animation.cancelled));assert.equal(f.timers.size,0);assert.equal(f.listeners.size,0);
+});
+
+test('French takes part in the same directional written-wordmark transitions as Latin and English',async()=>{
+ for(const [from,to,direction] of [['latin','french',1],['english','french',1],['french','english',-1],['french','latin',-1]]){
+  const f=fixture(),transition=beginSubjectTransition(f.root,from,to);
+  assert.match(f.overlays[0].innerHTML,new RegExp('data-subject="'+to+'"'));
+  const entry=f.calls.find(call=>call.frames?.[0]?.transform===`translateX(${direction*110}%)`);
+  assert.ok(entry,from+' → '+to);transition.dispose();await transition.entered;
+ }
 });

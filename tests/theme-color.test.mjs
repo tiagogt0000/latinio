@@ -51,7 +51,7 @@ test('A subject-permission fallback reuses the same theme and metadata path',()=
 });
 
 test('Profiles with no active subject stop before opening an unauthorized subject store',()=>{
- for(const allowedSubjects of [[],['french']]){
+ for(const allowedSubjects of [[],['retired-subject']]){
   const f=fixture();f.context.profile={role:'student',allowedSubjects};
   const start=source.indexOf(" if(profile.role!=='admin'&&Array.isArray(profile.allowedSubjects)");
   const end=source.indexOf(" if(subject!=='latin'){",start);

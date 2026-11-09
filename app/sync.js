@@ -117,12 +117,15 @@ export class Sync extends EventTarget {
         this.verifiedIdentity={url:config.url,token:config.token,profileId:this.store.profileId};
       }
       const meta=await this.request('check');this.cloudVersion=meta.version;
-      if(Array.isArray(meta.allowedSubjects)){
-        this.allowedSubjects=meta.allowedSubjects;
-        if(this.store.profileId!=='admin'){
-          await this.store.update(doc=>{doc.profile={...(doc.profile||{}),allowedSubjects:meta.allowedSubjects};return doc;});
-          const event=new Event('subjects-updated');event.allowedSubjects=meta.allowedSubjects;this.dispatchEvent(event);
+      if(Array.isArray(meta.allowedSubjects))this.allowedSubjects=meta.allowedSubjects;
+      if(this.store.profileId!=='admin'&&(Array.isArray(meta.allowedSubjects)||typeof meta.simplifiedMode==='boolean')){
+        const changes={...(Array.isArray(meta.allowedSubjects)?{allowedSubjects:meta.allowedSubjects}:{}),...(typeof meta.simplifiedMode==='boolean'?{simplifiedMode:meta.simplifiedMode}:{})};
+        const previous=this.store.doc.profile||{};
+        if(JSON.stringify({...previous,...changes})!==JSON.stringify(previous)){
+          await this.store.update(doc=>{doc.profile={...(doc.profile||{}),...changes};return doc;});
+          const event=new Event('profile-updated');event.profile=this.store.doc.profile;this.dispatchEvent(event);
         }
+        if(Array.isArray(meta.allowedSubjects)){const event=new Event('subjects-updated');event.allowedSubjects=meta.allowedSubjects;this.dispatchEvent(event);}
       }
       if(Array.isArray(meta.allowedSubjects)&&this.store.profileId!=='admin'&&!meta.allowedSubjects.includes(this.subject)){
         this.set('restricted','Dieses Lernfach ist für dein Profil nicht freigeschaltet.');

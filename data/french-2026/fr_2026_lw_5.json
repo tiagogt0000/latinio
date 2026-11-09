@@ -1,0 +1,284 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_5",
+  "name": "Lernwoche 5",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      5
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_956bda5fb5e227cc5f2c",
+      "latin": "stresser qn",
+      "meanings": [
+        [
+          "(jemanden) stressen"
+        ]
+      ],
+      "answerVariants": [
+        "stresser (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_0d744d5ea65e411f0f87",
+      "latin": "dire qc (à qn)",
+      "meanings": [
+        [
+          "(jemandem) (etwas) sagen"
+        ]
+      ],
+      "answerVariants": [
+        "dire (qc) (à qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_c57b7501cd843672550c",
+      "latin": "que",
+      "meanings": [
+        [
+          "dass"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_5b60c2ae159f131a651b",
+      "latin": "devoir + inf.",
+      "meanings": [
+        [
+          "(etwas) tun müssen"
+        ]
+      ],
+      "answerVariants": [
+        "devoir (+ inf.)"
+      ]
+    },
+    {
+      "id": "fr_2026_8e2814d357305d4c2935",
+      "latin": "au moins (adv.)",
+      "meanings": [
+        [
+          "mindestens",
+          "wenigstens"
+        ]
+      ],
+      "answerVariants": [
+        "au moins"
+      ]
+    },
+    {
+      "id": "fr_2026_3ae5baee14ffd21e2c13",
+      "latin": "à cause de",
+      "meanings": [
+        [
+          "wegen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_926026f04161973ea3a7",
+      "latin": "une impression",
+      "meanings": [
+        [
+          "(ein) Eindruck"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_672585a7182fc5bf180a",
+      "latin": "à la place de (qn/qc)",
+      "meanings": [
+        [
+          "anstelle von (jemandem)",
+          "anstelle von (etwas)",
+          "statt"
+        ]
+      ],
+      "answerVariants": [
+        "à la place de (qn)",
+        "à la place de (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_995327b7043becbe69e4",
+      "latin": "à ma place",
+      "meanings": [
+        [
+          "an meiner Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_4625e2eb60ff3a53b634",
+      "latin": "à ta place",
+      "meanings": [
+        [
+          "an deiner Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_4e03606ab9926ffa31dc",
+      "latin": "à sa place",
+      "meanings": [
+        [
+          "an seiner Stelle",
+          "an ihrer Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_5134046677fa5e19d716",
+      "latin": "à notre place",
+      "meanings": [
+        [
+          "an unserer Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_0d2462dd7fd6ce261800",
+      "latin": "à votre place",
+      "meanings": [
+        [
+          "an eurer Stelle",
+          "an Ihrer Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_3ad2c776ba16c6c2d1b9",
+      "latin": "à leur place",
+      "meanings": [
+        [
+          "an ihrer Stelle"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_37485fef42be92fe778c",
+      "latin": "passer du temps (avec qn)",
+      "meanings": [
+        [
+          "(mit jemandem) Zeit verbringen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_532a13b9658e4054aad3",
+      "latin": "le contraire",
+      "meanings": [
+        [
+          "(das) Gegenteil"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_cb741b418ef8bc1a26ea",
+      "latin": "demander (qc à qn)",
+      "meanings": [
+        [
+          "(jemanden nach etwas) fragen",
+          "(jemanden) um (etwas) bitten"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_d321058acb41f83eddd1",
+      "latin": "demander si",
+      "meanings": [
+        [
+          "fragen, ob"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_85c790baeb033b0d2e89",
+      "latin": "avoir besoin de qn/qc",
+      "meanings": [
+        [
+          "(jemanden) brauchen",
+          "(etwas) brauchen"
+        ]
+      ],
+      "answerVariants": [
+        "avoir besoin de (qn)",
+        "avoir besoin de (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_16b933a573ca7a86b097",
+      "latin": "une aide",
+      "meanings": [
+        [
+          "(eine) Hilfe"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_2c6b8c460a40c0a6f858",
+      "latin": "oh là là",
+      "meanings": [
+        [
+          "oje"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_fbdb1433979d60e98ffb",
+      "latin": "vouloir savoir si",
+      "meanings": [
+        [
+          "wissen wollen, ob"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_87b6bd4873416f5f1879",
+      "latin": "Je te jure ! (fam.)",
+      "meanings": [
+        [
+          "(Ganz) Ehrlich!",
+          "Ich schwör’s!"
+        ]
+      ],
+      "answerVariants": [
+        "Je te jure !"
+      ]
+    },
+    {
+      "id": "fr_2026_8e47b028e9d76b4477c4",
+      "latin": "le reste",
+      "meanings": [
+        [
+          "(der) Rest"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e7a4f937913c90864a5b",
+      "latin": "faire confiance à qn",
+      "meanings": [
+        [
+          "(jemandem) vertrauen"
+        ]
+      ],
+      "answerVariants": [
+        "faire confiance à (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_f58f3ef49b88e565d3c4",
+      "latin": "à mon avis",
+      "meanings": [
+        [
+          "meiner Meinung nach"
+        ]
+      ]
+    }
+  ]
+}

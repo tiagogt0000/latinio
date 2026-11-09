@@ -75,7 +75,7 @@ function actionFixture(subject='latin'){
  const modalRoot={get children(){return html?[{}]:[];},set innerHTML(value){html=value;},querySelector:()=>focusable,querySelectorAll:()=>[focusable],contains:()=>false};
  const document={activeElement:focusable,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type),querySelector:()=>null};
  const store={doc:{pending:[]},recordActivity:async kind=>calls.activities.push(kind)};
- const context=vm.createContext({
+ const context=vm.createContext({simpleMode:()=>false,
   queueMicrotask,pendingCloudRender:false,document,modalRoot,modalReturnFocus:null,modalCleanup:null,interfaceMotion:{closeModal(){},openModal(){}},store,subject,english:subject!=='latin',
   data:()=>{calls.reads++;return applyOps(d,[]);},prefs:()=>({...d.settings.general}),selected:['a','b'],predicateSelected:null,
   subjectTransition:null,ready:true,working:false,waitingStart:false,cloudNotice:null,cloudWait:{blocked:false},screen:'learn',pendingStart:null,

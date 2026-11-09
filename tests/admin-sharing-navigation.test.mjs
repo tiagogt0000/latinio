@@ -88,7 +88,7 @@ test('Checker failures stay in the checker with retry and restore usable control
  assert.equal(f.ui.busy,false);
 });
 
-test('A check synchronizes both supported subjects and reads differences without changing any grant',async t=>{
+test('A check synchronizes all three supported subjects and reads differences without changing any grant',async t=>{
  const otherSubjects=[],contexts=[];
  const f=setup(t,{openShareSubject:async subject=>{
   otherSubjects.push(subject);
@@ -96,7 +96,7 @@ test('A check synchronizes both supported subjects and reads differences without
   contexts.push(context);return context;
  }});
  await openChecker(f);await check(f,[diff('d1')]);
- assert.deepEqual(otherSubjects,['english']);
+ assert.deepEqual(otherSubjects,['english','french']);
  assert.deepEqual(f.requests.map(request=>request.action),['profiles','autoShareCheck']);
  assert.deepEqual(f.requests[1].args,{profileIds:['p1','p2']});
  assert.match(f.views.at(-1).html,/1 Unterschiede/);
@@ -222,7 +222,7 @@ test('Checker handling stays synchronous even while an asynchronous request is p
 
 test('A late profile edit does not reopen administration after its dialog was closed',async t=>{
  const f=setup(t),original=globalThis.FormData;
- globalThis.FormData=class{get(key){return key==='name'?'Anna Neu':'anna@example.invalid';}getAll(){return ['latin'];}};
+ globalThis.FormData=class{get(key){return key==='name'?'Anna Neu':'anna@example.invalid';}getAll(){return ['latin'];}has(){return false;}};
  t.after(()=>{globalThis.FormData=original;});
  const message={isConnected:true,textContent:''},button={isConnected:false,disabled:false};
  const form={id:'profile-edit-form',dataset:{id:'p1'},isConnected:false,querySelector:selector=>selector==='[data-save-status]'?message:button};

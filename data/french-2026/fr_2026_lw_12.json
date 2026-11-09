@@ -1,0 +1,286 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_12",
+  "name": "Lernwoche 12",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      11
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_ff461b719347f1ba090b",
+      "latin": "marocain/marocaine",
+      "meanings": [
+        [
+          "marokkanisch"
+        ]
+      ],
+      "answerVariants": [
+        "marocain",
+        "marocaine"
+      ]
+    },
+    {
+      "id": "fr_2026_efc40229969a5a9bee23",
+      "latin": "tout le / toute la, tous les / toutes les",
+      "meanings": [
+        [
+          "ganzer",
+          "ganze",
+          "ganzes",
+          "alle"
+        ]
+      ],
+      "answerVariants": [
+        "tout le",
+        "toute la",
+        "tous les",
+        "toutes les"
+      ]
+    },
+    {
+      "id": "fr_2026_15a7c8a77356291c804d",
+      "latin": "tomber amoureux/amoureuse (de qn)",
+      "meanings": [
+        [
+          "sich (in jemanden) verlieben"
+        ]
+      ],
+      "answerVariants": [
+        "tomber amoureux (de qn)",
+        "tomber amoureuse (de qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_112bae4284c2fe3d7284",
+      "latin": "difficile (m./f.)",
+      "meanings": [
+        [
+          "schwer",
+          "schwierig"
+        ]
+      ],
+      "answerVariants": [
+        "difficile"
+      ]
+    },
+    {
+      "id": "fr_2026_4089a4a854cb83e6f4a0",
+      "latin": "le jury",
+      "meanings": [
+        [
+          "(die) Jury"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_3a90ce3cbdbfdb5c7e82",
+      "latin": "la perruque",
+      "meanings": [
+        [
+          "(die) Perücke"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a9623005aa7ce9f05ca7",
+      "latin": "le bac (fam.) / le baccalauréat",
+      "meanings": [
+        [
+          "(das) Abi",
+          "(das) Abitur"
+        ]
+      ],
+      "answerVariants": [
+        "le bac",
+        "le baccalauréat"
+      ]
+    },
+    {
+      "id": "fr_2026_308a9b4ee37f44a4a905",
+      "latin": "homosexuel/homosexuelle",
+      "meanings": [
+        [
+          "homosexuell"
+        ]
+      ],
+      "answerVariants": [
+        "homosexuel",
+        "homosexuelle"
+      ]
+    },
+    {
+      "id": "fr_2026_2bc9de41cdcf7ba117e8",
+      "latin": "le blog",
+      "meanings": [
+        [
+          "(der) Blog"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_d826da5fd081d3b6eef5",
+      "latin": "un avion",
+      "meanings": [
+        [
+          "(ein) Flugzeug"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_cc646b0fed3dfc58c8a4",
+      "latin": "durer",
+      "meanings": [
+        [
+          "dauern",
+          "andauern"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_ee6db6773a12a481e0f0",
+      "latin": "la personne",
+      "meanings": [
+        [
+          "(die) Person"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_489011e65bea38a2ba14",
+      "latin": "le bonbon",
+      "meanings": [
+        [
+          "(das) Bonbon"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_392cd0c906192985c947",
+      "latin": "le piment",
+      "meanings": [
+        [
+          "(die) Chili(schote)"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_5342f36eef737838c568",
+      "latin": "le Réunionnais / la Réunionnaise",
+      "meanings": [
+        [
+          "(der) Reunionaiser (Einwohner von La Réunion)",
+          "(die) Reunionaiserin (Einwohner von La Réunion)"
+        ]
+      ],
+      "answerVariants": [
+        "le Réunionnais",
+        "la Réunionnaise"
+      ]
+    },
+    {
+      "id": "fr_2026_4de396eac28bd36c4298",
+      "latin": "le Français / la Française",
+      "meanings": [
+        [
+          "(der) Franzose",
+          "(die) Französin"
+        ]
+      ],
+      "answerVariants": [
+        "le Français",
+        "la Française"
+      ]
+    },
+    {
+      "id": "fr_2026_f67cc6fba5504bc379b9",
+      "latin": "le continent",
+      "meanings": [
+        [
+          "(der) Kontinent"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_12e95fb99793ea7f3562",
+      "latin": "créole",
+      "meanings": [
+        [
+          "kreolisch"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_ef4c8c1d3e916fefc54c",
+      "latin": "ça sent",
+      "meanings": [
+        [
+          "es riecht (nach)"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_5baf133faf32df5bd738",
+      "latin": "nager",
+      "meanings": [
+        [
+          "schwimmen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a664674ebe4c22546f67",
+      "latin": "beau/bel/belle/beaux/belles",
+      "meanings": [
+        [
+          "schön"
+        ]
+      ],
+      "answerVariants": [
+        "beau",
+        "bel",
+        "belle",
+        "beaux",
+        "belles"
+      ]
+    },
+    {
+      "id": "fr_2026_829d370769f5bb056ede",
+      "latin": "la cascade",
+      "meanings": [
+        [
+          "(der) Wasserfall"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_dde38ae373a760ceef85",
+      "latin": "la forêt",
+      "meanings": [
+        [
+          "(der) Wald"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_337670262099df6af820",
+      "latin": "vieux/vieil/vieille/vieux/vieilles",
+      "meanings": [
+        [
+          "alt"
+        ]
+      ],
+      "answerVariants": [
+        "vieux",
+        "vieil",
+        "vieille",
+        "vieilles"
+      ]
+    }
+  ]
+}

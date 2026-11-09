@@ -1,0 +1,268 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_9",
+  "name": "Lernwoche 9",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      8
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_3810110d65ef7922f556",
+      "latin": "liker qn/qc (fam.)",
+      "meanings": [
+        [
+          "(jemanden) liken",
+          "(etwas) liken"
+        ]
+      ],
+      "answerVariants": [
+        "liker (qn)",
+        "liker (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_2603c2c289725de0e5c3",
+      "latin": "le youtubeur / la youtubeuse",
+      "meanings": [
+        [
+          "(der) Youtuber",
+          "(die) Youtuberin"
+        ]
+      ],
+      "answerVariants": [
+        "le youtubeur",
+        "la youtubeuse"
+      ]
+    },
+    {
+      "id": "fr_2026_394ccdd85b6eba33921b",
+      "latin": "un acteur / une actrice",
+      "meanings": [
+        [
+          "(ein) Schauspieler",
+          "(eine) Schauspielerin"
+        ]
+      ],
+      "answerVariants": [
+        "un acteur",
+        "une actrice"
+      ]
+    },
+    {
+      "id": "fr_2026_c778c01c3ba4d276e09b",
+      "latin": "engagé/engagée",
+      "meanings": [
+        [
+          "engagiert"
+        ]
+      ],
+      "answerVariants": [
+        "engagé",
+        "engagée"
+      ]
+    },
+    {
+      "id": "fr_2026_f1e3d79debdb058122f5",
+      "latin": "un/une astronaute",
+      "meanings": [
+        [
+          "(ein) Astronaut",
+          "(eine) Astronautin"
+        ]
+      ],
+      "answerVariants": [
+        "un astronaute",
+        "une astronaute"
+      ]
+    },
+    {
+      "id": "fr_2026_1318adce9f5ae508ba8f",
+      "latin": "une activité",
+      "meanings": [
+        [
+          "(eine) Aktivität"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e9fe5f3d7eec6d563db4",
+      "latin": "télécharger qc",
+      "meanings": [
+        [
+          "(etwas) herunterladen"
+        ]
+      ],
+      "answerVariants": [
+        "télécharger (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_07825b87c9263fcc3081",
+      "latin": "cliquer sur qc",
+      "meanings": [
+        [
+          "auf (etwas) klicken"
+        ]
+      ],
+      "answerVariants": [
+        "cliquer sur (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_dcdfbc1c2e93835a67cb",
+      "latin": "le lien",
+      "meanings": [
+        [
+          "(der) Link"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_0c7df66eb2f57c928721",
+      "latin": "laisser qc",
+      "meanings": [
+        [
+          "(etwas) lassen",
+          "(etwas) hinterlassen"
+        ]
+      ],
+      "answerVariants": [
+        "laisser (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_b38fa0d8290a5e95d6d0",
+      "latin": "poster qc",
+      "meanings": [
+        [
+          "(etwas) posten"
+        ]
+      ],
+      "answerVariants": [
+        "poster (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_f11c5710336ccd6d04b9",
+      "latin": "le tuto (fam.) / le tutoriel",
+      "meanings": [
+        [
+          "(das) Erklärvideo",
+          "(das) Tutorial"
+        ]
+      ],
+      "answerVariants": [
+        "le tuto",
+        "le tutoriel"
+      ]
+    },
+    {
+      "id": "fr_2026_5e9d717b3b981d6cc795",
+      "latin": "enregistrer qc",
+      "meanings": [
+        [
+          "(etwas) aufnehmen",
+          "(etwas) speichern"
+        ]
+      ],
+      "answerVariants": [
+        "enregistrer (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_aef9eec2d0a95898523b",
+      "latin": "les réseaux sociaux (m. pl.)",
+      "meanings": [
+        [
+          "(die) sozialen Netzwerke"
+        ]
+      ],
+      "answerVariants": [
+        "les réseaux sociaux"
+      ]
+    },
+    {
+      "id": "fr_2026_418143d5c77e54106bdd",
+      "latin": "être accro à qc",
+      "meanings": [
+        [
+          "nach (etwas) süchtig sein",
+          "von (etwas) abhängig sein"
+        ]
+      ],
+      "answerVariants": [
+        "être accro à (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_221c03d2cbd26610ebcb",
+      "latin": "la victime",
+      "meanings": [
+        [
+          "(das) Opfer"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_d44a5315f01cb8990601",
+      "latin": "le cyberharcèlement",
+      "meanings": [
+        [
+          "(das) Cybermobbing"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_60c6ba8d9164b8e4547b",
+      "latin": "créer qc",
+      "meanings": [
+        [
+          "(etwas) erschaffen",
+          "(etwas) gründen"
+        ]
+      ],
+      "answerVariants": [
+        "créer (qc)"
+      ]
+    },
+    {
+      "id": "fr_2026_2581841d0434a24a1b12",
+      "latin": "avoir… vues",
+      "meanings": [
+        [
+          "… Aufrufe haben",
+          "… Klicks haben"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_51fc30b8c2aa76e43e8b",
+      "latin": "le million",
+      "meanings": [
+        [
+          "(die) Million"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_9b0dbca5c62e1f3c5286",
+      "latin": "un abonné / une abonnée",
+      "meanings": [
+        [
+          "(ein) Abonnent",
+          "(eine) Abonnentin"
+        ]
+      ],
+      "answerVariants": [
+        "un abonné",
+        "une abonnée"
+      ]
+    }
+  ]
+}

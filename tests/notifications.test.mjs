@@ -56,31 +56,31 @@ test('Admin edits, disabled texts, global off and selected time windows are hono
  f.setTime(Date.parse('2026-10-15T18:30:00Z'));await f.service.tick();assert.equal(f.sent.length,1);assert.equal(f.sent[0].payload.body,'Eine kleine Runde Englisch? 🇺🇸');assert.match(f.sent[0].payload.title,/Latinio · Englisch/);
  assert.throws(()=>f.service.request({action:'notificationCatalogSave',catalog:{...catalog,end:23*60}},f.admin),/Zeitfenster/);
 });
-test('Legacy French catalog rows and history remain stored but are never sent',async t=>{
+test('French catalog rows can be sent while existing history remains stored',async t=>{
  const f=fixture(t);f.service.request({action:'notificationSubscribe',subscription:subscription()},f.profile);
  const catalog={enabled:true,start:17*60,end:20*60,messages:[{id:'archived-french',subject:'french',text:'Bonjour 🥐',enabled:true}]};
  f.service.request({action:'notificationCatalogSave',catalog},f.admin);
  const history={id:'old-french',profile:f.profile.id,name:f.profile.name,at:time-86400000,subject:'french',text:'Ancien rappel',result:'Push-Dienst hat angenommen: 1'};
  f.database.db.prepare('INSERT INTO notification_history VALUES(?,?,?,?,?,?,?)').run(...Object.values(history));
- await f.service.tick();assert.equal(f.sent.length,0);
+ await f.service.tick();assert.equal(f.sent.length,1);assert.equal(f.sent[0].payload.url,'./?subject=french');assert.match(f.sent[0].payload.title,/Französisch/);
  const result=f.service.request({action:'notificationAdmin'},f.admin);
- assert.deepEqual(result.catalog,catalog);assert.deepEqual({...result.history[0]},history);
+ assert.deepEqual(result.catalog,catalog);assert.deepEqual({...result.history.find(row=>row.id===history.id)},history);
 });
 test('An all-subject reminder selects an allowed active subject even when French is first',async t=>{
  const f=fixture(t);f.service.request({action:'notificationSubscribe',subscription:subscription()},f.profile);
  f.database.request({action:'profileUpdateSubjects',profileId:f.profile.id,allowedSubjects:['french','english'],token});
- const catalog={enabled:true,start:17*60,end:20*60,messages:[{id:'archived',subject:'french',text:'Bonjour',enabled:true},{id:'all',subject:'all',text:'Eine kleine Runde?',enabled:true}]};
+ const catalog={enabled:true,start:17*60,end:20*60,messages:[{id:'all',subject:'all',text:'Eine kleine Runde?',enabled:true}]};
  f.service.request({action:'notificationCatalogSave',catalog},f.admin);await f.service.tick();
- assert.equal(f.sent.length,1);assert.equal(f.sent[0].payload.url,'./?subject=english');assert.match(f.sent[0].payload.title,/Englisch/);
+ assert.equal(f.sent.length,1);assert.equal(f.sent[0].payload.url,'./?subject=french');assert.match(f.sent[0].payload.title,/Französisch/);
  assert.equal(f.sent[0].payload.body,'Eine kleine Runde?');
 });
-test('Profiles with only French receive no reminder or daily reservation, including all-subject messages',async t=>{
+test('French-only profiles receive one reminder per day and keep their subject rights',async t=>{
  const f=fixture(t);f.service.request({action:'notificationSubscribe',subscription:subscription()},f.profile);
  f.database.request({action:'profileUpdateSubjects',profileId:f.profile.id,allowedSubjects:['french'],token});
  f.service.request({action:'notificationCatalogSave',catalog:{enabled:true,start:17*60,end:20*60,messages:[{id:'all',subject:'all',text:'Eine kleine Runde?',enabled:true},{id:'archived',subject:'french',text:'Bonjour',enabled:true}]}},f.admin);
- await f.service.tick();assert.equal(f.sent.length,0);
- assert.equal(f.service.request({action:'notificationAdmin'},f.admin).history.length,0);
- assert.equal(f.database.db.prepare('SELECT count(*) n FROM notification_daily WHERE profile=?').get(f.profile.id).n,0);
+ await f.service.tick();await f.service.tick();assert.equal(f.sent.length,1);
+ assert.equal(f.service.request({action:'notificationAdmin'},f.admin).history.length,1);
+ assert.equal(f.database.db.prepare('SELECT count(*) n FROM notification_daily WHERE profile=?').get(f.profile.id).n,1);
  assert.deepEqual(f.database.notificationSnapshot().find(person=>person.id===f.profile.id).subjects,['french']);
 });
 test('Expired push endpoints are removed; revoked users and device opt-out receive nothing',async t=>{

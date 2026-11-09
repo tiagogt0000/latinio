@@ -15,10 +15,10 @@ test('French Vocabify text and JSON imports split German meanings and refuse for
  assert.equal(parseImport(frenchImport({name:'Test',lang:'fr',vocab:[{f:'la sœur',d:'die Schwester'}]}),emptyData()).words[0].latin,'la sœur');
  assert.throws(()=>frenchImport({lang:'en',vocab:[]}),/französische/);assert.throws(()=>frenchTextImport('# Sprache: la\nvox ; Stimme'),/nicht zu Französisch/);
 });
-test('Removed French links and remembered choices return to Latin without offering a third subject',()=>{
- const storage=disk();rememberSubject('french',storage);assert.equal(currentSubject('',storage),'latin');
- assert.equal(currentSubject('?subject=french',storage),'latin');assert.doesNotMatch(entranceMarkup(),/data-enter-subject="french"|Vocabify/i);
- storage.setItem(SUBJECT_SWITCH_KEY,'french');assert.equal(consumeSubjectSwitch(storage),'latin');assert.equal(consumeSubjectSwitch(storage),null);
+test('French links and remembered choices offer the French Latinio subject',()=>{
+ const storage=disk();rememberSubject('french',storage);assert.equal(currentSubject('',storage),'french');
+ assert.equal(currentSubject('?subject=french',storage),'french');assert.match(entranceMarkup(),/data-enter-subject="french"/);assert.doesNotMatch(entranceMarkup(),/Vocabify/i);
+ storage.setItem(SUBJECT_SWITCH_KEY,'french');assert.equal(consumeSubjectSwitch(storage),'french');assert.equal(consumeSubjectSwitch(storage),null);
 });
 test('French modes use both directions, preserve reviews and filter older, unseen and incorrect words',()=>{
  const d=emptyData(),now=Date.now();d.collections.c={id:'c',name:'Unité 1'};
@@ -42,10 +42,10 @@ test('French journals, automatic shares and checker preserve Latin and English a
  assert.throws(()=>h.request({action:'pull',subject:'latin',token:user.token}),/nicht freigeschaltet/);
  assert.equal(h.request({action:'shareList',subject:'french'}).shares[0].automatic,true);
 });
-test('Active app and offline shell no longer load the archived French feature',()=>{
- const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');assert.doesNotMatch(main,/firebase|gstatic|french|Vocabify/);
+test('French uses the shared vocabulary trainer and its own offline icon without the archived Vocabify feature',()=>{
+ const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');assert.doesNotMatch(main,/firebase|gstatic|from.*french\.js|Vocabify/);
  const sw=fs.readFileSync(new URL('../sw.js',import.meta.url),'utf8');assert.doesNotMatch(sw,/french\.js|icon-vocabify/);
- for(const name of ['notifications.js','subjects.js','icon-english.svg'])assert.ok(sw.includes(name));
+ for(const name of ['notifications.js','subjects.js','icon-english.svg','icon-french.svg'])assert.ok(sw.includes(name));
 });
 test('The French starter imports only the eight French demo words, once, without sample users or progress',async()=>{
  const data=emptyData();let commits=0;const store={data,subject:'french',profileId:'admin',async commit(changes){commits++;for(const [entity,key,value] of changes)data[entity][key]=value;}};

@@ -13,12 +13,12 @@ test('An explicit language URL updates the local preference without a cloud depe
  const local=storage('english');assert.equal(currentSubject('?subject=latin',local),'latin');assert.equal(local.getItem(LAST_SUBJECT_KEY),'latin');assert.equal(currentSubject('?subject=english',local),'english');assert.equal(local.getItem(LAST_SUBJECT_KEY),'english');
 });
 
-test('Legacy French URLs and preferences normalize to Latin without touching stored learning data',()=>{
+test('French URLs and preferences reopen French without touching stored learning data',()=>{
  const values=new Map([[LAST_SUBJECT_KEY,'french'],['latinio-french-progress','preserve this history']]);
  const local={getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};
- assert.equal(currentSubject('',local),'latin');assert.equal(values.get(LAST_SUBJECT_KEY),'latin');
- rememberSubject('english',local);assert.equal(currentSubject('?subject=french',local),'latin');
- rememberSubject('french',local);assert.equal(currentSubject('',local),'latin');
+ assert.equal(currentSubject('',local),'french');assert.equal(values.get(LAST_SUBJECT_KEY),'french');
+ rememberSubject('english',local);assert.equal(currentSubject('?subject=french',local),'french');
+ rememberSubject('french',local);assert.equal(currentSubject('',local),'french');
  assert.equal(values.get('latinio-french-progress'),'preserve this history');assert.equal(values.size,2);
 });
 

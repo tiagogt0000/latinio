@@ -1,0 +1,205 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_3",
+  "name": "Lernwoche 3",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      4
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_aaad7ce3ec520dfb9cf1",
+      "latin": "écrire qc (à qn)",
+      "meanings": [
+        [
+          "(jemandem) (etwas) schreiben"
+        ]
+      ],
+      "answerVariants": [
+        "écrire (qc) (à qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_c1fd9242e6699c503c9b",
+      "latin": "laisser qn tranquille",
+      "meanings": [
+        [
+          "(jemanden) in Ruhe lassen"
+        ]
+      ],
+      "answerVariants": [
+        "laisser (qn) tranquille"
+      ]
+    },
+    {
+      "id": "fr_2026_c610a5de110fcecedcfb",
+      "latin": "sérieux/sérieuse",
+      "meanings": [
+        [
+          "ernst",
+          "ernsthaft"
+        ]
+      ],
+      "answerVariants": [
+        "sérieux",
+        "sérieuse"
+      ]
+    },
+    {
+      "id": "fr_2026_c42d2659e6ab0f017267",
+      "latin": "débrouillard/débrouillarde (fam.)",
+      "meanings": [
+        [
+          "geschickt",
+          "pfiffig"
+        ]
+      ],
+      "answerVariants": [
+        "débrouillard",
+        "débrouillarde"
+      ]
+    },
+    {
+      "id": "fr_2026_72f6e11dbdee24bf2c3c",
+      "latin": "populaire (m./f.)",
+      "meanings": [
+        [
+          "beliebt"
+        ]
+      ],
+      "answerVariants": [
+        "populaire"
+      ]
+    },
+    {
+      "id": "fr_2026_5a1c0815de546f1bd246",
+      "latin": "malade (m./f.)",
+      "meanings": [
+        [
+          "krank"
+        ]
+      ],
+      "answerVariants": [
+        "malade"
+      ]
+    },
+    {
+      "id": "fr_2026_e6ff265461090dc5ac86",
+      "latin": "le voisin / la voisine",
+      "meanings": [
+        [
+          "(der) (Sitz-)Nachbar",
+          "(die) (Sitz-)Nachbarin"
+        ]
+      ],
+      "answerVariants": [
+        "le voisin",
+        "la voisine"
+      ]
+    },
+    {
+      "id": "fr_2026_0a0f3774a3722c632a46",
+      "latin": "le sac",
+      "meanings": [
+        [
+          "(die) Tasche",
+          "(die) Schultasche"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_9371b40a4d587a7e1235",
+      "latin": "le bulletin",
+      "meanings": [
+        [
+          "(das) Zeugnis"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_1a5b3ac56f025c738ec0",
+      "latin": "le conseil",
+      "meanings": [
+        [
+          "(der) Rat",
+          "(der) Ratschlag"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e9dc5d69be208ea992a6",
+      "latin": "le résultat",
+      "meanings": [
+        [
+          "(das) Ergebnis",
+          "(das) Resultat"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_a8b78b922bfff4ece758",
+      "latin": "le test",
+      "meanings": [
+        [
+          "(der) Test"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_f30646804a9f6feee4dc",
+      "latin": "le genre (de qc)",
+      "meanings": [
+        [
+          "(die) Art"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_6181b1ae4e1bd955e361",
+      "latin": "le réveil",
+      "meanings": [
+        [
+          "(der) Wecker"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_8e775bd5fa634e5d38be",
+      "latin": "sonner",
+      "meanings": [
+        [
+          "klingeln"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_76c8824009a0f12101b0",
+      "latin": "plus (adv.)",
+      "meanings": [
+        [
+          "mehr"
+        ]
+      ],
+      "answerVariants": [
+        "plus"
+      ]
+    },
+    {
+      "id": "fr_2026_3c05c8766bcdff3e1a7e",
+      "latin": "sans + inf.",
+      "meanings": [
+        [
+          "ohne (etwas) zu tun"
+        ]
+      ],
+      "answerVariants": [
+        "sans (+ inf.)"
+      ]
+    }
+  ]
+}

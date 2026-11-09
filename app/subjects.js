@@ -1,6 +1,7 @@
 export const SUBJECTS=[
  {id:'latin',label:'Latein',flag:'🇻🇦',code:'la',logo:'./icon.svg?v=2.14.0',brand:'latinio'},
- {id:'english',label:'Englisch',flag:'🇺🇸',code:'en',logo:'./icon-english.svg?v=2.14.0',brand:'latinio'}
+ {id:'english',label:'Englisch',flag:'🇺🇸',code:'en',logo:'./icon-english.svg?v=2.14.0',brand:'latinio'},
+ {id:'french',label:'Französisch',flag:'🇫🇷',code:'fr',logo:'./icon-french.svg?v=2.16.0',brand:'latinio'}
 ];
 export const subjectInfo=id=>SUBJECTS.find(s=>s.id===id)||SUBJECTS[0];
 export const brandWord=()=> 'latinio<span>✦</span>';
@@ -60,7 +61,7 @@ export function beginSubjectTransition(root,from,to,{keyboard=false,reducedMotio
  };
  transitions.set(root,controller);preference?.addEventListener?.('change',preferenceChanged);
  if(!keyboard&&!reducedMotion&&!resume&&source.id!==target.id){
-  const direction=target.id==='english'?1:-1;
+   const direction=SUBJECTS.indexOf(target)>SUBJECTS.indexOf(source)?1:-1;
   const entering=[
    play(veil.querySelector('.is-from'),[{opacity:1,transform:'translateX(0)'},{opacity:0,transform:`translateX(${-direction*110}%)`}],{duration,fill:'backwards'}),
    play(veil.querySelector('.is-to'),[{opacity:0,transform:`translateX(${direction*110}%)`},{opacity:1,transform:'translateX(0)'}],{duration,fill:'backwards'})

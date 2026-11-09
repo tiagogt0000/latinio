@@ -1,0 +1,260 @@
+{
+  "format": "latinio-collection",
+  "schema": 1,
+  "id": "fr_2026_lw_1",
+  "name": "Lernwoche 1",
+  "language": "fr",
+  "source": {
+    "document": "Franzoesisch_Vokabeln_nach_Lernwochen.pdf",
+    "pdfPages": [
+      2
+    ],
+    "schedule": "2025_26_F_9bd_1_Koch_Phase 3_4476.pdf"
+  },
+  "words": [
+    {
+      "id": "fr_2026_a8805e4288442dc74cb0",
+      "latin": "la planète",
+      "meanings": [
+        [
+          "(der) Planet"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_58fb87ae8a8f3bfcdf2e",
+      "latin": "le médiateur / la médiatrice",
+      "meanings": [
+        [
+          "(der) Vermittler",
+          "(die) Vermittlerin"
+        ]
+      ],
+      "answerVariants": [
+        "le médiateur",
+        "la médiatrice"
+      ]
+    },
+    {
+      "id": "fr_2026_c99f0f4097946527a9d7",
+      "latin": "un/une intello (fam.)",
+      "meanings": [
+        [
+          "(ein) Streber",
+          "(eine) Streberin"
+        ]
+      ],
+      "answerVariants": [
+        "un intello",
+        "une intello"
+      ]
+    },
+    {
+      "id": "fr_2026_3df0dec0d69a6e5b0d3d",
+      "latin": "la brute",
+      "meanings": [
+        [
+          "(der) Unruhestifter",
+          "(die) Unruhestifterin"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_548255b5c9111feaa2de",
+      "latin": "le bavard / la bavarde",
+      "meanings": [
+        [
+          "(die) Quasselstrippe"
+        ]
+      ],
+      "answerVariants": [
+        "le bavard",
+        "la bavarde"
+      ]
+    },
+    {
+      "id": "fr_2026_c174cc96ba3af2f8b0db",
+      "latin": "le geek",
+      "meanings": [
+        [
+          "(der) Nerd",
+          "(der) Computernerd"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_d2cc9f7b5bf61c704804",
+      "latin": "le clown",
+      "meanings": [
+        [
+          "(der) Clown",
+          "(die) Clownin"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_7a1b9ea78b18d23fca4d",
+      "latin": "les inséparables (m./f. pl.)",
+      "meanings": [
+        [
+          "(die) Unzertrennlichen"
+        ]
+      ],
+      "answerVariants": [
+        "les inséparables"
+      ]
+    },
+    {
+      "id": "fr_2026_cdd6e605fb9e12749029",
+      "latin": "le chouchou / la chouchoute (fam.)",
+      "meanings": [
+        [
+          "(der) Liebling"
+        ]
+      ],
+      "answerVariants": [
+        "le chouchou",
+        "la chouchoute"
+      ]
+    },
+    {
+      "id": "fr_2026_3d1009925c88428ac901",
+      "latin": "seul/seule",
+      "meanings": [
+        [
+          "allein"
+        ]
+      ],
+      "answerVariants": [
+        "seul",
+        "seule"
+      ]
+    },
+    {
+      "id": "fr_2026_08630c4385971c1f6bc7",
+      "latin": "poser une question (à qn)",
+      "meanings": [
+        [
+          "(jemandem) eine Frage stellen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_2bfa004df5b534744e60",
+      "latin": "une excuse",
+      "meanings": [
+        [
+          "(eine) Entschuldigung",
+          "(eine) Ausrede"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_39febdac4901de8b94fa",
+      "latin": "la pression",
+      "meanings": [
+        [
+          "(der) Druck"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_b67b3046fa18df6ea596",
+      "latin": "mettre la pression à qn",
+      "meanings": [
+        [
+          "(jemanden) unter Druck setzen"
+        ]
+      ],
+      "answerVariants": [
+        "mettre la pression à (qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_7dbd499e28aaabe1c204",
+      "latin": "le temps",
+      "meanings": [
+        [
+          "(die) Zeit"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_9ef27044e02f52381c62",
+      "latin": "dernier/dernière",
+      "meanings": [
+        [
+          "letzter",
+          "letzte",
+          "letztes"
+        ]
+      ],
+      "answerVariants": [
+        "dernier",
+        "dernière"
+      ]
+    },
+    {
+      "id": "fr_2026_d1963c79386ee8c1d387",
+      "latin": "réviser (qc)",
+      "meanings": [
+        [
+          "(etwas) lernen",
+          "(etwas) wiederholen"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_00c78552e15190cbc4b9",
+      "latin": "participer en cours",
+      "meanings": [
+        [
+          "im Unterricht mitarbeiten"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_e546b2498801c9c4c989",
+      "latin": "rendre qc (à qn)",
+      "meanings": [
+        [
+          "(jemandem) (etwas) zurückgeben"
+        ]
+      ],
+      "answerVariants": [
+        "rendre (qc) (à qn)"
+      ]
+    },
+    {
+      "id": "fr_2026_1100c449b0f47d2c60d0",
+      "latin": "mauvais/mauvaise",
+      "meanings": [
+        [
+          "schlecht"
+        ]
+      ],
+      "answerVariants": [
+        "mauvais",
+        "mauvaise"
+      ]
+    },
+    {
+      "id": "fr_2026_580a3ab2a38cd10c28b4",
+      "latin": "la note",
+      "meanings": [
+        [
+          "(die) Note (Schule, Musik)"
+        ]
+      ]
+    },
+    {
+      "id": "fr_2026_06fbbd39a95d0e437ecc",
+      "latin": "la moyenne",
+      "meanings": [
+        [
+          "(der) Durchschnitt"
+        ]
+      ]
+    }
+  ]
+}

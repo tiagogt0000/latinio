@@ -13,7 +13,7 @@ for(const kind of ['vocab','predicates'])test(`An empty ${kind} options dialog b
  const d=emptyData();let removed=false,dialogs=0;
  const empty={remove(){removed=true;}},hint={textContent:''};
  const node={dataset:{waitingOptions:kind},innerHTML:'disabled options',removeAttribute(){delete this.dataset.waitingOptions;},closest:()=>({querySelector:()=>empty})};
- const context=vm.createContext({cloudWait:{blocked:true},data:()=>d,selected:[],english:false,predicateSelected:null,trainingDecks,trainingOptionCounts,predicateDecks,predicateQueue,
+ const context=vm.createContext({simpleMode:()=>false,cloudWait:{blocked:true},data:()=>d,selected:[],english:false,predicateSelected:null,trainingDecks,trainingOptionCounts,predicateDecks,predicateQueue,
   document:{activeElement:null},modalRoot:{querySelector:selector=>selector==='[data-options-empty] p'?hint:node},showModal(){dialogs++;}});
  vm.runInContext(section('function selectedPredicateDecks(','function predicatePracticeCard('),context);
  vm.runInContext(section('function predicateOptionButtons(','function renderPredicateTest('),context);
@@ -34,7 +34,7 @@ for(const kind of ['vocab','predicates'])test(`An empty ${kind} options dialog b
 
 test('A page render shares one snapshot and releases it on completion or an exception',()=>{
  let reads=0,revision=0;
- const ctx=vm.createContext({store:{get data(){reads++;return {revision};}},viewSnapshot:null,screen:'match',renderedScreen:null,
+ const ctx=vm.createContext({simpleMode:()=>false,store:{get data(){reads++;return {revision};}},viewSnapshot:null,screen:'match',renderedScreen:null,
   interfaceMotion:{beforeRender(){}},theme(){for(let i=0;i<10;i++)ctx.data();},confusions:{view(){for(let i=0;i<10;i++)ctx.data();return 'matching';}},app:{innerHTML:''}});
  vm.runInContext('const data=()=>viewSnapshot||store.data;this.data=data;',ctx);
  vm.runInContext(section('function render(){','function adminView()'),ctx);

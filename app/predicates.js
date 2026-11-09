@@ -128,7 +128,7 @@ export async function predicateChanges(items,name='Prädikate'){
 }
 
 export async function migrateLocalPredicates(store,items){
- if(store.subject==='english'||store.doc.predicatesCloudMigrated)return;
+ if(store.subject&&store.subject!=='latin'||store.doc.predicatesCloudMigrated)return;
  const changes=(await predicateChanges(items)).filter(([,id])=>!store.data.settings[id]);
  if(changes.length)await store.commit(changes);
  await store.update(doc=>{doc.predicatesCloudMigrated=true;return doc;});

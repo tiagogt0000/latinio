@@ -44,9 +44,9 @@
   --green-soft: #fcedef;
 }
 :root[data-subject=french] {
-  --green: #a05a16;
-  --green-dark: #894a10;
-  --green-soft: #fbf0e2;
+  --green: #245a91;
+  --green-dark: #1d4773;
+  --green-soft: #eaf1fa;
 }
 :root[data-theme=dark] {
   --bg: #111114;
@@ -79,10 +79,10 @@
   --apple-on-accent: #3a1015;
 }
 :root[data-subject=french][data-theme=dark] {
-  --green: #edb97e;
-  --green-dark: #f2cb9e;
-  --green-soft: #3b2d20;
-  --apple-on-accent: #30200e;
+  --green: #9cbff0;
+  --green-dark: #b5d1f5;
+  --green-soft: #20334d;
+  --apple-on-accent: #10243c;
 }
 
 html, body { min-height: 100%; background: var(--bg); }
@@ -253,12 +253,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--green); }
   padding: calc(1.25rem + env(safe-area-inset-top, 0px)) max(1.25rem, env(safe-area-inset-right, 0px)) calc(1.25rem + env(safe-area-inset-bottom, 0px)) max(1.25rem, env(safe-area-inset-left, 0px));
   overscroll-behavior: contain;
 }
-.entrance-content { flex: none; width: min(100%, 46rem); margin-block: auto; padding: clamp(1rem, 4svh, 3rem) 0; }
+.entrance-content { flex: none; width: min(100%, 60rem); margin-block: auto; padding: clamp(1rem, 4svh, 3rem) 0; }
 .entrance-wordmark { margin-bottom: clamp(2rem, 6svh, 3.5rem); }
 .entrance-eyebrow { margin-bottom: .875rem; opacity: 1; font-size: .6875rem; line-height: 1.6; letter-spacing: .12em; font-weight: 600; }
 .subject-entrance h1 { max-width: 37rem; margin-bottom: 1rem; font-size: clamp(2.125rem, 5vw, 3.5rem); line-height: 1.08; letter-spacing: -.04em; font-weight: 700; overflow-wrap: anywhere; }
 .entrance-subtitle { margin-bottom: 2rem; font-size: 1rem; line-height: 1.6; }
-.entrance-choices { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.entrance-choices { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.25rem; }
 .entrance-choice {
   min-height: 15rem;
   padding: 1.75rem;
@@ -334,3 +334,6 @@ input:focus, select:focus, textarea:focus { border-color: var(--green); }
   :root[data-theme=dark] { --border: #99999f; --apple-separator: #99999f; --muted: #c5c5cb; }
   .button.secondary, .chip.selected, .nav-item.active { outline: 1px solid currentColor; outline-offset: -1px; }
 }
+
+/* The simplified profile keeps two equally sized navigation targets. */
+.mobile-nav nav[data-simple-mode] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
