@@ -12,13 +12,13 @@ function fixture(){
  let html='',visible=[],renders=0;
  const data={collections:{}},focusable={focus(){}},listeners=new Map();
  const modalRoot={get children(){return html?[{}]:[];},set innerHTML(value){html=value;},querySelector:selector=>selector==='[data-cloud-connection-notice]'?(html.includes('data-cloud-connection-notice')?focusable:null):focusable,querySelectorAll:()=>[],contains:()=>false};
- const ctx=vm.createContext({simpleMode:()=>false,
+ const ctx=vm.createContext({vocabularyAdminUI:null,simpleMode:()=>false,
   queueMicrotask,setTimeout,clearTimeout,pendingCloudRender:false,ready:true,working:false,waitingStart:false,screen:'collections',subjectTransition:null,
   cloudNotice:null,cloudWait:{blocked:false},store:{doc:{pending:[]},data,recordActivity:async()=>{}},sync:{schedule(){}},modalRoot,modalCleanup:null,modalReturnFocus:null,
   document:{activeElement:focusable,addEventListener:(type,handler)=>listeners.set(type,handler),removeEventListener:type=>listeners.delete(type)},
   icon:()=>'',interfaceMotion:{closeModal(){},openModal(){}},settleSync:async()=>{},refreshStreak:async()=>{},updateStatus(){},checkShareNotices(){},checkAnnouncements:async()=>{},reportAppVersion:async()=>{},autoUpdate(){},
   render(){renders++;visible=Object.values(data.collections).map(collection=>collection.name);},notify(message){throw Error(message);},
-  collectionOpener:{cancel(){}},subject:'latin',tablePractice:null,grammar:null,reminders:null,sharing:{handle:async()=>false,afterAction(){}},confusions:{handle:async()=>false},
+  collectionOpener:{cancel(){}},subject:'latin',tablePractice:null,grammar:null,reminders:null,sharing:{handle:async()=>false,afterAction(){}},
  });
  vm.runInContext(section('function flushCloudRender(','const prefs='),ctx);
  vm.runInContext(section('function showModal(','function showStreakDemo('),ctx);
@@ -110,7 +110,7 @@ test('Closing a dialog inside an unfinished action refreshes only after the acti
 });
 
 test('Deferred downloads do not replace a live exercise, result, worksheet or admin screen',async()=>{
- for(const screen of ['test','match','predicate-test','round-end','tables','grammar','admin']){
+ for(const screen of ['test','predicate-test','round-end','tables','grammar','admin']){
   const f=fixture();f.ctx.showModal('Options');f.download();await f.ctx.backgroundSync();
   f.ctx.screen=screen;f.ctx.closeModal();await tick();f.ctx.flushCloudRender();
   assert.equal(f.renders,0,screen);

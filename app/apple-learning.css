@@ -388,3 +388,13 @@
   .grammar-shell .grammar-panel,
   .test-shell .test-content > .latin-word { border-color: var(--text); box-shadow: none; }
 }
+/* Keep before/after corrections readable in the existing modal surface. */
+.vocab-change-preview{margin-block:16px}
+.vocab-change-preview p{margin-bottom:0}
+.vocab-audit-entry{margin-block:16px}
+.vocab-audit-entry h3{margin-top:0;overflow-wrap:anywhere}
+.vocab-audit-field{margin-top:14px}
+.vocab-audit-values{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:6px}
+.vocab-audit-values small{color:var(--muted)}
+.vocab-audit-values p{white-space:pre-wrap;overflow-wrap:anywhere;margin-block:4px 0}
+@media(max-width:420px){.vocab-audit-values{grid-template-columns:1fr;gap:8px}}

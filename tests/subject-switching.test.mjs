@@ -21,14 +21,14 @@ function fixture(t,{reducedMotion=false,allowed=['latin','english'],navigationEr
  const document={documentElement:{},defaultView:{setTimeout:setTimer,clearTimeout:clearTimer,matchMedia:()=>({matches:reducedMotion,addEventListener(){},removeEventListener(){}})},createElement:()=>veil,body:{append(){calls.push('begin');}}};
  const app={ownerDocument:document};
  const doc={pending:[{id:'saved-review',entity:'reviews'}],session:{id:'round',answers:['amavi']}};
- const context=vm.createContext({simpleMode:()=>false,flushCloudRender(){},
+ const context=vm.createContext({vocabularyAdminUI:null,simpleMode:()=>false,flushCloudRender(){},
   app,document,URL,localStorage,sessionStorage,rememberSubject,TRANSITION_KEY,SUBJECT_SWITCH_KEY,beginSubjectTransition,
   subject:'latin',subjectTransition:null,ready:true,working:false,waitingStart:false,screen:'learn',
   subjectAllowed:id=>SUBJECTS.some(item=>item.id===id)&&allowed.includes(id),
   collectionOpener:{cancel(){}},tablePractice:null,grammar:null,reminders:null,
   store:{doc},sync:{busy:true},cloudWait:{blocked:true,wait(){throw Error('Subject navigation waited for initial sync');}},
   settleSync(){throw Error('Subject navigation waited for cloud reconciliation');},
-  sharing:{handle:async()=>false,afterAction(){}},confusions:{handle:async()=>false},
+  sharing:{handle:async()=>false,afterAction(){}},
   location:{href:'https://example.test/app/?subject=latin&keep=1#home',assign(url){if(navigationError)throw Error('Navigation failed');calls.push(['navigate',url]);}},
   setTimeout:setTimer,clearTimeout:clearTimer,closeModal(){calls.push('close');},checkShareNotices(){},autoUpdate(){},notify:message=>calls.push(['notice',message]),
  });
@@ -63,8 +63,19 @@ test('Reduced-motion and keyboard switches navigate without animation or timer w
   const f=fixture(t,options);await f.click('english',options.detail);
   assert.equal(f.animations.length,0);assert.equal(f.timers.size,0);
   assert.ok(f.calls.some(call=>Array.isArray(call)&&call[0]==='navigate'));
+  assert.equal(f.sessionStorage.getItem('latinio-subject-keyboard'),options.detail===0?'1':'0','the destination retains input intent for its arrival');
   assert.equal(f.context.working,false);
  }
+});
+test('Boot consumes keyboard intent once and uses it for both startup arrival calls',()=>{
+ const start=source.indexOf('let directKeyboard;'),end=source.indexOf('subject=direct',start);
+ const consume=source.slice(start,end)+';directKeyboard';
+ assert.ok(start>=0&&end>start);
+ const sessionStorage=storage();sessionStorage.setItem('latinio-subject-keyboard','1');
+ assert.equal(vm.runInNewContext(consume,{direct:'english',sessionStorage}),true);
+ assert.equal(sessionStorage.getItem('latinio-subject-keyboard'),null);
+ assert.equal(vm.runInNewContext(consume,{direct:null,sessionStorage}),undefined,'initial selection keeps its local keyboard intent');
+ assert.equal(source.match(/arrive\(app,\{keyboard:directKeyboard\}\)/g)?.length,2);
 });
 
 test('Duplicate switching clicks cannot replace the pending subject or navigate twice',async t=>{

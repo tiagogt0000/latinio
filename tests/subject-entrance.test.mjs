@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {chooseSubject} from '../app/subject-entrance.js';
+import {chooseSubject,arrive} from '../app/subject-entrance.js';
 
 test('Subject entrance ignores repeated clicks and completes its exit animation before selection',async()=>{
   let finish;const listeners=[];
@@ -21,6 +21,7 @@ test('Keyboard subject selection has no animation or waiting period',async()=>{
  let click;const button={dataset:{enterSubject:'latin'},addEventListener:(_name,fn)=>{click=fn;}};
  const root={querySelectorAll:()=>[button],querySelector:()=>({animate:()=>{throw Error('Keyboard selection must be immediate');}})};
  const result=chooseSubject(root,{reducedMotion:false});await click({detail:0});assert.equal(await result,'latin');
+ assert.doesNotThrow(()=>arrive(root),'the resulting screen retains immediate keyboard navigation');
 });
 
 test('A browser animation exception cannot leave the subject selection disabled forever',async()=>{

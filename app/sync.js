@@ -53,7 +53,7 @@ export class Sync extends EventTarget {
   get streakSummary(){return this.currentBridge?.streakSummary===true;}
   schedule(ms=1200){clearTimeout(this.timer);this.timer=setTimeout(()=>this.run(),ms);}
   async request(action,payload,requestSubject=this.subject){
-    if(requestSubject!==this.subject&&(!['check','pull','streak'].includes(action)||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
+    if(requestSubject!==this.subject&&(!(['check','pull','streak'].includes(action)||action==='vocabAdminHistory'&&this.store.profileId==='admin')||!['latin','english','french'].includes(requestSubject)))throw Error('Fachübergreifend ist nur das Lesen des eigenen Lernstands erlaubt.');
     const config={...this.store.doc.config},profileId=this.store.profileId;
     if(!this.bridge||this.bridge.url!==config.url||this.bridge.token!==config.token){this.bridge?.destroy();this.bridge=createBridge(config.url,config.token);}
     const perform=async bridge=>{
@@ -118,8 +118,8 @@ export class Sync extends EventTarget {
       }
       const meta=await this.request('check');this.cloudVersion=meta.version;
       if(Array.isArray(meta.allowedSubjects))this.allowedSubjects=meta.allowedSubjects;
-      if(this.store.profileId!=='admin'&&(Array.isArray(meta.allowedSubjects)||typeof meta.simplifiedMode==='boolean')){
-        const changes={...(Array.isArray(meta.allowedSubjects)?{allowedSubjects:meta.allowedSubjects}:{}),...(typeof meta.simplifiedMode==='boolean'?{simplifiedMode:meta.simplifiedMode}:{})};
+      if(this.store.profileId!=='admin'&&(Array.isArray(meta.allowedSubjects)||Array.isArray(meta.vocabAdminSubjects)||typeof meta.simplifiedMode==='boolean')){
+        const changes={...(Array.isArray(meta.vocabAdminSubjects)?{vocabAdminSubjects:meta.vocabAdminSubjects}:{}),...(Array.isArray(meta.allowedSubjects)?{allowedSubjects:meta.allowedSubjects}:{}),...(typeof meta.simplifiedMode==='boolean'?{simplifiedMode:meta.simplifiedMode}:{})};
         const previous=this.store.doc.profile||{};
         if(JSON.stringify({...previous,...changes})!==JSON.stringify(previous)){
           await this.store.update(doc=>{doc.profile={...(doc.profile||{}),...changes};return doc;});

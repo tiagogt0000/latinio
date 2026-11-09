@@ -3,10 +3,16 @@ import assert from 'node:assert/strict';
 import {createInterfaceMotion} from '../app/interface-motion.js';
 
 function fixture(){
- const listeners=new Map(),changes=new Set(),calls=[];
+ const listeners=new Map(),changes=new Set(),calls=[],windowListeners=new Map(),viewportListeners=new Map(),frames=new Map(),navStyles=new Map();
+ let frameId=0;
+ const viewport={height:760,offsetTop:0,scale:1,addEventListener(type,fn){viewportListeners.set(type,fn);},removeEventListener(type){viewportListeners.delete(type);}};
+ const nav={style:{setProperty(name,value){navStyles.set(name,value);},removeProperty(name){navStyles.delete(name);}}};
  const preference={matches:false,addEventListener(_type,listener){changes.add(listener);},removeEventListener(_type,listener){changes.delete(listener);}};
  const root={
-  defaultView:{matchMedia:()=>preference},
+  hidden:false,querySelector:()=>nav,getElementById:()=>app,
+  defaultView:{innerHeight:800,visualViewport:viewport,matchMedia:()=>preference,
+   addEventListener(type,fn){windowListeners.set(type,fn);},removeEventListener(type){windowListeners.delete(type);},
+   requestAnimationFrame(fn){frames.set(++frameId,fn);return frameId;},cancelAnimationFrame(id){frames.delete(id);}},
   addEventListener(type,listener){listeners.set(type,listener);},
   removeEventListener(type,listener){assert.equal(listeners.get(type),listener);listeners.delete(type);}
  };
@@ -28,7 +34,10 @@ function fixture(){
  const toggle=target=>listeners.get('toggle')({target});
  const key=()=>listeners.get('keydown')({key:'Enter'});
  const reduce=value=>{preference.matches=value;for(const listener of changes)listener();};
- return {motion,calls,click,toggle,key,reduce,element,cards,content,app,modalRoot,streak(value){streak=value;},listeners,changes};
+ return {motion,calls,click,toggle,key,reduce,element,cards,content,app,modalRoot,streak(value){streak=value;},listeners,changes,viewport,navStyles,frames,windowListeners,viewportListeners,
+  visibility(hidden){root.hidden=hidden;listeners.get('visibilitychange')();},
+  frame(){const pending=[...frames.values()];frames.clear();pending.forEach(fn=>fn());}
+ };
 }
 
 test('Only a pointer-driven real page change moves, with direction matching navigation',()=>{
@@ -127,4 +136,29 @@ test('An animation API failure cannot stop rendering, modal opening or cleanup',
  f.motion.screen(f.app,{from:'collections',to:'learn'});
  for(const call of f.calls)call.animation.cancel=()=>{throw new Error('Already disposed');};
  assert.doesNotThrow(()=>f.motion.beforeRender());assert.doesNotThrow(()=>f.motion.dispose());
+});
+test('Restoring a backgrounded app settles suspended motion and anchors navigation to the visible viewport',()=>{
+ const f=fixture();f.click();f.motion.screen(f.app,{from:'learn',to:'collections'});
+ assert.equal(f.navStyles.get('--mobile-nav-bottom'),'40px');
+ f.viewport.height=620;f.viewport.offsetTop=25;
+ f.viewportListeners.get('resize')();f.viewportListeners.get('scroll')();
+ assert.equal(f.frames.size,1,'viewport events are coalesced');
+ f.visibility(true);
+ assert.equal(f.frames.size,0);assert.equal(f.calls[0].animation.cancelled,true);
+ f.viewport.height=740;f.viewport.offsetTop=0;
+ f.visibility(false);f.windowListeners.get('pageshow')({persisted:true});f.frame();
+ assert.equal(f.navStyles.get('--mobile-nav-bottom'),'60px');
+ f.motion.screen(f.app,{from:'collections',to:'settings'});
+ assert.equal(f.calls.length,1,'resume cannot replay the last pointer action');
+ f.viewport.height=780;f.viewportListeners.get('scroll')();f.frame();
+ assert.equal(f.navStyles.get('--mobile-nav-bottom'),'20px');
+ f.motion.dispose();assert.equal(f.navStyles.size,0);assert.equal(f.windowListeners.size,0);assert.equal(f.viewportListeners.size,0);
+});
+test('Page hide cancels pending viewport work; pinch zoom and overscroll never push navigation off screen',()=>{
+ const f=fixture();f.windowListeners.get('resize')();assert.equal(f.frames.size,1);
+ f.windowListeners.get('pagehide')();assert.equal(f.frames.size,0);
+ f.viewport.scale=2;f.windowListeners.get('pageshow')();f.frame();
+ assert.equal(f.navStyles.get('--mobile-nav-bottom'),'0px');
+ f.viewport.scale=1;f.viewport.height=850;f.viewportListeners.get('resize')();f.frame();
+ assert.equal(f.navStyles.get('--mobile-nav-bottom'),'0px');f.motion.dispose();
 });

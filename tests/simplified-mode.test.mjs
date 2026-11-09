@@ -35,7 +35,7 @@ test('Old profile clients preserve the mode, subject changes preserve it, and in
 function ui(profile={id:'student',role:'student',simplifiedMode:true}){
  const d=emptyData();d.collections.lesson={id:'lesson',name:'Lernwoche 1'};
  const calls={renders:0,words:[]};
- const ctx=vm.createContext({profile,ready:true,subjectTransition:null,screen:'learn',collectionTab:'lessons',collectionFilter:'lesson',collectionsSearchOpen:true,search:'old hidden search',english:true,
+ const ctx=vm.createContext({vocabularyAdminUI:null,profile,ready:true,subjectTransition:null,screen:'learn',collectionTab:'lessons',collectionFilter:'lesson',collectionsSearchOpen:true,search:'old hidden search',english:true,
   isAdmin:()=>ctx.profile.role==='admin',h:String,icon:name=>`<svg data-icon="${name}"></svg>`,data:()=>d,store:{doc:{deletedCollections:[]}},
   collectionLearningView:()=>'<p>Lernwoche 1</p>',sharing:{toolbar:()=>''},legacyRefreshCount:()=>0,wordRows:(id,query)=>{calls.words.push(query);return '<p>la planète</p>';},
   collectionOpener:{cancel(){}},closeModal(){},render(){calls.renders++;},cloudNotice:null,pendingCloudRender:false,working:false,waitingStart:false,modalRoot:{children:[]}});

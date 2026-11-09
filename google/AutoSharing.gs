@@ -101,8 +101,8 @@ function autoSharingApi_(request,identity){
   if(Array.from(ids).some(function(id){return !available.has(id);}))throw new Error('Der Cloud-Stand hat sich seit der Prüfung geändert. Bitte erneut prüfen.');
   return autoApplyPlans_(result.plans,function(d){return ids.has(d.id);},request.requestId);
 }
-function autoShareChanges_(ops,subject){
-  if(!autoSharingEnabled_())return null;
+function autoShareChanges_(ops,subject,confirmedVocabularyEdit){
+  if(!autoSharingEnabled_()&&confirmedVocabularyEdit!==true)return null;
   // Learning activity cannot change shared lesson contents. Do not load every
   // sharing record and recipient just to save a review, session or streak day.
   if(!ops.some(function(op){return op.entity==='words'||op.entity==='collections'&&!op.value?.refreshSource||op.entity==='settings'&&(!op.value||op.value.kind==='predicateDeck'||op.value.kind==='predicateItem');}))return null;
@@ -126,6 +126,7 @@ function autoShareChanges_(ops,subject){
     const parentChanged=ops.some(function(o){return o.key===d.sourceId&&(o.entity==='collections'||o.value?.kind==='predicateDeck'||o.entity==='settings'&&!o.value);});
     return d.parentMissing||keys.has(d.key)||parentChanged&&!d.key.startsWith('extra_');
   },ops[ops.length-1]?.id||Utilities.getUuid());
+  if(confirmedVocabularyEdit===true)result.recipients=profiles.filter(function(profile){return plans.some(function(plan){return plan.record.profileId===profile.id&&plan.diffs.some(function(d){return d.parentMissing||keys.has(d.key);});});}).map(function(profile){return {id:profile.id,name:profile.name};});
   // Save stable mappings even when the content already matched.
   plans.forEach(function(p){saveRecord_('_LatinioAutoShares',p.record.id,p.record);saveRecords_('_LatinioAutoShares',p.entries);});
   return result;

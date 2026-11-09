@@ -1,3 +1,4 @@
+import {settleArrival} from './subject-entrance.js';
 const PAGE_ORDER=['learn','collections','classroom','admin','settings'];
 const pageGroup=screen=>['collection-detail','predicate-detail'].includes(screen)?'collections':['tables','grammar'].includes(screen)?'learn':screen;
 
@@ -10,7 +11,27 @@ export function createInterfaceMotion({root=globalThis.document}={}){
  const enter=parseFloat(style?.getPropertyValue('--apple-enter'))||220;
  const fast=parseFloat(style?.getPropertyValue('--apple-fast'))||160;
  const active=new Set(),detailsIntent=new WeakMap();
- let pointerActivation=false;
+ const viewport=view.visualViewport;
+ let pointerActivation=false,viewportFrame=null,lastNav,lastInset;
+ function syncViewport(){
+  if(root.hidden)return;
+  const nav=root.querySelector?.('#app > .mobile-nav');
+  if(!nav?.style)return;
+  // WebKit may restore a visual viewport that differs from the layout viewport
+  // after a keyboard or app switch. Anchor the bar to its visible bottom edge.
+  const inset=viewport&&(!viewport.scale||viewport.scale===1)
+   ?Math.max(0,(view.innerHeight||0)-viewport.height-viewport.offsetTop):0;
+  const value=`${Number.isFinite(inset)?Math.round(inset):0}px`;
+  if(lastNav!==nav||lastInset!==value){nav.style.setProperty('--mobile-nav-bottom',value);lastNav=nav;lastInset=value;}
+ }
+ function scheduleViewport(){
+  if(root.hidden||viewportFrame!==null)return;
+  if(view.requestAnimationFrame)viewportFrame=view.requestAnimationFrame(()=>{viewportFrame=null;syncViewport();});else syncViewport();
+ }
+ function cancelViewport(){
+  if(viewportFrame!==null)view.cancelAnimationFrame?.(viewportFrame);
+  viewportFrame=null;
+ }
 
  function stop(item){
   active.delete(item);
@@ -53,14 +74,28 @@ export function createInterfaceMotion({root=globalThis.document}={}){
   ],{kind:'details',duration:menu?enter:fast});
  }
  function preferenceChanged(){if(preference.matches){pointerActivation=false;cancel();}}
+ function suspend(){
+  pointerActivation=false;cancel();cancelViewport();
+  settleArrival(root.getElementById?.('app'));
+ }
+ function resume(){suspend();lastNav=null;scheduleViewport();}
+ function visibilityChanged(){suspend();if(!root.hidden)scheduleViewport();}
  root.addEventListener('click',click,true);
  root.addEventListener('keydown',keyboard,true);
  root.addEventListener('toggle',toggle,true);
+ root.addEventListener('visibilitychange',visibilityChanged);
+ view.addEventListener?.('pagehide',suspend);
+ view.addEventListener?.('pageshow',resume);
+ view.addEventListener?.('resize',scheduleViewport);
+ view.addEventListener?.('scroll',scheduleViewport,{passive:true});
+ viewport?.addEventListener?.('resize',scheduleViewport);
+ viewport?.addEventListener?.('scroll',scheduleViewport);
  preference?.addEventListener?.('change',preferenceChanged);
 
  return {
-  beforeRender(){cancel('page');cancel('details');},
+  beforeRender(){cancel('page');cancel('details');settleArrival(root.getElementById?.('app'));},
   screen(container,{from,to}){
+   syncViewport();
    if(from===null||from===to||!pointerActivation||preference?.matches)return;
    const content=container.querySelector('.content');
    if(!content)return;
@@ -84,7 +119,11 @@ export function createInterfaceMotion({root=globalThis.document}={}){
   },
   closeModal(){cancel('modal');},
   dispose(){
+   suspend();root.querySelector?.('#app > .mobile-nav')?.style?.removeProperty('--mobile-nav-bottom');
    cancel();root.removeEventListener('click',click,true);root.removeEventListener('keydown',keyboard,true);root.removeEventListener('toggle',toggle,true);
+   root.removeEventListener('visibilitychange',visibilityChanged);
+   view.removeEventListener?.('pagehide',suspend);view.removeEventListener?.('pageshow',resume);view.removeEventListener?.('resize',scheduleViewport);view.removeEventListener?.('scroll',scheduleViewport);
+   viewport?.removeEventListener?.('resize',scheduleViewport);viewport?.removeEventListener?.('scroll',scheduleViewport);
    preference?.removeEventListener?.('change',preferenceChanged);
   }
  };

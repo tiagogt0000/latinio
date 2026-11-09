@@ -78,7 +78,7 @@ function login_(request){
 }
 function studentCodesRequired_(){return typeof STUDENT_CODES_REQUIRED!=='undefined'&&STUDENT_CODES_REQUIRED===true;}
 function publicProfile_(profile){
-  const result=Object.assign({},profile,{allowedSubjects:normalizeSubjects_(profile.allowedSubjects),simplifiedMode:profile.simplifiedMode===true,codeReady:!!profile.loginCodeHash});
+  const result=Object.assign({},profile,{allowedSubjects:normalizeSubjects_(profile.allowedSubjects),simplifiedMode:profile.simplifiedMode===true,vocabAdminSubjects:normalizeVocabAdminSubjects_(profile.vocabAdminSubjects,profile.allowedSubjects),codeReady:!!profile.loginCodeHash});
   delete result.loginCodeHash;delete result.loginCodeSalt;
   return result;
 }
@@ -286,15 +286,16 @@ function accountApi_(request,identity,subject='latin'){
     if(!name||name.length>80||email.length>254||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.id!==profile.id&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     const previousSubjects=normalizeSubjects_(profile.allowedSubjects);
-    const simplifiedMode=profileMode_(request.simplifiedMode,profile.simplifiedMode);
-    profile.name=name;profile.email=email;profile.allowedSubjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.simplifiedMode=simplifiedMode;profile.updatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
+    const simplifiedMode=profileMode_(request.simplifiedMode,profile.simplifiedMode),allowedSubjects=normalizeRequestedSubjects_(request.allowedSubjects);
+    const vocabAdminSubjects=requestedVocabAdminSubjects_(request.vocabAdminSubjects,profile.vocabAdminSubjects,allowedSubjects);
+    profile.name=name;profile.email=email;profile.allowedSubjects=allowedSubjects;profile.simplifiedMode=simplifiedMode;profile.vocabAdminSubjects=vocabAdminSubjects;profile.updatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
     const added=profile.allowedSubjects.filter(function(s){return previousSubjects.indexOf(s)<0;});const autoShare=added.length?autoShareNewProfile_(Object.assign({},profile,{allowedSubjects:added})):null;
     return {profile:publicProfile_(profile),autoShare:autoShare};
   }
   if(request.action==='profileUpdateSubjects'){
     const profile=records_('_LatinioProfiles')[request.profileId];if(!profile||!profile.active)throw new Error('Profil nicht gefunden.');
     const previousSubjects=normalizeSubjects_(profile.allowedSubjects);
-    const subjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.allowedSubjects=subjects;profile.subjectsUpdatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
+    const subjects=normalizeRequestedSubjects_(request.allowedSubjects);profile.allowedSubjects=subjects;profile.vocabAdminSubjects=normalizeVocabAdminSubjects_(profile.vocabAdminSubjects,subjects);profile.subjectsUpdatedAt=Date.now();saveRecord_('_LatinioProfiles',profile.id,profile);
     const added=subjects.filter(function(s){return previousSubjects.indexOf(s)<0;});const autoShare=added.length?autoShareNewProfile_(Object.assign({},profile,{allowedSubjects:added})):null;
     return {profile:publicProfile_(profile),autoShare:autoShare};
   }
@@ -321,6 +322,7 @@ function accountApi_(request,identity,subject='latin'){
     if(!name||name.length>80||email.length>254||!/^\S+@\S+\.\S+$/.test(email))throw new Error('Name und gültige E-Mail eingeben.');
     const profiles=records_('_LatinioProfiles');if(Object.values(profiles).some(function(p){return p.active&&p.email===email;}))throw new Error('Diese E-Mail ist bereits angelegt.');
     const profile={id:'p_'+Utilities.getUuid().replace(/-/g,''),name:name,email:email,active:true,allowedSubjects:normalizeRequestedSubjects_(request.allowedSubjects),simplifiedMode:profileMode_(request.simplifiedMode,false)};
+    profile.vocabAdminSubjects=requestedVocabAdminSubjects_(request.vocabAdminSubjects,[],profile.allowedSubjects);
     saveRecord_('_LatinioProfiles',profile.id,profile);const autoShare=autoShareNewProfile_(profile);return {profile:publicProfile_(profile),autoShare:autoShare};
   }
   if(request.action==='shareCreateMany'){
@@ -453,4 +455,107 @@ function normalizeRequestedSubjects_(subjects){
   const allowed=Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english'||s==='french';})));
   if(!allowed.length||allowed.length!==subjects.length)throw new Error('Bitte mindestens ein gültiges Lernfach auswählen.');
   return allowed;
+}
+
+/** Subject-scoped editors remain students. Only this explicit correction endpoint
+ * may change canonical vocabulary; grants never authorize account administration. */
+function normalizeVocabAdminSubjects_(subjects,allowedSubjects){
+  const allowed=normalizeSubjects_(allowedSubjects);
+  return Array.isArray(subjects)?Array.from(new Set(subjects.filter(function(s){return allowed.includes(s);}))).sort():[];
+}
+function requestedVocabAdminSubjects_(subjects,previous,allowedSubjects){
+  if(subjects===undefined)return normalizeVocabAdminSubjects_(previous,allowedSubjects);
+  if(!Array.isArray(subjects)||subjects.length>3||subjects.some(function(s){return typeof s!=='string'||!allowedSubjects.includes(s);}))throw new Error('Vokabel-Admin: Nur freigeschaltete Fächer auswählen.');
+  return normalizeVocabAdminSubjects_(subjects,allowedSubjects);
+}
+function vocabAdminId_(value){return typeof value==='string'&&/^[a-zA-Z0-9_-]{1,160}$/.test(value)&&!['__proto__','constructor','prototype'].includes(value);}
+function vocabAdminMapping_(identity,subject,wordId){
+  if(!vocabAdminId_(wordId))throw new Error('Ungültige Vokabel.');
+  const own=readState_(identity.id,true,subject).data,local=own.words[wordId];
+  if(!local||!own.collections[local.collectionId])throw new Error('Diese Vokabel ist nicht mehr vorhanden.');
+  const mappings=records_('_LatinioAutoShares'),manual=records_('_LatinioShares'),candidates=[];
+  Object.values(mappings).forEach(function(entry){
+    if(entry.kind!=='autoEntry'||entry.entity!=='words'||entry.targetKey!==wordId)return;
+    const resource=mappings[entry.resourceId];
+    if(resource&&resource.active&&resource.resourceKind==='lesson'&&resource.profileId===identity.id&&resource.subject===subject&&resource.targetId===local.collectionId)candidates.push({wordId:entry.sourceKey,collectionId:resource.sourceId});
+  });
+  Object.values(manual).forEach(function(entry){
+    if(entry.kind!=='entry')return;
+    const share=manual[entry.shareId];
+    if(share&&share.kind==='share'&&share.ready&&!share.revoked&&share.profileId===identity.id&&shareSubject_(share)===subject&&share.targetId===local.collectionId&&targetId_(share.id,entry.sourceId)===wordId)candidates.push({wordId:entry.sourceId,collectionId:share.sourceId});
+  });
+  const unique=Array.from(new Set(candidates.map(function(c){return c.wordId+':'+c.collectionId;})));
+  if(!unique.length)return null;
+  if(unique.length!==1)throw new Error('Die Freigabe dieser Vokabel ist nicht eindeutig. Bitte den Admin fragen.');
+  const source=readState_('admin',true,subject).data,mapping=candidates[0],word=source.words[mapping.wordId],collection=source.collections[mapping.collectionId];
+  if(!word||!collection||collection.refreshSource||word.collectionId!==collection.id)return null;
+  return {wordId:wordId,sourceWordId:word.id,collectionName:collection.name,before:word,localBefore:local,revision:hash_(subject+':'+identity.id+':'+autoJson_(word)+':'+autoJson_(local))};
+}
+function vocabAdminContent_(input,before){
+  if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(function(k){return !['latin','meanings','forms','answerVariants'].includes(k);}))throw new Error('Nur den Inhalt einer vorhandenen Vokabel bearbeiten.');
+  if(typeof input.latin!=='string'||!input.latin.trim()||input.latin.length>200||!Array.isArray(input.meanings)||!input.meanings.length||input.meanings.length>40||input.meanings.some(function(g){return !Array.isArray(g)||!g.length||g.length>40;}))throw new Error('Ungültige Vokabel.');
+  if(input.forms!==undefined&&(!Array.isArray(input.forms)||input.forms.length>300||input.forms.some(function(f){return typeof f!=='string'||!f.trim()||f.length>100;})))throw new Error('Ungültige Wortformen.');
+  const after=Object.assign({},before,{latin:input.latin.trim(),meanings:input.meanings});
+  ['forms','answerVariants'].forEach(function(k){if(input[k]===undefined)delete after[k];else after[k]=input[k];});
+  validateOp_({id:'vocab_validation',device:'vocab_admin',seq:0,at:Date.now(),entity:'words',key:before.id,value:after});
+  return after;
+}
+// Keep each full word snapshot in its own metadata row. Valid 300-form words
+// must not exceed the storage limit merely because an audit retains three copies.
+function vocabAdminAuditSnapshots_(audits){
+  const needed=new Set();audits.forEach(function(a){if(!a.before)['before','localBefore','after'].forEach(function(k){needed.add(a.id+'_'+k);});});
+  const snapshots=Object.create(null),sheet=needed.size?metaSheet_('_LatinioVocabEditWords',true):null;
+  if(sheet&&sheet.getLastRow()>1)sheet.getRange(2,1,sheet.getLastRow()-1,1).getValues().forEach(function(row,index){if(needed.has(row[0]))snapshots[row[0]]=JSON.parse(sheet.getRange(index+2,2).getValue());});
+  return audits.map(function(a){
+    if(a.before)return a;
+    const result=Object.assign({},a);['before','localBefore','after'].forEach(function(k){const word=snapshots[a.id+'_'+k];if(!word)throw new Error('Der Änderungsnachweis ist unvollständig. Bitte den Admin fragen.');result[k]=word;});return result;
+  });
+}
+function vocabAdminSaveAudit_(audit,createSnapshots){
+  if(createSnapshots){
+    const snapshots=['before','localBefore','after'].map(function(k){return [audit.id+'_'+k,audit[k]];});
+    if(snapshots.some(function(entry){return JSON.stringify(entry[1]).length>45000;}))throw new Error('Ein Eintrag ist zu groß.');
+    saveRecords_('_LatinioVocabEditWords',snapshots);
+  }
+  const record=Object.assign({},audit);delete record.before;delete record.localBefore;delete record.after;
+  saveRecord_('_LatinioVocabEdits',audit.id,record);
+}
+function vocabAdminApi_(request,identity,subject){
+  if(request.action==='vocabAdminHistory'){
+    if(identity.role!=='admin')throw new Error('Nur für das Admin-Profil.');
+    const limit=request.limit===undefined?50:request.limit;
+    if(!Number.isSafeInteger(limit)||limit<1||limit>100||(request.before!==undefined&&!/^va_[a-f0-9]{40}$/.test(request.before)))throw new Error('Ungültige Verlaufsseite.');
+    let changes=Object.values(records_('_LatinioVocabEdits')).filter(function(e){return e.subject===subject;}).sort(function(a,b){return b.at-a.at||b.id.localeCompare(a.id);});
+    if(request.before!==undefined){const index=changes.findIndex(function(e){return e.id===request.before;});if(index<0)throw new Error('Verlauf bitte neu laden.');changes=changes.slice(index+1);}
+    const page=vocabAdminAuditSnapshots_(changes.slice(0,limit));
+    return {changes:page.map(function(e){return {id:e.id,actorId:e.actorId,actorName:e.actorName,subject:e.subject,at:e.at,collectionName:e.collectionName,before:e.before,editorBefore:e.localBefore||e.before,after:e.after,users:e.result?.users||0,recipients:e.result?.recipients||[],status:e.status};}),nextBefore:changes.length>limit?page[page.length-1].id:null};
+  }
+  if(identity.role!=='student'||!normalizeVocabAdminSubjects_(identity.vocabAdminSubjects,identity.allowedSubjects).includes(subject))throw new Error('Für dieses Fach bist du nicht als Vokabel-Admin freigeschaltet.');
+  if(request.action==='vocabAdminWord'){
+    const mapping=vocabAdminMapping_(identity,subject,request.wordId);
+    return mapping?Object.assign({eligible:true},mapping):{eligible:false,wordId:request.wordId};
+  }
+  if(request.confirmed!==true)throw new Error('Die Übernahme für alle muss ausdrücklich bestätigt werden.');
+  if(typeof request.requestId!=='string'||!/^[a-zA-Z0-9_-]{8,100}$/.test(request.requestId)||!vocabAdminId_(request.wordId)||typeof request.revision!=='string'||!/^[a-f0-9]{64}$/.test(request.revision))throw new Error('Ungültige Änderungsanfrage.');
+  const fingerprint=hash_(autoJson_({subject:subject,wordId:request.wordId,revision:request.revision,word:request.word})),id='va_'+hash_(identity.id+':'+request.requestId).slice(0,40);
+  let existing=records_('_LatinioVocabEdits')[id];
+  if(existing&&existing.fingerprint!==fingerprint)throw new Error('Diese Änderungskennung wurde bereits für eine andere Änderung verwendet.');
+  if(existing&&existing.status==='complete')return existing.result;
+  if(existing)existing=vocabAdminAuditSnapshots_([existing])[0];
+  const mapping=vocabAdminMapping_(identity,subject,request.wordId);
+  if(!mapping)throw new Error('Nur vorhandene, vom Admin geteilte Vokabeln können für alle geändert werden.');
+  if(!existing&&mapping.revision!==request.revision)throw new Error('Die Vokabel wurde inzwischen geändert. Bitte neu öffnen und die Änderung prüfen.');
+  const after=vocabAdminContent_(request.word,existing?existing.before:mapping.before);
+  if(existing&&(mapping.sourceWordId!==existing.before.id||![autoJson_(existing.before),autoJson_(existing.after)].includes(autoJson_(mapping.before))))throw new Error('Die Vokabel wurde inzwischen geändert. Bitte neu öffnen und die Änderung prüfen.');
+  if(existing){const mappedAfter=Object.assign({},existing.after,{id:existing.localBefore.id,collectionId:existing.localBefore.collectionId});if(![autoJson_(existing.localBefore),autoJson_(mappedAfter)].includes(autoJson_(mapping.localBefore)))throw new Error('Deine Vokabel wurde inzwischen geändert. Bitte neu öffnen und die Änderung prüfen.');}
+  const audit=existing||{id:id,actorId:identity.id,actorName:identity.name,subject:subject,at:Date.now(),collectionName:mapping.collectionName,before:mapping.before,localBefore:mapping.localBefore,after:after,fingerprint:fingerprint,status:'pending'};
+  // Save provenance before any journal write. The Pi commits the entire API call
+  // atomically; a legacy Apps Script retry can finish an interrupted fanout.
+  vocabAdminSaveAudit_(audit,!existing);
+  const op={id:id,entity:'words',key:after.id,value:after};
+  serverWrite_('admin',[op],subject);
+  const shared=autoShareChanges_([op],subject,true);
+  const result={ok:true,auditId:id,users:shared.users,recipients:shared.recipients,version:readState_(identity.id,true,subject).version};
+  audit.status='complete';audit.result=result;vocabAdminSaveAudit_(audit,false);
+  return result;
 }

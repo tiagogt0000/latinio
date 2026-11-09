@@ -767,7 +767,7 @@ test('Main delegates drag and touch only to the ready, unobstructed Latin table 
  const end=source.indexOf('installKeyboardSupport(',start);
  assert.ok(start>=0&&end>start);
  const listeners=new Map(),received=[];
- const context=vm.createContext({ready:true,working:false,modalRoot:{children:[]},subject:'latin',screen:'tables',cloudWait:{blocked:true},
+ const context=vm.createContext({vocabularyAdminUI:null,ready:true,working:false,modalRoot:{children:[]},subject:'latin',screen:'tables',cloudWait:{blocked:true},
   document:{addEventListener:(type,listener)=>listeners.set(type,listener)},tablePractice:{drag:event=>received.push(event.type)}});
  vm.runInContext(source.slice(start,end),context);
  const types=['dragstart','dragover','drop','dragend','pointerdown','pointermove','pointerup','pointercancel','lostpointercapture'];

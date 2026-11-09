@@ -1,4 +1,12 @@
-# Latinio · Version 2.16.0
+# Latinio · Version 2.17.0
+## Neu in 2.17.0: Fach-Admins und schnelle, feste Navigation
+
+Unter **Nutzer → Bearbeiten → Fach-Admin** kann das Hauptadmin-Profil einzelne freigegebene Fächer zuweisen. Standardmäßig hat niemand diese Berechtigung. Fach-Admins können bei einer bestehenden geteilten Vokabel zwischen **Nur für mich speichern** und **Ja, für alle übernehmen** wählen. Bestätigte Korrekturen aktualisieren die gemeinsame Quelle und die Einträge aller berechtigten Empfänger, einschließlich zuvor privat bearbeiteter Varianten; Lernstände und andere Vokabeln bleiben erhalten. Andere Admin-Rechte werden nicht vergeben.
+
+**Nutzer → Vokabeländerungen** zeigt dem Hauptadmin pro Fach, wer wann welchen Inhalt geändert hat, mit Vorher/Nachher und der Zahl der Empfänger. Gleichzeitige Änderungen werden vor dem Übertragen erkannt; ein Wiederholen nach einem Verbindungsabbruch erzeugt keine doppelte Übertragung. Der Verlauf wird nur beim Öffnen geladen.
+
+Der Bereich **Verwechslungsgefahr** ist entfernt. Beim Start und Fachwechsel erscheint die Oberfläche innerhalb von rund 300 ms sanft von oben nach unten. Der vorhandene Hintergrund bleibt stehen; die feste untere Navigation wird nach Rückkehr in die App und Änderungen des sichtbaren Handyfensters neu ausgerichtet. Reduzierte Bewegung und Tastaturbedienung bleiben berücksichtigt. Die iPhone-Wiederaufnahme muss noch am echten Gerät überprüft werden; es gab keinen visuellen Browser- oder Gerätetest.
+
 ## Neu in 2.16.0: Französisches Vokabeltraining und vereinfachte Nutzeransicht
 Französisch ist als dunkelblaue Latinio-Version verfügbar. Es nutzt wie Englisch das Vokabeltraining in beiden Richtungen, mit getrennten Lernständen und ohne Tabellen oder Grammatikbereich. Die angezeigte Lösung hat wieder dieselbe Schrift, Fläche und Abstände wie der Fragekasten.
 Im Adminbereich lässt sich unter „Nutzer bearbeiten“ der vereinfachte Modus einschalten. Er ist standardmäßig aus und wird pro Nutzer in der Cloud gespeichert. Eingeschaltet bleiben nur Startseite und Sammlungen in der Navigation; Einstellungen, Unterrichtssuche und die Suchfelder in Sammlungen entfallen. Laufende Übungen werden beim Eintreffen einer Änderung nicht unterbrochen.
@@ -333,7 +341,7 @@ Lektionen und Auffrisch-Sammlungen verwenden dieselben Zeilen mit Name, Aktiv-Sc
 
 ## 1.4.0 · Sammlungsübersicht und automatischer Cloud-Abgleich
 
-Die Sammlungsübersicht besteht aus allgemeiner Suche und numerisch sortierter Lektionsliste mit Aktiv-Schaltern und Bearbeitungsstiften. Keine separate Gesamtwortliste oder Werkzeugbox. Der Stift öffnet die Sammlung zum Bearbeiten, Hinzufügen, Umbenennen und Löschen. „Neu“ erstellt eine Sammlung; Import bleibt in Einstellungen. Teilen und Verwechslungen verwalten stehen direkt unter der Liste.
+Die Sammlungsübersicht besteht aus allgemeiner Suche und numerisch sortierter Lektionsliste mit Aktiv-Schaltern und Bearbeitungsstiften. Keine separate Gesamtwortliste oder Werkzeugbox. Der Stift öffnet die Sammlung zum Bearbeiten, Hinzufügen, Umbenennen und Löschen. „Neu“ erstellt eine Sammlung; Import bleibt in Einstellungen. Teilen steht direkt unter der Liste.
 
 Darstellung fest auf Grün, weich/rund und großzügig; keine Darstellungs-Auswahl mehr. Hell/Dunkel folgt dem Gerät. Frühere Farb-/Dichte-Einstellungen werden ignoriert, Lernpräferenzen bleiben erhalten.
 
@@ -359,7 +367,7 @@ Validierung: 73 automatisierte Tests; Syntax und Offline-Manifest geprüft. Die 
 
 ## Neu: aktive Sammlungen und Auffrischungscheck
 
-Unter Sammlungen steuert jeder Nutzer seine eigene Aktiv-Auswahl. Bestehende Sammlungen sind zunächst aktiv. Inaktive bleiben im Unterricht und in der Verwaltung sichtbar, fehlen aber in Home, Smart/Alle/Lernen/Auffrischen und automatischen Verwechslungsrunden. Die Auswahl synchronisiert als persönliche Einstellung und wird nicht geteilt.
+Unter Sammlungen steuert jeder Nutzer seine eigene Aktiv-Auswahl. Bestehende Sammlungen sind zunächst aktiv. Inaktive bleiben im Unterricht und in der Verwaltung sichtbar, fehlen aber in Home, Smart/Alle/Lernen/Auffrischen. Die Auswahl synchronisiert als persönliche Einstellung und wird nicht geteilt.
 
 Das ⋯-Menü bietet „Kann ich schon“ und einen vollständigen Auffrischungscheck. Manuelles Markieren erhält die Historie und zählt nicht als heute trainierte Antwort. Der Check fragt jedes Wort einmal. Nicht vollständig gewusste Wörter aus inaktiven Sammlungen sammeln sich in „Inaktive Vokabeln auffrischen“. Eine spätere vollständige erste Antwort entfernt sie; Wiederholungen innerhalb derselben Runde löschen den ursprünglichen Fehler nicht. Reaktivierte Sammlungen gehen zurück ins normale Training.
 

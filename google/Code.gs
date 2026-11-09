@@ -30,7 +30,7 @@ function latinioApi(request) {
   requestSheets_=Object.create(null);
   const subject=request&&request.subject||'latin';
   if(!['latin','english','french'].includes(subject))throw new Error('Unbekanntes Lernfach.');
-  const readOnly=request&&['check','pull','streak','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList'].includes(request.action);
+  const readOnly=request&&['check','pull','streak','whoami','profiles','shareList','profileCollections','profileActivity','autoShareCheck','announcementInbox','announcementList','vocabAdminWord','vocabAdminHistory'].includes(request.action);
   const lock=readOnly?null:LockService.getScriptLock();
   if(lock&&!lock.tryLock(15000))throw new Error('Ein anderes Gerät speichert gerade. Bitte gleich noch einmal versuchen.');
   try {
@@ -38,6 +38,7 @@ function latinioApi(request) {
     if(!request||typeof request.action!=='string')throw new Error('Ungültige Anfrage.');
     if(request.action==='login')return login_(request);
     const identity=authorize_(request);
+    if(['vocabAdminWord','vocabAdminPublish','vocabAdminHistory'].includes(request.action))return vocabAdminApi_(request,identity,subject);
     if(['autoShareCheck','autoShareApply'].includes(request.action))return autoSharingApi_(request,identity);
     if(request.action==='whoami')return {profile:identity,apiVersion:7,subjects:['latin','english','french'],allowedSubjects:identity.allowedSubjects,compactSync:true,streakSummary:true};
     if(['profiles','profileCodeGenerate','profileCreate','profileUpdate','profileUpdateSubjects','profileDelete','profileCollections','profileActivity','profileVersion','announcementInbox','announcementList','announcementRead','announcementSend','shareRevoke','shareList','shareCreate','shareCreateMany','shareNotify','shareRepair','shareChanges','shareSend','predicateShareSet','collectionAccessSet','logout'].includes(request.action)){const result=accountApi_(request,identity,subject);return request.action==='shareList'?autoShareDirectory_(result,subject):result;}
@@ -45,7 +46,7 @@ function latinioApi(request) {
     const sheet=ensureLog_(identity.id,readOnly,subject);
     const lastRow=sheet?sheet.getLastRow():0;
     let version=lastRow>1?Number(sheet.getRange(lastRow,1).getValue()):0;
-    if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects,simplifiedMode:identity.simplifiedMode===true};
+    if(request.action==='check')return {version:version,allowedSubjects:identity.allowedSubjects,simplifiedMode:identity.simplifiedMode===true,vocabAdminSubjects:identity.vocabAdminSubjects||[]};
     if(!['pull','push','streak'].includes(request.action))throw new Error('Unbekannte Aktion.');
     if(request.action==='push'){
       if(!Number.isSafeInteger(request.base)||request.base<0)throw new Error('Ungültige Version.');
@@ -94,7 +95,7 @@ function authorize_(request){
   const profile=records_('_LatinioProfiles')[session.profileId];
   if(!profile||!profile.active)throw new Error('Dieses Profil ist nicht freigeschaltet.');
   if((studentCodesRequired_()||profile.loginCodeHash)&&(!profile.loginCodeHash||!session.codeAuthVersion||session.codeAuthVersion!==profile.codeAuthVersion))throw new Error('Bitte melde dich mit deinem Zugangscode neu an.');
-  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),simplifiedMode:profile.simplifiedMode===true,codeAuthVersion:session.codeAuthVersion||null};
+  return {id:profile.id,role:'student',name:profile.name,email:profile.email,allowedSubjects:normalizeSubjects_(profile.allowedSubjects),simplifiedMode:profile.simplifiedMode===true,vocabAdminSubjects:normalizeVocabAdminSubjects_(profile.vocabAdminSubjects,profile.allowedSubjects),codeAuthVersion:session.codeAuthVersion||null};
 }
 function normalizeSubjects_(subjects){return Array.isArray(subjects)&&subjects.length?Array.from(new Set(subjects.filter(function(s){return s==='latin'||s==='english'||s==='french';}))):['latin','english','french'];}
 function ensureLog_(profileId,readOnly,subject='latin'){
