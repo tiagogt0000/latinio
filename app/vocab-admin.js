@@ -46,6 +46,10 @@ export function vocabularyAdmin({store,sync,getProfile,subject,h,modalRoot,showM
   if(!canManageVocabulary(getProfile(),subject))throw Error('Du bist für dieses Fach nicht mehr als Fach-Admin eingetragen.');
   if(!draft.editor.metadata||draft.editor.metadata.eligible===false)throw Error('Die Berechtigung konnte noch nicht geprüft werden.');
   if(draft.word.collectionId!==draft.editor.before.collectionId)throw Error('Eine Vokabel kann beim Übertragen nicht in eine andere Sammlung verschoben werden. Speichere diese Änderung nur für dich.');
+  if((store.doc?.pending||[]).some(op=>op.entity==='words'&&op.key===draft.word.id||op.entity==='collections'&&op.key===draft.word.collectionId)){
+   sync.schedule();
+   throw Error('Eine frühere Änderung dieser Vokabel wird noch abgeglichen. Bitte versuche die Übertragung danach erneut.');
+  }
   const liveWord=store.data.words[draft.word.id];
   if(!liveWord||liveWord.collectionId!==draft.editor.before.collectionId||!same(liveWord,draft.editor.before))throw Error('Die Vokabel wurde inzwischen geändert. Bitte öffne sie erneut.');
   setBusy(true,'Die Änderung wird für alle gespeichert …');

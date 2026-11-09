@@ -1,5 +1,5 @@
-# Latinio · Version 2.17.0
-## Neu in 2.17.0: Fach-Admins und schnelle, feste Navigation
+# Latinio · Version 2.17.1
+## Neu in 2.17.1: Fach-Admins und schnelle, feste Navigation
 
 Unter **Nutzer → Bearbeiten → Fach-Admin** kann das Hauptadmin-Profil einzelne freigegebene Fächer zuweisen. Standardmäßig hat niemand diese Berechtigung. Fach-Admins können bei einer bestehenden geteilten Vokabel zwischen **Nur für mich speichern** und **Ja, für alle übernehmen** wählen. Bestätigte Korrekturen aktualisieren die gemeinsame Quelle und die Einträge aller berechtigten Empfänger, einschließlich zuvor privat bearbeiteter Varianten; Lernstände und andere Vokabeln bleiben erhalten. Andere Admin-Rechte werden nicht vergeben.
 

@@ -125,3 +125,35 @@ test('Cross-subject audit transport rejects delegates before sending any request
   await assert.rejects(sync.request(action,{},'english'),/Fachübergreifend/);
  }
 });
+
+test('Queued changes to the edited word or its collection block publication until they have synced, then the same confirmation can retry',async()=>{
+ for(const op of [
+  {id:'noop-word',entity:'words',key:'w',value:structuredClone(original)},
+  {id:'delete-word',entity:'words',key:'w',value:null},
+  {id:'collection-name',entity:'collections',key:'c',value:{id:'c',name:'Neuer Name'}},
+ ]){
+  const f=fixture();f.store.doc.pending=[structuredClone(op)];f.ui.prepare(original);await tick();const draft=f.draft();f.ui.offer(draft);
+  await assert.rejects(f.handle('vocab-publish'),/synchron|abgeglichen|Abgleich|übertragen|geladen|gespeichert/i,op.id);
+  assert.deepEqual(f.requests.map(request=>request.action),['vocabAdminWord'],op.id+' must not reach the publication endpoint');
+  assert.ok(f.events.includes('schedule'),'the pending operation needs a sync retry');assert.equal(f.ui.busy,false);assert.equal(f.buttons[0].disabled,false);
+  assert.equal(f.closed,0);assert.match(f.html,/Änderung für alle übernehmen/);assert.equal(f.saved.length,0);assert.deepEqual(f.store.doc.pending,[op]);assert.deepEqual(f.store.data.words.w,original);
+  f.store.doc.pending=[];
+  await f.handle('vocab-publish');
+  const publication=f.requests.find(request=>request.action==='vocabAdminPublish');assert.ok(publication,op.id+' retries after reconciliation');
+  assert.equal(publication.payload.revision,'revision-1');assert.deepEqual(publication.payload.word,vocabularyFields(draft));assert.equal(publication.payload.confirmed,true);
+  assert.equal(f.requests.filter(request=>request.action==='vocabAdminWord').length,1,'the valid draft and captured revision remain available');
+  assert.equal(f.saved.length,0);assert.equal(f.closed,1);
+ }
+});
+
+test('Pending reviews and unrelated word or collection edits do not block a vocabulary publication',async()=>{
+ const pending=[
+  {id:'review',entity:'reviews',key:'w',value:{wordId:'w',grade:'full'}},
+  {id:'different-word',entity:'words',key:'other',value:{...original,id:'other'}},
+  {id:'different-collection',entity:'collections',key:'other',value:{id:'other',name:'Andere Sammlung'}},
+ ];
+ const f=fixture({onSync({store}){assert.deepEqual(store.doc.pending,pending,'unrelated pending work is retained until the normal sync');store.doc.pending=[];}});
+ f.store.doc.pending=structuredClone(pending);f.ui.prepare(original);await tick();f.ui.offer(f.draft());await f.handle('vocab-publish');
+ assert.deepEqual(f.events,['vocabAdminWord','vocabAdminPublish','sync','published:w']);assert.equal(f.saved.length,0);assert.equal(f.closed,1);
+ assert.equal(f.requests.filter(request=>request.action==='vocabAdminPublish').length,1);
+});
