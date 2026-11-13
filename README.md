@@ -1,4 +1,15 @@
-# Latinio · Version 2.17.3
+# Latinio · Version 2.18.0
+
+## Neu in 2.18.0: Deine adaptive Lernlandschaft
+
+Im Lateinbereich kann der Hauptadmin zwischen **Klassisch** und **Lernlandschaft** wechseln. Der neue Lernweg verbindet flüssig wischbare und umdrehbare Karteikarten, vollständige Schreibabfragen mit Checkpoint, Wortpaare, schnelle schriftliche Auffrischungen und Satzbausteine. Dazu kommen schrittweise Endungstabellen aus der Buchvorlage, Kasusfragen und die Vorbereitung auf eine Klassenarbeit mit ausgewählten Sammlungen und Datum. Die Vorschau ist auch auf dem Server auf das Adminprofil beschränkt; klassisches Lernen und andere Fächer bleiben verfügbar.
+
+Die neue Lernplanung unterscheidet Wiedererkennen, einzelne und vollständige Bedeutungen, verwendete Hilfen, Fehlerkorrekturen und späteren eigenständigen Abruf. Begonnene Runden und Eingaben bleiben nach Pause oder Neuladen erhalten und werden synchronisiert. Jede Runde ist ohne Zeitlimit. Bewegungen begleiten den gesamten Lernweg; die vier bereitgestellten Auswahl-, Start- und Antwortsounds laufen unabhängig und dürfen sich überlappen.
+
+Auf dem Pi liegt ein vorab erzeugter Vorrat von **1.900 Satzaufgaben für 19 Lektionen**. Die Antwortkontrolle benötigt keinen KI-Schlüssel. **479 von 480 Vokabeln** sind als Satzfokus abgedeckt; das angehängte **-que** fehlt noch als eigenständiger Satzfokus. Die Pflege und Prüfung weiterer Inhalte ist in [docs/landscape-content.md](docs/landscape-content.md) beschrieben; Architektur und Lernregeln stehen in [docs/LEARNING_LANDSCAPE.md](docs/LEARNING_LANDSCAPE.md).
+
+726 automatisierte Node-Tests und sieben Installerprüfungen bestanden. Geprüft wurden die Lernlogik, Speicherung, Zugriffskontrolle und überlappende Audiowiedergabe sowie isolierte Browserabläufe: unter anderem eine Runde mit 33 Wörtern, Checkpoint nach 17 Wörtern, Fehlerkorrektur, Pause, Neuladen und Fortsetzen. Schülerzugriffe auf die neue API werden mit HTTP 403 abgewiesen. Die mobile Browseremulation umfasst auch schmale Ansichten, dunkles Design und reduzierte Bewegung. Bei der Migration einer Kopie der produktiven SQLite-Datenbank blieben sämtliche bestehenden Tabelleninhalte unverändert. **Ein echtes iPhone wurde nicht getestet.** Dieses Release benötigt das passende neue Pi-Backend, das vor der Oberfläche aktualisiert wird.
+
 ## Neu in 2.17.3: Sanfter Einstieg und Vokabelstart
 Nach der ersten Fachauswahl erscheint der ausgeschriebene Latinio-Schriftzug in der gewählten Fachfarbe weich in der Mitte, bleibt kurz stehen und blendet mit der Unschärfe wieder aus. Anschließend erscheinen die Felder wie beim Fachwechsel. Der bereits abgestimmte Wechsel zwischen zwei Fachfarben bleibt erhalten.
 Auch beim Start einer Vokabelrunde erscheinen Kopfzeile, Frage, Eingabe und Schaltflächen in einer ruhigen, überlappenden Bewegung von oben nach unten. Antworten und folgende Vokabeln bleiben direkt bedienbar. Hintergrund und feste Bedienelemente bleiben an ihrem Platz; Tastaturbedienung und reduzierte Bewegung werden berücksichtigt.
@@ -6,7 +17,7 @@ Auch beim Start einer Vokabelrunde erscheinen Kopfzeile, Frage, Eingabe und Scha
 ## Neu in 2.17.2: Ruhigere Übergänge zwischen den Fächern
 Die Sprachauswahl blendet in 440 ms weich aus; danach erscheinen die Inhalte in einer überlappenden Bewegung von oben nach unten über 640 ms. Das kurz aufblitzende Lade-Logo zwischen Auswahl und Startseite entfällt.
 Beim Fachwechsel nimmt die Unschärfe zunächst allmählich zu. Der ausgeschriebene bisherige Latinio-Schriftzug gleitet dann in 720 ms kleiner nach links hinaus, während der neue farbige Schriftzug von rechts in die Mitte wächst. Nach dem Seitenwechsel bleibt dessen Endbild erhalten; Schriftzug und Unschärfe blenden weich aus und die neuen Felder erscheinen. Der gesamte Ablauf dauert ohne zusätzliche Ladezeit rund zwei Sekunden. Hintergrundgestaltung, feste Navigation, Daten und Serverfunktionen bleiben unverändert. Reduzierte Bewegung und Tastaturbedienung werden berücksichtigt.
-657 automatisierte Node-Tests und sechs Installerprüfungen bestanden. Kein visueller Browser- oder Gerätetest gemäß Nutzerpräferenz; das Bewegungsgefühl auf dem iPhone bleibt am Gerät zu beurteilen.
+657 automatisierte Node-Tests und sieben Installerprüfungen bestanden. Kein visueller Browser- oder Gerätetest gemäß Nutzerpräferenz; das Bewegungsgefühl auf dem iPhone bleibt am Gerät zu beurteilen.
 ## Neu in 2.17.1: Fach-Admins und schnelle, feste Navigation
 
 Unter **Nutzer → Bearbeiten → Fach-Admin** kann das Hauptadmin-Profil einzelne freigegebene Fächer zuweisen. Standardmäßig hat niemand diese Berechtigung. Fach-Admins können bei einer bestehenden geteilten Vokabel zwischen **Nur für mich speichern** und **Ja, für alle übernehmen** wählen. Bestätigte Korrekturen aktualisieren die gemeinsame Quelle und die Einträge aller berechtigten Empfänger, einschließlich zuvor privat bearbeiteter Varianten; Lernstände und andere Vokabeln bleiben erhalten. Andere Admin-Rechte werden nicht vergeben.

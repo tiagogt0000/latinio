@@ -23,7 +23,8 @@ file=Path(os.environ['LATINIO_TEST_STATE']);state=json.loads(file.read_text());a
 state['calls'].append(args);file.write_text(json.dumps(state))
 root=Path(state['root']);mode=state['fail']
 def save():file.write_text(json.dumps(state))
-if args[0]=='inspect':
+if args[0]=='version':print('Docker test fixture')
+elif args[0]=='inspect':
  target=args[-1]
  if '--format' in args:
   field=args[args.index('--format')+1]
@@ -65,11 +66,11 @@ from pathlib import Path
 state=json.loads(Path(os.environ['LATINIO_TEST_STATE']).read_text())
 ok=state['running']=='new' and state['fail']!='health'
 ready=state['running']=='old' or ok
-Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok,'frenchEnabled':ok,'pushReady':ok,'grammarReady':ok}))
+Path(sys.argv[sys.argv.index('-o')+1]).write_text(json.dumps({'ready':ready,'studentCodesRequired':True,'autoSharingEnabled':ok,'frenchEnabled':ok,'pushReady':ok,'grammarReady':ok,'landscapeReady':ok}))
 '''
 
 class InstallerTests(unittest.TestCase):
-    def scenario(self, failure=''):
+    def scenario(self, failure='', passwordless=False):
         with tempfile.TemporaryDirectory(prefix='latinio-installer-test-') as temp:
             directory=Path(temp);root=directory/'vokabeltrainer';root.mkdir()
             old={}
@@ -89,11 +90,11 @@ class InstallerTests(unittest.TestCase):
                 if source.is_file():source.chmod(0o600)
             script=package/'Installieren-Pi.sh';script.write_text(script.read_text().replace('/home/tiago/vokabeltrainer',str(root)))
             binaries=directory/'bin';binaries.mkdir()
-            for name,content in [('sudo','#!/bin/sh\nif [ "$1" = "-v" ]; then exit 0; fi\nexec "$@"\n'),('docker',DOCKER),('curl',CURL),('sleep','#!/bin/sh\nexit 0\n')]:
+            for name,content in [('sudo','#!/bin/sh\nif [ "$1" = "-n" ]; then [ "$LATINIO_TEST_DOCKER_NOPASS" = "1" ] || exit 1; shift; fi\nif [ "$1" = "-v" ]; then [ "$LATINIO_TEST_DOCKER_NOPASS" != "1" ] || exit 91; exit 0; fi\nexec "$@"\n'),('docker',DOCKER),('curl',CURL),('sleep','#!/bin/sh\nexit 0\n')]:
                 path=binaries/name;path.write_text(content);path.chmod(0o755)
             volume=directory/'volume';volume.mkdir()
             state=directory/'state.json';state.write_text(json.dumps({'root':str(root),'volume':str(volume),'fail':failure,'running':'broken' if failure=='already-broken' else 'old','calls':[]}))
-            env={**os.environ,'PATH':str(binaries)+os.pathsep+os.environ['PATH'],'LATINIO_TEST_STATE':str(state)}
+            env={**os.environ,'PATH':str(binaries)+os.pathsep+os.environ['PATH'],'LATINIO_TEST_STATE':str(state),'LATINIO_TEST_DOCKER_NOPASS':'1' if passwordless else '0'}
             result=subprocess.run(['bash',str(script)],env=env,text=True,capture_output=True,timeout=30)
             final=json.loads(state.read_text())
             mutating=[args for args in final['calls'] if args[0]!='inspect']
@@ -114,6 +115,7 @@ class InstallerTests(unittest.TestCase):
                 if failure=='unsafe-volume':self.assertFalse((root/'backups').exists())
 
     def test_successful_private_installation(self):self.scenario()
+    def test_passwordless_docker_permission_does_not_request_general_sudo_password(self):self.scenario(passwordless=True)
     def test_recovers_previously_broken_private_container_then_installs(self):self.scenario('already-broken')
     def test_failed_build_restores_code(self):self.scenario('build')
     def test_failed_restart_restores_previous_private_container(self):self.scenario('up')

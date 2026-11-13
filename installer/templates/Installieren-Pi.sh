@@ -10,7 +10,7 @@ CODE_WRITTEN=0
 UP_ATTEMPTED=0
 OLD_IMAGE=''
 OLD_REF=''
-FILES=(google/Code.gs google/Accounts.gs google/AutoSharing.gs server/database.mjs server/start.mjs server/http.mjs server/Dockerfile server/grammar.mjs server/grammar-content.mjs server/notifications.mjs server/package.json server/package-lock.json)
+FILES=(google/Code.gs google/Accounts.gs google/AutoSharing.gs server/database.mjs server/start.mjs server/http.mjs server/Dockerfile server/grammar.mjs server/grammar-content.mjs server/notifications.mjs server/package.json server/package-lock.json server/landscape.mjs server/landscape-content.mjs server/content/landscape-sentences.json.gz)
 
 compose() { sudo docker compose -p vokabeltrainer -f "$ROOT/server/compose.yaml" "$@" </dev/null; }
 rollback() {
@@ -36,7 +36,7 @@ trap 'rollback "$?" "$LINENO"' ERR
 
 printf '\nLatinio %s - Pi-Installation\n' "$VERSION"
 python3 "$PACKAGE/Pruefen.py" package "$PACKAGE" "$ROOT"
-sudo -v </dev/null
+if ! sudo -n docker version >/dev/null 2>&1; then sudo -v </dev/null; fi
 compose config --format json > "$PACKAGE/compose-pruefung.json"
 python3 "$PACKAGE/Pruefen.py" config "$PACKAGE/compose-pruefung.json" "$ROOT"
 API_ID=$(compose ps -a -q api)
@@ -82,7 +82,7 @@ for file in "${FILES[@]}"; do
 done
 sudo docker image tag "$OLD_IMAGE" "vokabeltrainer:vor-$VERSION-$STAMP" </dev/null
 CODE_WRITTEN=1
-for file in "${FILES[@]}"; do install -m 644 -- "$PACKAGE/Dateien/$file" "$ROOT/$file"; done
+for file in "${FILES[@]}"; do install -D -m 644 -- "$PACKAGE/Dateien/$file" "$ROOT/$file"; done
 
 printf '\n3/4 - Nur den Vokabel-Container bauen und aktualisieren ...\n'
 compose build api

@@ -4,6 +4,8 @@ const ANSWER_SELECTOR = [
   '#table-practice-form input[data-table-answer]',
   '#table-learning-form input[data-table-answer]',
   '.grammar-shell textarea[data-grammar-answer]',
+  '.landscape-shell input[data-field]',
+  '.landscape-shell .ls-form-label input',
 ].join(', ');
 const KEYBOARD_INSET = '--answer-keyboard-inset';
 const isZoomed = viewport => Number(viewport?.scale) > 1.01;

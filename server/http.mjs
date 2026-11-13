@@ -12,7 +12,7 @@ function acceptsGzip(header='') {
   return encoding?.quality>0&&encoding.quality<=1;
 }
 
-export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null, grammar = null) {
+export function apiServer(database, origin = 'https://tiagogt0000.github.io', notifications = null, grammar = null, landscape = null) {
   return createServer(async (req,res) => {
     res.setHeader('Cache-Control','no-store');
     res.setHeader('X-Content-Type-Options','nosniff');
@@ -30,7 +30,7 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io', no
       res.writeHead(status,headers);
       res.end(payload);
     };
-    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true,grammarReady:grammar?.ready===true});
+    if (req.url === '/health' && req.method === 'GET') return reply(database.ready()?200:503,{ready:database.ready(),studentCodesRequired:database.studentCodesRequired===true,autoSharingEnabled:database.autoSharingEnabled===true,frenchEnabled:database.frenchEnabled===true,pushReady:notifications?.ready===true,grammarReady:grammar?.ready===true,landscapeReady:!!landscape});
     if (req.headers.origin !== origin) return reply(403,{error:'Herkunft nicht erlaubt.'});
     res.setHeader('Access-Control-Allow-Origin',origin);
     if (req.url !== '/api') return reply(404,{error:'Nicht gefunden.'});
@@ -56,6 +56,12 @@ export function apiServer(database, origin = 'https://tiagogt0000.github.io', no
       if (!body || Array.isArray(body) || typeof body.action !== 'string') return reply(400,{error:'Ungültige Anfrage.'});
       const token=(req.headers.authorization||'').match(/^Bearer ([a-zA-Z0-9_-]{32,200})$/)?.[1] || '';
       try {
+        if(body.action.startsWith('landscape')){
+          const identity=database.request({action:'whoami',token}).profile;
+          if(identity?.role!=='admin')return reply(403,{error:'Die Lernlandschaft ist zurzeit nur für den Admin verfügbar.'});
+          if(!landscape)throw Error('Die Lernlandschaft benötigt das neue Pi-Backend.');
+          return reply(200,{result:await landscape.request(body,identity)});
+        }
         if(body.action.startsWith('grammar')){
           const identity=database.request({action:'whoami',token}).profile;
           if(identity.role!=='admin')return reply(403,{error:'Nur für den Admin.'});

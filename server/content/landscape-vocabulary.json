@@ -1,0 +1,6296 @@
+{
+  "collections": {
+    "buch-lektion-03-20260918": {
+      "name": "Lektion 3",
+      "id": "buch-lektion-03-20260918"
+    },
+    "buch-lektion-04-20260918": {
+      "id": "buch-lektion-04-20260918",
+      "name": "Lektion 4"
+    },
+    "buch-lektion-05-20260918": {
+      "id": "buch-lektion-05-20260918",
+      "name": "Lektion 5"
+    },
+    "buch-lektion-06-20260918": {
+      "id": "buch-lektion-06-20260918",
+      "name": "Lektion 6"
+    },
+    "buch-lektion-07-20260918": {
+      "id": "buch-lektion-07-20260918",
+      "name": "Lektion 7"
+    },
+    "buch-lektion-09-20260918": {
+      "id": "buch-lektion-09-20260918",
+      "name": "Lektion 9"
+    },
+    "buch-lektion-10-20260918": {
+      "name": "Lektion 10",
+      "id": "buch-lektion-10-20260918"
+    },
+    "buch-lektion-02-20260918": {
+      "name": "Lektion 2",
+      "id": "buch-lektion-02-20260918"
+    },
+    "buch-lektion-08-20260918": {
+      "id": "buch-lektion-08-20260918",
+      "name": "Lektion 8"
+    },
+    "buch-lektion-01-20260918": {
+      "name": "Lektion 1",
+      "id": "buch-lektion-01-20260918"
+    },
+    "buch-lektion-11-20260921": {
+      "id": "buch-lektion-11-20260921",
+      "name": "Lektion 11"
+    },
+    "buch-lektion-12-20260921": {
+      "name": "Lektion 12",
+      "id": "buch-lektion-12-20260921"
+    },
+    "buch-lektion-13-20260921": {
+      "name": "Lektion 13",
+      "id": "buch-lektion-13-20260921"
+    },
+    "buch-lektion-14-20260921": {
+      "id": "buch-lektion-14-20260921",
+      "name": "Lektion 14"
+    },
+    "buch-lektion-15-20260921": {
+      "name": "Lektion 15",
+      "id": "buch-lektion-15-20260921"
+    },
+    "buch-lektion-16-20260921": {
+      "id": "buch-lektion-16-20260921",
+      "name": "Lektion 16"
+    },
+    "buch-lektion-17-20260921": {
+      "name": "Lektion 17",
+      "id": "buch-lektion-17-20260921"
+    },
+    "buch-lektion-18-20260921": {
+      "id": "buch-lektion-18-20260921",
+      "name": "Lektion 18"
+    },
+    "a9fc6a3f-a064-471e-98b7-83cff9a9372a": {
+      "name": "Lektion 19",
+      "id": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    }
+  },
+  "words": {
+    "dae34c32-5944-4012-8100-2bd69ef773d2": {
+      "latin": "ad (m. Akk.)",
+      "id": "dae34c32-5944-4012-8100-2bd69ef773d2",
+      "meanings": [
+        [
+          "an"
+        ],
+        [
+          "bei"
+        ],
+        [
+          "nach"
+        ],
+        [
+          "zu"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "eaa348da-c81b-4fae-b266-731af6e7aa9e": {
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "eaa348da-c81b-4fae-b266-731af6e7aa9e",
+      "latin": "per (m. Akk.)",
+      "meanings": [
+        [
+          "durch"
+        ],
+        [
+          "hindurch"
+        ]
+      ]
+    },
+    "03fc5a32-40fd-422f-9a36-71497cbc8a8b": {
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "Freundin"
+        ]
+      ],
+      "latin": "amīca",
+      "id": "03fc5a32-40fd-422f-9a36-71497cbc8a8b"
+    },
+    "bf1f54bd-887f-43d3-88db-8fffef865b52": {
+      "latin": "vidēre",
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "bf1f54bd-887f-43d3-88db-8fffef865b52",
+      "meanings": [
+        [
+          "sehen"
+        ],
+        [
+          "darauf achten"
+        ]
+      ]
+    },
+    "ed8bc65a-3022-49f8-b5e1-0dde73ff0fe8": {
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "ed8bc65a-3022-49f8-b5e1-0dde73ff0fe8",
+      "latin": "petere",
+      "meanings": [
+        [
+          "(auf)suchen"
+        ],
+        [
+          "(er)streben"
+        ],
+        [
+          "bitten"
+        ],
+        [
+          "verlangen"
+        ]
+      ]
+    },
+    "b7a6f4c2-bfd1-4bec-92c5-e0acdf1f0ee7": {
+      "id": "b7a6f4c2-bfd1-4bec-92c5-e0acdf1f0ee7",
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "Tempel"
+        ]
+      ],
+      "latin": "templum"
+    },
+    "26a82995-719f-4ae3-a7d4-1097f4f2bc0c": {
+      "meanings": [
+        [
+          "Gebäude"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "aedificium",
+      "id": "26a82995-719f-4ae3-a7d4-1097f4f2bc0c"
+    },
+    "d0d143b3-cea0-46e7-95e2-d85f25b0722a": {
+      "meanings": [
+        [
+          "betrachten"
+        ],
+        [
+          "hinsehen"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "d0d143b3-cea0-46e7-95e2-d85f25b0722a",
+      "latin": "spectāre"
+    },
+    "f3d49b79-115d-412d-a08a-d789b08ddcb1": {
+      "latin": "basilica",
+      "id": "f3d49b79-115d-412d-a08a-d789b08ddcb1",
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "Basilika"
+        ],
+        [
+          "Halle"
+        ]
+      ]
+    },
+    "c7267518-0be3-462f-b04e-f99846b1f8f1": {
+      "meanings": [
+        [
+          "betreten"
+        ],
+        [
+          "eintreten"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "c7267518-0be3-462f-b04e-f99846b1f8f1",
+      "latin": "intrāre"
+    },
+    "e6e4c5ac-caf7-4247-a87d-b2ad777f4c51": {
+      "id": "e6e4c5ac-caf7-4247-a87d-b2ad777f4c51",
+      "latin": "mercātor, mercātōrem",
+      "meanings": [
+        [
+          "Kaufmann"
+        ],
+        [
+          "Händler"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "a40a9c57-cff7-4b6b-ba12-ca3515967bfe": {
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "contendere",
+      "id": "a40a9c57-cff7-4b6b-ba12-ca3515967bfe",
+      "meanings": [
+        [
+          "eilen"
+        ],
+        [
+          "sich anstrengen"
+        ]
+      ]
+    },
+    "15f6b789-fd0c-4968-84b3-827dc40f24b7": {
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "bēstia",
+      "meanings": [
+        [
+          "Tier"
+        ]
+      ],
+      "id": "15f6b789-fd0c-4968-84b3-827dc40f24b7"
+    },
+    "81e4e44a-e558-4dc5-99e1-23861449fc8e": {
+      "latin": "vendere",
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "81e4e44a-e558-4dc5-99e1-23861449fc8e",
+      "meanings": [
+        [
+          "verkaufen"
+        ]
+      ]
+    },
+    "03b33cfe-d92a-4a04-8829-4035c0b35a46": {
+      "id": "03b33cfe-d92a-4a04-8829-4035c0b35a46",
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "vor"
+        ]
+      ],
+      "latin": "ante (m. Akk.)"
+    },
+    "0280826a-a810-41a6-b9c2-9c69a8cb9a27": {
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "taberna",
+      "id": "0280826a-a810-41a6-b9c2-9c69a8cb9a27",
+      "meanings": [
+        [
+          "Laden"
+        ],
+        [
+          "Werkstatt"
+        ],
+        [
+          "Gasthaus"
+        ]
+      ]
+    },
+    "5f395f2c-23cb-45a8-9755-00837c4b5b37": {
+      "meanings": [
+        [
+          "auf der Stelle"
+        ],
+        [
+          "sofort"
+        ]
+      ],
+      "latin": "statim",
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "5f395f2c-23cb-45a8-9755-00837c4b5b37"
+    },
+    "8a8b049c-9357-4df0-b0e3-e72ab0dcd982": {
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "in (m. Akk.)",
+      "id": "8a8b049c-9357-4df0-b0e3-e72ab0dcd982",
+      "meanings": [
+        [
+          "in (... hinein)"
+        ],
+        [
+          "nach (... hin)"
+        ]
+      ],
+      "forms": []
+    },
+    "e170ce6f-dbe4-40cb-8d0d-b6ce17de365d": {
+      "id": "e170ce6f-dbe4-40cb-8d0d-b6ce17de365d",
+      "latin": "dēlectāre",
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "erfreuen"
+        ],
+        [
+          "unterhalten"
+        ]
+      ]
+    },
+    "e2b27387-0ca6-409b-850a-03e245b4e6e7": {
+      "latin": "mulier, mulierem",
+      "meanings": [
+        [
+          "Frau"
+        ]
+      ],
+      "id": "e2b27387-0ca6-409b-850a-03e245b4e6e7",
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "7b0c5ccc-78e1-4afa-a7f3-abc2886acc84": {
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "aber"
+        ],
+        [
+          "andererseits"
+        ]
+      ],
+      "id": "7b0c5ccc-78e1-4afa-a7f3-abc2886acc84",
+      "latin": "autem"
+    },
+    "f08a30b8-3c7f-434f-b6d9-ac2c2311c48e": {
+      "meanings": [
+        [
+          "Geschrei"
+        ],
+        [
+          "Lärm"
+        ]
+      ],
+      "id": "f08a30b8-3c7f-434f-b6d9-ac2c2311c48e",
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "clāmor, clāmōrem"
+    },
+    "07054cad-4ba8-4911-abee-483eb872f8c6": {
+      "id": "07054cad-4ba8-4911-abee-483eb872f8c6",
+      "meanings": [
+        [
+          "aufheben"
+        ],
+        [
+          "in die Höhe heben"
+        ],
+        [
+          "wegnehmen"
+        ]
+      ],
+      "latin": "tollere",
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "21f43ba0-4411-49cb-a681-c8aa8eefb0e3": {
+      "meanings": [
+        [
+          "was?"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918",
+      "latin": "quid?",
+      "id": "21f43ba0-4411-49cb-a681-c8aa8eefb0e3"
+    },
+    "97502d14-77af-4adb-9030-db78be62f4fe": {
+      "collectionId": "buch-lektion-03-20260918",
+      "meanings": [
+        [
+          "wer?"
+        ]
+      ],
+      "latin": "quis?",
+      "id": "97502d14-77af-4adb-9030-db78be62f4fe"
+    },
+    "e23e83c6-8593-404b-a919-67185c39ade3": {
+      "latin": "itaque",
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "e23e83c6-8593-404b-a919-67185c39ade3",
+      "meanings": [
+        [
+          "deshalb"
+        ]
+      ]
+    },
+    "97180908-64a5-4907-b40d-eb702ee8937e": {
+      "latin": "relinquere",
+      "id": "97180908-64a5-4907-b40d-eb702ee8937e",
+      "meanings": [
+        [
+          "unbeachtet lassen"
+        ],
+        [
+          "verlassen"
+        ],
+        [
+          "zurücklassen"
+        ]
+      ],
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "c38467a9-5431-41ca-abe9-ca04078d4b9f": {
+      "meanings": [
+        [
+          "warum?"
+        ]
+      ],
+      "latin": "cūr?",
+      "collectionId": "buch-lektion-03-20260918",
+      "id": "c38467a9-5431-41ca-abe9-ca04078d4b9f"
+    },
+    "e1b691a4-6d7a-4d3b-8603-10fa4a9ececd": {
+      "meanings": [
+        [
+          "bei"
+        ],
+        [
+          "nahe bei"
+        ]
+      ],
+      "latin": "apud (m. Akk.)",
+      "id": "e1b691a4-6d7a-4d3b-8603-10fa4a9ececd",
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "9898189d-fe99-43fe-abd6-b63aef6d3d57": {
+      "meanings": [
+        [
+          "nicht"
+        ]
+      ],
+      "id": "9898189d-fe99-43fe-abd6-b63aef6d3d57",
+      "latin": "nōn",
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "4e961b58-f0e7-4b14-94bd-802d05a92e3a": {
+      "id": "4e961b58-f0e7-4b14-94bd-802d05a92e3a",
+      "meanings": [
+        [
+          "schon"
+        ],
+        [
+          "nun"
+        ]
+      ],
+      "latin": "iam",
+      "collectionId": "buch-lektion-03-20260918"
+    },
+    "9789764f-0ba0-462f-9a89-76f0204d0539": {
+      "id": "9789764f-0ba0-462f-9a89-76f0204d0539",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "in"
+        ],
+        [
+          "an"
+        ],
+        [
+          "auf"
+        ],
+        [
+          "bei"
+        ]
+      ],
+      "latin": "in (m. Abl.)"
+    },
+    "d3628a9a-c46b-484f-8225-a253188b9e2c": {
+      "latin": "cum (m. Abl.)",
+      "meanings": [
+        [
+          "mit"
+        ],
+        [
+          "zusammen mit"
+        ]
+      ],
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "d3628a9a-c46b-484f-8225-a253188b9e2c"
+    },
+    "2a805b53-19b6-444f-90e5-8026386a4c29": {
+      "id": "2a805b53-19b6-444f-90e5-8026386a4c29",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "Thermen"
+        ],
+        [
+          "Badeanlage"
+        ]
+      ],
+      "latin": "thermae, thermās"
+    },
+    "9e234f71-7651-4b7e-8087-90143d9814e3": {
+      "latin": "vestis, vestem",
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "9e234f71-7651-4b7e-8087-90143d9814e3",
+      "meanings": [
+        [
+          "Kleid"
+        ],
+        [
+          "Kleidung"
+        ]
+      ]
+    },
+    "4a083c7a-1ba9-40a9-bee3-0fc0f969ac48": {
+      "id": "4a083c7a-1ba9-40a9-bee3-0fc0f969ac48",
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "dēpōnere",
+      "meanings": [
+        [
+          "ablegen"
+        ],
+        [
+          "niederlegen"
+        ],
+        [
+          "aufgeben"
+        ]
+      ]
+    },
+    "245ebbf8-a034-4f9c-a436-31ec60ad262c": {
+      "meanings": [
+        [
+          "von"
+        ],
+        [
+          "(von ... her)"
+        ],
+        [
+          "(von ... herab)"
+        ],
+        [
+          "über"
+        ]
+      ],
+      "id": "245ebbf8-a034-4f9c-a436-31ec60ad262c",
+      "collectionId": "buch-lektion-04-20260918",
+      "forms": [],
+      "latin": "dē (m. Abl.)"
+    },
+    "96f23fdf-a400-474d-8c77-b0db09cf8f0e": {
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "96f23fdf-a400-474d-8c77-b0db09cf8f0e",
+      "latin": "cōgitāre",
+      "meanings": [
+        [
+          "denken"
+        ],
+        [
+          "beabsichtigen"
+        ]
+      ]
+    },
+    "0785db2c-db5f-489f-84fe-98c69704263e": {
+      "latin": "amāre",
+      "id": "0785db2c-db5f-489f-84fe-98c69704263e",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "lieben"
+        ],
+        [
+          "gernhaben"
+        ]
+      ]
+    },
+    "58a85ad4-43dd-483d-8ca1-baeaab77b2e6": {
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "immer"
+        ]
+      ],
+      "id": "58a85ad4-43dd-483d-8ca1-baeaab77b2e6",
+      "latin": "semper"
+    },
+    "b7649caa-a28f-4bb4-8275-e7775a3a4cac": {
+      "latin": "dōnum",
+      "meanings": [
+        [
+          "Geschenk"
+        ]
+      ],
+      "id": "b7649caa-a28f-4bb4-8275-e7775a3a4cac",
+      "collectionId": "buch-lektion-04-20260918"
+    },
+    "8bd66f09-635b-4171-9ff2-c4b7790fe3dd": {
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "8bd66f09-635b-4171-9ff2-c4b7790fe3dd",
+      "forms": [],
+      "meanings": [
+        [
+          "(er, sie, es) will"
+        ]
+      ],
+      "latin": "vult"
+    },
+    "c5e4b507-4f58-447c-ab55-34d8da4fb1a7": {
+      "id": "c5e4b507-4f58-447c-ab55-34d8da4fb1a7",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "dennoch"
+        ],
+        [
+          "jedoch"
+        ]
+      ],
+      "latin": "tamen"
+    },
+    "05ae0cc6-dc55-4ad2-8a74-db71c4bec67d": {
+      "meanings": [
+        [
+          "loben"
+        ]
+      ],
+      "id": "05ae0cc6-dc55-4ad2-8a74-db71c4bec67d",
+      "latin": "laudāre",
+      "collectionId": "buch-lektion-04-20260918"
+    },
+    "55fe6f30-2915-4819-8612-27ea94b9d37d": {
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "tē",
+      "meanings": [
+        [
+          "dich"
+        ]
+      ],
+      "id": "55fe6f30-2915-4819-8612-27ea94b9d37d"
+    },
+    "a82530d9-8d41-4d50-916c-5933d6bbe499": {
+      "meanings": [
+        [
+          "gewiss"
+        ],
+        [
+          "sicherlich"
+        ]
+      ],
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "certē",
+      "id": "a82530d9-8d41-4d50-916c-5933d6bbe499"
+    },
+    "b3fa32a3-a6b3-496c-9db3-66178110f1fb": {
+      "id": "b3fa32a3-a6b3-496c-9db3-66178110f1fb",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "anfüllen"
+        ],
+        [
+          "erfüllen"
+        ]
+      ],
+      "latin": "complēre"
+    },
+    "db61bb06-c1ff-4056-9100-0f70e0a85048": {
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "senex, senem",
+      "meanings": [
+        [
+          "Greis"
+        ],
+        [
+          "alter Mann"
+        ]
+      ],
+      "id": "db61bb06-c1ff-4056-9100-0f70e0a85048"
+    },
+    "f719d726-9fb6-4578-a084-2015c26fc1d6": {
+      "latin": "vīnum",
+      "meanings": [
+        [
+          "Wein"
+        ]
+      ],
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "f719d726-9fb6-4578-a084-2015c26fc1d6"
+    },
+    "d07ae131-2339-4d48-bd6b-33f39c42548c": {
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "d07ae131-2339-4d48-bd6b-33f39c42548c",
+      "latin": "sūmere",
+      "meanings": [
+        [
+          "nehmen"
+        ]
+      ]
+    },
+    "60da4d67-93bf-47a7-b2a2-4776ae3e688f": {
+      "id": "60da4d67-93bf-47a7-b2a2-4776ae3e688f",
+      "latin": "prō (m. Abl.)",
+      "collectionId": "buch-lektion-04-20260918",
+      "meanings": [
+        [
+          "anstelle von"
+        ],
+        [
+          "für"
+        ],
+        [
+          "vor"
+        ]
+      ]
+    },
+    "78fd8e72-577c-408a-803f-0d943e113cbc": {
+      "meanings": [
+        [
+          "Geld"
+        ],
+        [
+          "Vermögen"
+        ]
+      ],
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "pecūnia",
+      "id": "78fd8e72-577c-408a-803f-0d943e113cbc"
+    },
+    "fdc78f80-ef33-4c71-9d84-e899cfba7e74": {
+      "meanings": [
+        [
+          "Dieb"
+        ]
+      ],
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "fdc78f80-ef33-4c71-9d84-e899cfba7e74",
+      "latin": "fūr, fūrem"
+    },
+    "1dc296df-6d9c-4023-a53f-4668c5fe1e13": {
+      "id": "1dc296df-6d9c-4023-a53f-4668c5fe1e13",
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "tantum",
+      "meanings": [
+        [
+          "nur"
+        ]
+      ]
+    },
+    "5114660c-677b-4dc9-9f5b-a61571afc858": {
+      "meanings": [
+        [
+          "niemals"
+        ]
+      ],
+      "id": "5114660c-677b-4dc9-9f5b-a61571afc858",
+      "latin": "numquam",
+      "collectionId": "buch-lektion-04-20260918"
+    },
+    "b6e310ed-12f6-41d9-a4f8-b5e87a7f4943": {
+      "meanings": [
+        [
+          "Ehefrau"
+        ]
+      ],
+      "latin": "uxor, uxōrem",
+      "collectionId": "buch-lektion-04-20260918",
+      "id": "b6e310ed-12f6-41d9-a4f8-b5e87a7f4943"
+    },
+    "ca8333a8-e0dc-4b33-be1b-99c523901e66": {
+      "id": "ca8333a8-e0dc-4b33-be1b-99c523901e66",
+      "collectionId": "buch-lektion-04-20260918",
+      "latin": "adulēscēns, adulēscentem",
+      "meanings": [
+        [
+          "junger Mann"
+        ]
+      ]
+    },
+    "48035540-2812-4090-afa8-b494abfc39d5": {
+      "latin": "cōnsistere",
+      "id": "48035540-2812-4090-afa8-b494abfc39d5",
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "haltmachen"
+        ],
+        [
+          "sich aufstellen"
+        ]
+      ]
+    },
+    "853ec601-0db2-4829-84e6-4e6743418737": {
+      "latin": "dubitāre",
+      "id": "853ec601-0db2-4829-84e6-4e6743418737",
+      "meanings": [
+        [
+          "zögern"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "ae7bf09b-7af5-4e2f-b6a2-13b02c1f5324": {
+      "meanings": [
+        [
+          "antworten"
+        ],
+        [
+          "entsprechen"
+        ]
+      ],
+      "latin": "respondēre",
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "ae7bf09b-7af5-4e2f-b6a2-13b02c1f5324"
+    },
+    "15bdfb3f-d9fe-4086-84ef-afa577e7d969": {
+      "latin": "undique",
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "15bdfb3f-d9fe-4086-84ef-afa577e7d969",
+      "meanings": [
+        [
+          "von allen Seiten"
+        ]
+      ]
+    },
+    "b3dd9fc9-c86c-4601-a1f7-121d21502ea7": {
+      "meanings": [
+        [
+          "um ... herum"
+        ],
+        [
+          "rings um"
+        ]
+      ],
+      "latin": "circum (m. Akk.)",
+      "id": "b3dd9fc9-c86c-4601-a1f7-121d21502ea7",
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "4e97a261-4ee3-48be-8f2e-fd8324c9e8dd": {
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "4e97a261-4ee3-48be-8f2e-fd8324c9e8dd",
+      "meanings": [
+        [
+          "Bote"
+        ],
+        [
+          "Nachricht"
+        ]
+      ],
+      "latin": "nūntius"
+    },
+    "f73b75df-453e-42c3-941b-7c6ac29d449b": {
+      "id": "f73b75df-453e-42c3-941b-7c6ac29d449b",
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "victōria",
+      "meanings": [
+        [
+          "Sieg"
+        ]
+      ]
+    },
+    "26bd7b56-2c78-4aa1-af37-0b2ae62269cd": {
+      "latin": "nūntiāre",
+      "meanings": [
+        [
+          "melden"
+        ]
+      ],
+      "id": "26bd7b56-2c78-4aa1-af37-0b2ae62269cd",
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "c544dbac-ebea-4502-a9d7-d572c66532db": {
+      "latin": "ē / ex (m. Abl.)",
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "c544dbac-ebea-4502-a9d7-d572c66532db",
+      "meanings": [
+        [
+          "aus"
+        ],
+        [
+          "von ... her"
+        ]
+      ]
+    },
+    "fc86b165-42c0-4402-abed-43e503cf8558": {
+      "latin": "repente",
+      "id": "fc86b165-42c0-4402-abed-43e503cf8558",
+      "meanings": [
+        [
+          "plötzlich"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "e65438f6-6769-45ee-b411-2c7aec301bac": {
+      "id": "e65438f6-6769-45ee-b411-2c7aec301bac",
+      "latin": "cōnsul, cōnsulem",
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "Konsul"
+        ]
+      ]
+    },
+    "c2bded56-62fd-40b8-a983-73714b84111c": {
+      "forms": [],
+      "latin": "līctor, līctōrem",
+      "meanings": [
+        [
+          "Liktor"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "c2bded56-62fd-40b8-a983-73714b84111c"
+    },
+    "447978a0-167b-45a3-802c-d8074bea200c": {
+      "id": "447978a0-167b-45a3-802c-d8074bea200c",
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "bekannt"
+        ],
+        [
+          "in aller Öffentlichkeit"
+        ]
+      ],
+      "latin": "palam"
+    },
+    "0248e7bc-1f9d-40f3-89da-d7122ab16d43": {
+      "id": "0248e7bc-1f9d-40f3-89da-d7122ab16d43",
+      "meanings": [
+        [
+          "es ist erlaubt"
+        ],
+        [
+          "es ist möglich"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "licet"
+    },
+    "8636faa4-6fec-4225-a4ce-f4a4f439130c": {
+      "meanings": [
+        [
+          "dass"
+        ],
+        [
+          "weil"
+        ]
+      ],
+      "latin": "quod",
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "8636faa4-6fec-4225-a4ce-f4a4f439130c"
+    },
+    "73f09368-094a-4b62-ac58-53ae76217069": {
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "iniūria",
+      "meanings": [
+        [
+          "Unrecht"
+        ],
+        [
+          "Beleidigung"
+        ],
+        [
+          "Gewalttat"
+        ]
+      ],
+      "id": "73f09368-094a-4b62-ac58-53ae76217069"
+    },
+    "8ab5a3b2-e31d-4c0e-a5eb-03fc8be9cdfc": {
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "schmerzen"
+        ],
+        [
+          "bedauern"
+        ]
+      ],
+      "forms": [],
+      "latin": "dolēre",
+      "id": "8ab5a3b2-e31d-4c0e-a5eb-03fc8be9cdfc"
+    },
+    "9215d835-807d-4fff-a07b-12baac39331e": {
+      "meanings": [
+        [
+          "Ausländer"
+        ],
+        [
+          "Barbar"
+        ]
+      ],
+      "id": "9215d835-807d-4fff-a07b-12baac39331e",
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "barbarus"
+    },
+    "c0ac6e02-96f4-466b-9b5d-49a1248cd1f2": {
+      "latin": "pūgnāre",
+      "meanings": [
+        [
+          "kämpfen"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "c0ac6e02-96f4-466b-9b5d-49a1248cd1f2"
+    },
+    "988772bb-e03e-4daa-8523-1335c51a1ed2": {
+      "latin": "patria",
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "Heimat"
+        ]
+      ],
+      "id": "988772bb-e03e-4daa-8523-1335c51a1ed2"
+    },
+    "08d6c214-a319-4fc5-9aa4-1fb66a7ef5a1": {
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "arma, arma",
+      "id": "08d6c214-a319-4fc5-9aa4-1fb66a7ef5a1",
+      "meanings": [
+        [
+          "Waffen"
+        ],
+        [
+          "Gerät"
+        ]
+      ]
+    },
+    "e0f2420a-1a35-4d69-bdce-e22a363b3138": {
+      "collectionId": "buch-lektion-05-20260918",
+      "meanings": [
+        [
+          "verteidigen"
+        ],
+        [
+          "abwehren"
+        ],
+        [
+          "schützen"
+        ]
+      ],
+      "id": "e0f2420a-1a35-4d69-bdce-e22a363b3138",
+      "latin": "dēfendere"
+    },
+    "f788e9c1-46d2-450d-bf01-76c07ecdded5": {
+      "latin": "deus",
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "f788e9c1-46d2-450d-bf01-76c07ecdded5",
+      "meanings": [
+        [
+          "Gott"
+        ],
+        [
+          "Gottheit"
+        ]
+      ]
+    },
+    "b15be810-8467-4573-8cf4-5a85b40303d8": {
+      "id": "b15be810-8467-4573-8cf4-5a85b40303d8",
+      "collectionId": "buch-lektion-05-20260918",
+      "latin": "colere",
+      "meanings": [
+        [
+          "bewirtschaften"
+        ],
+        [
+          "pflegen"
+        ],
+        [
+          "verehren"
+        ]
+      ]
+    },
+    "df4e1dbe-85af-4500-94d1-1482110c8eaf": {
+      "latin": "dēbēre",
+      "meanings": [
+        [
+          "müssen"
+        ],
+        [
+          "sollen"
+        ],
+        [
+          "schulden"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "df4e1dbe-85af-4500-94d1-1482110c8eaf"
+    },
+    "23263e2a-c89d-4f11-9e6a-cbc6390b86b7": {
+      "latin": "sine (m. Abl.)",
+      "meanings": [
+        [
+          "ohne"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918",
+      "id": "23263e2a-c89d-4f11-9e6a-cbc6390b86b7"
+    },
+    "4f7f92e4-1f93-4489-aeac-3295813854d9": {
+      "id": "4f7f92e4-1f93-4489-aeac-3295813854d9",
+      "latin": "perīculum",
+      "meanings": [
+        [
+          "Gefahr"
+        ]
+      ],
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "a8d1af92-5bef-4fd3-98dc-60261500caf3": {
+      "meanings": [
+        [
+          "leben"
+        ]
+      ],
+      "id": "a8d1af92-5bef-4fd3-98dc-60261500caf3",
+      "latin": "vīvere",
+      "collectionId": "buch-lektion-05-20260918"
+    },
+    "eabe7ed9-6634-40b3-9c47-1920f2ad9679": {
+      "latin": "puer, puerum",
+      "meanings": [
+        [
+          "Junge"
+        ],
+        [
+          "Bub"
+        ]
+      ],
+      "id": "eabe7ed9-6634-40b3-9c47-1920f2ad9679",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "55aaf17f-bd98-4be3-b6fb-e3998ea32814": {
+      "id": "55aaf17f-bd98-4be3-b6fb-e3998ea32814",
+      "meanings": [
+        [
+          "(los)lassen"
+        ],
+        [
+          "schicken"
+        ],
+        [
+          "werfen"
+        ]
+      ],
+      "latin": "mittere",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "a6e5ad71-3f37-4375-b35a-1225a2e9a4de": {
+      "latin": "domina",
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "a6e5ad71-3f37-4375-b35a-1225a2e9a4de",
+      "meanings": [
+        [
+          "Herrin"
+        ]
+      ]
+    },
+    "9a2982e6-e427-4cf1-b444-6440f6be0d8d": {
+      "id": "9a2982e6-e427-4cf1-b444-6440f6be0d8d",
+      "collectionId": "buch-lektion-06-20260918",
+      "meanings": [
+        [
+          "kaufen"
+        ]
+      ],
+      "latin": "emere"
+    },
+    "108827a3-7efc-4831-bac7-445f969fddac": {
+      "meanings": [
+        [
+          "Sklavin"
+        ]
+      ],
+      "id": "108827a3-7efc-4831-bac7-445f969fddac",
+      "latin": "serva",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "29903598-306c-4bee-ab0d-9afe15d1290f": {
+      "meanings": [
+        [
+          "(vor)bereiten"
+        ],
+        [
+          "vorhaben"
+        ],
+        [
+          "erwerben"
+        ]
+      ],
+      "collectionId": "buch-lektion-06-20260918",
+      "latin": "parāre",
+      "id": "29903598-306c-4bee-ab0d-9afe15d1290f",
+      "forms": []
+    },
+    "bdb70d80-3a5d-42d5-b4c5-2b0b8044eb4e": {
+      "meanings": [
+        [
+          "schmücken"
+        ]
+      ],
+      "id": "bdb70d80-3a5d-42d5-b4c5-2b0b8044eb4e",
+      "latin": "ōrnāre",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "5b299e00-e8cc-4f56-8692-7d9e9c870eac": {
+      "id": "5b299e00-e8cc-4f56-8692-7d9e9c870eac",
+      "meanings": [
+        [
+          "Tisch"
+        ]
+      ],
+      "latin": "mēnsa",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "3d4ee5c6-d6c4-4471-bdf0-150f150725d0": {
+      "id": "3d4ee5c6-d6c4-4471-bdf0-150f150725d0",
+      "latin": "labōrāre",
+      "meanings": [
+        [
+          "arbeiten"
+        ]
+      ],
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "80e3ef66-461a-46a9-ae27-eeff1fd387ed": {
+      "collectionId": "buch-lektion-06-20260918",
+      "latin": "cēna",
+      "id": "80e3ef66-461a-46a9-ae27-eeff1fd387ed",
+      "meanings": [
+        [
+          "Essen"
+        ],
+        [
+          "Mahlzeit"
+        ]
+      ]
+    },
+    "d0fe51e2-79d0-4c15-9993-2f97edad00fa": {
+      "id": "d0fe51e2-79d0-4c15-9993-2f97edad00fa",
+      "latin": "iubēre",
+      "meanings": [
+        [
+          "anordnen"
+        ],
+        [
+          "befehlen"
+        ]
+      ],
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "48019908-0fe4-4a7c-89a9-44efc913fdbb": {
+      "latin": "puella",
+      "collectionId": "buch-lektion-06-20260918",
+      "meanings": [
+        [
+          "Mädchen"
+        ]
+      ],
+      "id": "48019908-0fe4-4a7c-89a9-44efc913fdbb"
+    },
+    "7dc65bd8-67cb-49f7-8351-cf4e5464e333": {
+      "meanings": [
+        [
+          "du"
+        ]
+      ],
+      "id": "7dc65bd8-67cb-49f7-8351-cf4e5464e333",
+      "latin": "tū",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "5963d2fa-1635-42e9-bc5a-6b2c5ece6e99": {
+      "latin": "illūc",
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "5963d2fa-1635-42e9-bc5a-6b2c5ece6e99",
+      "meanings": [
+        [
+          "dahin"
+        ],
+        [
+          "dorthin"
+        ]
+      ]
+    },
+    "8a8463e8-b0e0-4cb2-922d-4f35eb1a5d13": {
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "8a8463e8-b0e0-4cb2-922d-4f35eb1a5d13",
+      "latin": "bene",
+      "meanings": [
+        [
+          "gut"
+        ]
+      ]
+    },
+    "de84733b-bc16-4951-9239-2159bb3d5026": {
+      "latin": "līberī, līberōs",
+      "meanings": [
+        [
+          "Kinder"
+        ]
+      ],
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "de84733b-bc16-4951-9239-2159bb3d5026"
+    },
+    "becf5955-1d2f-4869-846b-b5e695c60024": {
+      "meanings": [
+        [
+          "Mutter"
+        ]
+      ],
+      "latin": "māter, mātrem",
+      "id": "becf5955-1d2f-4869-846b-b5e695c60024",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "a4c6a398-ef0b-4ac9-9e6f-38d0c825f4d6": {
+      "id": "a4c6a398-ef0b-4ac9-9e6f-38d0c825f4d6",
+      "latin": "ostendere",
+      "meanings": [
+        [
+          "zeigen"
+        ],
+        [
+          "darlegen"
+        ]
+      ],
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "68cff2e4-ec73-4f36-8828-204c58d55d5c": {
+      "meanings": [
+        [
+          "gefallen"
+        ]
+      ],
+      "latin": "placēre",
+      "id": "68cff2e4-ec73-4f36-8828-204c58d55d5c",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "e653138d-bd56-47a6-85e1-3388792d424f": {
+      "latin": "paulō",
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "e653138d-bd56-47a6-85e1-3388792d424f",
+      "meanings": [
+        [
+          "(um) ein wenig"
+        ]
+      ]
+    },
+    "422281a5-58fe-4715-8d02-a2b33a4f5b84": {
+      "collectionId": "buch-lektion-06-20260918",
+      "id": "422281a5-58fe-4715-8d02-a2b33a4f5b84",
+      "latin": "post",
+      "meanings": [
+        [
+          "hinter"
+        ],
+        [
+          "nach"
+        ],
+        [
+          "dann"
+        ],
+        [
+          "später"
+        ]
+      ]
+    },
+    "621cf4bd-491f-4f46-904e-3c41194898d7": {
+      "collectionId": "buch-lektion-06-20260918",
+      "latin": "aedēs, aedēs",
+      "meanings": [
+        [
+          "Haus"
+        ],
+        [
+          "Gebäude"
+        ]
+      ],
+      "id": "621cf4bd-491f-4f46-904e-3c41194898d7"
+    },
+    "191bc025-5826-4040-bf25-27802e7ce1f1": {
+      "latin": "portāre",
+      "meanings": [
+        [
+          "tragen"
+        ],
+        [
+          "bringen"
+        ]
+      ],
+      "id": "191bc025-5826-4040-bf25-27802e7ce1f1",
+      "collectionId": "buch-lektion-06-20260918"
+    },
+    "5984a0bf-2463-4637-8111-c5330379066e": {
+      "id": "5984a0bf-2463-4637-8111-c5330379066e",
+      "meanings": [
+        [
+          "wollen"
+        ]
+      ],
+      "latin": "velle",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "800e9836-1360-4bde-a3b8-f30797110ec8": {
+      "id": "800e9836-1360-4bde-a3b8-f30797110ec8",
+      "meanings": [
+        [
+          "ungefähr"
+        ]
+      ],
+      "latin": "circiter",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "e866720e-a7f8-48e2-bf58-808f5618354f": {
+      "meanings": [
+        [
+          "zwanzig"
+        ]
+      ],
+      "id": "e866720e-a7f8-48e2-bf58-808f5618354f",
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "vīgintī"
+    },
+    "fb509008-8029-4f63-8ae3-749807e91470": {
+      "latin": "sacrum",
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "fb509008-8029-4f63-8ae3-749807e91470",
+      "meanings": [
+        [
+          "Opfer"
+        ],
+        [
+          "Heiligtum"
+        ]
+      ]
+    },
+    "07915b5f-ff7b-4162-91aa-daed6cb04a2d": {
+      "meanings": [
+        [
+          "Gastmahl"
+        ],
+        [
+          "Gelage"
+        ]
+      ],
+      "id": "07915b5f-ff7b-4162-91aa-daed6cb04a2d",
+      "latin": "convīvium",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "57f0f39d-d0ec-4e22-99db-cead46adb874": {
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "zuerst"
+        ]
+      ],
+      "latin": "prīmō",
+      "id": "57f0f39d-d0ec-4e22-99db-cead46adb874"
+    },
+    "47adbd21-683e-44e9-9795-2b2744a9704a": {
+      "forms": [],
+      "latin": "toga",
+      "id": "47adbd21-683e-44e9-9795-2b2744a9704a",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "Toga"
+        ]
+      ]
+    },
+    "49f50804-625f-4ecf-af51-22b90b1560e4": {
+      "id": "49f50804-625f-4ecf-af51-22b90b1560e4",
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "tunica",
+      "forms": [],
+      "meanings": [
+        [
+          "Tunika"
+        ]
+      ]
+    },
+    "5f68891f-d0cc-413f-8234-d0a76ecdb843": {
+      "id": "5f68891f-d0cc-413f-8234-d0a76ecdb843",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "Wort"
+        ],
+        [
+          "Äußerung"
+        ]
+      ],
+      "latin": "verbum"
+    },
+    "4e3e139e-cd6e-4b82-b33d-c297a4f1a62c": {
+      "id": "4e3e139e-cd6e-4b82-b33d-c297a4f1a62c",
+      "meanings": [
+        [
+          "sagen"
+        ],
+        [
+          "sprechen"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "dīcere"
+    },
+    "6c0435ea-58fc-4d51-9de2-38f1853ecb1f": {
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "Menge"
+        ],
+        [
+          "Vorrat"
+        ],
+        [
+          "Möglichkeit"
+        ]
+      ],
+      "latin": "cōpia",
+      "id": "6c0435ea-58fc-4d51-9de2-38f1853ecb1f"
+    },
+    "dcbb64b6-928e-4276-be7c-d39678f19cc4": {
+      "meanings": [
+        [
+          "Beratung"
+        ],
+        [
+          "Beschluss"
+        ],
+        [
+          "Plan"
+        ],
+        [
+          "Rat"
+        ]
+      ],
+      "latin": "cōnsilium",
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "dcbb64b6-928e-4276-be7c-d39678f19cc4"
+    },
+    "e951eefd-e689-429e-8e72-afa0de46d38f": {
+      "meanings": [
+        [
+          "hinzuziehen"
+        ],
+        [
+          "zulassen"
+        ]
+      ],
+      "latin": "admittere",
+      "id": "e951eefd-e689-429e-8e72-afa0de46d38f",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "e79939d8-391f-4d26-a283-a2b839b46c08": {
+      "latin": "fīlius",
+      "id": "e79939d8-391f-4d26-a283-a2b839b46c08",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "Sohn"
+        ]
+      ]
+    },
+    "58ecfc90-e09f-4747-a57c-8804de537964": {
+      "id": "58ecfc90-e09f-4747-a57c-8804de537964",
+      "meanings": [
+        [
+          "berühren"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "attingere"
+    },
+    "f2b29f74-b61b-493f-9bf0-71bb563de601": {
+      "id": "f2b29f74-b61b-493f-9bf0-71bb563de601",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "beweisen"
+        ],
+        [
+          "für gut befinden"
+        ]
+      ],
+      "latin": "probāre"
+    },
+    "388517d8-d8e5-482d-ad71-85537318e294": {
+      "latin": "nōn-ne",
+      "meanings": [
+        [
+          "(etwa) nicht?"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "388517d8-d8e5-482d-ad71-85537318e294"
+    },
+    "c7f655f8-7a20-41a8-8b1a-d46bc25809ab": {
+      "meanings": [
+        [
+          "Hilfe"
+        ]
+      ],
+      "id": "c7f655f8-7a20-41a8-8b1a-d46bc25809ab",
+      "latin": "auxilium",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "d93c4f94-f52e-4365-a857-8bcd68740464": {
+      "latin": "gerere",
+      "id": "d93c4f94-f52e-4365-a857-8bcd68740464",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "(aus)führen"
+        ],
+        [
+          "tragen"
+        ]
+      ],
+      "forms": []
+    },
+    "216326cc-264d-4505-8a96-d5a171aaeeed": {
+      "meanings": [
+        [
+          "Tochter"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "216326cc-264d-4505-8a96-d5a171aaeeed",
+      "latin": "fīlia"
+    },
+    "caacdbce-b743-4d2f-8eba-d1a8302e3973": {
+      "latin": "-que",
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "caacdbce-b743-4d2f-8eba-d1a8302e3973",
+      "meanings": [
+        [
+          "und"
+        ]
+      ]
+    },
+    "bd8745c8-5b77-4539-a9f1-84c0c880239f": {
+      "latin": "oculus",
+      "id": "bd8745c8-5b77-4539-a9f1-84c0c880239f",
+      "collectionId": "buch-lektion-07-20260918",
+      "meanings": [
+        [
+          "Auge"
+        ]
+      ]
+    },
+    "b3cd5692-00f1-40ee-ad0d-15bdaf5f2a81": {
+      "latin": "convertere",
+      "collectionId": "buch-lektion-07-20260918",
+      "id": "b3cd5692-00f1-40ee-ad0d-15bdaf5f2a81",
+      "meanings": [
+        [
+          "verändern"
+        ],
+        [
+          "(um)wenden"
+        ],
+        [
+          "richten (auf)"
+        ]
+      ]
+    },
+    "7c1c1917-8042-4db9-92cb-f39186d4b0b1": {
+      "latin": "compōnere",
+      "meanings": [
+        [
+          "vergleichen"
+        ]
+      ],
+      "id": "7c1c1917-8042-4db9-92cb-f39186d4b0b1",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "07651954-2ea3-4824-89b1-6440adff9051": {
+      "id": "07651954-2ea3-4824-89b1-6440adff9051",
+      "meanings": [
+        [
+          "(zurück)bleiben"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "remanēre"
+    },
+    "59053fdb-6739-4157-9be5-2dd9bea8d69c": {
+      "meanings": [
+        [
+          "Vater"
+        ]
+      ],
+      "id": "59053fdb-6739-4157-9be5-2dd9bea8d69c",
+      "latin": "pater, patris",
+      "collectionId": "buch-lektion-07-20260918"
+    },
+    "b089f5c3-a7aa-4282-bce6-b02e7800dfa3": {
+      "id": "b089f5c3-a7aa-4282-bce6-b02e7800dfa3",
+      "meanings": [
+        [
+          "nicht wollen"
+        ]
+      ],
+      "collectionId": "buch-lektion-07-20260918",
+      "latin": "nōlle"
+    },
+    "d62bff42-9340-4c7d-8593-b769681292a7": {
+      "meanings": [
+        [
+          "besuchen"
+        ],
+        [
+          "zusammenkommen"
+        ],
+        [
+          "zusammenpassen"
+        ]
+      ],
+      "latin": "convenīre",
+      "collectionId": "buch-lektion-09-20260918",
+      "id": "d62bff42-9340-4c7d-8593-b769681292a7"
+    },
+    "5d47f7c5-03e7-4d0f-b613-552a4390abe0": {
+      "id": "5d47f7c5-03e7-4d0f-b613-552a4390abe0",
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "hospes, hospitis",
+      "meanings": [
+        [
+          "Fremder"
+        ],
+        [
+          "Gast"
+        ],
+        [
+          "Gastgeber"
+        ]
+      ]
+    },
+    "769636ab-c2cb-458a-acbe-d8b243d9ab70": {
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "Herr"
+        ]
+      ],
+      "id": "769636ab-c2cb-458a-acbe-d8b243d9ab70",
+      "latin": "dominus"
+    },
+    "4b5f16bb-2770-4243-93c0-523fe58c30cf": {
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "sich setzen"
+        ],
+        [
+          "sich niederlassen"
+        ]
+      ],
+      "id": "4b5f16bb-2770-4243-93c0-523fe58c30cf",
+      "latin": "cōnsīdere"
+    },
+    "32b51db7-255d-482f-848a-85188f09c634": {
+      "id": "32b51db7-255d-482f-848a-85188f09c634",
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "gehorchen"
+        ],
+        [
+          "sich richten nach"
+        ]
+      ],
+      "latin": "pārēre"
+    },
+    "adedd270-b578-42e4-9671-e20b145f41ec": {
+      "latin": "aqua",
+      "meanings": [
+        [
+          "Wasser"
+        ]
+      ],
+      "id": "adedd270-b578-42e4-9671-e20b145f41ec",
+      "collectionId": "buch-lektion-09-20260918"
+    },
+    "4cbdfd60-8226-4ea5-b342-e37171a669be": {
+      "id": "4cbdfd60-8226-4ea5-b342-e37171a669be",
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "posteā",
+      "meanings": [
+        [
+          "nachher"
+        ],
+        [
+          "später"
+        ]
+      ]
+    },
+    "c1f1f176-cb27-4526-8a8c-50c3a964aff9": {
+      "id": "c1f1f176-cb27-4526-8a8c-50c3a964aff9",
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "cibus",
+      "meanings": [
+        [
+          "Nahrung"
+        ],
+        [
+          "Speise"
+        ]
+      ]
+    },
+    "252224c0-b512-4ad5-851a-c6561bb99a77": {
+      "latin": "praebēre",
+      "meanings": [
+        [
+          "geben"
+        ],
+        [
+          "hinhalten"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918",
+      "id": "252224c0-b512-4ad5-851a-c6561bb99a77"
+    },
+    "7f7c53a4-ffc0-4ca1-9c65-78eb29beaf12": {
+      "id": "7f7c53a4-ffc0-4ca1-9c65-78eb29beaf12",
+      "meanings": [
+        [
+          "trinken"
+        ]
+      ],
+      "latin": "bibere",
+      "collectionId": "buch-lektion-09-20260918"
+    },
+    "0830c2ba-c106-44b1-b354-4ddefd43df49": {
+      "latin": "ōrātiō, ōrātiōnis",
+      "id": "0830c2ba-c106-44b1-b354-4ddefd43df49",
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "Rede"
+        ]
+      ]
+    },
+    "1a4da875-7680-46ff-b886-78e75a37d322": {
+      "id": "1a4da875-7680-46ff-b886-78e75a37d322",
+      "meanings": [
+        [
+          "haben"
+        ],
+        [
+          "halten"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "habēre"
+    },
+    "413138ac-ddc4-4da5-8195-a4db3c2d5047": {
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "vōbīs",
+      "meanings": [
+        [
+          "euch"
+        ]
+      ],
+      "id": "413138ac-ddc4-4da5-8195-a4db3c2d5047"
+    },
+    "23644ea3-6a74-4231-b4af-aaaf21c681eb": {
+      "meanings": [
+        [
+          "Ansehen"
+        ],
+        [
+          "Beliebtheit"
+        ],
+        [
+          "Dank"
+        ],
+        [
+          "Gefälligkeit"
+        ]
+      ],
+      "id": "23644ea3-6a74-4231-b4af-aaaf21c681eb",
+      "latin": "grātia",
+      "collectionId": "buch-lektion-09-20260918"
+    },
+    "25b809ab-84eb-4e51-b1b5-5b513d6e4119": {
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "interesse",
+      "id": "25b809ab-84eb-4e51-b1b5-5b513d6e4119",
+      "meanings": [
+        [
+          "dazwischen sein"
+        ],
+        [
+          "teilnehmen an"
+        ]
+      ]
+    },
+    "2ef47b14-7d78-41e8-bc5c-01dab7ddc717": {
+      "latin": "mōs, mōris",
+      "id": "2ef47b14-7d78-41e8-bc5c-01dab7ddc717",
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "Sitte"
+        ],
+        [
+          "Brauch"
+        ],
+        [
+          "Charakter"
+        ]
+      ],
+      "forms": []
+    },
+    "1cabd9a9-2a99-4cb0-9c65-7cb13717943b": {
+      "id": "1cabd9a9-2a99-4cb0-9c65-7cb13717943b",
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "māiōrēs, māiōrum",
+      "meanings": [
+        [
+          "Vorfahren"
+        ]
+      ]
+    },
+    "286c8f00-8a8d-4715-883c-db1e21dd7eb7": {
+      "latin": "mūnus, mūneris",
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "Aufgabe"
+        ],
+        [
+          "Geschenk"
+        ]
+      ],
+      "id": "286c8f00-8a8d-4715-883c-db1e21dd7eb7"
+    },
+    "dbce7b6c-e259-4f55-87dd-33eab5897e14": {
+      "meanings": [
+        [
+          "(so) wie"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918",
+      "id": "dbce7b6c-e259-4f55-87dd-33eab5897e14",
+      "latin": "sīcut"
+    },
+    "d8357ff6-4fc3-4ac4-84f1-dabeb313a56b": {
+      "meanings": [
+        [
+          "und"
+        ]
+      ],
+      "id": "d8357ff6-4fc3-4ac4-84f1-dabeb313a56b",
+      "latin": "atque",
+      "collectionId": "buch-lektion-09-20260918"
+    },
+    "00fc40f9-132a-4840-bad7-e2ffbbf3eb74": {
+      "collectionId": "buch-lektion-09-20260918",
+      "latin": "indūcere",
+      "id": "00fc40f9-132a-4840-bad7-e2ffbbf3eb74",
+      "meanings": [
+        [
+          "(hin)einführen"
+        ],
+        [
+          "verleiten"
+        ]
+      ]
+    },
+    "ba1e4c17-49a1-4e47-a618-5078db85d8d2": {
+      "collectionId": "buch-lektion-09-20260918",
+      "meanings": [
+        [
+          "auch"
+        ]
+      ],
+      "id": "ba1e4c17-49a1-4e47-a618-5078db85d8d2",
+      "latin": "quoque"
+    },
+    "10d228fc-75b4-494f-80dc-5752947c9f57": {
+      "id": "10d228fc-75b4-494f-80dc-5752947c9f57",
+      "latin": "circumvenīre",
+      "meanings": [
+        [
+          "umringen"
+        ],
+        [
+          "umzingeln"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918"
+    },
+    "6bbc4d2a-3602-43ed-b365-454076482377": {
+      "id": "6bbc4d2a-3602-43ed-b365-454076482377",
+      "latin": "nārrāre",
+      "meanings": [
+        [
+          "erzählen (von",
+          "über)"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918",
+      "forms": []
+    },
+    "69cf7773-a472-4eb9-8a25-73b8d05e3115": {
+      "latin": "iter, itineris",
+      "meanings": [
+        [
+          "Reise"
+        ],
+        [
+          "Weg"
+        ],
+        [
+          "Marsch"
+        ]
+      ],
+      "collectionId": "buch-lektion-09-20260918",
+      "id": "69cf7773-a472-4eb9-8a25-73b8d05e3115"
+    },
+    "23b726a3-7cde-4c69-ac64-943cd6c77202": {
+      "latin": "cupere",
+      "collectionId": "buch-lektion-10-20260918",
+      "meanings": [
+        [
+          "verlangen"
+        ],
+        [
+          "wünschen"
+        ],
+        [
+          "wollen"
+        ]
+      ],
+      "id": "23b726a3-7cde-4c69-ac64-943cd6c77202"
+    },
+    "03d6ef7e-77f8-4b12-9ea3-bcf8395e84d7": {
+      "id": "03d6ef7e-77f8-4b12-9ea3-bcf8395e84d7",
+      "meanings": [
+        [
+          "große Zahl"
+        ],
+        [
+          "Menge"
+        ]
+      ],
+      "latin": "multitūdō, multitūdinis",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "7709ccdb-ce4f-43f6-8010-bf274b7b23d7": {
+      "meanings": [
+        [
+          "Mensch"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "7709ccdb-ce4f-43f6-8010-bf274b7b23d7",
+      "latin": "homō, hominis"
+    },
+    "f8cf0c8e-50d2-4fec-90e6-b2872b0666e1": {
+      "meanings": [
+        [
+          "erblicken"
+        ]
+      ],
+      "id": "f8cf0c8e-50d2-4fec-90e6-b2872b0666e1",
+      "latin": "aspicere",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "51e7b6e9-2e6d-4a13-b1dd-0332bd654db7": {
+      "latin": "scīre",
+      "id": "51e7b6e9-2e6d-4a13-b1dd-0332bd654db7",
+      "collectionId": "buch-lektion-10-20260918",
+      "meanings": [
+        [
+          "kennen"
+        ],
+        [
+          "wissen"
+        ],
+        [
+          "verstehen"
+        ]
+      ]
+    },
+    "2e30f7e9-44fc-4804-8123-1178d163e929": {
+      "id": "2e30f7e9-44fc-4804-8123-1178d163e929",
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "liber, librī",
+      "meanings": [
+        [
+          "Buch"
+        ]
+      ]
+    },
+    "0f8253b3-18ea-4fe3-b08f-e4fcf57af448": {
+      "collectionId": "buch-lektion-10-20260918",
+      "meanings": [
+        [
+          "Dichter"
+        ]
+      ],
+      "latin": "poēta",
+      "id": "0f8253b3-18ea-4fe3-b08f-e4fcf57af448"
+    },
+    "31943578-6278-48a2-b6d3-3afd82424885": {
+      "latin": "comes, comitis",
+      "meanings": [
+        [
+          "Gefährte"
+        ],
+        [
+          "Begleiter(in)"
+        ]
+      ],
+      "id": "31943578-6278-48a2-b6d3-3afd82424885",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "eb184365-eb98-49c6-b908-5366b5af862a": {
+      "meanings": [
+        [
+          "linke Hand"
+        ]
+      ],
+      "id": "eb184365-eb98-49c6-b908-5366b5af862a",
+      "latin": "sinistra",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "413acdba-194c-42bb-8af5-c52e0a782fb0": {
+      "latin": "capere",
+      "id": "413acdba-194c-42bb-8af5-c52e0a782fb0",
+      "meanings": [
+        [
+          "fassen"
+        ],
+        [
+          "nehmen"
+        ],
+        [
+          "erobern"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "12a7e3a5-309b-48d8-89d5-7b4814de0172": {
+      "latin": "corripere",
+      "meanings": [
+        [
+          "ergreifen"
+        ],
+        [
+          "gewaltsam an sich reißen"
+        ]
+      ],
+      "id": "12a7e3a5-309b-48d8-89d5-7b4814de0172",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "91321b77-0150-45a7-98cb-94165deee44f": {
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "carmen, carminis",
+      "meanings": [
+        [
+          "Lied"
+        ],
+        [
+          "Gedicht"
+        ]
+      ],
+      "id": "91321b77-0150-45a7-98cb-94165deee44f"
+    },
+    "3ab07e1b-741c-4fed-8ed0-21589f8604dc": {
+      "latin": "legere",
+      "meanings": [
+        [
+          "lesen"
+        ],
+        [
+          "auswählen"
+        ]
+      ],
+      "id": "3ab07e1b-741c-4fed-8ed0-21589f8604dc",
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "736bf17b-2a87-4705-831e-0a8e55db65fb": {
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "736bf17b-2a87-4705-831e-0a8e55db65fb",
+      "latin": "instituere",
+      "meanings": [
+        [
+          "beginnen"
+        ],
+        [
+          "einrichten"
+        ],
+        [
+          "unterrichten"
+        ]
+      ]
+    },
+    "b49516b6-b0bb-487e-ba3d-fabd16ba404f": {
+      "meanings": [
+        [
+          "oder (in der Frage)"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "b49516b6-b0bb-487e-ba3d-fabd16ba404f",
+      "latin": "an"
+    },
+    "ad0b91d3-e342-468f-8c5a-d902573d213c": {
+      "latin": "ut",
+      "meanings": [
+        [
+          "wie"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "ad0b91d3-e342-468f-8c5a-d902573d213c"
+    },
+    "ef55c2ce-e785-4e5d-ac8e-292beff55b12": {
+      "meanings": [
+        [
+          "glauben"
+        ],
+        [
+          "meinen"
+        ]
+      ],
+      "id": "ef55c2ce-e785-4e5d-ac8e-292beff55b12",
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "putāre"
+    },
+    "73c082d6-6bbc-4e9c-85c8-a1999d9a2543": {
+      "id": "73c082d6-6bbc-4e9c-85c8-a1999d9a2543",
+      "latin": "placet",
+      "meanings": [
+        [
+          "es gefällt jdm."
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "forms": []
+    },
+    "50fa449a-0419-4afe-b578-03465be9b856": {
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "50fa449a-0419-4afe-b578-03465be9b856",
+      "meanings": [
+        [
+          "dorthin"
+        ]
+      ],
+      "latin": "eō"
+    },
+    "f1483c76-8b5a-42bf-9143-b3ab7868bf76": {
+      "id": "f1483c76-8b5a-42bf-9143-b3ab7868bf76",
+      "collectionId": "buch-lektion-10-20260918",
+      "meanings": [
+        [
+          "machen"
+        ],
+        [
+          "tun"
+        ],
+        [
+          "handeln"
+        ]
+      ],
+      "latin": "facere"
+    },
+    "73fdd9d9-54ad-459d-9907-397751fb924b": {
+      "latin": "urbs, urbis",
+      "meanings": [
+        [
+          "Stadt"
+        ],
+        [
+          "Hauptstadt"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "73fdd9d9-54ad-459d-9907-397751fb924b"
+    },
+    "7b8d0249-10ea-44e6-8780-b615194c9e0c": {
+      "id": "7b8d0249-10ea-44e6-8780-b615194c9e0c",
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "provincia",
+      "meanings": [
+        [
+          "Provinz"
+        ]
+      ]
+    },
+    "9071c4af-fc69-4af7-b72b-1cf8f51b291b": {
+      "id": "9071c4af-fc69-4af7-b72b-1cf8f51b291b",
+      "latin": "bellum",
+      "meanings": [
+        [
+          "Krieg"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918"
+    },
+    "eaa7caad-b44e-4c50-b4d7-25e0366f0340": {
+      "id": "eaa7caad-b44e-4c50-b4d7-25e0366f0340",
+      "meanings": [
+        [
+          "dann"
+        ],
+        [
+          "darauf"
+        ]
+      ],
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "deinde"
+    },
+    "ca7c1c06-cfa5-4490-9e0e-f4d7426b437b": {
+      "collectionId": "buch-lektion-10-20260918",
+      "latin": "servāre",
+      "id": "ca7c1c06-cfa5-4490-9e0e-f4d7426b437b",
+      "meanings": [
+        [
+          "bewahren"
+        ],
+        [
+          "retten"
+        ]
+      ]
+    },
+    "b4e93bd0-c27b-407f-a68b-f797caa50dc2": {
+      "meanings": [
+        [
+          "Befehlshaber"
+        ],
+        [
+          "Feldherr"
+        ],
+        [
+          "Kaiser"
+        ]
+      ],
+      "latin": "imperātor, imperātōris",
+      "collectionId": "buch-lektion-10-20260918",
+      "id": "b4e93bd0-c27b-407f-a68b-f797caa50dc2"
+    },
+    "61e13d39-4a4c-4616-ab65-8ac4d8e99b3e": {
+      "id": "61e13d39-4a4c-4616-ab65-8ac4d8e99b3e",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "heute"
+        ]
+      ],
+      "latin": "hodiē"
+    },
+    "f72885a0-4880-44b4-a97d-a379028018db": {
+      "id": "f72885a0-4880-44b4-a97d-a379028018db",
+      "latin": "circus",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "Zirkus"
+        ],
+        [
+          "Rennbahn"
+        ]
+      ]
+    },
+    "2a713bed-3b5e-4e3a-9fa7-52346c199f99": {
+      "latin": "lūdus",
+      "meanings": [
+        [
+          "Spiel"
+        ],
+        [
+          "Wettkampf"
+        ],
+        [
+          "Schule"
+        ]
+      ],
+      "id": "2a713bed-3b5e-4e3a-9fa7-52346c199f99",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "44d164c1-f8d8-4e24-a145-710760f70310": {
+      "latin": "sunt",
+      "id": "44d164c1-f8d8-4e24-a145-710760f70310",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "sie sind"
+        ]
+      ]
+    },
+    "41d1c51a-2e3e-4d89-802a-d3079a2b0a76": {
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "sed",
+      "meanings": [
+        [
+          "aber"
+        ],
+        [
+          "sondern"
+        ]
+      ],
+      "id": "41d1c51a-2e3e-4d89-802a-d3079a2b0a76"
+    },
+    "56ece588-a95d-49ad-b79f-468d3b563d8f": {
+      "latin": "amīcus",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "Freund"
+        ]
+      ],
+      "id": "56ece588-a95d-49ad-b79f-468d3b563d8f"
+    },
+    "3c2f6082-77f6-426c-9f68-d8c71f2422f1": {
+      "meanings": [
+        [
+          "lange Zeit"
+        ]
+      ],
+      "latin": "diū",
+      "id": "3c2f6082-77f6-426c-9f68-d8c71f2422f1",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "1cc40c5a-d02a-47b2-8fac-3fad40ece46e": {
+      "meanings": [
+        [
+          "(er)warten"
+        ]
+      ],
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "exspectāre",
+      "id": "1cc40c5a-d02a-47b2-8fac-3fad40ece46e",
+      "forms": []
+    },
+    "c2cdad05-1db5-4a9f-a955-ec3f6e236a02": {
+      "id": "c2cdad05-1db5-4a9f-a955-ec3f6e236a02",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "endlich"
+        ]
+      ],
+      "latin": "tandem"
+    },
+    "943da987-ebe2-4713-9075-d97f37001040": {
+      "latin": "populus",
+      "collectionId": "buch-lektion-02-20260918",
+      "id": "943da987-ebe2-4713-9075-d97f37001040",
+      "meanings": [
+        [
+          "Volk"
+        ]
+      ]
+    },
+    "ce36e67a-ef06-4318-82b6-de36bc878df1": {
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "etiam",
+      "id": "ce36e67a-ef06-4318-82b6-de36bc878df1",
+      "meanings": [
+        [
+          "auch"
+        ],
+        [
+          "sogar"
+        ]
+      ]
+    },
+    "28dbae6d-df06-4810-a0d1-6ddc11c05551": {
+      "id": "28dbae6d-df06-4810-a0d1-6ddc11c05551",
+      "latin": "nunc",
+      "meanings": [
+        [
+          "jetzt"
+        ],
+        [
+          "nun"
+        ]
+      ],
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "bd5b3cb3-4de5-43f8-94ef-2c977971aa3e": {
+      "id": "bd5b3cb3-4de5-43f8-94ef-2c977971aa3e",
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "schweigen"
+        ]
+      ],
+      "latin": "tacēre"
+    },
+    "05adad63-b299-4de8-865c-d38e8a1ab30b": {
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "porta",
+      "id": "05adad63-b299-4de8-865c-d38e8a1ab30b",
+      "meanings": [
+        [
+          "Tor"
+        ]
+      ]
+    },
+    "6546c801-348f-4b1f-89d3-3ce649dc71a2": {
+      "id": "6546c801-348f-4b1f-89d3-3ce649dc71a2",
+      "meanings": [
+        [
+          "offenstehen"
+        ],
+        [
+          "sich erstrecken"
+        ]
+      ],
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "patēre"
+    },
+    "85eda9eb-abf4-4200-b80d-c045aae3ab36": {
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "equus",
+      "id": "85eda9eb-abf4-4200-b80d-c045aae3ab36",
+      "meanings": [
+        [
+          "Pferd"
+        ]
+      ]
+    },
+    "92b9c4d4-04aa-4b61-ae38-7edbb291942d": {
+      "meanings": [
+        [
+          "herbeikommen"
+        ],
+        [
+          "hinzukommen"
+        ]
+      ],
+      "latin": "accēdere",
+      "id": "92b9c4d4-04aa-4b61-ae38-7edbb291942d",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "c8458602-5a03-4fc0-994c-70bce5a82639": {
+      "latin": "dēnique",
+      "meanings": [
+        [
+          "schließlich"
+        ],
+        [
+          "zuletzt"
+        ]
+      ],
+      "id": "c8458602-5a03-4fc0-994c-70bce5a82639",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "fac65c5a-b1c1-423b-89fc-59627a251408": {
+      "collectionId": "buch-lektion-02-20260918",
+      "id": "fac65c5a-b1c1-423b-89fc-59627a251408",
+      "latin": "sīgnum",
+      "meanings": [
+        [
+          "Merkmal"
+        ],
+        [
+          "Zeichen"
+        ]
+      ]
+    },
+    "f5dfd2b0-691a-42b9-ad70-1d5fd654b603": {
+      "collectionId": "buch-lektion-02-20260918",
+      "meanings": [
+        [
+          "geben"
+        ]
+      ],
+      "id": "f5dfd2b0-691a-42b9-ad70-1d5fd654b603",
+      "latin": "dare"
+    },
+    "bbb67246-4bb3-4340-b35d-0c9e3de8462d": {
+      "id": "bbb67246-4bb3-4340-b35d-0c9e3de8462d",
+      "meanings": [
+        [
+          "eilen"
+        ],
+        [
+          "laufen"
+        ]
+      ],
+      "latin": "currere",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "6a816d2d-8c3c-47eb-b26c-5185a5d16922": {
+      "latin": "surgere",
+      "meanings": [
+        [
+          "aufstehen"
+        ],
+        [
+          "sich erheben"
+        ]
+      ],
+      "id": "6a816d2d-8c3c-47eb-b26c-5185a5d16922",
+      "collectionId": "buch-lektion-02-20260918"
+    },
+    "461775e7-1c31-411a-b804-1e9107209cd4": {
+      "meanings": [
+        [
+          "rufen"
+        ],
+        [
+          "nennen"
+        ]
+      ],
+      "id": "461775e7-1c31-411a-b804-1e9107209cd4",
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "vocāre"
+    },
+    "072f28e8-f952-49da-9eee-6ae0cb5791ba": {
+      "collectionId": "buch-lektion-02-20260918",
+      "latin": "victor",
+      "meanings": [
+        [
+          "Sieger"
+        ]
+      ],
+      "id": "072f28e8-f952-49da-9eee-6ae0cb5791ba"
+    },
+    "3dac71d3-8888-4d05-816b-5157a3bd646c": {
+      "meanings": [
+        [
+          "Belohnung"
+        ],
+        [
+          "Lohn"
+        ],
+        [
+          "Preis"
+        ]
+      ],
+      "forms": [],
+      "latin": "praemium",
+      "collectionId": "buch-lektion-02-20260918",
+      "id": "3dac71d3-8888-4d05-816b-5157a3bd646c"
+    },
+    "0accdf32-34c3-4c55-afac-bcec8a2163e8": {
+      "id": "0accdf32-34c3-4c55-afac-bcec8a2163e8",
+      "meanings": [
+        [
+          "kommen"
+        ]
+      ],
+      "latin": "venīre",
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "9361fc30-231d-4f50-92eb-d94efda460da": {
+      "latin": "lībertus",
+      "meanings": [
+        [
+          "Freigelassener"
+        ]
+      ],
+      "id": "9361fc30-231d-4f50-92eb-d94efda460da",
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "565fae07-47ec-4363-a594-17dc648ba414": {
+      "meanings": [
+        [
+          "Aufgabe"
+        ],
+        [
+          "Geschäft"
+        ],
+        [
+          "Angelegenheit"
+        ]
+      ],
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "565fae07-47ec-4363-a594-17dc648ba414",
+      "latin": "negōtium"
+    },
+    "6538efd0-c0b0-4e94-baf5-31e5d69dcb9b": {
+      "id": "6538efd0-c0b0-4e94-baf5-31e5d69dcb9b",
+      "meanings": [
+        [
+          "handeln"
+        ],
+        [
+          "treiben"
+        ],
+        [
+          "verhandeln"
+        ]
+      ],
+      "latin": "agere",
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "5da4c738-f04c-49d7-9714-dfbfa5ce99d9": {
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "5da4c738-f04c-49d7-9714-dfbfa5ce99d9",
+      "latin": "vōx, vōcis",
+      "meanings": [
+        [
+          "Äußerung"
+        ],
+        [
+          "Laut"
+        ],
+        [
+          "Stimme"
+        ]
+      ]
+    },
+    "52c0f5e6-472d-4d5e-a015-8c42288a74f5": {
+      "meanings": [
+        [
+          "hören"
+        ]
+      ],
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "audīre",
+      "id": "52c0f5e6-472d-4d5e-a015-8c42288a74f5"
+    },
+    "93c98bbf-c62e-4018-a07a-10f310660e3a": {
+      "latin": "patrōnus",
+      "meanings": [
+        [
+          "Patron"
+        ],
+        [
+          "(Schutz-)Herr"
+        ]
+      ],
+      "id": "93c98bbf-c62e-4018-a07a-10f310660e3a",
+      "forms": [],
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "6ab74006-09e1-404e-94c8-40c9bad47419": {
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "6ab74006-09e1-404e-94c8-40c9bad47419",
+      "latin": "via",
+      "meanings": [
+        [
+          "Straße"
+        ],
+        [
+          "Weg"
+        ]
+      ]
+    },
+    "2b629aa6-ec66-4158-940f-e2bca04a4f7d": {
+      "meanings": [
+        [
+          "Berg"
+        ]
+      ],
+      "latin": "mōns, montis",
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "2b629aa6-ec66-4158-940f-e2bca04a4f7d"
+    },
+    "03cbbb46-6eaa-45a9-81e4-2fcebc432650": {
+      "latin": "pervenīre",
+      "collectionId": "buch-lektion-08-20260918",
+      "forms": [],
+      "id": "03cbbb46-6eaa-45a9-81e4-2fcebc432650",
+      "meanings": [
+        [
+          "kommen (zu) (nach)"
+        ]
+      ]
+    },
+    "e9681114-62ea-43b7-8147-0f009e78c329": {
+      "meanings": [
+        [
+          "führen"
+        ],
+        [
+          "ziehen"
+        ]
+      ],
+      "id": "e9681114-62ea-43b7-8147-0f009e78c329",
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "dūcere"
+    },
+    "3b3263ce-b9f2-4ff0-8d93-d1994f4bf817": {
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "propinquus",
+      "meanings": [
+        [
+          "Verwandter"
+        ]
+      ],
+      "id": "3b3263ce-b9f2-4ff0-8d93-d1994f4bf817"
+    },
+    "73b94599-1935-47e5-97ed-6b45a4185585": {
+      "latin": "gēns, gentis",
+      "id": "73b94599-1935-47e5-97ed-6b45a4185585",
+      "collectionId": "buch-lektion-08-20260918",
+      "meanings": [
+        [
+          "Familienverband"
+        ],
+        [
+          "Stamm"
+        ],
+        [
+          "Volk"
+        ]
+      ]
+    },
+    "371a9c79-7c62-4d97-8bd8-4e5d48c18437": {
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "371a9c79-7c62-4d97-8bd8-4e5d48c18437",
+      "meanings": [
+        [
+          "Vater"
+        ],
+        [
+          "Mutter"
+        ]
+      ],
+      "latin": "parēns, parentis"
+    },
+    "b8d09b9b-da67-4556-af2f-1dfead3ac165": {
+      "meanings": [
+        [
+          "Eltern"
+        ]
+      ],
+      "latin": "parentēs, parentum",
+      "id": "b8d09b9b-da67-4556-af2f-1dfead3ac165",
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "61464018-3ce8-49f9-9fb1-e05a88d39246": {
+      "id": "61464018-3ce8-49f9-9fb1-e05a88d39246",
+      "meanings": [
+        [
+          "Schwester"
+        ]
+      ],
+      "latin": "soror, sorōris",
+      "collectionId": "buch-lektion-08-20260918"
+    },
+    "87ead0a4-2249-462f-b5be-ddce462a5359": {
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "āra",
+      "meanings": [
+        [
+          "Altar"
+        ]
+      ],
+      "id": "87ead0a4-2249-462f-b5be-ddce462a5359"
+    },
+    "b2e9542c-20ae-4778-80a6-9eb5f302e391": {
+      "id": "b2e9542c-20ae-4778-80a6-9eb5f302e391",
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "gaudium",
+      "meanings": [
+        [
+          "Freude"
+        ]
+      ]
+    },
+    "531e47d7-ff97-4a53-8788-ffd2008b1f30": {
+      "collectionId": "buch-lektion-08-20260918",
+      "meanings": [
+        [
+          "Göttin"
+        ]
+      ],
+      "latin": "dea",
+      "id": "531e47d7-ff97-4a53-8788-ffd2008b1f30"
+    },
+    "4da89c0e-03f9-48a6-ac3d-6ff2af467b63": {
+      "meanings": [
+        [
+          "Gesundheit"
+        ],
+        [
+          "Glück"
+        ],
+        [
+          "Rettung"
+        ],
+        [
+          "Gruß"
+        ]
+      ],
+      "collectionId": "buch-lektion-08-20260918",
+      "id": "4da89c0e-03f9-48a6-ac3d-6ff2af467b63",
+      "latin": "salūs, salūtis"
+    },
+    "15aea251-cc04-4af4-9313-82543dbe5533": {
+      "latin": "pāx, pācis",
+      "collectionId": "buch-lektion-08-20260918",
+      "meanings": [
+        [
+          "Friede"
+        ]
+      ],
+      "id": "15aea251-cc04-4af4-9313-82543dbe5533"
+    },
+    "a1c5f740-1e6c-4354-8f34-1ecec427914b": {
+      "meanings": [
+        [
+          "bitten"
+        ],
+        [
+          "beten"
+        ]
+      ],
+      "collectionId": "buch-lektion-08-20260918",
+      "forms": [],
+      "id": "a1c5f740-1e6c-4354-8f34-1ecec427914b",
+      "latin": "ōrāre"
+    },
+    "7ed2223f-447b-458e-9d85-2e23759f4d01": {
+      "collectionId": "buch-lektion-08-20260918",
+      "forms": [],
+      "latin": "agmen, agminis",
+      "id": "7ed2223f-447b-458e-9d85-2e23759f4d01",
+      "meanings": [
+        [
+          "(Heeres-)Zug"
+        ]
+      ]
+    },
+    "1a631733-6511-41bf-8430-f82c37fdf606": {
+      "meanings": [
+        [
+          "nach Hause"
+        ]
+      ],
+      "id": "1a631733-6511-41bf-8430-f82c37fdf606",
+      "collectionId": "buch-lektion-08-20260918",
+      "latin": "domum"
+    },
+    "14d59077-3d29-4cb4-b7af-253d4d99265d": {
+      "meanings": [
+        [
+          "Senator"
+        ]
+      ],
+      "latin": "senātor",
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "14d59077-3d29-4cb4-b7af-253d4d99265d"
+    },
+    "59d646c0-a26c-4433-82c0-aa40ad0e9d81": {
+      "meanings": [
+        [
+          "Marktplatz"
+        ],
+        [
+          "Forum"
+        ],
+        [
+          "Öffentlichkeit"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "forum",
+      "id": "59d646c0-a26c-4433-82c0-aa40ad0e9d81"
+    },
+    "8ae57497-7527-4469-bc7f-28967ea4b7bf": {
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "8ae57497-7527-4469-bc7f-28967ea4b7bf",
+      "latin": "properāre",
+      "meanings": [
+        [
+          "eilen"
+        ],
+        [
+          "sich beeilen"
+        ]
+      ]
+    },
+    "60bd5797-9e4d-47ff-9c7d-53fa07fb984c": {
+      "collectionId": "buch-lektion-01-20260918",
+      "meanings": [
+        [
+          "denn"
+        ],
+        [
+          "nämlich"
+        ]
+      ],
+      "latin": "nam",
+      "id": "60bd5797-9e4d-47ff-9c7d-53fa07fb984c"
+    },
+    "9a8be9d5-aa30-4e03-8281-b6ab00b07bf4": {
+      "latin": "ibī",
+      "meanings": [
+        [
+          "dort"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "9a8be9d5-aa30-4e03-8281-b6ab00b07bf4"
+    },
+    "f6c7ab1e-edcd-474c-9bf1-4b828b8f8770": {
+      "id": "f6c7ab1e-edcd-474c-9bf1-4b828b8f8770",
+      "latin": "cūria",
+      "meanings": [
+        [
+          "Kurie"
+        ],
+        [
+          "Rathaus"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918"
+    },
+    "2eeb9920-ce69-4296-8e5b-3b95d5295c79": {
+      "id": "2eeb9920-ce69-4296-8e5b-3b95d5295c79",
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "esse",
+      "meanings": [
+        [
+          "sein"
+        ]
+      ]
+    },
+    "fd8ab8db-2290-4298-b6e3-7ee0f5471735": {
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "fd8ab8db-2290-4298-b6e3-7ee0f5471735",
+      "latin": "hīc",
+      "meanings": [
+        [
+          "hier"
+        ]
+      ]
+    },
+    "d50f2edb-14ae-4202-b984-1c3370bd1f05": {
+      "id": "d50f2edb-14ae-4202-b984-1c3370bd1f05",
+      "latin": "turba",
+      "collectionId": "buch-lektion-01-20260918",
+      "meanings": [
+        [
+          "Menschenmenge"
+        ],
+        [
+          "Lärm"
+        ],
+        [
+          "Verwirrung"
+        ]
+      ]
+    },
+    "2bea31e3-f25a-43d5-b398-1e9f5f1503ae": {
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "stāre",
+      "id": "2bea31e3-f25a-43d5-b398-1e9f5f1503ae",
+      "meanings": [
+        [
+          "stehen"
+        ]
+      ]
+    },
+    "bc46c366-f65b-4102-8cf8-b67a0ca01812": {
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "bc46c366-f65b-4102-8cf8-b67a0ca01812",
+      "latin": "et",
+      "meanings": [
+        [
+          "und"
+        ],
+        [
+          "auch"
+        ]
+      ]
+    },
+    "81a94fdd-5c16-455b-a055-47f7d259d083": {
+      "meanings": [
+        [
+          "laut rufen"
+        ],
+        [
+          "schreien"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "clāmāre",
+      "id": "81a94fdd-5c16-455b-a055-47f7d259d083"
+    },
+    "020a61ec-6d08-4acd-bc1d-9713b41d4aac": {
+      "meanings": [
+        [
+          "sei gegrüßt!"
+        ]
+      ],
+      "id": "020a61ec-6d08-4acd-bc1d-9713b41d4aac",
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "avē!"
+    },
+    "80d21c9d-7e9d-4163-8952-e98f129e7ed9": {
+      "latin": "gaudēre",
+      "collectionId": "buch-lektion-01-20260918",
+      "meanings": [
+        [
+          "sich freuen"
+        ]
+      ],
+      "id": "80d21c9d-7e9d-4163-8952-e98f129e7ed9"
+    },
+    "789e3bc9-6734-49af-a1ec-19d39605e783": {
+      "latin": "salvē!",
+      "meanings": [
+        [
+          "sei gegrüßt!"
+        ]
+      ],
+      "id": "789e3bc9-6734-49af-a1ec-19d39605e783",
+      "collectionId": "buch-lektion-01-20260918"
+    },
+    "98c67411-0ceb-4c1d-ba8d-67126116d124": {
+      "latin": "salvēte!",
+      "id": "98c67411-0ceb-4c1d-ba8d-67126116d124",
+      "collectionId": "buch-lektion-01-20260918",
+      "meanings": [
+        [
+          "seid gegrüßt!"
+        ]
+      ]
+    },
+    "debeea6f-6e64-4896-8fcb-7ea2dd0ca9db": {
+      "latin": "subitō",
+      "id": "debeea6f-6e64-4896-8fcb-7ea2dd0ca9db",
+      "collectionId": "buch-lektion-01-20260918",
+      "meanings": [
+        [
+          "plötzlich"
+        ]
+      ]
+    },
+    "31b766ea-40b4-490a-afb1-cfc7b12f67ea": {
+      "meanings": [
+        [
+          "Sklave"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "31b766ea-40b4-490a-afb1-cfc7b12f67ea",
+      "latin": "servus"
+    },
+    "207bc49a-51e9-4c32-b5c4-2a9bb1029e0d": {
+      "meanings": [
+        [
+          "da sein"
+        ]
+      ],
+      "id": "207bc49a-51e9-4c32-b5c4-2a9bb1029e0d",
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "adesse"
+    },
+    "5efeb56f-7e31-4c09-8712-50451768f0b3": {
+      "id": "5efeb56f-7e31-4c09-8712-50451768f0b3",
+      "meanings": [
+        [
+          "bitten"
+        ],
+        [
+          "erbitten"
+        ],
+        [
+          "fragen"
+        ]
+      ],
+      "latin": "rogāre",
+      "collectionId": "buch-lektion-01-20260918"
+    },
+    "b05d6438-3de2-4224-a791-e16828dbed0a": {
+      "meanings": [
+        [
+          "wo?"
+        ]
+      ],
+      "latin": "ubi?",
+      "collectionId": "buch-lektion-01-20260918",
+      "id": "b05d6438-3de2-4224-a791-e16828dbed0a"
+    },
+    "863dd7d2-b7da-45fb-9d95-29cb40be874d": {
+      "meanings": [
+        [
+          "lachen"
+        ],
+        [
+          "auslachen"
+        ]
+      ],
+      "id": "863dd7d2-b7da-45fb-9d95-29cb40be874d",
+      "collectionId": "buch-lektion-01-20260918",
+      "latin": "rīdēre"
+    },
+    "bb2eabd1-4207-4f8c-b78f-38d1f05a93f5": {
+      "latin": "tum",
+      "id": "bb2eabd1-4207-4f8c-b78f-38d1f05a93f5",
+      "meanings": [
+        [
+          "da"
+        ],
+        [
+          "damals"
+        ],
+        [
+          "darauf"
+        ],
+        [
+          "dann"
+        ]
+      ],
+      "collectionId": "buch-lektion-01-20260918"
+    },
+    "f9207948-c7e6-4ab0-bb81-475b774c8482": {
+      "id": "f9207948-c7e6-4ab0-bb81-475b774c8482",
+      "forms": [
+        "possum",
+        "potuī"
+      ],
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "posse",
+      "meanings": [
+        [
+          "können"
+        ]
+      ]
+    },
+    "855a0ee7-8418-4a4a-bafd-2c1bf1555b86": {
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "calamitās, calamitātis",
+      "meanings": [
+        [
+          "Unglück"
+        ],
+        [
+          "Niederlage"
+        ],
+        [
+          "Schaden"
+        ]
+      ],
+      "id": "855a0ee7-8418-4a4a-bafd-2c1bf1555b86"
+    },
+    "4983f656-4870-495e-9595-6dab766d953a": {
+      "meanings": [
+        [
+          "töten"
+        ]
+      ],
+      "id": "4983f656-4870-495e-9595-6dab766d953a",
+      "collectionId": "buch-lektion-11-20260921",
+      "forms": [
+        "necō",
+        "necāvī"
+      ],
+      "latin": "necāre"
+    },
+    "863145ff-955e-471f-9c06-a1075866afd8": {
+      "id": "863145ff-955e-471f-9c06-a1075866afd8",
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Ehemann"
+        ]
+      ],
+      "latin": "marītus"
+    },
+    "2511751c-6e3c-4667-a24b-bb2dd6bc1788": {
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "2511751c-6e3c-4667-a24b-bb2dd6bc1788",
+      "latin": "crēdere",
+      "forms": [
+        "crēdō"
+      ],
+      "meanings": [
+        [
+          "anvertrauen"
+        ],
+        [
+          "glauben"
+        ]
+      ]
+    },
+    "28331fa6-9a00-4548-abea-bf1d3a12e101": {
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "mihi",
+      "meanings": [
+        [
+          "mir"
+        ]
+      ],
+      "id": "28331fa6-9a00-4548-abea-bf1d3a12e101"
+    },
+    "6a439624-0c20-4cdd-930f-7e9c9e8d0c3c": {
+      "id": "6a439624-0c20-4cdd-930f-7e9c9e8d0c3c",
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Mann"
+        ]
+      ],
+      "latin": "vir, virī"
+    },
+    "b8d165fc-677f-49b8-8e55-4b16563551b2": {
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "sich"
+        ]
+      ],
+      "latin": "sē",
+      "id": "b8d165fc-677f-49b8-8e55-4b16563551b2"
+    },
+    "e45379da-2aa2-4c0c-ae25-c6041e1239a2": {
+      "latin": "ubi",
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "e45379da-2aa2-4c0c-ae25-c6041e1239a2",
+      "meanings": [
+        [
+          "sobald"
+        ]
+      ]
+    },
+    "76930b80-0137-4e5b-a88d-9218e7910a02": {
+      "forms": [
+        "mūniō",
+        "mūnīvī"
+      ],
+      "meanings": [
+        [
+          "bauen"
+        ],
+        [
+          "befestigen"
+        ],
+        [
+          "schützen"
+        ]
+      ],
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "mūnīre",
+      "id": "76930b80-0137-4e5b-a88d-9218e7910a02"
+    },
+    "5742ea78-df9a-4fcb-a0f8-1f694a6e34d2": {
+      "id": "5742ea78-df9a-4fcb-a0f8-1f694a6e34d2",
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Mauer"
+        ]
+      ],
+      "latin": "mūrus"
+    },
+    "d19b6fd0-dbe8-4a55-886b-ad00489a7e76": {
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "d19b6fd0-dbe8-4a55-886b-ad00489a7e76",
+      "latin": "egō",
+      "meanings": [
+        [
+          "ich"
+        ]
+      ]
+    },
+    "8adb7339-7aee-4d0a-8be4-4d88da111134": {
+      "id": "8adb7339-7aee-4d0a-8be4-4d88da111134",
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "enim",
+      "meanings": [
+        [
+          "nämlich"
+        ],
+        [
+          "in der Tat"
+        ]
+      ]
+    },
+    "8082aaaf-d22c-44d7-9662-3a3abb3ad90d": {
+      "meanings": [
+        [
+          "Feind (Landesfeind)"
+        ]
+      ],
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "8082aaaf-d22c-44d7-9662-3a3abb3ad90d",
+      "latin": "hostis, hostis"
+    },
+    "53c6689a-7779-49ce-b1e8-69e6a7db0a9e": {
+      "meanings": [
+        [
+          "von"
+        ],
+        [
+          "von ... her"
+        ]
+      ],
+      "id": "53c6689a-7779-49ce-b1e8-69e6a7db0a9e",
+      "latin": "ā / ab",
+      "collectionId": "buch-lektion-11-20260921"
+    },
+    "ba8fe192-302f-41b6-a9bc-d201d387b670": {
+      "forms": [
+        "prohibeō",
+        "prohibuī"
+      ],
+      "latin": "prohibēre",
+      "meanings": [
+        [
+          "abhalten (von)"
+        ],
+        [
+          "hindern (an)"
+        ]
+      ],
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "ba8fe192-302f-41b6-a9bc-d201d387b670"
+    },
+    "9ead9c7d-9ebd-4381-9645-897a566a7b42": {
+      "latin": "īra",
+      "id": "9ead9c7d-9ebd-4381-9645-897a566a7b42",
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Zorn"
+        ]
+      ]
+    },
+    "c1b808ba-b183-430b-bbf6-afebc2672cbd": {
+      "collectionId": "buch-lektion-11-20260921",
+      "latin": "ō(h)",
+      "meanings": [
+        [
+          "ach"
+        ],
+        [
+          "oh"
+        ]
+      ],
+      "id": "c1b808ba-b183-430b-bbf6-afebc2672cbd"
+    },
+    "9d0da5bb-4059-418e-ab67-c4c176e3a240": {
+      "id": "9d0da5bb-4059-418e-ab67-c4c176e3a240",
+      "latin": "frāter, frātris",
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Bruder"
+        ]
+      ]
+    },
+    "7b20de80-0332-4861-904d-f7215fc0ea87": {
+      "meanings": [
+        [
+          "Träne"
+        ]
+      ],
+      "latin": "lacrima",
+      "id": "7b20de80-0332-4861-904d-f7215fc0ea87",
+      "collectionId": "buch-lektion-11-20260921"
+    },
+    "ba618244-7eec-4743-ba60-d806f63916ef": {
+      "forms": [
+        "teneō",
+        "tenuī"
+      ],
+      "meanings": [
+        [
+          "besitzen"
+        ],
+        [
+          "festhalten"
+        ],
+        [
+          "halten"
+        ]
+      ],
+      "latin": "tenēre",
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "ba618244-7eec-4743-ba60-d806f63916ef"
+    },
+    "604c5531-85f7-47bd-a195-f9b0e0b0d59d": {
+      "meanings": [
+        [
+          "vergeblich"
+        ]
+      ],
+      "collectionId": "buch-lektion-11-20260921",
+      "id": "604c5531-85f7-47bd-a195-f9b0e0b0d59d",
+      "latin": "frūstrā"
+    },
+    "978d36e9-f5dd-44ce-897f-2d3697248b89": {
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Ufer"
+        ]
+      ],
+      "latin": "rīpa",
+      "id": "978d36e9-f5dd-44ce-897f-2d3697248b89"
+    },
+    "ca989044-6901-4cd9-b4d9-9c6e1b1efc35": {
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "ernähren"
+        ],
+        [
+          "großziehen"
+        ]
+      ],
+      "forms": [
+        "alō",
+        "aluī"
+      ],
+      "latin": "alere",
+      "id": "ca989044-6901-4cd9-b4d9-9c6e1b1efc35"
+    },
+    "d15854b0-3ffc-40ea-928d-c6a3a5fa939e": {
+      "forms": [
+        "fleō",
+        "flēvī"
+      ],
+      "latin": "flēre",
+      "id": "d15854b0-3ffc-40ea-928d-c6a3a5fa939e",
+      "meanings": [
+        [
+          "beklagen"
+        ],
+        [
+          "(be)weinen"
+        ]
+      ],
+      "collectionId": "buch-lektion-11-20260921"
+    },
+    "c0264848-c92c-4985-b72b-a706f7f31cdb": {
+      "collectionId": "buch-lektion-11-20260921",
+      "meanings": [
+        [
+          "Mord"
+        ],
+        [
+          "Tod"
+        ]
+      ],
+      "id": "c0264848-c92c-4985-b72b-a706f7f31cdb",
+      "latin": "nex, necis"
+    },
+    "947302a5-1920-475d-b613-e5b1ec61f400": {
+      "collectionId": "buch-lektion-12-20260921",
+      "meanings": [
+        [
+          "Brücke"
+        ]
+      ],
+      "latin": "pōns, pontis",
+      "id": "947302a5-1920-475d-b613-e5b1ec61f400"
+    },
+    "95638559-145a-4a98-b925-5531e27b2555": {
+      "id": "95638559-145a-4a98-b925-5531e27b2555",
+      "meanings": [
+        [
+          "erstens"
+        ],
+        [
+          "zuerst"
+        ]
+      ],
+      "latin": "prīmum",
+      "collectionId": "buch-lektion-12-20260921",
+      "forms": []
+    },
+    "73400190-9264-4690-b1d0-9d86b621bdac": {
+      "id": "73400190-9264-4690-b1d0-9d86b621bdac",
+      "collectionId": "buch-lektion-12-20260921",
+      "latin": "procul",
+      "meanings": [
+        [
+          "von fern"
+        ],
+        [
+          "weit weg"
+        ]
+      ]
+    },
+    "fcc82567-dd3f-4b95-bc5d-bbfeab1bf036": {
+      "meanings": [
+        [
+          "schließlich"
+        ]
+      ],
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "fcc82567-dd3f-4b95-bc5d-bbfeab1bf036",
+      "latin": "postrēmō"
+    },
+    "b8d02d24-974d-40d4-b0b5-af1ac5df7354": {
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "b8d02d24-974d-40d4-b0b5-af1ac5df7354",
+      "meanings": [
+        [
+          "näher"
+        ]
+      ],
+      "latin": "propius"
+    },
+    "f8d18c61-8231-452f-a8f6-76eb3f0d2ffe": {
+      "id": "f8d18c61-8231-452f-a8f6-76eb3f0d2ffe",
+      "latin": "quidem",
+      "collectionId": "buch-lektion-12-20260921",
+      "meanings": [
+        [
+          "freilich"
+        ],
+        [
+          "gewiss"
+        ],
+        [
+          "wenigstens"
+        ],
+        [
+          "zwar"
+        ]
+      ]
+    },
+    "2b54e573-9cf7-4567-aeff-d5f5fce3529f": {
+      "meanings": [
+        [
+          "mit mir"
+        ]
+      ],
+      "latin": "mēcum",
+      "id": "2b54e573-9cf7-4567-aeff-d5f5fce3529f",
+      "collectionId": "buch-lektion-12-20260921"
+    },
+    "bb0a7f5d-f5b0-490b-8c8c-402035a601e9": {
+      "id": "bb0a7f5d-f5b0-490b-8c8c-402035a601e9",
+      "meanings": [
+        [
+          "Bau"
+        ],
+        [
+          "Befestigung"
+        ]
+      ],
+      "collectionId": "buch-lektion-12-20260921",
+      "latin": "mūnītiō, mūnītiōnis"
+    },
+    "ea508a54-3546-4b5a-ae24-96f0a52483a6": {
+      "meanings": [
+        [
+          "bis jetzt"
+        ],
+        [
+          "noch"
+        ]
+      ],
+      "latin": "adhūc",
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "ea508a54-3546-4b5a-ae24-96f0a52483a6"
+    },
+    "e52b24cc-29b4-4809-b4a3-bc2e71bbf5d3": {
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "e52b24cc-29b4-4809-b4a3-bc2e71bbf5d3",
+      "meanings": [
+        [
+          "schauen auf"
+        ],
+        [
+          "sehen"
+        ],
+        [
+          "vorhersehen"
+        ]
+      ],
+      "latin": "prōspicere",
+      "forms": [
+        "prōspiciō"
+      ]
+    },
+    "64300cb4-5020-4b3d-a460-cafa9fc22c17": {
+      "meanings": [
+        [
+          "(Angriffs-)Waffe"
+        ],
+        [
+          "Geschoss"
+        ]
+      ],
+      "latin": "tēlum",
+      "id": "64300cb4-5020-4b3d-a460-cafa9fc22c17",
+      "collectionId": "buch-lektion-12-20260921"
+    },
+    "623033d0-efbd-4f9a-ae8d-05c1acc9df68": {
+      "id": "623033d0-efbd-4f9a-ae8d-05c1acc9df68",
+      "meanings": [
+        [
+          "nicht einmal"
+        ]
+      ],
+      "latin": "nē ... quidem",
+      "collectionId": "buch-lektion-12-20260921"
+    },
+    "ce7d23d6-bec9-4fc1-876f-52e93a25fb89": {
+      "latin": "fīdūcia",
+      "id": "ce7d23d6-bec9-4fc1-876f-52e93a25fb89",
+      "collectionId": "buch-lektion-12-20260921",
+      "meanings": [
+        [
+          "Vertrauen"
+        ]
+      ]
+    },
+    "fe775aa5-50e2-4446-bb78-b3cd06c9b717": {
+      "meanings": [
+        [
+          "frei sein von"
+        ],
+        [
+          "etwas nicht haben"
+        ]
+      ],
+      "collectionId": "buch-lektion-12-20260921",
+      "latin": "carēre",
+      "id": "fe775aa5-50e2-4446-bb78-b3cd06c9b717",
+      "forms": [
+        "careō",
+        "caruī"
+      ]
+    },
+    "399201cd-4bd1-4bf9-a562-9e9a7267d25e": {
+      "forms": [
+        "cōnfīdō"
+      ],
+      "latin": "cōnfīdere",
+      "meanings": [
+        [
+          "vertrauen"
+        ]
+      ],
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "399201cd-4bd1-4bf9-a562-9e9a7267d25e"
+    },
+    "c2c39c1e-7343-4388-b99f-50f2cc0c9145": {
+      "id": "c2c39c1e-7343-4388-b99f-50f2cc0c9145",
+      "latin": "gladius",
+      "collectionId": "buch-lektion-12-20260921",
+      "meanings": [
+        [
+          "Schwert"
+        ]
+      ]
+    },
+    "c6a0242b-369e-4e74-8fd2-7768625d3142": {
+      "meanings": [
+        [
+          "es ist bekannt"
+        ],
+        [
+          "es steht fest"
+        ]
+      ],
+      "latin": "cōnstat",
+      "collectionId": "buch-lektion-12-20260921",
+      "id": "c6a0242b-369e-4e74-8fd2-7768625d3142"
+    },
+    "3ead7c90-aba4-4093-87ce-b78c137f6f2c": {
+      "latin": "magnus, a, um",
+      "meanings": [
+        [
+          "groß"
+        ],
+        [
+          "bedeutend"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "id": "3ead7c90-aba4-4093-87ce-b78c137f6f2c"
+    },
+    "51ed5e96-a488-4a56-8318-e08e900d8304": {
+      "id": "51ed5e96-a488-4a56-8318-e08e900d8304",
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "multus, a, um",
+      "meanings": [
+        [
+          "viel"
+        ]
+      ]
+    },
+    "b8e0a4d0-0496-4604-b54a-7c1069db7225": {
+      "id": "b8e0a4d0-0496-4604-b54a-7c1069db7225",
+      "meanings": [
+        [
+          "gut"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "bonus, a, um"
+    },
+    "4e88e0f2-4745-47bb-a0ed-610d0c5057fa": {
+      "latin": "mors, mortis",
+      "meanings": [
+        [
+          "Tod"
+        ]
+      ],
+      "id": "4e88e0f2-4745-47bb-a0ed-610d0c5057fa",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "e3efc240-40ff-459f-bfeb-118acd957aa1": {
+      "forms": [
+        "occupō"
+      ],
+      "meanings": [
+        [
+          "besetzen"
+        ],
+        [
+          "einnehmen"
+        ]
+      ],
+      "latin": "occupāre",
+      "collectionId": "buch-lektion-13-20260921",
+      "id": "e3efc240-40ff-459f-bfeb-118acd957aa1"
+    },
+    "70ecc840-03d2-466c-8f70-7b81ae9794db": {
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "erschrecken"
+        ]
+      ],
+      "id": "70ecc840-03d2-466c-8f70-7b81ae9794db",
+      "forms": [
+        "terreō",
+        "terruī"
+      ],
+      "latin": "terrēre"
+    },
+    "7c270355-0c67-43d4-ba43-6288e71d4a3b": {
+      "id": "7c270355-0c67-43d4-ba43-6288e71d4a3b",
+      "meanings": [
+        [
+          "Ursache"
+        ],
+        [
+          "Sache"
+        ],
+        [
+          "Prozess"
+        ]
+      ],
+      "latin": "causa",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "d9970bbd-0f31-4718-9a7d-2a9ea46fe41c": {
+      "meanings": [
+        [
+          "erkennen"
+        ],
+        [
+          "kennenlernen"
+        ]
+      ],
+      "id": "d9970bbd-0f31-4718-9a7d-2a9ea46fe41c",
+      "forms": [
+        "cognōscō",
+        "cognōvī"
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "cognōscere"
+    },
+    "f7bf92bf-937e-43b6-a39c-f1a9c20d12b2": {
+      "latin": "scelus, sceleris",
+      "id": "f7bf92bf-937e-43b6-a39c-f1a9c20d12b2",
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "Verbrechen"
+        ],
+        [
+          "Schurke"
+        ]
+      ]
+    },
+    "0ba863be-790f-4f82-b2b2-6deb38396176": {
+      "meanings": [
+        [
+          "König"
+        ]
+      ],
+      "latin": "rēx, rēgis",
+      "id": "0ba863be-790f-4f82-b2b2-6deb38396176",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "c158207a-274e-4ddb-a423-3119507f6a1f": {
+      "meanings": [
+        [
+          "Los"
+        ],
+        [
+          "Orakelspruch"
+        ],
+        [
+          "Schicksal"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "sors, sortis",
+      "id": "c158207a-274e-4ddb-a423-3119507f6a1f"
+    },
+    "f760bb3a-18e1-4526-8fa3-f7fba577de48": {
+      "latin": "miser, misera, miserum",
+      "meanings": [
+        [
+          "arm"
+        ],
+        [
+          "erbärmlich"
+        ],
+        [
+          "unglücklich"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "id": "f760bb3a-18e1-4526-8fa3-f7fba577de48"
+    },
+    "a955151e-9ba4-475d-8a19-3869fd9dd07c": {
+      "meanings": [
+        [
+          "sagt(e) er"
+        ]
+      ],
+      "latin": "inquit",
+      "id": "a955151e-9ba4-475d-8a19-3869fd9dd07c",
+      "collectionId": "buch-lektion-13-20260921",
+      "forms": []
+    },
+    "e26a7fbf-c7d5-4672-b487-1f7693ee00ac": {
+      "id": "e26a7fbf-c7d5-4672-b487-1f7693ee00ac",
+      "latin": "propter",
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "wegen"
+        ]
+      ]
+    },
+    "1be80c59-87ea-4a79-be06-db95fab976ab": {
+      "meanings": [
+        [
+          "vertreiben"
+        ],
+        [
+          "verbannen"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "expellere",
+      "id": "1be80c59-87ea-4a79-be06-db95fab976ab",
+      "forms": [
+        "expellō"
+      ]
+    },
+    "d345a70b-4e0e-4382-abc0-5c3c8a640337": {
+      "latin": "superbus, a, um",
+      "id": "d345a70b-4e0e-4382-abc0-5c3c8a640337",
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "stolz"
+        ],
+        [
+          "überheblich"
+        ]
+      ]
+    },
+    "02803b09-99ef-46a7-90ec-65086bcebad6": {
+      "id": "02803b09-99ef-46a7-90ec-65086bcebad6",
+      "meanings": [
+        [
+          "schlecht"
+        ],
+        [
+          "schlimm"
+        ]
+      ],
+      "latin": "malus, a, um",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "056ea726-5a0e-404a-8c0e-b04c179cb829": {
+      "id": "056ea726-5a0e-404a-8c0e-b04c179cb829",
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "nicht kennen"
+        ],
+        [
+          "nicht wissen"
+        ]
+      ],
+      "latin": "īgnōrāre",
+      "forms": [
+        "īgnōrō"
+      ]
+    },
+    "beb24ddf-071f-4072-9fed-339b187778c7": {
+      "meanings": [
+        [
+          "etwa"
+        ]
+      ],
+      "id": "beb24ddf-071f-4072-9fed-339b187778c7",
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "num"
+    },
+    "301d4fab-c7d4-4d03-928a-a22f6524e5a1": {
+      "meanings": [
+        [
+          "Blut"
+        ],
+        [
+          "Blutvergießen"
+        ]
+      ],
+      "id": "301d4fab-c7d4-4d03-928a-a22f6524e5a1",
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "sanguis, sanguinis"
+    },
+    "b2d9b8cc-7e97-462a-833f-311a382c98fa": {
+      "id": "b2d9b8cc-7e97-462a-833f-311a382c98fa",
+      "latin": "sī",
+      "meanings": [
+        [
+          "falls"
+        ],
+        [
+          "wenn"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "c356608e-7af8-4cd7-9fc0-b392b2e4f678": {
+      "meanings": [
+        [
+          "sicher (vor)"
+        ]
+      ],
+      "id": "c356608e-7af8-4cd7-9fc0-b392b2e4f678",
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "tūtus, a, um"
+    },
+    "778210f2-095b-4e35-bb01-1df904d49738": {
+      "forms": [
+        "tōtīus",
+        "tōtī"
+      ],
+      "latin": "tōtus, a, um",
+      "meanings": [
+        [
+          "ganz"
+        ]
+      ],
+      "id": "778210f2-095b-4e35-bb01-1df904d49738",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "981ce46c-6a1f-408a-bd68-b53bd552d6b6": {
+      "id": "981ce46c-6a1f-408a-bd68-b53bd552d6b6",
+      "meanings": [
+        [
+          "befreien"
+        ],
+        [
+          "freilassen"
+        ]
+      ],
+      "latin": "līberāre",
+      "collectionId": "buch-lektion-13-20260921",
+      "forms": [
+        "līberō"
+      ]
+    },
+    "046934ef-489b-4fd6-8713-2ca149c8b7a8": {
+      "meanings": [
+        [
+          "sowohl ... als auch"
+        ]
+      ],
+      "id": "046934ef-489b-4fd6-8713-2ca149c8b7a8",
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "et ... et"
+    },
+    "0deb95d0-4c1c-4a83-8be4-2ea365b23f0f": {
+      "meanings": [
+        [
+          "Angst haben"
+        ],
+        [
+          "fürchten"
+        ]
+      ],
+      "forms": [
+        "timeō",
+        "timuī"
+      ],
+      "id": "0deb95d0-4c1c-4a83-8be4-2ea365b23f0f",
+      "latin": "timēre",
+      "collectionId": "buch-lektion-13-20260921"
+    },
+    "6fc78e0d-c942-470a-90ba-77a6bc745dae": {
+      "meanings": [
+        [
+          "so"
+        ]
+      ],
+      "collectionId": "buch-lektion-13-20260921",
+      "latin": "ita",
+      "id": "6fc78e0d-c942-470a-90ba-77a6bc745dae"
+    },
+    "9f8f636f-7cf5-4782-bfaf-a6372bf7686d": {
+      "latin": "ultimus, a, um",
+      "collectionId": "buch-lektion-13-20260921",
+      "meanings": [
+        [
+          "der äußerste"
+        ],
+        [
+          "der entfernteste"
+        ],
+        [
+          "der letzte"
+        ]
+      ],
+      "id": "9f8f636f-7cf5-4782-bfaf-a6372bf7686d"
+    },
+    "ed7e40cb-8f65-4c70-a9be-03ab6f9ad8fc": {
+      "latin": "nōs",
+      "collectionId": "buch-lektion-14-20260921",
+      "forms": [],
+      "id": "ed7e40cb-8f65-4c70-a9be-03ab6f9ad8fc",
+      "meanings": [
+        [
+          "wir"
+        ],
+        [
+          "uns"
+        ]
+      ]
+    },
+    "b6094ab9-7bd4-493c-a29a-f29782e294db": {
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "b6094ab9-7bd4-493c-a29a-f29782e294db",
+      "meanings": [
+        [
+          "nachdem"
+        ]
+      ],
+      "latin": "postquam"
+    },
+    "f3b9bacd-dceb-4c8c-8bc4-2acb1e4cf4f3": {
+      "latin": "legiō, legiōnis",
+      "id": "f3b9bacd-dceb-4c8c-8bc4-2acb1e4cf4f3",
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "Legion"
+        ]
+      ]
+    },
+    "2b958a34-fc9b-487f-89d8-db6922c1ecfc": {
+      "latin": "vincere",
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "(be)siegen"
+        ],
+        [
+          "übertreffen"
+        ]
+      ],
+      "forms": [
+        "vincō",
+        "vīcī"
+      ],
+      "id": "2b958a34-fc9b-487f-89d8-db6922c1ecfc"
+    },
+    "11e310d6-7974-426b-a8c2-dedbe5c2ccc5": {
+      "id": "11e310d6-7974-426b-a8c2-dedbe5c2ccc5",
+      "latin": "suus, a, um",
+      "meanings": [
+        [
+          "ihr"
+        ],
+        [
+          "sein"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "6b7074db-cf5a-4db5-a01a-54f07d9a8f79": {
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "alle (zusammen)"
+        ]
+      ],
+      "id": "6b7074db-cf5a-4db5-a01a-54f07d9a8f79",
+      "latin": "cūnctī, ae, a"
+    },
+    "bce7b35c-cf70-427f-a45f-e4f8a53c6b68": {
+      "id": "bce7b35c-cf70-427f-a45f-e4f8a53c6b68",
+      "meanings": [
+        [
+          "mein"
+        ]
+      ],
+      "latin": "meus, a, um",
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "18c54096-ca2e-413e-ac38-c92a87112f90": {
+      "id": "18c54096-ca2e-413e-ac38-c92a87112f90",
+      "latin": "āmittere",
+      "forms": [
+        "āmittō",
+        "āmīsī"
+      ],
+      "meanings": [
+        [
+          "aufgeben"
+        ],
+        [
+          "verlieren"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "8d5e9488-1255-4108-bd64-7050494ef27d": {
+      "latin": "alius, a, ud",
+      "meanings": [
+        [
+          "ein anderer"
+        ]
+      ],
+      "id": "8d5e9488-1255-4108-bd64-7050494ef27d",
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "c38e2f9a-93ef-422a-844f-c4012bb4eef0": {
+      "id": "c38e2f9a-93ef-422a-844f-c4012bb4eef0",
+      "latin": "tibi",
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "dir"
+        ]
+      ]
+    },
+    "108e3149-0e44-459a-a5fb-1310a754003e": {
+      "id": "108e3149-0e44-459a-a5fb-1310a754003e",
+      "latin": "tuus, a, um",
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "dein"
+        ]
+      ]
+    },
+    "74828c08-1729-4165-94ca-8bb30623c9a7": {
+      "id": "74828c08-1729-4165-94ca-8bb30623c9a7",
+      "meanings": [
+        [
+          "bleiben"
+        ],
+        [
+          "warten (auf)"
+        ]
+      ],
+      "forms": [
+        "maneō",
+        "mānsī"
+      ],
+      "latin": "manēre",
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "add8aca2-0894-4338-b16f-a45c5e578b91": {
+      "forms": [
+        "ūnīus",
+        "ūnī"
+      ],
+      "id": "add8aca2-0894-4338-b16f-a45c5e578b91",
+      "collectionId": "buch-lektion-14-20260921",
+      "latin": "ūnus, a, um",
+      "meanings": [
+        [
+          "ein(er)"
+        ],
+        [
+          "ein einziger"
+        ]
+      ]
+    },
+    "63036d49-efc7-497e-9861-3922c4ecfa76": {
+      "meanings": [
+        [
+          "lebend"
+        ],
+        [
+          "lebendig"
+        ]
+      ],
+      "latin": "vīvus, a, um",
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "63036d49-efc7-497e-9861-3922c4ecfa76"
+    },
+    "510973b6-e5fd-4b7c-abe0-61bd64283964": {
+      "latin": "restāre",
+      "id": "510973b6-e5fd-4b7c-abe0-61bd64283964",
+      "collectionId": "buch-lektion-14-20260921",
+      "forms": [
+        "restō"
+      ],
+      "meanings": [
+        [
+          "übrig bleiben"
+        ],
+        [
+          "Widerstand leisten"
+        ]
+      ]
+    },
+    "cad71f58-c83b-451d-92fc-1b8cde743534": {
+      "latin": "sōlum",
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "cad71f58-c83b-451d-92fc-1b8cde743534",
+      "meanings": [
+        [
+          "nur"
+        ]
+      ]
+    },
+    "2a35a55c-0627-45a0-a2e6-4038785af756": {
+      "latin": "noster, nostra, nostrum",
+      "meanings": [
+        [
+          "unser"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "2a35a55c-0627-45a0-a2e6-4038785af756"
+    },
+    "b3d7788d-979d-44a8-b63d-39d9d2a7c8ed": {
+      "latin": "cōnsulere",
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "b3d7788d-979d-44a8-b63d-39d9d2a7c8ed",
+      "meanings": [
+        [
+          "befragen"
+        ],
+        [
+          "beraten (über)"
+        ]
+      ],
+      "forms": [
+        "cōnsulō",
+        "cōnsuluī"
+      ]
+    },
+    "11babf90-4f6e-47f2-9126-91021786e7a3": {
+      "latin": "labor, labōris",
+      "id": "11babf90-4f6e-47f2-9126-91021786e7a3",
+      "meanings": [
+        [
+          "Anstrengung"
+        ],
+        [
+          "Arbeit"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "d5100e68-c805-4a48-a42b-285c44548eb9": {
+      "meanings": [
+        [
+          "Soldat"
+        ]
+      ],
+      "latin": "mīles, mīlitis",
+      "id": "d5100e68-c805-4a48-a42b-285c44548eb9",
+      "collectionId": "buch-lektion-14-20260921"
+    },
+    "33899e0d-dc23-4def-97d7-bb5b02e3710e": {
+      "latin": "oppidum",
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "33899e0d-dc23-4def-97d7-bb5b02e3710e",
+      "meanings": [
+        [
+          "Stadt"
+        ]
+      ]
+    },
+    "364f63df-0980-4bb9-affe-692cd4973332": {
+      "id": "364f63df-0980-4bb9-affe-692cd4973332",
+      "collectionId": "buch-lektion-14-20260921",
+      "latin": "nōbīs",
+      "meanings": [
+        [
+          "uns"
+        ]
+      ]
+    },
+    "32ca245d-1b77-41f9-a92a-85b07f81065d": {
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "(ich) allerdings"
+        ],
+        [
+          "freilich"
+        ]
+      ],
+      "id": "32ca245d-1b77-41f9-a92a-85b07f81065d",
+      "latin": "equidem"
+    },
+    "7f45dc07-bc37-4ea1-ac63-fd6f74b933ea": {
+      "id": "7f45dc07-bc37-4ea1-ac63-fd6f74b933ea",
+      "latin": "cēnsēre",
+      "collectionId": "buch-lektion-14-20260921",
+      "forms": [
+        "cēnseō",
+        "cēnsuī"
+      ],
+      "meanings": [
+        [
+          "meinen"
+        ],
+        [
+          "einschätzen"
+        ],
+        [
+          "seine Stimme abgeben (für)"
+        ]
+      ]
+    },
+    "f7a17e08-1a93-4e4e-ad17-147c37bb678e": {
+      "id": "f7a17e08-1a93-4e4e-ad17-147c37bb678e",
+      "latin": "aperīre",
+      "forms": [
+        "aperiō",
+        "aperuī"
+      ],
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "aufdecken"
+        ],
+        [
+          "öffnen"
+        ]
+      ]
+    },
+    "9f71fa55-3b32-418b-8ec6-bb74393446f5": {
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "Zensor (röm. Beamter)"
+        ]
+      ],
+      "id": "9f71fa55-3b32-418b-8ec6-bb74393446f5",
+      "latin": "cēnsor, cēnsōris"
+    },
+    "a7a59846-1b28-48a0-b3fd-0b23d8b68ad8": {
+      "latin": "vērō",
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "aber"
+        ]
+      ],
+      "id": "a7a59846-1b28-48a0-b3fd-0b23d8b68ad8"
+    },
+    "39c429d1-0d85-44f9-af3d-a383dbbda564": {
+      "meanings": [
+        [
+          "Antrag (im Senat)"
+        ],
+        [
+          "Meinung"
+        ],
+        [
+          "Satz"
+        ],
+        [
+          "Sinn"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "39c429d1-0d85-44f9-af3d-a383dbbda564",
+      "latin": "sententia"
+    },
+    "09f00e1d-f617-4c99-a027-b76a3864479a": {
+      "collectionId": "buch-lektion-14-20260921",
+      "meanings": [
+        [
+          "Kampf"
+        ],
+        [
+          "Schlacht"
+        ]
+      ],
+      "id": "09f00e1d-f617-4c99-a027-b76a3864479a",
+      "latin": "proelium"
+    },
+    "2f3ad9c7-3c5e-4613-a777-d09e32de75e4": {
+      "id": "2f3ad9c7-3c5e-4613-a777-d09e32de75e4",
+      "meanings": [
+        [
+          "(Stadt-)Mauern"
+        ]
+      ],
+      "collectionId": "buch-lektion-14-20260921",
+      "latin": "moenia, moenium"
+    },
+    "11eb14d5-92c5-482d-941b-7fffa8243d92": {
+      "latin": "altus, a, um",
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "11eb14d5-92c5-482d-941b-7fffa8243d92",
+      "meanings": [
+        [
+          "hoch"
+        ],
+        [
+          "tief"
+        ]
+      ]
+    },
+    "786c286d-9313-48f1-8710-026d9ad8703f": {
+      "collectionId": "buch-lektion-14-20260921",
+      "id": "786c286d-9313-48f1-8710-026d9ad8703f",
+      "meanings": [
+        [
+          "mich"
+        ]
+      ],
+      "latin": "mē"
+    },
+    "18abf74c-ce3a-401a-bbb7-e022c580fae0": {
+      "latin": "vōs",
+      "collectionId": "buch-lektion-14-20260921",
+      "forms": [],
+      "meanings": [
+        [
+          "ihr"
+        ],
+        [
+          "euch"
+        ]
+      ],
+      "id": "18abf74c-ce3a-401a-bbb7-e022c580fae0"
+    },
+    "a04f17e9-78d3-40cf-83d3-1dac1f676743": {
+      "forms": [],
+      "collectionId": "buch-lektion-15-20260921",
+      "latin": "quī, quae, quod",
+      "id": "a04f17e9-78d3-40cf-83d3-1dac1f676743",
+      "meanings": [
+        [
+          "welcher (welche",
+          "welche)"
+        ],
+        [
+          "der (die",
+          "das)"
+        ]
+      ]
+    },
+    "44d21733-5363-4b20-9c99-e49898689acb": {
+      "forms": [
+        "appellō"
+      ],
+      "id": "44d21733-5363-4b20-9c99-e49898689acb",
+      "meanings": [
+        [
+          "anrufen"
+        ],
+        [
+          "nennen"
+        ],
+        [
+          "bezeichnen (als)"
+        ]
+      ],
+      "latin": "appellāre",
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "3187849a-2c6e-4e03-b7b2-f55239ae9d21": {
+      "meanings": [
+        [
+          "weil"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "latin": "quia",
+      "id": "3187849a-2c6e-4e03-b7b2-f55239ae9d21"
+    },
+    "e67470ce-12fe-47ec-a5f2-05c7209863b7": {
+      "forms": [
+        "subiciō",
+        "subiēcī"
+      ],
+      "id": "e67470ce-12fe-47ec-a5f2-05c7209863b7",
+      "meanings": [
+        [
+          "darunterlegen"
+        ],
+        [
+          "unterwerfen"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "latin": "subicere"
+    },
+    "d0cc343a-9687-4b2c-93aa-53bf798c36c3": {
+      "meanings": [
+        [
+          "besonders"
+        ],
+        [
+          "vor allem"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "latin": "imprīmīs",
+      "id": "d0cc343a-9687-4b2c-93aa-53bf798c36c3"
+    },
+    "29b06ccf-4167-4793-a470-1c121bcf247e": {
+      "forms": [
+        "errō"
+      ],
+      "id": "29b06ccf-4167-4793-a470-1c121bcf247e",
+      "meanings": [
+        [
+          "(sich) irren"
+        ]
+      ],
+      "latin": "errāre",
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "a0c4b73e-3df0-4c96-83fe-415a45ce52ae": {
+      "latin": "superāre",
+      "collectionId": "buch-lektion-15-20260921",
+      "meanings": [
+        [
+          "besiegen"
+        ],
+        [
+          "übertreffen"
+        ]
+      ],
+      "forms": [
+        "superō"
+      ],
+      "id": "a0c4b73e-3df0-4c96-83fe-415a45ce52ae"
+    },
+    "e47932ef-1223-4970-b52a-a0c3f9617da8": {
+      "latin": "nescīre",
+      "id": "e47932ef-1223-4970-b52a-a0c3f9617da8",
+      "meanings": [
+        [
+          "nicht wissen"
+        ],
+        [
+          "nicht kennen"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "forms": [
+        "nesciō",
+        "nescīvī"
+      ]
+    },
+    "01362c00-3560-4731-b084-6f7620ebec3a": {
+      "collectionId": "buch-lektion-15-20260921",
+      "meanings": [
+        [
+          "beschließen"
+        ],
+        [
+          "entscheiden"
+        ],
+        [
+          "zuerkennen"
+        ]
+      ],
+      "forms": [
+        "dēcernō",
+        "dēcrēvī"
+      ],
+      "id": "01362c00-3560-4731-b084-6f7620ebec3a",
+      "latin": "dēcernere"
+    },
+    "b769e5a9-ab51-423e-9ef5-fbdd6b886e05": {
+      "latin": "virtūs, virtūtis",
+      "meanings": [
+        [
+          "Tapferkeit"
+        ],
+        [
+          "Tüchtigkeit"
+        ],
+        [
+          "Leistung"
+        ]
+      ],
+      "id": "b769e5a9-ab51-423e-9ef5-fbdd6b886e05",
+      "forms": [],
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "98362bc3-3899-445a-bc67-8cbde678d9f9": {
+      "id": "98362bc3-3899-445a-bc67-8cbde678d9f9",
+      "latin": "neque",
+      "collectionId": "buch-lektion-15-20260921",
+      "meanings": [
+        [
+          "und nicht"
+        ],
+        [
+          "auch nicht"
+        ],
+        [
+          "nicht einmal"
+        ]
+      ]
+    },
+    "69fd1cd7-3dde-4a86-8249-e70c9082b839": {
+      "meanings": [
+        [
+          "Beschuldigung"
+        ],
+        [
+          "Vorwurf"
+        ],
+        [
+          "Verbrechen"
+        ]
+      ],
+      "latin": "crīmen, crīminis",
+      "collectionId": "buch-lektion-15-20260921",
+      "id": "69fd1cd7-3dde-4a86-8249-e70c9082b839"
+    },
+    "98cd573f-44b3-4900-9d95-288e79a9ff00": {
+      "id": "98cd573f-44b3-4900-9d95-288e79a9ff00",
+      "meanings": [
+        [
+          "falsch"
+        ]
+      ],
+      "latin": "falsus, a, um",
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "8fb80f46-e48e-4f44-ab8d-12a7cbba1590": {
+      "latin": "accūsāre",
+      "id": "8fb80f46-e48e-4f44-ab8d-12a7cbba1590",
+      "forms": [
+        "accūsō"
+      ],
+      "meanings": [
+        [
+          "anklagen"
+        ],
+        [
+          "beschuldigen"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "8f467340-f5f4-4d38-91a5-91bbeb5faef9": {
+      "meanings": [
+        [
+          "Familie"
+        ],
+        [
+          "Hausgemeinschaft"
+        ]
+      ],
+      "latin": "familia",
+      "id": "8f467340-f5f4-4d38-91a5-91bbeb5faef9",
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "64c3f278-c4fe-4601-90f1-b81b039dd572": {
+      "id": "64c3f278-c4fe-4601-90f1-b81b039dd572",
+      "latin": "clārus, a, um",
+      "collectionId": "buch-lektion-15-20260921",
+      "meanings": [
+        [
+          "berühmt"
+        ],
+        [
+          "hell"
+        ],
+        [
+          "klar"
+        ]
+      ]
+    },
+    "7a3c4d8f-3b60-4b14-94b6-e7c5dfc1aafc": {
+      "meanings": [
+        [
+          "Beispiel"
+        ],
+        [
+          "Vorbild"
+        ]
+      ],
+      "latin": "exemplum",
+      "collectionId": "buch-lektion-15-20260921",
+      "id": "7a3c4d8f-3b60-4b14-94b6-e7c5dfc1aafc"
+    },
+    "29fbd957-4864-4480-9986-74e0dd369ccb": {
+      "forms": [
+        "dēspērō"
+      ],
+      "id": "29fbd957-4864-4480-9986-74e0dd369ccb",
+      "meanings": [
+        [
+          "die Hoffnung aufgeben (auf)"
+        ],
+        [
+          "verzweifeln (an)"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "latin": "dēspērāre"
+    },
+    "6b4cd04f-cfb9-45b5-9aef-600c6b0da12e": {
+      "latin": "sōlus, a, um",
+      "meanings": [
+        [
+          "allein"
+        ],
+        [
+          "einzig"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "id": "6b4cd04f-cfb9-45b5-9aef-600c6b0da12e"
+    },
+    "29dd4d7e-2bed-4c67-ac34-43d7b57e7ee6": {
+      "forms": [
+        "cūrō"
+      ],
+      "id": "29dd4d7e-2bed-4c67-ac34-43d7b57e7ee6",
+      "latin": "cūrāre",
+      "collectionId": "buch-lektion-15-20260921",
+      "meanings": [
+        [
+          "pflegen"
+        ],
+        [
+          "sorgen für"
+        ],
+        [
+          "besorgen"
+        ]
+      ]
+    },
+    "c3aed74c-ce20-4810-80fa-eb2b222917b7": {
+      "latin": "studēre",
+      "forms": [
+        "studeō",
+        "studuī"
+      ],
+      "meanings": [
+        [
+          "sich beschäftigen"
+        ],
+        [
+          "sich bemühen"
+        ],
+        [
+          "streben (nach)"
+        ]
+      ],
+      "collectionId": "buch-lektion-15-20260921",
+      "id": "c3aed74c-ce20-4810-80fa-eb2b222917b7"
+    },
+    "84712b78-6b64-4e65-b9b3-f645bcd448ef": {
+      "collectionId": "buch-lektion-15-20260921",
+      "id": "84712b78-6b64-4e65-b9b3-f645bcd448ef",
+      "meanings": [
+        [
+          "Leben"
+        ],
+        [
+          "Lebensweise"
+        ]
+      ],
+      "latin": "vīta"
+    },
+    "92aae0f5-4d30-48ee-bc72-4bb10fc21561": {
+      "meanings": [
+        [
+          "euer"
+        ]
+      ],
+      "latin": "vester, vestra, vestrum",
+      "id": "92aae0f5-4d30-48ee-bc72-4bb10fc21561",
+      "collectionId": "buch-lektion-15-20260921"
+    },
+    "4b5a4900-a6e4-4dc9-856e-4df8c1220572": {
+      "collectionId": "buch-lektion-15-20260921",
+      "forms": [
+        "dīmittō",
+        "dīmīsī"
+      ],
+      "id": "4b5a4900-a6e4-4dc9-856e-4df8c1220572",
+      "meanings": [
+        [
+          "aufgeben"
+        ],
+        [
+          "entlassen"
+        ]
+      ],
+      "latin": "dīmittere"
+    },
+    "ffd89ccb-2be6-4194-8d08-b53c4e33974e": {
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "is, ea, id",
+      "id": "ffd89ccb-2be6-4194-8d08-b53c4e33974e",
+      "forms": [],
+      "meanings": [
+        [
+          "dieser (diese",
+          "dieses)"
+        ],
+        [
+          "er (sie",
+          "es)"
+        ]
+      ]
+    },
+    "b320060b-4b9b-4f80-83b1-32a0db110b4a": {
+      "id": "b320060b-4b9b-4f80-83b1-32a0db110b4a",
+      "collectionId": "buch-lektion-16-20260921",
+      "meanings": [
+        [
+          "Nacht"
+        ]
+      ],
+      "latin": "nox, noctis"
+    },
+    "a2e5208d-1165-4743-b6cc-07eae00f197f": {
+      "id": "a2e5208d-1165-4743-b6cc-07eae00f197f",
+      "meanings": [
+        [
+          "Schlaf"
+        ]
+      ],
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "somnus"
+    },
+    "57ee5cd6-bbc5-43b8-8a82-2754477633ac": {
+      "forms": [
+        "excitō"
+      ],
+      "latin": "excitāre",
+      "meanings": [
+        [
+          "wecken"
+        ],
+        [
+          "erregen"
+        ],
+        [
+          "ermuntern"
+        ]
+      ],
+      "id": "57ee5cd6-bbc5-43b8-8a82-2754477633ac",
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "1aa052a3-0fc6-4e6e-9c8c-a84f89f16866": {
+      "meanings": [
+        [
+          "bemerken"
+        ],
+        [
+          "wahrnehmen"
+        ]
+      ],
+      "latin": "animadvertere",
+      "forms": [
+        "animadvertō",
+        "animadvertī"
+      ],
+      "collectionId": "buch-lektion-16-20260921",
+      "id": "1aa052a3-0fc6-4e6e-9c8c-a84f89f16866"
+    },
+    "2ea2f9b6-5426-4e33-bf38-df9b2e7506ef": {
+      "meanings": [
+        [
+          "der höchste"
+        ],
+        [
+          "der letzte"
+        ],
+        [
+          "der oberste"
+        ]
+      ],
+      "id": "2ea2f9b6-5426-4e33-bf38-df9b2e7506ef",
+      "latin": "summus, a, um",
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "c7d28c45-7bbb-40b4-8c9d-3bd4a7b8ca0d": {
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "paucī, ae, a",
+      "meanings": [
+        [
+          "wenige"
+        ]
+      ],
+      "id": "c7d28c45-7bbb-40b4-8c9d-3bd4a7b8ca0d"
+    },
+    "82eee3eb-8c5f-409c-9097-d79c99e420c6": {
+      "latin": "arcessere",
+      "forms": [
+        "arcessō",
+        "arcessīvī"
+      ],
+      "meanings": [
+        [
+          "herbeirufen"
+        ],
+        [
+          "holen"
+        ]
+      ],
+      "id": "82eee3eb-8c5f-409c-9097-d79c99e420c6",
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "073858d3-2e4b-4698-b5ba-2b7890ab220d": {
+      "meanings": [
+        [
+          "befehlen"
+        ],
+        [
+          "herrschen (über)"
+        ]
+      ],
+      "id": "073858d3-2e4b-4698-b5ba-2b7890ab220d",
+      "collectionId": "buch-lektion-16-20260921",
+      "forms": [
+        "imperō"
+      ],
+      "latin": "imperāre"
+    },
+    "b6d4c493-7ffd-48ac-9cb3-c11d4586ab90": {
+      "id": "b6d4c493-7ffd-48ac-9cb3-c11d4586ab90",
+      "forms": [
+        "claudō",
+        "clausī"
+      ],
+      "meanings": [
+        [
+          "abschließen"
+        ],
+        [
+          "einschließen"
+        ]
+      ],
+      "latin": "claudere",
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "4155c1a9-ebe6-4fc0-ba9e-fa840b0f4cd0": {
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "prīmus, a, um",
+      "meanings": [
+        [
+          "der erste"
+        ]
+      ],
+      "id": "4155c1a9-ebe6-4fc0-ba9e-fa840b0f4cd0"
+    },
+    "33116885-68dd-4092-967e-06ca578bbe9e": {
+      "latin": "lūx, lūcis",
+      "meanings": [
+        [
+          "Licht"
+        ],
+        [
+          "Tageslicht"
+        ]
+      ],
+      "collectionId": "buch-lektion-16-20260921",
+      "id": "33116885-68dd-4092-967e-06ca578bbe9e"
+    },
+    "74ca3cb3-451d-45ec-a740-1aef4e834d28": {
+      "meanings": [
+        [
+          "sicherlich"
+        ],
+        [
+          "tatsächlich"
+        ]
+      ],
+      "latin": "profectō",
+      "collectionId": "buch-lektion-16-20260921",
+      "id": "74ca3cb3-451d-45ec-a740-1aef4e834d28"
+    },
+    "ec099b2f-5d51-438f-a77b-401739f82623": {
+      "latin": "duo, duae, duo",
+      "id": "ec099b2f-5d51-438f-a77b-401739f82623",
+      "collectionId": "buch-lektion-16-20260921",
+      "meanings": [
+        [
+          "zwei"
+        ]
+      ]
+    },
+    "91095fb8-3d37-4463-8322-365691d876d2": {
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "discēdere",
+      "meanings": [
+        [
+          "auseinandergehen"
+        ],
+        [
+          "weggehen"
+        ]
+      ],
+      "forms": [
+        "discēdō",
+        "discessī"
+      ],
+      "id": "91095fb8-3d37-4463-8322-365691d876d2"
+    },
+    "824b75b3-68de-435b-bb6e-c66e27446ead": {
+      "meanings": [
+        [
+          "versammeln"
+        ]
+      ],
+      "collectionId": "buch-lektion-16-20260921",
+      "latin": "convocāre",
+      "forms": [
+        "convocō"
+      ],
+      "id": "824b75b3-68de-435b-bb6e-c66e27446ead"
+    },
+    "1184e3fc-9103-404d-96bc-0a43dd94c8aa": {
+      "id": "1184e3fc-9103-404d-96bc-0a43dd94c8aa",
+      "latin": "īnsidiae, īnsidiārum",
+      "meanings": [
+        [
+          "Falle"
+        ],
+        [
+          "Attentat"
+        ],
+        [
+          "Hinterlist"
+        ]
+      ],
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "815035b6-e26b-45c5-bd87-d41bdeb4029c": {
+      "id": "815035b6-e26b-45c5-bd87-d41bdeb4029c",
+      "latin": "vītāre",
+      "forms": [
+        "vītō"
+      ],
+      "collectionId": "buch-lektion-16-20260921",
+      "meanings": [
+        [
+          "meiden"
+        ],
+        [
+          "vermeiden"
+        ]
+      ]
+    },
+    "ac678cb4-a24f-4b32-a417-531fb5d5cfca": {
+      "meanings": [
+        [
+          "(er)mahnen"
+        ]
+      ],
+      "forms": [
+        "moneō",
+        "monuī"
+      ],
+      "latin": "monēre",
+      "collectionId": "buch-lektion-16-20260921",
+      "id": "ac678cb4-a24f-4b32-a417-531fb5d5cfca"
+    },
+    "8e7f1385-43d9-415c-8836-ba31c22f3a85": {
+      "forms": [
+        "postulō"
+      ],
+      "meanings": [
+        [
+          "fordern"
+        ]
+      ],
+      "latin": "postulāre",
+      "id": "8e7f1385-43d9-415c-8836-ba31c22f3a85",
+      "collectionId": "buch-lektion-16-20260921"
+    },
+    "2e89a658-366b-4606-a38c-9b028a284049": {
+      "collectionId": "buch-lektion-16-20260921",
+      "id": "2e89a658-366b-4606-a38c-9b028a284049",
+      "meanings": [
+        [
+          "schlagen"
+        ],
+        [
+          "vertreiben"
+        ]
+      ],
+      "latin": "pellere",
+      "forms": [
+        "pellō"
+      ]
+    },
+    "77f31e6f-e0d3-4d22-a440-8c29dae6371c": {
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "77f31e6f-e0d3-4d22-a440-8c29dae6371c",
+      "latin": "vehemēns, vehementis",
+      "meanings": [
+        [
+          "heftig"
+        ],
+        [
+          "energisch"
+        ],
+        [
+          "kritisch"
+        ]
+      ]
+    },
+    "ab3ebbff-ae1c-4227-b036-2c38570f0f1c": {
+      "id": "ab3ebbff-ae1c-4227-b036-2c38570f0f1c",
+      "collectionId": "buch-lektion-17-20260921",
+      "meanings": [
+        [
+          "während"
+        ],
+        [
+          "solange"
+        ],
+        [
+          "bis"
+        ]
+      ],
+      "latin": "dum",
+      "forms": []
+    },
+    "b0ea8dca-7534-433f-8b3b-c5cb2ab7b7e8": {
+      "id": "b0ea8dca-7534-433f-8b3b-c5cb2ab7b7e8",
+      "collectionId": "buch-lektion-17-20260921",
+      "meanings": [
+        [
+          "gewaltig"
+        ],
+        [
+          "ungeheuer"
+        ]
+      ],
+      "latin": "ingēns, ingentis"
+    },
+    "6792187b-e0ee-4678-ba28-7722f4a0e98f": {
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "6792187b-e0ee-4678-ba28-7722f4a0e98f",
+      "latin": "prīstinus, a, um",
+      "meanings": [
+        [
+          "früher"
+        ]
+      ]
+    },
+    "21127a6a-15dc-4586-bd97-96a94133a29d": {
+      "meanings": [
+        [
+          "übertreffen"
+        ]
+      ],
+      "id": "21127a6a-15dc-4586-bd97-96a94133a29d",
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "praestāre",
+      "forms": [
+        "praestō",
+        "praestitī"
+      ]
+    },
+    "153ad279-e6c0-466a-bb2e-a527ff453d36": {
+      "id": "153ad279-e6c0-466a-bb2e-a527ff453d36",
+      "meanings": [
+        [
+          "echt"
+        ],
+        [
+          "richtig"
+        ],
+        [
+          "wahr"
+        ]
+      ],
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "vērus, a, um"
+    },
+    "9dba8b96-f72a-4d0b-b110-b4d68cdcaf5e": {
+      "meanings": [
+        [
+          "auch wenn"
+        ],
+        [
+          "obwohl"
+        ]
+      ],
+      "id": "9dba8b96-f72a-4d0b-b110-b4d68cdcaf5e",
+      "latin": "etsī",
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "56d8e2c9-5d46-4388-945e-bf5505a4619f": {
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "potēns, potentis",
+      "id": "56d8e2c9-5d46-4388-945e-bf5505a4619f",
+      "meanings": [
+        [
+          "mächtig"
+        ],
+        [
+          "stark"
+        ]
+      ]
+    },
+    "030ce6b0-2fea-4a1f-8b11-5f01c68c58f0": {
+      "latin": "pulcher",
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "030ce6b0-2fea-4a1f-8b11-5f01c68c58f0",
+      "meanings": [
+        [
+          "schön"
+        ]
+      ],
+      "forms": []
+    },
+    "a239bc2b-3631-462d-9fbd-22dfddcf23c7": {
+      "meanings": [
+        [
+          "Einfluss haben"
+        ],
+        [
+          "gesund sein"
+        ],
+        [
+          "stark sein"
+        ]
+      ],
+      "id": "a239bc2b-3631-462d-9fbd-22dfddcf23c7",
+      "collectionId": "buch-lektion-17-20260921",
+      "forms": [
+        "valeō",
+        "valuī"
+      ],
+      "latin": "valēre"
+    },
+    "c2d7815c-496e-431a-8585-5ef39616ef06": {
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "c2d7815c-496e-431a-8585-5ef39616ef06",
+      "meanings": [
+        [
+          "Macht"
+        ]
+      ],
+      "latin": "potentia"
+    },
+    "ea05da42-fe7a-49b8-ac03-22850d687e10": {
+      "meanings": [
+        [
+          "wenn"
+        ],
+        [
+          "als"
+        ]
+      ],
+      "latin": "cum",
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "ea05da42-fe7a-49b8-ac03-22850d687e10",
+      "forms": []
+    },
+    "344a35ff-7583-4cb9-ba0c-75615148a977": {
+      "meanings": [
+        [
+          "obwohl"
+        ]
+      ],
+      "id": "344a35ff-7583-4cb9-ba0c-75615148a977",
+      "latin": "quamquam",
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "49998e94-4742-4ac0-8b65-3ba1c4206bb6": {
+      "latin": "contentus, a, um",
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "49998e94-4742-4ac0-8b65-3ba1c4206bb6",
+      "meanings": [
+        [
+          "zufrieden (mit)"
+        ]
+      ]
+    },
+    "5bb703cc-145b-4417-a9db-ee8dac6c6823": {
+      "id": "5bb703cc-145b-4417-a9db-ee8dac6c6823",
+      "latin": "inimīcus, a, um",
+      "meanings": [
+        [
+          "feindlich"
+        ],
+        [
+          "Feind"
+        ]
+      ],
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "d1ce0f7a-31d2-4370-a1f9-167250909fb3": {
+      "latin": "perspicere",
+      "collectionId": "buch-lektion-17-20260921",
+      "forms": [
+        "perspiciō",
+        "perspexī"
+      ],
+      "meanings": [
+        [
+          "erkennen"
+        ],
+        [
+          "genau betrachten"
+        ],
+        [
+          "sehen"
+        ]
+      ],
+      "id": "d1ce0f7a-31d2-4370-a1f9-167250909fb3"
+    },
+    "62480b85-61ee-4b4a-ad63-044f6bc7b47a": {
+      "id": "62480b85-61ee-4b4a-ad63-044f6bc7b47a",
+      "latin": "novus, a, um",
+      "meanings": [
+        [
+          "neu"
+        ],
+        [
+          "ungewöhnlich"
+        ]
+      ],
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "e4ee4035-6e79-449b-b6b7-cd8ceb0c7436": {
+      "meanings": [
+        [
+          "Truppen"
+        ]
+      ],
+      "id": "e4ee4035-6e79-449b-b6b7-cd8ceb0c7436",
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "cōpiae, cōpiārum"
+    },
+    "d7bb461b-de71-40e5-a7a2-e2db0b25be44": {
+      "meanings": [
+        [
+          "Schiff"
+        ]
+      ],
+      "latin": "nāvis, nāvis",
+      "id": "d7bb461b-de71-40e5-a7a2-e2db0b25be44",
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "3fb05de3-332e-497c-a948-8cf94a987b1e": {
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "monumentum",
+      "meanings": [
+        [
+          "Denkmal"
+        ]
+      ],
+      "id": "3fb05de3-332e-497c-a948-8cf94a987b1e"
+    },
+    "39afc276-d51a-4a76-bf10-318f9291c833": {
+      "latin": "imperium",
+      "collectionId": "buch-lektion-17-20260921",
+      "meanings": [
+        [
+          "Befehl"
+        ],
+        [
+          "Befehlsgewalt"
+        ],
+        [
+          "Herrschaft (-sgebiet)"
+        ]
+      ],
+      "id": "39afc276-d51a-4a76-bf10-318f9291c833",
+      "forms": []
+    },
+    "b0bfc240-810d-43c7-8d4b-68f6c0d6c722": {
+      "id": "b0bfc240-810d-43c7-8d4b-68f6c0d6c722",
+      "collectionId": "buch-lektion-17-20260921",
+      "forms": [
+        "temperō"
+      ],
+      "latin": "temperāre",
+      "meanings": [
+        [
+          "lenken"
+        ],
+        [
+          "ordnen"
+        ]
+      ]
+    },
+    "41bd9e75-7ce0-4977-b74d-639c2ce76e47": {
+      "id": "41bd9e75-7ce0-4977-b74d-639c2ce76e47",
+      "meanings": [
+        [
+          "Körper"
+        ],
+        [
+          "Leichnam"
+        ]
+      ],
+      "latin": "corpus, corporis",
+      "collectionId": "buch-lektion-17-20260921"
+    },
+    "fddd2edb-1008-47ab-832a-12b1cdf670de": {
+      "id": "fddd2edb-1008-47ab-832a-12b1cdf670de",
+      "latin": "aurum",
+      "collectionId": "buch-lektion-17-20260921",
+      "meanings": [
+        [
+          "Gold"
+        ]
+      ]
+    },
+    "7a37a88d-16b0-4ce5-b8a1-ef2468b6c8ad": {
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "7a37a88d-16b0-4ce5-b8a1-ef2468b6c8ad",
+      "latin": "sibi",
+      "meanings": [
+        [
+          "sich"
+        ]
+      ]
+    },
+    "3b8fa39a-a5bd-41a8-b3d2-cd7b2a9db125": {
+      "id": "3b8fa39a-a5bd-41a8-b3d2-cd7b2a9db125",
+      "forms": [
+        "adiungō",
+        "adiūnxī"
+      ],
+      "collectionId": "buch-lektion-17-20260921",
+      "latin": "adiungere",
+      "meanings": [
+        [
+          "hinzufügen"
+        ],
+        [
+          "anschließen"
+        ]
+      ]
+    },
+    "2f09b012-0d42-47de-9eae-c6667298d625": {
+      "collectionId": "buch-lektion-17-20260921",
+      "id": "2f09b012-0d42-47de-9eae-c6667298d625",
+      "latin": "rēgnum",
+      "meanings": [
+        [
+          "(Königs-)Herrschaft"
+        ],
+        [
+          "Reich"
+        ]
+      ]
+    },
+    "cc219d5f-49a2-4855-80fe-bc8218ee17de": {
+      "id": "cc219d5f-49a2-4855-80fe-bc8218ee17de",
+      "meanings": [
+        [
+          "(zusammen)werfen"
+        ],
+        [
+          "folgern"
+        ],
+        [
+          "vermuten"
+        ]
+      ],
+      "latin": "conicere",
+      "collectionId": "buch-lektion-17-20260921",
+      "forms": [
+        "coniciō",
+        "coniēcī"
+      ]
+    },
+    "14bc4ce3-75ef-46ef-91cf-1b3ab29ffcdb": {
+      "meanings": [
+        [
+          "hinausgehen"
+        ],
+        [
+          "weggehen"
+        ]
+      ],
+      "latin": "excēdere",
+      "id": "14bc4ce3-75ef-46ef-91cf-1b3ab29ffcdb",
+      "forms": [
+        "excēdō",
+        "excessī"
+      ],
+      "collectionId": "buch-lektion-18-20260921"
+    },
+    "5654b1eb-ea6e-4713-a87f-3f7099619f18": {
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "nōnnūllī, ae, a",
+      "meanings": [
+        [
+          "einige"
+        ],
+        [
+          "manche"
+        ]
+      ],
+      "id": "5654b1eb-ea6e-4713-a87f-3f7099619f18"
+    },
+    "cb7a2624-0908-4c0c-a46e-4053a153037f": {
+      "id": "cb7a2624-0908-4c0c-a46e-4053a153037f",
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "ferus, a, um",
+      "meanings": [
+        [
+          "wild"
+        ]
+      ]
+    },
+    "689e12a6-032b-40a3-9825-f8d0e147e0e5": {
+      "meanings": [
+        [
+          "Kopf"
+        ],
+        [
+          "Haupt"
+        ],
+        [
+          "Hauptstadt"
+        ]
+      ],
+      "id": "689e12a6-032b-40a3-9825-f8d0e147e0e5",
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "caput, capitis"
+    },
+    "b10d46b6-8b32-49d8-a7dd-c6575e427801": {
+      "forms": [
+        "abdūcō",
+        "abdūxī"
+      ],
+      "id": "b10d46b6-8b32-49d8-a7dd-c6575e427801",
+      "latin": "abdūcere",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "wegführen"
+        ]
+      ]
+    },
+    "e95c31e6-c425-4ac8-928e-e07397f6d8cd": {
+      "meanings": [
+        [
+          "wegführen"
+        ],
+        [
+          "rauben"
+        ],
+        [
+          "wegreißen"
+        ]
+      ],
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "rapere",
+      "forms": [
+        "rapiō",
+        "rapuī"
+      ],
+      "id": "e95c31e6-c425-4ac8-928e-e07397f6d8cd"
+    },
+    "279feb06-125b-4b41-9d0b-699000b6e956": {
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "sofort"
+        ]
+      ],
+      "id": "279feb06-125b-4b41-9d0b-699000b6e956",
+      "latin": "prōtinus"
+    },
+    "b0ad0814-7759-4c16-bc0d-df86b3761331": {
+      "forms": [
+        "ruō",
+        "ruī"
+      ],
+      "id": "b0ad0814-7759-4c16-bc0d-df86b3761331",
+      "meanings": [
+        [
+          "eilen"
+        ],
+        [
+          "stürmen"
+        ],
+        [
+          "stürzen"
+        ]
+      ],
+      "latin": "ruere",
+      "collectionId": "buch-lektion-18-20260921"
+    },
+    "77ff7634-8810-4ee9-9b09-6f01b5a53aeb": {
+      "latin": "indicāre",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "anzeigen"
+        ],
+        [
+          "melden"
+        ]
+      ],
+      "forms": [
+        "indicō"
+      ],
+      "id": "77ff7634-8810-4ee9-9b09-6f01b5a53aeb"
+    },
+    "cf735ed1-b5db-47db-a735-bcd4967c623a": {
+      "id": "cf735ed1-b5db-47db-a735-bcd4967c623a",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "vielmehr"
+        ],
+        [
+          "warum nicht"
+        ]
+      ],
+      "latin": "quīn"
+    },
+    "367d0479-112d-474b-b1d7-160b6554f4eb": {
+      "id": "367d0479-112d-474b-b1d7-160b6554f4eb",
+      "meanings": [
+        [
+          "Anführer"
+        ],
+        [
+          "Gründer"
+        ],
+        [
+          "Ratgeber"
+        ],
+        [
+          "Verfasser"
+        ]
+      ],
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "auctor, auctōris"
+    },
+    "acf328cd-b44c-49e6-b21a-6485ed580aa1": {
+      "id": "acf328cd-b44c-49e6-b21a-6485ed580aa1",
+      "latin": "nēmō, nēminis",
+      "meanings": [
+        [
+          "niemand"
+        ]
+      ],
+      "collectionId": "buch-lektion-18-20260921"
+    },
+    "3846e0e4-1a3c-4ffb-bb57-80faa3d7b82f": {
+      "meanings": [
+        [
+          "feindlich"
+        ],
+        [
+          "feindselig"
+        ]
+      ],
+      "latin": "īnfēstus, a, um",
+      "collectionId": "buch-lektion-18-20260921",
+      "id": "3846e0e4-1a3c-4ffb-bb57-80faa3d7b82f"
+    },
+    "b4338319-d818-4977-b014-d0fb9b5f2e8b": {
+      "latin": "nūper",
+      "id": "b4338319-d818-4977-b014-d0fb9b5f2e8b",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "neulich"
+        ],
+        [
+          "vor kurzem"
+        ]
+      ]
+    },
+    "4706209d-19f8-4e80-9819-4d4268c101b8": {
+      "latin": "improbus, a, um",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "schlecht"
+        ],
+        [
+          "unanständig"
+        ]
+      ],
+      "id": "4706209d-19f8-4e80-9819-4d4268c101b8"
+    },
+    "7ba65d4b-e93f-4aba-ac9d-09d6e2ed0456": {
+      "latin": "laedere",
+      "id": "7ba65d4b-e93f-4aba-ac9d-09d6e2ed0456",
+      "collectionId": "buch-lektion-18-20260921",
+      "forms": [
+        "laedō",
+        "laesī"
+      ],
+      "meanings": [
+        [
+          "beschädigen"
+        ],
+        [
+          "verletzen"
+        ],
+        [
+          "beleidigen"
+        ]
+      ]
+    },
+    "c78a22e1-06a9-4d36-9e60-4bf7cdceb1cb": {
+      "meanings": [
+        [
+          "offenkundig"
+        ],
+        [
+          "überführt"
+        ]
+      ],
+      "id": "c78a22e1-06a9-4d36-9e60-4bf7cdceb1cb",
+      "latin": "manifestus, a, um",
+      "collectionId": "buch-lektion-18-20260921"
+    },
+    "299085db-7c4a-4106-845e-3e050643d683": {
+      "latin": "committere",
+      "meanings": [
+        [
+          "anvertrauen"
+        ],
+        [
+          "veranstalten"
+        ],
+        [
+          "zustande bringen"
+        ]
+      ],
+      "forms": [
+        "committō",
+        "commīsī"
+      ],
+      "id": "299085db-7c4a-4106-845e-3e050643d683",
+      "collectionId": "buch-lektion-18-20260921"
+    },
+    "86316981-1042-4c05-8d64-ffe5ea4b0286": {
+      "collectionId": "buch-lektion-18-20260921",
+      "id": "86316981-1042-4c05-8d64-ffe5ea4b0286",
+      "latin": "suspīciō, suspīciōnis",
+      "meanings": [
+        [
+          "Verdacht"
+        ],
+        [
+          "Vermutung"
+        ]
+      ]
+    },
+    "05a58a5a-918f-43cf-b760-13c4e603b49e": {
+      "id": "05a58a5a-918f-43cf-b760-13c4e603b49e",
+      "forms": [
+        "quaerō",
+        "quaesīvī"
+      ],
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "quaerere",
+      "meanings": [
+        [
+          "erwerben wollen"
+        ],
+        [
+          "suchen"
+        ]
+      ]
+    },
+    "b88cdbcd-7ed3-41ff-9503-a3b19fb63183": {
+      "meanings": [
+        [
+          "fragen"
+        ]
+      ],
+      "collectionId": "buch-lektion-18-20260921",
+      "latin": "interrogāre",
+      "forms": [
+        "interrogō"
+      ],
+      "id": "b88cdbcd-7ed3-41ff-9503-a3b19fb63183"
+    },
+    "1508baa6-8071-4c19-be2a-8bb8c99a4a4c": {
+      "latin": "reperīre",
+      "meanings": [
+        [
+          "(wieder)finden"
+        ]
+      ],
+      "id": "1508baa6-8071-4c19-be2a-8bb8c99a4a4c",
+      "collectionId": "buch-lektion-18-20260921",
+      "forms": [
+        "reperiō",
+        "repperī"
+      ]
+    },
+    "4c4b79ec-cf0d-441f-835a-16f71a4dcb1e": {
+      "meanings": [
+        [
+          "festhalten"
+        ]
+      ],
+      "collectionId": "buch-lektion-18-20260921",
+      "forms": [
+        "contineō",
+        "continuī"
+      ],
+      "latin": "continēre",
+      "id": "4c4b79ec-cf0d-441f-835a-16f71a4dcb1e"
+    },
+    "39396326-d904-4d45-bc95-8ccab408b9f8": {
+      "id": "39396326-d904-4d45-bc95-8ccab408b9f8",
+      "forms": [
+        "ēripiō",
+        "ēripuī"
+      ],
+      "latin": "ēripere",
+      "collectionId": "buch-lektion-18-20260921",
+      "meanings": [
+        [
+          "entreißen"
+        ]
+      ]
+    },
+    "8b5e7989-10e1-49e6-a614-641ee4d59016": {
+      "id": "8b5e7989-10e1-49e6-a614-641ee4d59016",
+      "meanings": [
+        [
+          "fast",
+          "beinahe"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "paene"
+    },
+    "0f634ff1-bb0b-4cd1-a60a-89f345cc2e22": {
+      "meanings": [
+        [
+          "verneinen"
+        ],
+        [
+          "verweigern"
+        ],
+        [
+          "leugnen"
+        ]
+      ],
+      "forms": [
+        "nego"
+      ],
+      "latin": "negare",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "0f634ff1-bb0b-4cd1-a60a-89f345cc2e22"
+    },
+    "bc2c044e-4686-448f-9e0a-4eae8ccfeb88": {
+      "latin": "existimare",
+      "forms": [
+        "existimo"
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "bc2c044e-4686-448f-9e0a-4eae8ccfeb88",
+      "meanings": [
+        [
+          "(ein)schätzen"
+        ],
+        [
+          "meinen"
+        ]
+      ]
+    },
+    "8c0332b7-a628-47db-87a8-2dc0d069a1f3": {
+      "meanings": [
+        [
+          "Kraft"
+        ],
+        [
+          "Menge"
+        ],
+        [
+          "Gewalt"
+        ]
+      ],
+      "id": "8c0332b7-a628-47db-87a8-2dc0d069a1f3",
+      "forms": [
+        "vim",
+        "vi"
+      ],
+      "latin": "vis",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    },
+    "bc4e416d-6dc9-42a8-8060-684ffef3f3c1": {
+      "id": "bc4e416d-6dc9-42a8-8060-684ffef3f3c1",
+      "latin": "vires",
+      "forms": [
+        "virium"
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "meanings": [
+        [
+          "(Streit-)Kräfte"
+        ]
+      ]
+    },
+    "f933be63-b25c-467b-889c-8eb3714e5369": {
+      "id": "f933be63-b25c-467b-889c-8eb3714e5369",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "meanings": [
+        [
+          "abnehmen",
+          "ermatten"
+        ],
+        [
+          "verlassen"
+        ],
+        [
+          "ausgehen"
+        ]
+      ],
+      "forms": [
+        "deficio",
+        "defeci"
+      ],
+      "latin": "deficere"
+    },
+    "64e11de0-a297-4dd7-a7b6-3b3d4b9ec8bd": {
+      "id": "64e11de0-a297-4dd7-a7b6-3b3d4b9ec8bd",
+      "meanings": [
+        [
+          "fühlen"
+        ],
+        [
+          "meinen"
+        ],
+        [
+          "wahrnehmen"
+        ]
+      ],
+      "forms": [
+        "sentio",
+        "sensi"
+      ],
+      "latin": "sentire",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    },
+    "80eaaf53-a39f-4725-886c-c44b6cad2282": {
+      "meanings": [
+        [
+          "Geist"
+        ],
+        [
+          "Mut"
+        ],
+        [
+          "Gesinnung"
+        ],
+        [
+          "Herz"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "animus",
+      "id": "80eaaf53-a39f-4725-886c-c44b6cad2282"
+    },
+    "f608ed1b-19e9-4419-92ca-0d4509b694d5": {
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "dextera",
+      "meanings": [
+        [
+          "die rechte Hand"
+        ],
+        [
+          "die Rechte"
+        ]
+      ],
+      "id": "f608ed1b-19e9-4419-92ca-0d4509b694d5"
+    },
+    "858f2644-c006-4cc0-8338-f0685bcb6c82": {
+      "meanings": [
+        [
+          "wachsen"
+        ]
+      ],
+      "latin": "crescere",
+      "forms": [
+        "cresco",
+        "crevi"
+      ],
+      "id": "858f2644-c006-4cc0-8338-f0685bcb6c82",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    },
+    "2c034ce7-83ba-4834-afe9-a5800185f55c": {
+      "meanings": [
+        [
+          "vorher"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "2c034ce7-83ba-4834-afe9-a5800185f55c",
+      "latin": "ante"
+    },
+    "79f427a0-6f6a-4b94-b354-b5d7b5922c9f": {
+      "id": "79f427a0-6f6a-4b94-b354-b5d7b5922c9f",
+      "latin": "plerique",
+      "forms": [
+        "pleraeque",
+        "pleraque"
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "meanings": [
+        [
+          "die meisten"
+        ],
+        [
+          "sehr viele"
+        ]
+      ]
+    },
+    "8696ec2e-bb18-4b34-93e4-238986b683cc": {
+      "forms": [
+        "ambae",
+        "ambo"
+      ],
+      "latin": "ambo",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "meanings": [
+        [
+          "beide (zusammen)"
+        ]
+      ],
+      "id": "8696ec2e-bb18-4b34-93e4-238986b683cc"
+    },
+    "832588a2-0aa1-4f71-bbd9-b9675c75b6ef": {
+      "forms": [
+        "angusta",
+        "angustum"
+      ],
+      "latin": "angustus",
+      "meanings": [
+        [
+          "eng"
+        ],
+        [
+          "schwierig"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "832588a2-0aa1-4f71-bbd9-b9675c75b6ef"
+    },
+    "7d800e26-8978-4491-8fca-98258c13b054": {
+      "id": "7d800e26-8978-4491-8fca-98258c13b054",
+      "latin": "iterum",
+      "meanings": [
+        [
+          "wiederum"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    },
+    "6853c935-69f0-4656-9787-4487d2ee03b9": {
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "oportet",
+      "forms": [
+        "oportuit"
+      ],
+      "id": "6853c935-69f0-4656-9787-4487d2ee03b9",
+      "meanings": [
+        [
+          "es ist nötig"
+        ],
+        [
+          "es gehört sich"
+        ]
+      ]
+    },
+    "9b7be1ca-b422-48b3-bb76-469905047389": {
+      "meanings": [
+        [
+          "ja sogar"
+        ],
+        [
+          "vielmehr"
+        ],
+        [
+          "im Gegenteil"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "immo (vero)",
+      "id": "9b7be1ca-b422-48b3-bb76-469905047389"
+    },
+    "11316958-61fd-4f95-b50c-cd1ec333dc6d": {
+      "id": "11316958-61fd-4f95-b50c-cd1ec333dc6d",
+      "meanings": [
+        [
+          "erlauben"
+        ],
+        [
+          "nachgeben"
+        ],
+        [
+          "zugestehen"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "latin": "concedere",
+      "forms": [
+        "concedo",
+        "concessi"
+      ]
+    },
+    "a5eef76b-2131-40a4-8853-7250cf51aac0": {
+      "id": "a5eef76b-2131-40a4-8853-7250cf51aac0",
+      "meanings": [
+        [
+          "Mädchen"
+        ],
+        [
+          "junge Frau"
+        ]
+      ],
+      "forms": [
+        "virginis"
+      ],
+      "latin": "virgo",
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a"
+    },
+    "51e865ac-ce92-4b98-8f83-a77351ad5d1b": {
+      "latin": "secum",
+      "meanings": [
+        [
+          "mit sich"
+        ],
+        [
+          "bei sich"
+        ]
+      ],
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "51e865ac-ce92-4b98-8f83-a77351ad5d1b"
+    },
+    "79a4fb78-bfa1-4bfa-9db6-f25f3bb0ab78": {
+      "collectionId": "a9fc6a3f-a064-471e-98b7-83cff9a9372a",
+      "id": "79a4fb78-bfa1-4bfa-9db6-f25f3bb0ab78",
+      "latin": "umerus",
+      "meanings": [
+        [
+          "Oberarm"
+        ],
+        [
+          "Schulter"
+        ]
+      ]
+    }
+  }
+}

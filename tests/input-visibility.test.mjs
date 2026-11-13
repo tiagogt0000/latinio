@@ -100,7 +100,7 @@ test('unrelated inputs are ignored and invalid geometry cannot cause scrolling',
 });
 
 test('every editable training answer receives keyboard space and visibility checks',()=>{
- for(const fieldSelector of ['#answer-form input[name="answer"]','#predicate-answer-form input[name="answer"]','#table-practice-form input[data-table-answer]','#table-learning-form input[data-table-answer]','.grammar-shell textarea[data-grammar-answer]']){
+ for(const fieldSelector of ['#answer-form input[name="answer"]','#predicate-answer-form input[name="answer"]','#table-practice-form input[data-table-answer]','#table-learning-form input[data-table-answer]','.grammar-shell textarea[data-grammar-answer]','.landscape-shell input[data-field]','.landscape-shell .ls-form-label input']){
   const h=harness({height:400,fieldSelector});
   h.input.focus({preventScroll:true});h.flush();
   assert.equal(h.input.rect.bottom,384,fieldSelector);
@@ -169,7 +169,7 @@ test('the main screen guard enables all training views and suspends for dialogs'
  let options;
  const context=vm.createContext({document:{},screen:'learn',modalRoot:{children:[]},installInputVisibility:value=>{options=value;}});
  vm.runInContext(line,context);
- for(const screen of ['test','predicate-test','tables','grammar']){
+ for(const screen of ['test','predicate-test','tables','grammar','landscape']){
   context.screen=screen;assert.equal(options.active(),true,screen);
   context.modalRoot.children=[{}];assert.equal(options.active(),false,screen);context.modalRoot.children=[];
  }
