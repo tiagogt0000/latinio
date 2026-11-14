@@ -1,0 +1,26 @@
+import {answerWord,promptFor} from './english.js';
+import {answerFeedback,translationCard} from './feedback.js';
+import {subjectInfo} from './subjects.js';
+
+const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const paths={plus:'<path d="M12 5v14M5 12h14"/>',close:'<path d="m6 6 12 12M18 6 6 18"/>',check:'<path d="m5 12 4 4L19 6"/>',arrow:'<path d="M5 12h14m-6-6 6 6-6 6"/>',repeat:'<path d="M20 7h-6m6 0V2m0 5a8 8 0 0 0-14-1M4 17h6m-6 0v5m0-5a8 8 0 0 0 14 1"/>',edit:'<path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14v6Z"/>'};
+const defaultIcon=name=>`<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${paths[name]||''}</svg>`;
+
+/** One presentation for classic rounds and landscape writing, with action adapters only. */
+export function writeAnswerInput(value,index,disabled,{subject='latin',direction,h=escape,icon=defaultIcon,actionPrefix=''}={}){
+ const toForeign=subject!=='latin'&&direction==='de-en',language=subjectInfo(subject);
+ return `<div class="answer-row"><span>${index+1}</span><input name="answer" value="${h(value)}" placeholder="${toForeign?'Wort auf '+language.label:'Deutsche Bedeutung'}" aria-label="${toForeign?'Antwort auf '+language.label:'Deutsche Bedeutung'} ${index+1}" lang="${toForeign?language.code:'de'}" inputmode="text" autocomplete="${toForeign?'off':'on'}" autocorrect="${toForeign?'off':'on'}" autocapitalize="${toForeign?'none':'sentences'}" spellcheck="${toForeign?'false':'true'}" maxlength="300" ${disabled?'readonly':''}>${!disabled&&index>0?`<button type="button" class="icon-button" data-action="${actionPrefix}remove-answer" data-index="${index}" aria-label="Antwortfeld entfernen">${icon('close')}</button>`:''}</div>`;
+}
+
+export function writeFeedbackView(word,feedback,{h=escape,icon=defaultIcon}={}){
+ const title={full:feedback.meaningRequirement==='any'?'Bedeutung erkannt!':'Alles richtig!',partial:'Richtig – noch nicht vollständig.',wrong:'Noch nicht ganz.'}[feedback.grade];
+ return `<section class="feedback compact-feedback ${feedback.grade}" aria-live="polite"><h2>${icon(feedback.grade==='wrong'?'repeat':'check')} ${title}</h2><button type="button" class="icon-button" data-action="edit-word" data-id="${h(word.id)}" aria-label="Vokabeleintrag korrigieren">${icon('edit')}</button></section>`;
+}
+
+export function writePracticeView({word,subject='latin',direction,answers=[''],feedback=null,correctionMode=false,correctionAnswers=[''],correctionResult=null,eyebrow,h=escape,icon=defaultIcon,actionPrefix=''}={}){
+ const foreign=subject!=='latin',toForeign=foreign&&direction==='de-en',language=subjectInfo(subject);
+ const target=foreign?answerWord(word,direction):word;
+ const label=eyebrow??(toForeign?`DEUTSCH → ${language.label.toUpperCase()}`:`${language.label.toUpperCase()} → DEUTSCH`);
+ const input=(value,index)=>writeAnswerInput(value,index,false,{subject,direction,h,icon,actionPrefix});
+ return `<div class="test-content"><div class="eyebrow">${h(label)}</div><div class="test-title"><h1>${toForeign?'Wie heißt auf '+language.label+' …':'Was bedeutet …'}</h1><button class="icon-button" data-action="edit-word" data-id="${h(word.id)}" aria-label="Vokabel bearbeiten">${icon('edit')}</button></div><div class="latin-word" lang="${toForeign?'de':language.code}">${h(foreign?promptFor(word,direction):word.latin)}</div>${translationCard(target,feedback,toForeign?language.code:'de')}${!feedback?'<p class="muted test-help" data-compact-hide>Schreibe die Bedeutungen auf, die du kennst.</p>':''}<form id="answer-form"><div id="answers">${feedback?answerFeedback(feedback,{correctAction:`${actionPrefix}correct-evaluation`}):answers.map(input).join('')}</div>${!feedback?`<button type="button" class="add-answer" data-action="${actionPrefix}add-answer">${icon('plus')} Weitere Bedeutung</button>`:''}${correctionMode?`<section class="correction-practice" aria-live="polite"><p class="small muted">Noch einmal üben · ohne Wertung</p><div id="practice-answers">${correctionAnswers.map(input).join('')}</div>${correctionResult?`<p class="practice-result ${correctionResult.grade==='full'?'correct':'incorrect'}">${correctionResult.grade==='full'?'Richtig! Enter führt weiter.':'Noch nicht richtig. Ändere deine Antwort und versuche es erneut.'}</p>`:''}<button type="button" class="add-answer" data-action="${actionPrefix}practice-add">${icon('plus')} Weitere Bedeutung</button></section>`:''}<div class="test-feedback">${feedback?writeFeedbackView(word,feedback,{h,icon}):''}</div><footer class="test-footer ${feedback?'compact-footer':''}">${correctionMode?(correctionResult?.grade==='full'?`<button class="button primary wide" type="button" data-action="${actionPrefix}next">Weiter ${icon('arrow')}</button>`:`<button class="button primary wide" type="button" data-action="${actionPrefix}retry-submit">Prüfen ${icon('check')}</button>`):feedback?`<button class="button primary wide" type="button" data-action="${actionPrefix}next">Weiter ${icon('arrow')}</button>`:`<button class="text-button" type="button" data-action="${actionPrefix}dont-know">Weiß ich noch nicht</button><button class="button primary" type="submit">Prüfen ${icon('check')}</button>`}</footer></form></div>`;
+}

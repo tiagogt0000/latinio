@@ -1,5 +1,11 @@
 # Lernlandschaft · 2.18.0
 
+## Englisch ab 2.19.0
+Der Admin kann den Lernweg in Latein und Englisch nutzen. Das Fach wird explizit an UI, Engine, Speicher und API gereicht. Englische Ereignisse tragen `en-de` oder `de-en`; jede Richtung hat eigene Evidenz, Schwierigkeit, Stabilität und Fälligkeit. Deutsch → Englisch nutzt dieselbe Zielwort-/Variantenprüfung wie die klassische englische Abfrage, ohne Tippfehlertoleranz. Wiedererkennen und Hilfen ersetzen keinen eigenständigen schriftlichen Abruf. Englische Satzbausteine ergänzen das Vokabeltraining ungefähr jede achte Runde; lateinische Kasus- und Endungsaufgaben werden in Englisch nicht eingeplant.
+Normale Schreibaufgaben verwenden `write-practice.js` gemeinsam mit dem klassischen Modus. Der Rundenadapter bewahrt die eigene Lernplanung, Fehlerwiederholung und Checkpoints. Die ursprünglichen Einzelantwortfelder, Plus-Schaltfläche, Korrekturübung und Bewertungsberichtigung bleiben bedienbar. Eine Berichtigung bleibt als weiteres unveränderliches Ereignis erhalten, ersetzt in der Auswertung aber nur denselben ursprünglichen Versuch. Änderungen eines Vokabeleintrags aktualisieren den aktuellen Aufgabenstand und die zugehörige Bewertung.
+Bestehende Latin-Profile bleiben unter ihrem ursprünglichen Datenbankschlüssel; Englisch erhält einen disjunkten internen Profilnamensraum mit einem in externen IDs verbotenen Trennzeichen. Damit bleiben alte lateinische Replay-Hashes und alle Lernereignisse kompatibel. Die lokale IndexedDB ist bereits nach Fach getrennt; zusätzliche Fachmetadaten verhindern ein irrtümliches Vermischen. Inhaltsloader und Importwerkzeuge akzeptieren Latein und Englisch ausdrücklich und weisen andere Fächer zurück.
+
+
 Die Lernlandschaft ergänzt das klassische Lateintraining und ist zunächst ausschließlich für den Hauptadmin sichtbar. Die API prüft die Rolle unabhängig von der Oberfläche. Englische und französische Lernbereiche bleiben unverändert.
 
 ## Oberfläche und Bedienung

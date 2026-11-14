@@ -8,6 +8,20 @@ function functionLine(name){
   const line=source.split('\n').find(line=>line.startsWith(`function ${name}(`)||line.startsWith(`async function ${name}(`));
   assert(line,`${name} exists`);return line;
 }
+test('only admins see the landscape switch in Latin and English learning views',()=>{
+  const context=vm.createContext({subject:'english',screen:'learn',isAdmin:()=>true});
+  vm.runInContext(functionLine('learningModes'),context);
+  for(const subject of ['latin','english']){
+    context.subject=subject;
+    assert.match(context.learningModes(),/data-mode="landscape"/);
+    context.screen='landscape';
+    assert.match(context.learningModes(),/data-mode="landscape" aria-pressed="true"/);
+    context.screen='learn';
+  }
+  context.subject='french';assert.equal(context.learningModes(),'');
+  context.subject='english';context.isAdmin=()=>false;assert.equal(context.learningModes(),'');
+  context.isAdmin=()=>true;context.screen='settings';assert.equal(context.learningModes(),'');
+});
 
 test('an announcement response started in classic cannot interrupt a subsequently opened landscape',async()=>{
   let finish;const displayed=[];

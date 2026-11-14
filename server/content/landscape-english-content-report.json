@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "subject": "english",
+  "ok": true,
+  "errors": [],
+  "warnings": [],
+  "stats": {
+    "total": 193,
+    "collections": [
+      {
+        "id": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+        "name": "LW 2",
+        "count": 24,
+        "coveredWords": 25,
+        "totalWords": 25
+      },
+      {
+        "id": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+        "name": "LW 3",
+        "count": 25,
+        "coveredWords": 34,
+        "totalWords": 34
+      },
+      {
+        "id": "0091f57a-4af4-443f-b752-430f35114857",
+        "name": "LW 4",
+        "count": 24,
+        "coveredWords": 28,
+        "totalWords": 28
+      },
+      {
+        "id": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+        "name": "LW 5",
+        "count": 24,
+        "coveredWords": 19,
+        "totalWords": 19
+      },
+      {
+        "id": "e4963e32-82fc-4f68-a054-7eb891472787",
+        "name": "LW 6",
+        "count": 24,
+        "coveredWords": 16,
+        "totalWords": 16
+      },
+      {
+        "id": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+        "name": "LW 7",
+        "count": 24,
+        "coveredWords": 15,
+        "totalWords": 15
+      },
+      {
+        "id": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+        "name": "LW 8",
+        "count": 24,
+        "coveredWords": 25,
+        "totalWords": 25
+      },
+      {
+        "id": "17168717-1e1f-4be3-bfbe-2f8240679617",
+        "name": "LW 9",
+        "count": 24,
+        "coveredWords": 27,
+        "totalWords": 27
+      }
+    ]
+  }
+}

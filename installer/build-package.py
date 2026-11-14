@@ -12,7 +12,7 @@ FILES = (
     'google/Code.gs', 'google/Accounts.gs', 'google/AutoSharing.gs',
     'server/database.mjs', 'server/start.mjs', 'server/http.mjs', 'server/Dockerfile',
     'server/grammar.mjs', 'server/grammar-content.mjs', 'server/notifications.mjs', 'server/package.json', 'server/package-lock.json',
-    'server/landscape.mjs', 'server/landscape-content.mjs', 'server/content/landscape-sentences.json.gz',
+    'server/landscape.mjs', 'server/landscape-content.mjs', 'server/content/landscape-sentences.json.gz', 'server/content/landscape-english-sentences.json.gz',
 )
 
 def build(output, release):
@@ -57,8 +57,8 @@ die Datenbank wird nicht auf einen alten Stand zurueckgesetzt.
 Passwoerter, Admin-PIN, Nutzer- und Lerndaten sind nicht in diesem Paket enthalten.
 Dieses Paket ist ein Update fuer den bereits eingerichteten Pi.
 
-Neu: Die adaptive Lernlandschaft fuer Latein, zunaechst nur fuer den Admin.
-Nach Backendupdate und Veroeffentlichung: Latein -> Lernen -> Lernlandschaft.
+Neu: Die adaptive Lernlandschaft fuer Latein und Englisch, nur fuer den Admin.
+Nach Backendupdate und Veroeffentlichung: Latein oder Englisch -> Lernen -> Lernlandschaft.
 Der klassische Lernbereich bleibt weiterhin erreichbar.
 Die Landschaft verbindet neue Karteikarten mit Wischgesten, Schreibabfragen
 mit Checkpoint, Wortpaare, schnelle Auffrischung, Satzaufgaben und Kasustraining.

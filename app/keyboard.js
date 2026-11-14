@@ -1,7 +1,7 @@
 import {hasAnswerContent} from './answer-fields.js';
 import {focusInput} from './input-visibility.js';
 
-export function installKeyboardSupport({root,active,session,submit,next,addField,addCorrectionField,rateCard,beginCorrection,submitCorrection}){
+export function installKeyboardSupport({root,active,session,submit,next,addField,addCorrectionField,rateCard,beginCorrection,submitCorrection,addFieldAction='add-answer'}){
  let focusTimer=null;
  const handler=event=>{
   if(!active()||event.defaultPrevented||event.altKey||event.ctrlKey||event.metaKey||event.isComposing||event.keyCode===229)return;
@@ -39,7 +39,7 @@ export function installKeyboardSupport({root,active,session,submit,next,addField
   if(index<0)return;
   event.preventDefault();
   if(fields[index+1])focusInput(fields[index+1]);
-  else if(root.querySelector('[data-action="add-answer"]')){
+  else if(root.querySelector(`[data-action="${addFieldAction}"]`)){
    addField();clearTimeout(focusTimer);focusTimer=setTimeout(()=>{focusTimer=null;if(active())focusInput(root.querySelectorAll('#answers input[name="answer"]')[index+1]);},0);
   }
  };

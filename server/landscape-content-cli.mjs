@@ -13,8 +13,8 @@ for(let i=0;i<argv.length;i++){
 function read(path){const bytes=readFileSync(resolve(path));return JSON.parse((String(path).endsWith('.gz')?gunzipSync(bytes):bytes).toString('utf8'));}
 function help(){console.log(`Satzinhalte prüfen/importieren – ohne Netzwerk oder KI-Konto
 
-node server/landscape-content-cli.mjs validate --file KATALOG.json[.gz] --vocabulary VOKABELN.json [--minimum 100]
-node server/landscape-content-cli.mjs merge --file NEUE-SÄTZE.json --base KATALOG.json.gz --vocabulary VOKABELN.json --output VORBEREITETER-KATALOG.json.gz --reviewed
+node server/landscape-content-cli.mjs validate --file KATALOG.json[.gz] --vocabulary VOKABELN.json [--subject latin|english] [--minimum 100]
+node server/landscape-content-cli.mjs merge --file NEUE-SÄTZE.json --base KATALOG.json.gz --vocabulary VOKABELN.json --output VORBEREITETER-KATALOG.json.gz --reviewed [--subject latin|english]
 
 Der Import schreibt ausschließlich den ausdrücklich genannten Ausgabepfad.
 Bestehende Aufgaben-IDs werden nie stillschweigend ersetzt. Neue Sammlungen
@@ -25,17 +25,20 @@ try{
   else{
     if(typeof flags.file!=='string'||typeof flags.vocabulary!=='string')throw Error('--file und --vocabulary sind erforderlich.');
     const incoming=read(flags.file),vocabulary=read(flags.vocabulary);
+    const subject=flags.subject??incoming.subject??'latin';
+    if(!['latin','english'].includes(subject))throw Error('--subject muss latin oder english sein.');
     let candidate=incoming;
     if(command==='merge'){
       if(flags.reviewed!==true||typeof flags.base!=='string'||typeof flags.output!=='string')throw Error('Merge braucht --base, --output und die ausdrückliche Inhaltsprüfung --reviewed.');
       const base=read(flags.base),ids=new Set((base.sentences||[]).map(s=>s.id));
+      if((base.subject||'latin')!==subject||(incoming.subject||'latin')!==subject)throw Error('Sammlungen verschiedener Fächer werden nicht zusammengeführt.');
       for(const sentence of incoming.sentences||[])if(ids.has(sentence.id))throw Error('Bestehende Aufgaben-ID: '+sentence.id);
       const collections=new Map([...(base.collections||[]),...(incoming.collections||[])].map(c=>[c.id,c]));
       candidate={...base,schema:1,version:new Date().toISOString(),collections:[...collections.values()],sentences:[...(base.sentences||[]),...(incoming.sentences||[])]};
     }
     const minimum=flags.minimum===undefined?0:Number(flags.minimum);
     if(!Number.isInteger(minimum)||minimum<0)throw Error('--minimum muss eine nichtnegative ganze Zahl sein.');
-    const result=validateSentenceCatalogue(candidate,vocabulary,{minimumPerCollection:minimum});
+    const result=validateSentenceCatalogue(candidate,vocabulary,{minimumPerCollection:minimum,subject});
     console.log(JSON.stringify(result,null,2));
     if(!result.ok)process.exitCode=1;
     else if(command==='merge'){

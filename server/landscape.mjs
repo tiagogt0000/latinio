@@ -9,32 +9,45 @@ const object=value=>value && typeof value==='object' && !Array.isArray(value);
 const integer=(value,max=Number.MAX_SAFE_INTEGER)=>Number.isSafeInteger(value) && value>=0 && value<=max;
 const modalities=new Set(['cards','write','quick','matching','sentence','grammar','case-match']);
 const phases=new Set(['task','feedback','checkpoint','complete']);
-function checkedEvent(input,now) {
+const englishDirections=new Set(['en-de','de-en']);
+function checkedEvent(input,now,subject='latin') {
   assert(object(input) && validId(input.id) && validId(input.roundId) && validId(input.taskId),'Ungültiges Lernereignis.');
   assert(modalities.has(input.modality) && typeof input.correct==='boolean' && integer(input.at),'Ungültige Lernbewertung.');
   assert(input.at<=now+86400000,'Die Gerätezeit liegt zu weit in der Zukunft. Bitte die Uhrzeit prüfen.');
   assert(Array.isArray(input.results) && input.results.length<=200,'Zu viele Teilbewertungen.');
   assert(integer(input.attempt,10000) && input.attempt>=1,'Ungültige Versuchszahl.');
+  assert((input.subject || 'latin')===subject,'Die Bewertung gehört zu einem anderen Fach.');
+  assert(subject==='english'?englishDirections.has(input.direction):!input.direction || input.direction==='la-de','Ungültige Übersetzungsrichtung.');
+  assert(subject!=='english' || !['grammar','case-match'].includes(input.modality),'Lateinische Endungen gehören nicht zum Englischen.');
   const results=input.results.map(result=>{
     assert(object(result) && typeof result.key==='string' && result.key.length>0 && result.key.length<=500 && !forbidden.has(result.key) && typeof result.correct==='boolean','Ungültige Teilbewertung.');
     const value={key:result.key,correct:result.correct};
     if(result.wordId!=null){assert(validId(result.wordId),'Ungültige Wortkennung.');value.wordId=result.wordId;}
     if(result.cellId!=null){assert(validId(result.cellId),'Ungültiges Tabellenfeld.');value.cellId=result.cellId;}
     if(result.meaningIndex!=null){assert(integer(result.meaningIndex,100),'Ungültige Bedeutung.');value.meaningIndex=result.meaningIndex;}
+    if(subject==='english' && result.wordId && result.meaningIndex!=null)assert(result.key===`word:${result.wordId}:${input.direction}:${result.meaningIndex}`,'Die Bedeutungsbewertung gehört zu einer anderen Richtung.');
     return value;
   });
   const value={id:input.id,roundId:input.roundId,taskId:input.taskId,at:input.at,modality:input.modality,attempt:input.attempt,retry:!!input.retry,hinted:!!input.hinted,correct:input.correct,results};
   for(const key of ['wordId','sentenceId','caseId']){assert(input[key]==null || validId(input[key]),'Ungültige Inhaltskennung.');value[key]=input[key] || null;}
   value.hintedWordIds=[...new Set((Array.isArray(input.hintedWordIds)?input.hintedWordIds:[]).filter(validId))].slice(0,100);
   value.errorType=typeof input.errorType==='string'?input.errorType.slice(0,40):null;
+  // Keep old Latin canonical payloads byte-compatible with their replay hashes.
+  if(input.subject!==undefined)value.subject=input.subject;
+  if(input.direction!==undefined)value.direction=input.direction;
+  if(input.corrects!==undefined){assert(validId(input.corrects) && input.corrects!==input.id && integer(input.correctionRevision,10000) && input.correctionRevision>=1,'Ungültige Auswertungskorrektur.');value.corrects=input.corrects;value.correctionRevision=input.correctionRevision;}
   return value;
 }
-function checkedRound(input,now) {
+function checkedRound(input,now,subject='latin') {
   assert(object(input) && validId(input.id) && validId(input.mutationId) && validId(input.deviceId),'Ungültiger Rundenstand.');
   assert(integer(input.baseVersion) && integer(input.revision,100000000) && phases.has(input.phase),'Ungültige Rundenversion.');
   assert(['cards','write','quick','matching','sentence','mixed','grammar','case-match'].includes(input.kind),'Unbekannte Rundenart.');
+  assert((input.subject || 'latin')===subject,'Diese Runde gehört zu einem anderen Fach.');
+  assert(subject==='english'?['mixed','en-de','de-en'].includes(input.direction):!input.direction || input.direction==='la-de','Ungültige Rundenrichtung.');
+  assert(subject!=='english' || !['grammar','case-match'].includes(input.kind),'Lateinische Endungen gehören nicht zum Englischen.');
   assert(Array.isArray(input.tasks) && input.tasks.length>0 && input.tasks.length<=2000,'Ungültige Aufgabenanzahl.');
   assert(input.tasks.every(task=>object(task) && validId(task.id) && modalities.has(task.kind)),'Ungültige Aufgaben.');
+  assert(input.tasks.every(task=>(task.subject || 'latin')===subject && (subject==='english'?englishDirections.has(task.direction) && !['grammar','case-match'].includes(task.kind):!task.direction || task.direction==='la-de')),'Eine Aufgabe gehört zu einem anderen Fach oder einer ungültigen Richtung.');
   const ids=new Set(input.tasks.map(task=>task.id));
   assert(ids.size===input.tasks.length,'Doppelte Aufgabenkennung.');
   assert(Array.isArray(input.queue) && input.queue.length<=2000 && input.queue.every(key=>ids.has(key)),'Ungültige Aufgabenwarteschlange.');
@@ -42,7 +55,7 @@ function checkedRound(input,now) {
   assert(integer(input.blockIndex,input.blocks.length-1),'Ungültiger Abschnitt.');
   assert(integer(input.createdAt) && integer(input.updatedAt),'Ungültiger Rundenzeitpunkt.');
   assert(input.createdAt<=now+86400000 && input.updatedAt<=now+86400000,'Die Gerätezeit liegt zu weit in der Zukunft.');
-  const keys=['id','kind','label','collectionIds','createdAt','updatedAt','revision','phase','tasks','blocks','blockIndex','queue','retryIds','retryCycle','attempts','completedTaskIds','originalCount','feedback','draft','paused','caseId','contentNotice','completedAt','forkedFrom'];
+  const keys=['id','kind','label','collectionIds','createdAt','updatedAt','revision','phase','tasks','blocks','blockIndex','queue','retryIds','retryCycle','attempts','completedTaskIds','originalCount','feedback','draft','paused','caseId','contentNotice','completedAt','forkedFrom','subject','direction'];
   const round={};for(const key of keys)if(Object.hasOwn(input,key))round[key]=input[key];
   round.label=String(round.label || 'Lernrunde').slice(0,200);
   assert(Array.isArray(round.collectionIds) && round.collectionIds.length<=200 && round.collectionIds.every(validId),'Ungültige Sammlungen.');
@@ -96,10 +109,10 @@ export function createLandscape(database,{now=Date.now}={}) {
     }
     return {events,rounds,exams,inventory,cursor:page.at(-1)?.seq || cursor,hasMore};
   }
-  function sync(body,profile) {
+  function sync(body,profile,subject) {
     assert(Array.isArray(body.events || []) && (body.events || []).length<=500 && Array.isArray(body.rounds || []) && (body.rounds || []).length<=50 && Array.isArray(body.exams || []) && (body.exams || []).length<=50,'Zu viele Änderungen in einer Anfrage.');
     assert(Array.isArray(body.inventory || []) && (body.inventory || []).length<=500,'Zu viele Sammlungen.');
-    const at=now(), events=(body.events || []).map(e=>checkedEvent(e,at)), rounds=(body.rounds || []).map(r=>checkedRound(r,at)), exams=(body.exams || []).map(e=>checkedExam(e,at));
+    const at=now(), events=(body.events || []).map(e=>checkedEvent(e,at,subject)), rounds=(body.rounds || []).map(r=>checkedRound(r,at,subject)), exams=(body.exams || []).map(e=>checkedExam(e,at));
     const inventory=(body.inventory || []).map(item=>checkedInventory(item,at));
     const ackEventIds=[],acceptedRounds=[],acceptedExams=[],conflicts=[],conflictingRounds=[];
     db.exec('BEGIN IMMEDIATE');
@@ -116,6 +129,10 @@ export function createLandscape(database,{now=Date.now}={}) {
         if(existing)assert(existing.hash===digest,'Diese Ereigniskennung gehört bereits zu einer anderen Bewertung.');
         else {db.prepare('INSERT INTO landscape_events(profile,id,at,hash,value) VALUES(?,?,?,?,?)').run(profile,event.id,event.at,digest,JSON.stringify(event));change(profile,'event',event.id);}
         ackEventIds.push(event.id);
+      }
+      for(const event of events.filter(e=>e.corrects)){
+        const target=db.prepare('SELECT value FROM landscape_events WHERE profile=? AND id=?').get(profile,event.corrects),original=target?JSON.parse(target.value):null;
+        assert(original && !original.corrects && original.roundId===event.roundId && original.taskId===event.taskId && original.attempt===event.attempt && (original.direction || 'la-de')===(event.direction || 'la-de'),'Die Korrektur gehört nicht zu diesem bewerteten Versuch.');
       }
       for(const input of rounds){
         const digest=hash(input),previous=db.prepare('SELECT hash,result FROM landscape_snapshots WHERE profile=? AND mutation_id=?').get(profile,input.mutationId);
@@ -155,15 +172,19 @@ export function createLandscape(database,{now=Date.now}={}) {
     } catch(error){db.exec('ROLLBACK');throw error;}
   }
   return {ready:true,request(body,identity){
-    const profile=authorize(identity);
-    assert(!body.subject || body.subject==='latin','Die Lernlandschaft gehört zum Fach Latein.');
-    if(body.action==='landscapePull')return pull(profile,body.cursor || 0);
-    if(body.action==='landscapeSync')return sync(body,profile);
+    const owner=authorize(identity),subject=body.subject || 'latin';
+    assert(['latin','english'].includes(subject),'Dieses Fach hat noch keine Lernlandschaft.');
+    // Existing Latin rows retain the exact original profile key. A reserved
+    // control separator (forbidden in authenticated IDs) provides a disjoint
+    // namespace for English without rewriting/deleting any installed history.
+    const profile=subject==='latin'?owner:`${owner}\u001fenglish`;
+    if(body.action==='landscapePull')return {...pull(profile,body.cursor || 0),subject};
+    if(body.action==='landscapeSync')return {...sync(body,profile,subject),subject};
     if(body.action==='landscapeCatalogue'){
       assert(body.collections==null || Array.isArray(body.collections) && body.collections.length<=500 && body.collections.every(c=>object(c) && validId(c.id)),'Ungültige Sammlungsliste.');
-      return getSentenceCatalogue(body.collections);
+      return {...getSentenceCatalogue(body.collections,subject),subject};
     }
-    if(body.action==='landscapeSentences'){assert(validId(body.collectionId),'Ungültige Sammlung.');return {collectionId:body.collectionId,sentences:getCollectionSentences(body.collectionId)};}
+    if(body.action==='landscapeSentences'){assert(validId(body.collectionId),'Ungültige Sammlung.');return {subject,collectionId:body.collectionId,sentences:getCollectionSentences(body.collectionId,subject)};}
     throw Error('Unbekannte Lernlandschaft-Anfrage.');
   }};
 }

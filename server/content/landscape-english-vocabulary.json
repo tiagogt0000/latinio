@@ -1,0 +1,2297 @@
+{
+  "collections": {
+    "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e": {
+      "id": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "name": "LW 2"
+    },
+    "1c18c7b9-f532-4153-b56f-9394558a8f33": {
+      "id": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "name": "LW 3"
+    },
+    "0091f57a-4af4-443f-b752-430f35114857": {
+      "id": "0091f57a-4af4-443f-b752-430f35114857",
+      "name": "LW 4"
+    },
+    "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044": {
+      "id": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "name": "LW 5"
+    },
+    "e4963e32-82fc-4f68-a054-7eb891472787": {
+      "id": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "name": "LW 6"
+    },
+    "1c52ae1f-bafc-4802-908c-f8a2a589c405": {
+      "id": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "name": "LW 7"
+    },
+    "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f": {
+      "id": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "name": "LW 8"
+    },
+    "17168717-1e1f-4be3-bfbe-2f8240679617": {
+      "id": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "name": "LW 9"
+    }
+  },
+  "words": {
+    "01aaa48f-a2ab-4157-891d-8b188f6fcd15": {
+      "id": "01aaa48f-a2ab-4157-891d-8b188f6fcd15",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "independent",
+      "meanings": [
+        [
+          "unabhängig"
+        ]
+      ]
+    },
+    "5ab2f71d-a52e-4620-8ee3-35ae1596a578": {
+      "id": "5ab2f71d-a52e-4620-8ee3-35ae1596a578",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "dependency",
+      "meanings": [
+        [
+          "Schutzgebiet"
+        ],
+        [
+          "Kolonie"
+        ]
+      ]
+    },
+    "aa2ee010-1988-445c-a6cc-f9d248305b5d": {
+      "id": "aa2ee010-1988-445c-a6cc-f9d248305b5d",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "incredible",
+      "meanings": [
+        [
+          "unglaublich"
+        ]
+      ]
+    },
+    "bb28adb2-0769-4c8e-849c-ce1c9c6ab7d2": {
+      "id": "bb28adb2-0769-4c8e-849c-ce1c9c6ab7d2",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "statistics",
+      "meanings": [
+        [
+          "Statistik"
+        ]
+      ]
+    },
+    "20d04440-9753-4d4a-a450-c75445504e1b": {
+      "id": "20d04440-9753-4d4a-a450-c75445504e1b",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "populous",
+      "meanings": [
+        [
+          "bevölkerungsreich"
+        ],
+        [
+          "dicht besiedelt"
+        ]
+      ]
+    },
+    "2e61d079-03a5-4b12-bce7-91d1d154f982": {
+      "id": "2e61d079-03a5-4b12-bce7-91d1d154f982",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "billion",
+      "meanings": [
+        [
+          "Milliarde"
+        ]
+      ]
+    },
+    "11cc2d06-15f5-4fa1-8abc-bfff70c2159c": {
+      "id": "11cc2d06-15f5-4fa1-8abc-bfff70c2159c",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "Hindi",
+      "meanings": [
+        [
+          "Hindi"
+        ]
+      ]
+    },
+    "66b71178-806b-4e1d-a6c5-ff600bfdf602": {
+      "id": "66b71178-806b-4e1d-a6c5-ff600bfdf602",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "represent",
+      "meanings": [
+        [
+          "vertreten"
+        ],
+        [
+          "repräsentieren"
+        ],
+        [
+          "verkörpern"
+        ],
+        [
+          "symbolisieren"
+        ]
+      ]
+    },
+    "83a258e1-6c6f-434a-ace7-54d4f42e4762": {
+      "id": "83a258e1-6c6f-434a-ace7-54d4f42e4762",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "coastal",
+      "meanings": [
+        [
+          "Küsten-"
+        ]
+      ]
+    },
+    "db911a3d-6a2f-4294-af0b-cd1176691be2": {
+      "id": "db911a3d-6a2f-4294-af0b-cd1176691be2",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "bush",
+      "meanings": [
+        [
+          "Busch"
+        ],
+        [
+          "Strauch"
+        ]
+      ]
+    },
+    "7f1c5e73-154b-4c23-a165-0bab4923641c": {
+      "id": "7f1c5e73-154b-4c23-a165-0bab4923641c",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "coral",
+      "meanings": [
+        [
+          "Koralle"
+        ],
+        [
+          "(Korallen-)"
+        ]
+      ]
+    },
+    "84ee417a-32de-4406-8145-f6f3af78ebc8": {
+      "id": "84ee417a-32de-4406-8145-f6f3af78ebc8",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "kangaroo",
+      "meanings": [
+        [
+          "Känguru"
+        ]
+      ]
+    },
+    "feee4f6d-d5f7-441e-b75d-98a535be5254": {
+      "id": "feee4f6d-d5f7-441e-b75d-98a535be5254",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "the outback",
+      "meanings": [
+        [
+          "das Hinterland Australiens"
+        ]
+      ]
+    },
+    "4ee23ebc-0797-4fa4-9be3-9e4340efa9ad": {
+      "id": "4ee23ebc-0797-4fa4-9be3-9e4340efa9ad",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "spider",
+      "meanings": [
+        [
+          "Spinne"
+        ]
+      ]
+    },
+    "a6119766-30c3-4989-a868-78284856735e": {
+      "id": "a6119766-30c3-4989-a868-78284856735e",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "humid",
+      "meanings": [
+        [
+          "feucht"
+        ],
+        [
+          "feuchtwarm"
+        ]
+      ]
+    },
+    "7a0ec30b-a988-43a4-a808-d5c27e87b08c": {
+      "id": "7a0ec30b-a988-43a4-a808-d5c27e87b08c",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "remote",
+      "meanings": [
+        [
+          "abgelegen"
+        ],
+        [
+          "abgeschieden"
+        ]
+      ]
+    },
+    "ec47b5df-3093-4eef-b479-2e2cb9093a3c": {
+      "id": "ec47b5df-3093-4eef-b479-2e2cb9093a3c",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "sandy",
+      "meanings": [
+        [
+          "sandig"
+        ]
+      ]
+    },
+    "8bc6f1c9-20f5-4c8e-9f37-3cb6c9a11535": {
+      "id": "8bc6f1c9-20f5-4c8e-9f37-3cb6c9a11535",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "stunning",
+      "meanings": [
+        [
+          "atemberaubend"
+        ],
+        [
+          "überwältigend"
+        ],
+        [
+          "umwerfend"
+        ]
+      ]
+    },
+    "5237cef9-a2e9-4eb3-8e74-fdb61f9e06f6": {
+      "id": "5237cef9-a2e9-4eb3-8e74-fdb61f9e06f6",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "urban",
+      "meanings": [
+        [
+          "städtisch"
+        ],
+        [
+          "Stadt-"
+        ]
+      ]
+    },
+    "e38d8da2-1fe7-44aa-af18-016a486b67bd": {
+      "id": "e38d8da2-1fe7-44aa-af18-016a486b67bd",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "Aboriginal",
+      "meanings": [
+        [
+          "Aborigine-"
+        ],
+        [
+          "(die Ureinwohner Australiens betreffend)"
+        ]
+      ]
+    },
+    "4841c4e3-ba82-4c1b-92f8-a9b9c4e83b41": {
+      "id": "4841c4e3-ba82-4c1b-92f8-a9b9c4e83b41",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "camel",
+      "meanings": [
+        [
+          "Kamel"
+        ]
+      ]
+    },
+    "300227c4-ea92-4814-b74c-855261c447d7": {
+      "id": "300227c4-ea92-4814-b74c-855261c447d7",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "convict",
+      "meanings": [
+        [
+          "Sträfling"
+        ],
+        [
+          "Strafgefangener"
+        ]
+      ]
+    },
+    "f3828372-fa00-4b64-848f-c5d3a77e19e9": {
+      "id": "f3828372-fa00-4b64-848f-c5d3a77e19e9",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "koala",
+      "meanings": [
+        [
+          "Koala"
+        ]
+      ]
+    },
+    "7ed595a0-26e7-4f70-95e5-6c718ab3e941": {
+      "id": "7ed595a0-26e7-4f70-95e5-6c718ab3e941",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "poisonous",
+      "meanings": [
+        [
+          "giftig"
+        ]
+      ]
+    },
+    "eb2e567c-d8e6-4eef-8791-b6198fa3a8fa": {
+      "id": "eb2e567c-d8e6-4eef-8791-b6198fa3a8fa",
+      "collectionId": "b6798f3c-1f4e-4041-b9d8-ef45573ccb3e",
+      "latin": "territory",
+      "meanings": [
+        [
+          "Territorium"
+        ],
+        [
+          "Revier"
+        ]
+      ]
+    },
+    "aa69740a-30bb-4177-8365-d5dff5496c0f": {
+      "id": "aa69740a-30bb-4177-8365-d5dff5496c0f",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "flight",
+      "meanings": [
+        [
+          "Flug"
+        ]
+      ]
+    },
+    "be8163bb-a87f-4ffc-8b93-132217e74892": {
+      "id": "be8163bb-a87f-4ffc-8b93-132217e74892",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "circular",
+      "meanings": [
+        [
+          "kreisförmig"
+        ],
+        [
+          "rund"
+        ]
+      ]
+    },
+    "0531dff8-6ada-491f-9698-5540b15745b6": {
+      "id": "0531dff8-6ada-491f-9698-5540b15745b6",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "quay",
+      "meanings": [
+        [
+          "Kai"
+        ]
+      ]
+    },
+    "21d73948-24c0-4e7a-83bd-f7c2bb33f6f0": {
+      "id": "21d73948-24c0-4e7a-83bd-f7c2bb33f6f0",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "settle",
+      "meanings": [
+        [
+          "(sich) niederlassen"
+        ],
+        [
+          "(sich) ansiedeln"
+        ]
+      ]
+    },
+    "860cdf35-9f0d-4d92-b256-3b6fad80ddc3": {
+      "id": "860cdf35-9f0d-4d92-b256-3b6fad80ddc3",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "trendy",
+      "meanings": [
+        [
+          "modisch"
+        ],
+        [
+          "angesagt"
+        ],
+        [
+          "in"
+        ]
+      ]
+    },
+    "5325ace9-0288-4039-8c70-5f72195ac631": {
+      "id": "5325ace9-0288-4039-8c70-5f72195ac631",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "suburb",
+      "meanings": [
+        [
+          "Vorort"
+        ]
+      ]
+    },
+    "90fd7d97-1ade-4537-8dbe-7f06df7aa4e4": {
+      "id": "90fd7d97-1ade-4537-8dbe-7f06df7aa4e4",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "wharf",
+      "meanings": [
+        [
+          "Kai"
+        ],
+        [
+          "Anlegeplatz"
+        ]
+      ]
+    },
+    "b27185af-22df-421c-9033-6bc58886092f": {
+      "id": "b27185af-22df-421c-9033-6bc58886092f",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "botanic",
+      "meanings": [
+        [
+          "botanisch"
+        ]
+      ]
+    },
+    "a6332282-83ff-4c20-b1e4-b49f5d8e4af7": {
+      "id": "a6332282-83ff-4c20-b1e4-b49f5d8e4af7",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "business",
+      "meanings": [
+        [
+          "Geschäft"
+        ],
+        [
+          "Unternehmen"
+        ],
+        [
+          "Betrieb"
+        ]
+      ]
+    },
+    "b33a9fca-cdd2-4f82-93ac-aa42a1dcd0a9": {
+      "id": "b33a9fca-cdd2-4f82-93ac-aa42a1dcd0a9",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "district",
+      "meanings": [
+        [
+          "Gegend"
+        ],
+        [
+          "Bezirk"
+        ],
+        [
+          "Viertel"
+        ]
+      ]
+    },
+    "f53203ec-88b9-4703-a700-a465a7329671": {
+      "id": "f53203ec-88b9-4703-a700-a465a7329671",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "flying fox",
+      "meanings": [
+        [
+          "Flughund"
+        ]
+      ]
+    },
+    "8cf99281-190a-4559-b42f-0636389ba309": {
+      "id": "8cf99281-190a-4559-b42f-0636389ba309",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "fox",
+      "meanings": [
+        [
+          "Fuchs"
+        ]
+      ]
+    },
+    "b0dcf432-2cc4-4669-a2fd-5d0f74c3f06e": {
+      "id": "b0dcf432-2cc4-4669-a2fd-5d0f74c3f06e",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "opera",
+      "meanings": [
+        [
+          "Oper"
+        ]
+      ]
+    },
+    "b2c87b66-ee76-4a74-bbf9-3f7ccf900ca5": {
+      "id": "b2c87b66-ee76-4a74-bbf9-3f7ccf900ca5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "beg",
+      "meanings": [
+        [
+          "betteln"
+        ]
+      ]
+    },
+    "17f180d3-79ec-4a07-810c-70effc1b0a70": {
+      "id": "17f180d3-79ec-4a07-810c-70effc1b0a70",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "waterfront",
+      "meanings": [
+        [
+          "Hafenviertel"
+        ]
+      ]
+    },
+    "af8a6150-d111-4aac-8e12-f64922c33ce5": {
+      "id": "af8a6150-d111-4aac-8e12-f64922c33ce5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "contemporary",
+      "meanings": [
+        [
+          "zeitgenössisch"
+        ]
+      ]
+    },
+    "84278467-7355-4882-bf3b-a80f6852c40c": {
+      "id": "84278467-7355-4882-bf3b-a80f6852c40c",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "guide",
+      "meanings": [
+        [
+          "führen"
+        ]
+      ]
+    },
+    "2fa2901f-8284-486e-8c45-396821787aaa": {
+      "id": "2fa2901f-8284-486e-8c45-396821787aaa",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "honest",
+      "meanings": [
+        [
+          "ehrlich"
+        ]
+      ]
+    },
+    "d55712a9-f1ea-47d6-a9e3-bed4048f5c75": {
+      "id": "d55712a9-f1ea-47d6-a9e3-bed4048f5c75",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "take (on sth.)",
+      "meanings": [
+        [
+          "Einstellung (zu etwas)"
+        ],
+        [
+          "Meinung (zu etwas)"
+        ]
+      ]
+    },
+    "cbe74554-a663-4bf0-8df4-858ad05dce4e": {
+      "id": "cbe74554-a663-4bf0-8df4-858ad05dce4e",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "scenic",
+      "meanings": [
+        [
+          "(landschaftlich) schön"
+        ]
+      ]
+    },
+    "ee1985b4-e146-4c0f-9606-23acdeb0bb8d": {
+      "id": "ee1985b4-e146-4c0f-9606-23acdeb0bb8d",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "transform",
+      "meanings": [
+        [
+          "verwandeln"
+        ],
+        [
+          "umwandeln"
+        ]
+      ]
+    },
+    "0ffa57ab-8749-4893-8a49-22ae22c6d477": {
+      "id": "0ffa57ab-8749-4893-8a49-22ae22c6d477",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "landmark",
+      "meanings": [
+        [
+          "Wahrzeichen"
+        ]
+      ]
+    },
+    "39b60502-f9e3-4990-9d53-1e91b642644e": {
+      "id": "39b60502-f9e3-4990-9d53-1e91b642644e",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "paradise",
+      "meanings": [
+        [
+          "Paradies"
+        ]
+      ]
+    },
+    "ea137cd1-a2e5-4e6e-9d20-a5d07511e9ed": {
+      "id": "ea137cd1-a2e5-4e6e-9d20-a5d07511e9ed",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "testimonial",
+      "meanings": [
+        [
+          "Erfahrungsbericht"
+        ],
+        [
+          "Zeugnis"
+        ]
+      ]
+    },
+    "a4ef229d-62aa-4da2-8e7e-e90e939363ba": {
+      "id": "a4ef229d-62aa-4da2-8e7e-e90e939363ba",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "destination",
+      "meanings": [
+        [
+          "Reiseziel"
+        ],
+        [
+          "Bestimmungsort"
+        ],
+        [
+          "(Ziel)"
+        ]
+      ]
+    },
+    "0877f504-ed63-4c4b-a726-22743d9eac8f": {
+      "id": "0877f504-ed63-4c4b-a726-22743d9eac8f",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "apply for something",
+      "meanings": [
+        [
+          "(sich) für etwas bewerben"
+        ]
+      ]
+    },
+    "5af3f1e5-c22f-434e-8e3f-d1c2b31b70a5": {
+      "id": "5af3f1e5-c22f-434e-8e3f-d1c2b31b70a5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "contact somebody",
+      "meanings": [
+        [
+          "Kontakt zu jemandem aufnehmen"
+        ],
+        [
+          "sich bei jemandem melden"
+        ]
+      ]
+    },
+    "bacd1f8b-3315-4812-9fdc-59f20d1469c5": {
+      "id": "bacd1f8b-3315-4812-9fdc-59f20d1469c5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "Aussie",
+      "meanings": [
+        [
+          "Australier"
+        ],
+        [
+          "australisch"
+        ]
+      ]
+    },
+    "d3066457-0cf4-4125-85ba-8d4d828f55b5": {
+      "id": "d3066457-0cf4-4125-85ba-8d4d828f55b5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "though",
+      "meanings": [
+        [
+          "obwohl"
+        ]
+      ]
+    },
+    "d5770e4c-c1bb-4610-8d96-d8b7890a19c5": {
+      "id": "d5770e4c-c1bb-4610-8d96-d8b7890a19c5",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "especially",
+      "meanings": [
+        [
+          "besonders"
+        ],
+        [
+          "vor allem"
+        ]
+      ]
+    },
+    "eb19d6d0-a822-47db-b07b-19a1f769699a": {
+      "id": "eb19d6d0-a822-47db-b07b-19a1f769699a",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "barbecue",
+      "meanings": [
+        [
+          "Grill"
+        ],
+        [
+          "Grillfest"
+        ],
+        [
+          "(Grillparty)"
+        ]
+      ]
+    },
+    "7e2d3e48-c593-44cc-b014-13a8debc4a6f": {
+      "id": "7e2d3e48-c593-44cc-b014-13a8debc4a6f",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "swallow",
+      "meanings": [
+        [
+          "(ver-)schlucken"
+        ]
+      ]
+    },
+    "e3e7db37-f06d-4eae-b27c-297c94b80365": {
+      "id": "e3e7db37-f06d-4eae-b27c-297c94b80365",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "ton",
+      "meanings": [
+        [
+          "Tonne"
+        ]
+      ]
+    },
+    "1a63ad9e-0af8-428e-80d0-e51080b73c5c": {
+      "id": "1a63ad9e-0af8-428e-80d0-e51080b73c5c",
+      "collectionId": "1c18c7b9-f532-4153-b56f-9394558a8f33",
+      "latin": "private",
+      "meanings": [
+        [
+          "privat"
+        ]
+      ]
+    },
+    "1adcf4c5-04cc-4eae-89b0-4696ec7dcf3d": {
+      "id": "1adcf4c5-04cc-4eae-89b0-4696ec7dcf3d",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "accept",
+      "meanings": [
+        [
+          "akzeptieren"
+        ],
+        [
+          "annehmen"
+        ]
+      ]
+    },
+    "25950284-5c9e-4e2f-84dc-44bd62c4a927": {
+      "id": "25950284-5c9e-4e2f-84dc-44bd62c4a927",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "talkative",
+      "meanings": [
+        [
+          "gesprächig"
+        ]
+      ]
+    },
+    "80a5a73b-1b6e-46fb-9142-f8fa7edbd1f6": {
+      "id": "80a5a73b-1b6e-46fb-9142-f8fa7edbd1f6",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "photography",
+      "meanings": [
+        [
+          "Fotografie"
+        ]
+      ]
+    },
+    "e04f1368-628c-4521-b16f-87ebc7239567": {
+      "id": "e04f1368-628c-4521-b16f-87ebc7239567",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "be homesick",
+      "meanings": [
+        [
+          "Heimweh haben"
+        ]
+      ]
+    },
+    "2b554ff2-16a2-43d5-948b-fe9aa45aadcf": {
+      "id": "2b554ff2-16a2-43d5-948b-fe9aa45aadcf",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "get homesick",
+      "meanings": [
+        [
+          "Heimweh bekommen"
+        ]
+      ]
+    },
+    "a27026c9-a562-4fa3-abd0-61262dcce9f1": {
+      "id": "a27026c9-a562-4fa3-abd0-61262dcce9f1",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "self-confident",
+      "meanings": [
+        [
+          "selbstbewusst"
+        ],
+        [
+          "selbstsicher"
+        ]
+      ]
+    },
+    "d31c4722-63b3-4181-9ece-149954817cf1": {
+      "id": "d31c4722-63b3-4181-9ece-149954817cf1",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "easy-going",
+      "meanings": [
+        [
+          "locker"
+        ],
+        [
+          "unbeschwert"
+        ],
+        [
+          "gelassen"
+        ]
+      ]
+    },
+    "f6c23efa-f80d-4705-813f-9e773eb57a14": {
+      "id": "f6c23efa-f80d-4705-813f-9e773eb57a14",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "way of life",
+      "meanings": [
+        [
+          "Lebensweise"
+        ],
+        [
+          "Lebensart"
+        ]
+      ]
+    },
+    "4c192718-f1dd-4570-9960-3b0450e621bf": {
+      "id": "4c192718-f1dd-4570-9960-3b0450e621bf",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "general",
+      "meanings": [
+        [
+          "allgemein"
+        ]
+      ]
+    },
+    "7072df39-36c4-4d77-a5a9-c7d505b540d5": {
+      "id": "7072df39-36c4-4d77-a5a9-c7d505b540d5",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "statement",
+      "meanings": [
+        [
+          "Aussage"
+        ],
+        [
+          "Erklärung"
+        ],
+        [
+          "(Aussagesatz)"
+        ]
+      ]
+    },
+    "7ad51ea1-1823-4223-8f4e-a1e42e7711c3": {
+      "id": "7ad51ea1-1823-4223-8f4e-a1e42e7711c3",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "in progress",
+      "meanings": [
+        [
+          "im Gange"
+        ],
+        [
+          "im Verlauf"
+        ]
+      ]
+    },
+    "7c1af85a-7506-4e67-a576-efd1045f5060": {
+      "id": "7c1af85a-7506-4e67-a576-efd1045f5060",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "sunscreen",
+      "meanings": [
+        [
+          "Sonnenschutzmittel"
+        ]
+      ]
+    },
+    "070d7e53-cfef-4bb6-96eb-50b87fd4b20a": {
+      "id": "070d7e53-cfef-4bb6-96eb-50b87fd4b20a",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "No worries, mate.",
+      "meanings": [
+        [
+          "Kein Problem!"
+        ],
+        [
+          "Alles OK!"
+        ],
+        [
+          "Alles gut!"
+        ]
+      ]
+    },
+    "a9e555fe-43c2-4e1f-b46d-64031d2646d1": {
+      "id": "a9e555fe-43c2-4e1f-b46d-64031d2646d1",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "intonation",
+      "meanings": [
+        [
+          "Intonation"
+        ],
+        [
+          "(Satzmelodie)"
+        ]
+      ]
+    },
+    "80aa99bf-f230-4b7d-8bf9-79851023897b": {
+      "id": "80aa99bf-f230-4b7d-8bf9-79851023897b",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "rise",
+      "meanings": [
+        [
+          "steigen"
+        ],
+        [
+          "(aufsteigen)"
+        ],
+        [
+          "(sich erhöhen)"
+        ],
+        [
+          "(ansteigen)"
+        ]
+      ]
+    },
+    "f111a3af-06a6-4620-8d5e-869631eb3178": {
+      "id": "f111a3af-06a6-4620-8d5e-869631eb3178",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "pitch",
+      "meanings": [
+        [
+          "Tonlage"
+        ],
+        [
+          "Tonhöhe"
+        ]
+      ]
+    },
+    "7f3852d9-51a5-4cb8-9bef-257aa11807a1": {
+      "id": "7f3852d9-51a5-4cb8-9bef-257aa11807a1",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "tend to be something",
+      "meanings": [
+        [
+          "dazu neigen, etwas zu sein"
+        ],
+        [
+          "meistens etwas sein"
+        ]
+      ]
+    },
+    "fe5dfa64-33a7-4595-a03c-bf5d40df8c64": {
+      "id": "fe5dfa64-33a7-4595-a03c-bf5d40df8c64",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "tend to do something",
+      "meanings": [
+        [
+          "dazu neigen, etwas zu tun"
+        ],
+        [
+          "meistens etwas tun"
+        ]
+      ]
+    },
+    "ca04f798-7857-4a24-b089-8451a15a2cd5": {
+      "id": "ca04f798-7857-4a24-b089-8451a15a2cd5",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "among",
+      "meanings": [
+        [
+          "zwischen"
+        ],
+        [
+          "unter"
+        ]
+      ]
+    },
+    "45b8451c-acf3-4b4d-b5b3-753187efa3fd": {
+      "id": "45b8451c-acf3-4b4d-b5b3-753187efa3fd",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "unsure",
+      "meanings": [
+        [
+          "unsicher"
+        ]
+      ]
+    },
+    "06cc780e-1ec4-4d64-8b90-80125b6c3ddf": {
+      "id": "06cc780e-1ec4-4d64-8b90-80125b6c3ddf",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "somebody lacks something",
+      "meanings": [
+        [
+          "jemandem fehlt es an etwas"
+        ]
+      ]
+    },
+    "812fb4db-2b18-46f9-a473-81356532af29": {
+      "id": "812fb4db-2b18-46f9-a473-81356532af29",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "confidence",
+      "meanings": [
+        [
+          "Selbstvertrauen"
+        ],
+        [
+          "Zuversicht"
+        ],
+        [
+          "(Vertrauen)"
+        ]
+      ]
+    },
+    "abcde9ab-6ed8-4143-a9e5-f564b9270986": {
+      "id": "abcde9ab-6ed8-4143-a9e5-f564b9270986",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "pay attention to",
+      "meanings": [
+        [
+          "achten auf"
+        ],
+        [
+          "(aufpassen auf)"
+        ]
+      ]
+    },
+    "8d5cf9e0-75bd-4748-845c-b09c056295bc": {
+      "id": "8d5cf9e0-75bd-4748-845c-b09c056295bc",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "distract",
+      "meanings": [
+        [
+          "ablenken"
+        ]
+      ]
+    },
+    "bf4c6925-3358-4aec-8ea7-7ff6844fb258": {
+      "id": "bf4c6925-3358-4aec-8ea7-7ff6844fb258",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "several",
+      "meanings": [
+        [
+          "mehrere"
+        ],
+        [
+          "verschiedene"
+        ]
+      ]
+    },
+    "7fbe2040-6a6b-493a-9ac7-c1f13109c9e0": {
+      "id": "7fbe2040-6a6b-493a-9ac7-c1f13109c9e0",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "section",
+      "meanings": [
+        [
+          "Teil"
+        ],
+        [
+          "Abschnitt"
+        ],
+        [
+          "(Teilstück)"
+        ]
+      ]
+    },
+    "544137d6-2ccd-4785-9fd8-72e31b565bf1": {
+      "id": "544137d6-2ccd-4785-9fd8-72e31b565bf1",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "back and forth",
+      "meanings": [
+        [
+          "hin und her"
+        ],
+        [
+          "(hin und zurück)"
+        ],
+        [
+          "(auf und ab)"
+        ]
+      ]
+    },
+    "c6308417-30ba-4a62-91f7-163ee5e32a83": {
+      "id": "c6308417-30ba-4a62-91f7-163ee5e32a83",
+      "collectionId": "0091f57a-4af4-443f-b752-430f35114857",
+      "latin": "skin",
+      "meanings": [
+        [
+          "Haut"
+        ]
+      ]
+    },
+    "32b24fc6-6b4c-459e-8805-af92ef699905": {
+      "id": "32b24fc6-6b4c-459e-8805-af92ef699905",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "sunburn",
+      "meanings": [
+        [
+          "Sonnenbrand"
+        ]
+      ]
+    },
+    "bad6a4d9-b656-48ff-842c-f46f0e9f7a0a": {
+      "id": "bad6a4d9-b656-48ff-842c-f46f0e9f7a0a",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "brainstorm",
+      "meanings": [
+        [
+          "brainstormen"
+        ]
+      ]
+    },
+    "1a039470-cc30-4e5e-a6cb-5239dc8a418a": {
+      "id": "1a039470-cc30-4e5e-a6cb-5239dc8a418a",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "oppose something",
+      "meanings": [
+        [
+          "etwas ablehnen"
+        ],
+        [
+          "gegen etwas sein"
+        ]
+      ]
+    },
+    "f4998864-25bf-461d-af0f-a95205471435": {
+      "id": "f4998864-25bf-461d-af0f-a95205471435",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "abroad",
+      "meanings": [
+        [
+          "Ausland"
+        ]
+      ]
+    },
+    "c0679ad0-4c80-4e48-9fad-7b92f8a24218": {
+      "id": "c0679ad0-4c80-4e48-9fad-7b92f8a24218",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "in addition",
+      "meanings": [
+        [
+          "zusätzlich"
+        ],
+        [
+          "außerdem"
+        ],
+        [
+          "(darüber hinaus)"
+        ]
+      ]
+    },
+    "6f216867-d7d5-4dab-addd-90c6b391b7d0": {
+      "id": "6f216867-d7d5-4dab-addd-90c6b391b7d0",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "state something",
+      "meanings": [
+        [
+          "etwas äußern"
+        ],
+        [
+          "etwas angeben"
+        ]
+      ]
+    },
+    "9ccff1a5-c6cc-4b95-a083-baaa68640713": {
+      "id": "9ccff1a5-c6cc-4b95-a083-baaa68640713",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "briefly",
+      "meanings": [
+        [
+          "in Kürze"
+        ],
+        [
+          "in wenigen Worten"
+        ]
+      ]
+    },
+    "a26e4a85-527b-4fd9-923f-3252a5c039ee": {
+      "id": "a26e4a85-527b-4fd9-923f-3252a5c039ee",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "personally",
+      "meanings": [
+        [
+          "persönlich"
+        ]
+      ]
+    },
+    "28a00d1a-7805-47c7-a7c4-e078d7e75d1a": {
+      "id": "28a00d1a-7805-47c7-a7c4-e078d7e75d1a",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "discuss something",
+      "meanings": [
+        [
+          "über etwas diskutieren"
+        ],
+        [
+          "etwas besprechen"
+        ]
+      ]
+    },
+    "e8149445-d91a-4b17-acd8-dd623124eca1": {
+      "id": "e8149445-d91a-4b17-acd8-dd623124eca1",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "furthermore",
+      "meanings": [
+        [
+          "außerdem"
+        ],
+        [
+          "(des Weiteren)"
+        ]
+      ]
+    },
+    "e9b6380a-6f1a-44f3-9b83-cb40c87ae0cf": {
+      "id": "e9b6380a-6f1a-44f3-9b83-cb40c87ae0cf",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "in my view",
+      "meanings": [
+        [
+          "meiner Ansicht nach"
+        ],
+        [
+          "meiner Meinung nach"
+        ]
+      ]
+    },
+    "a4ae40fa-862a-42a4-a56b-d7fa03ce64d9": {
+      "id": "a4ae40fa-862a-42a4-a56b-d7fa03ce64d9",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "On the one hand, ...",
+      "meanings": [
+        [
+          "Einerseits ..."
+        ]
+      ]
+    },
+    "0bd5cee0-8337-45f9-8784-2b2ffa4bad1b": {
+      "id": "0bd5cee0-8337-45f9-8784-2b2ffa4bad1b",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "On the other hand, ...",
+      "meanings": [
+        [
+          "Andererseits ..."
+        ]
+      ]
+    },
+    "e4c6a3cc-f791-417b-8dba-ade71ec743ab": {
+      "id": "e4c6a3cc-f791-417b-8dba-ade71ec743ab",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "take a different view",
+      "meanings": [
+        [
+          "einen anderen Standpunkt vertreten"
+        ],
+        [
+          "anderer Ansicht sein"
+        ]
+      ]
+    },
+    "59775a71-ba48-4728-ba99-d2ea913c6b21": {
+      "id": "59775a71-ba48-4728-ba99-d2ea913c6b21",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "comparison",
+      "meanings": [
+        [
+          "Vergleich"
+        ]
+      ]
+    },
+    "618c0263-b6af-4ad1-bca6-2c2e6a0f7093": {
+      "id": "618c0263-b6af-4ad1-bca6-2c2e6a0f7093",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "In the first place, ...",
+      "meanings": [
+        [
+          "Erstens ..."
+        ],
+        [
+          "Zunächst ..."
+        ]
+      ]
+    },
+    "9aa7cf85-b555-435d-881d-11ad51e33b25": {
+      "id": "9aa7cf85-b555-435d-881d-11ad51e33b25",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "Firstly, ...",
+      "meanings": [
+        [
+          "Erstens ..."
+        ]
+      ]
+    },
+    "e894d871-a240-456c-bfde-07c9c9d87c32": {
+      "id": "e894d871-a240-456c-bfde-07c9c9d87c32",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "Secondly, ...",
+      "meanings": [
+        [
+          "Zweitens ..."
+        ]
+      ]
+    },
+    "57ea6284-ff77-48b8-a214-561306150bdd": {
+      "id": "57ea6284-ff77-48b8-a214-561306150bdd",
+      "collectionId": "11721a8d-7c7e-4fe8-ac4f-9a36f0e9f044",
+      "latin": "Thirdly, ...",
+      "meanings": [
+        [
+          "Drittens ..."
+        ]
+      ]
+    },
+    "0d7dacbb-ecb0-4f6e-93a7-4f631733cd59": {
+      "id": "0d7dacbb-ecb0-4f6e-93a7-4f631733cd59",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "cape",
+      "meanings": [
+        [
+          "Kap"
+        ]
+      ]
+    },
+    "f74a7f2c-7f0f-4104-b58c-78b5625d4e12": {
+      "id": "f74a7f2c-7f0f-4104-b58c-78b5625d4e12",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "reef",
+      "meanings": [
+        [
+          "Riff"
+        ]
+      ]
+    },
+    "3b179348-608f-4c88-9eb9-54f38c7e957f": {
+      "id": "3b179348-608f-4c88-9eb9-54f38c7e957f",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "wet",
+      "meanings": [
+        [
+          "Nässe"
+        ]
+      ]
+    },
+    "30a6129c-121e-4357-aa72-e18d60b43ee8": {
+      "id": "30a6129c-121e-4357-aa72-e18d60b43ee8",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "folk",
+      "meanings": [
+        [
+          "Leute"
+        ]
+      ]
+    },
+    "c566e78a-e83e-4e7e-942a-ce97b6dfb045": {
+      "id": "c566e78a-e83e-4e7e-942a-ce97b6dfb045",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "season",
+      "meanings": [
+        [
+          "Jahreszeit"
+        ],
+        [
+          "Saison"
+        ]
+      ]
+    },
+    "8143e234-4e79-4a8f-ab54-90928a20f937": {
+      "id": "8143e234-4e79-4a8f-ab54-90928a20f937",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "(to) be determined to do something",
+      "meanings": [
+        [
+          "(fest) entschlossen sein, etwas zu tun"
+        ]
+      ]
+    },
+    "73d06c1e-748e-446a-8e17-3e3d15cb847c": {
+      "id": "73d06c1e-748e-446a-8e17-3e3d15cb847c",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "cyclone",
+      "meanings": [
+        [
+          "Zyklon"
+        ],
+        [
+          "Wirbelsturm"
+        ]
+      ]
+    },
+    "8caf30e8-aef9-4068-bcfd-63a468150f70": {
+      "id": "8caf30e8-aef9-4068-bcfd-63a468150f70",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "insect",
+      "meanings": [
+        [
+          "Insekt"
+        ]
+      ]
+    },
+    "7333d0c5-e8af-45ae-9d7b-ffb497b30214": {
+      "id": "7333d0c5-e8af-45ae-9d7b-ffb497b30214",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "python",
+      "meanings": [
+        [
+          "Python"
+        ]
+      ]
+    },
+    "dd697cb8-4c1c-4130-931d-94bfca7418bd": {
+      "id": "dd697cb8-4c1c-4130-931d-94bfca7418bd",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "luckily",
+      "meanings": [
+        [
+          "glücklicherweise"
+        ],
+        [
+          "zum Glück"
+        ]
+      ]
+    },
+    "35c49ae1-8762-4e95-9ad0-e7d2be2836ff": {
+      "id": "35c49ae1-8762-4e95-9ad0-e7d2be2836ff",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "human",
+      "meanings": [
+        [
+          "Mensch"
+        ],
+        [
+          "menschlich"
+        ]
+      ]
+    },
+    "b79227e5-fc95-4d1c-b901-592f7090b299": {
+      "id": "b79227e5-fc95-4d1c-b901-592f7090b299",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "(to) feed on",
+      "meanings": [
+        [
+          "sich ernähren von"
+        ]
+      ]
+    },
+    "6099ed96-be16-400b-bbed-f4dc6f11a2b3": {
+      "id": "6099ed96-be16-400b-bbed-f4dc6f11a2b3",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "mainly",
+      "meanings": [
+        [
+          "hauptsächlich"
+        ],
+        [
+          "vorwiegend"
+        ]
+      ]
+    },
+    "d104fde1-3f43-4b3e-9a99-a981b85c93e2": {
+      "id": "d104fde1-3f43-4b3e-9a99-a981b85c93e2",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "(to) provoke",
+      "meanings": [
+        [
+          "provozieren"
+        ]
+      ]
+    },
+    "89c7dfdc-aee0-4eda-9205-02d70226a69c": {
+      "id": "89c7dfdc-aee0-4eda-9205-02d70226a69c",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "(to) injure somebody",
+      "meanings": [
+        [
+          "jemanden verletzen"
+        ]
+      ]
+    },
+    "540f5d59-a52e-4541-9624-bcd41e2a478e": {
+      "id": "540f5d59-a52e-4541-9624-bcd41e2a478e",
+      "collectionId": "e4963e32-82fc-4f68-a054-7eb891472787",
+      "latin": "moth",
+      "meanings": [
+        [
+          "Nachtfalter"
+        ],
+        [
+          "Motte"
+        ]
+      ]
+    },
+    "667357c9-9532-406d-a94f-f73aadf0ead5": {
+      "id": "667357c9-9532-406d-a94f-f73aadf0ead5",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "crocodile",
+      "meanings": [
+        [
+          "Krokodil"
+        ]
+      ]
+    },
+    "2b456cf4-413a-4eb3-8820-fe4427c68cb6": {
+      "id": "2b456cf4-413a-4eb3-8820-fe4427c68cb6",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "(to) bump into somebody",
+      "meanings": [
+        [
+          "jemanden zufällig treffen"
+        ],
+        [
+          "jemandem zufällig begegnen"
+        ]
+      ]
+    },
+    "e566b1a1-305c-4534-8079-c05493c4e177": {
+      "id": "e566b1a1-305c-4534-8079-c05493c4e177",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "(to) snorkel",
+      "meanings": [
+        [
+          "schnorcheln"
+        ]
+      ]
+    },
+    "99e83796-4fe2-4d91-8b3f-aa831a46d66f": {
+      "id": "99e83796-4fe2-4d91-8b3f-aa831a46d66f",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "greenhouse",
+      "meanings": [
+        [
+          "Gewächshaus"
+        ],
+        [
+          "Treibhaus"
+        ]
+      ]
+    },
+    "ba3bbed9-7a32-4c9f-b48a-8da655e83b06": {
+      "id": "ba3bbed9-7a32-4c9f-b48a-8da655e83b06",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "(to) shorten",
+      "meanings": [
+        [
+          "(ver-)kürzen"
+        ]
+      ]
+    },
+    "fff73880-497f-48b3-a379-d6b1b71c07cf": {
+      "id": "fff73880-497f-48b3-a379-d6b1b71c07cf",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "formal",
+      "meanings": [
+        [
+          "formal"
+        ],
+        [
+          "förmlich"
+        ]
+      ]
+    },
+    "906e83b2-0d9a-415a-abea-4f3bc5e46f68": {
+      "id": "906e83b2-0d9a-415a-abea-4f3bc5e46f68",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "the tropics",
+      "meanings": [
+        [
+          "die Tropen"
+        ]
+      ]
+    },
+    "b745e360-c55a-4f62-a167-335ac4a3f623": {
+      "id": "b745e360-c55a-4f62-a167-335ac4a3f623",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "coastline",
+      "meanings": [
+        [
+          "Küste"
+        ],
+        [
+          "Küstenlinie"
+        ]
+      ]
+    },
+    "d4b9f0d2-a54a-4b19-af7c-166553e18a0d": {
+      "id": "d4b9f0d2-a54a-4b19-af7c-166553e18a0d",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "entertainment",
+      "meanings": [
+        [
+          "Unterhaltung"
+        ],
+        [
+          "Belustigung"
+        ],
+        [
+          "Vergnügen"
+        ]
+      ]
+    },
+    "5eaec0b9-0a3d-4da0-a77c-7de220d5f9e3": {
+      "id": "5eaec0b9-0a3d-4da0-a77c-7de220d5f9e3",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "facilities",
+      "meanings": [
+        [
+          "Einrichtungen"
+        ],
+        [
+          "Ausstattung"
+        ],
+        [
+          "Anlagen"
+        ],
+        [
+          "Angebote"
+        ]
+      ]
+    },
+    "2bdc4c87-08fc-4060-a21c-3ece0c7dc20e": {
+      "id": "2bdc4c87-08fc-4060-a21c-3ece0c7dc20e",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "overcrowded",
+      "meanings": [
+        [
+          "überfüllt"
+        ]
+      ]
+    },
+    "8117bf7c-e94e-4d95-acae-2771f93b0133": {
+      "id": "8117bf7c-e94e-4d95-acae-2771f93b0133",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "rural",
+      "meanings": [
+        [
+          "ländlich"
+        ],
+        [
+          "Land-"
+        ]
+      ]
+    },
+    "c728db24-b036-4121-9da8-1e1deb4b12ed": {
+      "id": "c728db24-b036-4121-9da8-1e1deb4b12ed",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "suburban",
+      "meanings": [
+        [
+          "Vorort-"
+        ],
+        [
+          "Vorstadt-"
+        ],
+        [
+          "vorstädtisch"
+        ]
+      ]
+    },
+    "4da9e15d-db79-43bc-98d9-00100bdb4598": {
+      "id": "4da9e15d-db79-43bc-98d9-00100bdb4598",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "inland",
+      "meanings": [
+        [
+          "im Landesinneren"
+        ],
+        [
+          "(Binnen-)"
+        ]
+      ]
+    },
+    "316c6494-83fa-495d-800f-8b9411a43704": {
+      "id": "316c6494-83fa-495d-800f-8b9411a43704",
+      "collectionId": "1c52ae1f-bafc-4802-908c-f8a2a589c405",
+      "latin": "mild",
+      "meanings": [
+        [
+          "mild"
+        ]
+      ]
+    },
+    "cd2735f9-0d09-4ef5-bde7-50bc954e7a3b": {
+      "id": "cd2735f9-0d09-4ef5-bde7-50bc954e7a3b",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "mountainous",
+      "meanings": [
+        [
+          "bergig"
+        ],
+        [
+          "gebirgig"
+        ]
+      ]
+    },
+    "52fd15df-b3b7-4d29-984d-77ceb24dea5d": {
+      "id": "52fd15df-b3b7-4d29-984d-77ceb24dea5d",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "old-fashioned",
+      "meanings": [
+        [
+          "altmodisch"
+        ]
+      ]
+    },
+    "9187f177-4cfa-4206-b0e2-1eb18f6d1fbe": {
+      "id": "9187f177-4cfa-4206-b0e2-1eb18f6d1fbe",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "southern",
+      "meanings": [
+        [
+          "südlich"
+        ],
+        [
+          "Süd-"
+        ]
+      ]
+    },
+    "19fd9003-dc83-4c3e-82ae-7327c22e4190": {
+      "id": "19fd9003-dc83-4c3e-82ae-7327c22e4190",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "tiny",
+      "meanings": [
+        [
+          "winzig"
+        ]
+      ]
+    },
+    "97d62543-b84e-4d5a-9595-58f36fff904b": {
+      "id": "97d62543-b84e-4d5a-9595-58f36fff904b",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "collocation",
+      "meanings": [
+        [
+          "Kollokation (Wörter, die oft zusammen vorkommen)"
+        ]
+      ]
+    },
+    "32a5149b-91ac-4fb0-919f-b8e8836454b4": {
+      "id": "32a5149b-91ac-4fb0-919f-b8e8836454b4",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "descriptive",
+      "meanings": [
+        [
+          "beschreibend"
+        ]
+      ]
+    },
+    "7dea2a7c-7760-4165-992d-0e5aacebeb54": {
+      "id": "7dea2a7c-7760-4165-992d-0e5aacebeb54",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "disagree (with)",
+      "meanings": [
+        [
+          "anderer Meinung sein (als)"
+        ],
+        [
+          "nicht übereinstimmen (mit)"
+        ],
+        [
+          "nicht zustimmen"
+        ]
+      ]
+    },
+    "cbb3b647-4ab8-4448-be08-8c249d987ffd": {
+      "id": "cbb3b647-4ab8-4448-be08-8c249d987ffd",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "nonsense",
+      "meanings": [
+        [
+          "Unsinn"
+        ],
+        [
+          "dummes Zeug"
+        ]
+      ]
+    },
+    "2326c40c-bf5b-40a6-ac7f-f339b5ac2bee": {
+      "id": "2326c40c-bf5b-40a6-ac7f-f339b5ac2bee",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "direct",
+      "meanings": [
+        [
+          "direkt"
+        ]
+      ]
+    },
+    "28a5ebca-71ac-4339-88aa-953172a67350": {
+      "id": "28a5ebca-71ac-4339-88aa-953172a67350",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "hurtful",
+      "meanings": [
+        [
+          "verletzend"
+        ]
+      ]
+    },
+    "23aedbcf-02ee-4dc2-b228-c6798c3cb8ac": {
+      "id": "23aedbcf-02ee-4dc2-b228-c6798c3cb8ac",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "I'm afraid ...",
+      "meanings": [
+        [
+          "Leider ..."
+        ]
+      ]
+    },
+    "504b9e12-fd55-46ba-b240-dc02edd94b2d": {
+      "id": "504b9e12-fd55-46ba-b240-dc02edd94b2d",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "have a point",
+      "meanings": [
+        [
+          "nicht ganz Unrecht haben"
+        ]
+      ]
+    },
+    "ae600fd5-29a5-4c44-a66b-f179d1c971d1": {
+      "id": "ae600fd5-29a5-4c44-a66b-f179d1c971d1",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "gift voucher",
+      "meanings": [
+        [
+          "Geschenkgutschein"
+        ]
+      ]
+    },
+    "6b8c0ad8-5a6b-4b10-824d-129d19778b81": {
+      "id": "6b8c0ad8-5a6b-4b10-824d-129d19778b81",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "dig (for sth.)",
+      "meanings": [
+        [
+          "(nach etwas) graben"
+        ]
+      ]
+    },
+    "8e6e388a-adc3-4c6e-8c91-fad00571cff2": {
+      "id": "8e6e388a-adc3-4c6e-8c91-fad00571cff2",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "camp (out)",
+      "meanings": [
+        [
+          "zelten"
+        ],
+        [
+          "im Freien kampieren"
+        ]
+      ]
+    },
+    "928ffd8b-a1e6-4e89-8261-621312654453": {
+      "id": "928ffd8b-a1e6-4e89-8261-621312654453",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "dream",
+      "meanings": [
+        [
+          "träumen"
+        ]
+      ]
+    },
+    "033acd8d-aafb-4247-8e92-7ce0e3c4d283": {
+      "id": "033acd8d-aafb-4247-8e92-7ce0e3c4d283",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "painting",
+      "meanings": [
+        [
+          "Gemälde"
+        ],
+        [
+          "Bild"
+        ]
+      ]
+    },
+    "f86a20ae-ffec-4a1a-92d5-bc40a0403067": {
+      "id": "f86a20ae-ffec-4a1a-92d5-bc40a0403067",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "sort (of)",
+      "meanings": [
+        [
+          "Art"
+        ],
+        [
+          "Sorte"
+        ]
+      ]
+    },
+    "fc28865f-f00c-46e2-9bcd-b8b97b08e872": {
+      "id": "fc28865f-f00c-46e2-9bcd-b8b97b08e872",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "fewer",
+      "meanings": [
+        [
+          "weniger"
+        ]
+      ]
+    },
+    "87e49ee1-6c21-4898-844c-1e58e21c47fa": {
+      "id": "87e49ee1-6c21-4898-844c-1e58e21c47fa",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "opportunity",
+      "meanings": [
+        [
+          "Gelegenheit"
+        ],
+        [
+          "Möglichkeit"
+        ],
+        [
+          "Chance"
+        ]
+      ]
+    },
+    "a6d1aec1-f4a9-4b54-953b-2e0d06d8840b": {
+      "id": "a6d1aec1-f4a9-4b54-953b-2e0d06d8840b",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "work experience",
+      "meanings": [
+        [
+          "Arbeitserfahrung(en)"
+        ],
+        [
+          "Praxiserfahrung(en)"
+        ],
+        [
+          "Praktikum"
+        ]
+      ]
+    },
+    "9700d179-3d97-46d4-82f8-765bad6f2dff": {
+      "id": "9700d179-3d97-46d4-82f8-765bad6f2dff",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "health",
+      "meanings": [
+        [
+          "Gesundheit"
+        ]
+      ]
+    },
+    "eba5c623-5087-4c60-9ee0-6cbd09202809": {
+      "id": "eba5c623-5087-4c60-9ee0-6cbd09202809",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "clinic",
+      "meanings": [
+        [
+          "Klinik"
+        ]
+      ]
+    },
+    "384f50af-d7ed-420a-91cf-0b4a2a7fcbb8": {
+      "id": "384f50af-d7ed-420a-91cf-0b4a2a7fcbb8",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "patient",
+      "meanings": [
+        [
+          "Patient/in"
+        ]
+      ]
+    },
+    "c80944cb-f5a2-4ccf-9bd9-d33c44297b6c": {
+      "id": "c80944cb-f5a2-4ccf-9bd9-d33c44297b6c",
+      "collectionId": "6d3a111c-1c3a-4442-9f90-64dba1a7ce6f",
+      "latin": "community",
+      "meanings": [
+        [
+          "Gemeinde"
+        ],
+        [
+          "Gemeinschaft"
+        ]
+      ]
+    },
+    "ef87eb43-4f13-4054-ae7b-ff847ab30fba": {
+      "id": "ef87eb43-4f13-4054-ae7b-ff847ab30fba",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "debate sth.",
+      "meanings": [
+        [
+          "über etwas debattieren"
+        ]
+      ]
+    },
+    "900d4b19-8ead-4119-b70b-7dc3bb9dc0da": {
+      "id": "900d4b19-8ead-4119-b70b-7dc3bb9dc0da",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "racism",
+      "meanings": [
+        [
+          "Rassismus"
+        ]
+      ]
+    },
+    "3a7d3c1b-e5c8-43ef-b833-06d2177048e8": {
+      "id": "3a7d3c1b-e5c8-43ef-b833-06d2177048e8",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "racist",
+      "meanings": [
+        [
+          "Rassist/in"
+        ],
+        [
+          "rassistisch"
+        ]
+      ]
+    },
+    "4e27a4bc-87aa-41a3-a175-3edeab5f0a44": {
+      "id": "4e27a4bc-87aa-41a3-a175-3edeab5f0a44",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "bully sb.",
+      "meanings": [
+        [
+          "jemanden tyrannisieren"
+        ],
+        [
+          "jemanden mobben"
+        ]
+      ]
+    },
+    "afd75c6c-012d-4c63-9fc6-fb5668bb4415": {
+      "id": "afd75c6c-012d-4c63-9fc6-fb5668bb4415",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "height",
+      "meanings": [
+        [
+          "Höhe"
+        ],
+        [
+          "(Körper-)Größe"
+        ]
+      ]
+    },
+    "525f2052-2875-4c0b-ad9e-188db3d16444": {
+      "id": "525f2052-2875-4c0b-ad9e-188db3d16444",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "professional",
+      "meanings": [
+        [
+          "professionell"
+        ],
+        [
+          "Profi-"
+        ]
+      ]
+    },
+    "d7ef2bad-736a-443d-95c5-e09190677974": {
+      "id": "d7ef2bad-736a-443d-95c5-e09190677974",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "peak",
+      "meanings": [
+        [
+          "Gipfel"
+        ],
+        [
+          "Spitze"
+        ],
+        [
+          "Höhepunkt"
+        ]
+      ]
+    },
+    "6f5c2b88-44ec-4a8a-a255-ad83d2810aa4": {
+      "id": "6f5c2b88-44ec-4a8a-a255-ad83d2810aa4",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "female",
+      "meanings": [
+        [
+          "weiblich"
+        ],
+        [
+          "weibliche Person"
+        ],
+        [
+          "Weibchen"
+        ]
+      ]
+    },
+    "2a65ff86-f82a-4a11-94e9-ac132fef171a": {
+      "id": "2a65ff86-f82a-4a11-94e9-ac132fef171a",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "male",
+      "meanings": [
+        [
+          "männlich"
+        ],
+        [
+          "männliche Person"
+        ],
+        [
+          "Männchen"
+        ]
+      ]
+    },
+    "dfdcedf1-4646-4845-9122-029953cac985": {
+      "id": "dfdcedf1-4646-4845-9122-029953cac985",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "the Olympic Games",
+      "meanings": [
+        [
+          "die Olympischen Spiele"
+        ]
+      ]
+    },
+    "cfa52562-a0d8-4060-abe1-a0c2c1c32c8c": {
+      "id": "cfa52562-a0d8-4060-abe1-a0c2c1c32c8c",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "admire",
+      "meanings": [
+        [
+          "bewundern"
+        ]
+      ]
+    },
+    "8116de04-3021-4340-9074-692b3bf1465c": {
+      "id": "8116de04-3021-4340-9074-692b3bf1465c",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "league",
+      "meanings": [
+        [
+          "Liga"
+        ]
+      ]
+    },
+    "289c4c07-d76a-4842-b9e7-68a8db5ac551": {
+      "id": "289c4c07-d76a-4842-b9e7-68a8db5ac551",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "recently",
+      "meanings": [
+        [
+          "vor Kurzem"
+        ],
+        [
+          "neulich"
+        ],
+        [
+          "in letzter Zeit"
+        ]
+      ]
+    },
+    "0082f56f-6274-4565-b46b-170f51b6d831": {
+      "id": "0082f56f-6274-4565-b46b-170f51b6d831",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "all-star team/player",
+      "meanings": [
+        [
+          "Auswahlmannschaft"
+        ],
+        [
+          "Auswahlspieler/in"
+        ]
+      ]
+    },
+    "dcf58cff-999c-4caa-a8a1-5a9149829df9": {
+      "id": "dcf58cff-999c-4caa-a8a1-5a9149829df9",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "in a row",
+      "meanings": [
+        [
+          "in Folge"
+        ],
+        [
+          "hintereinander"
+        ],
+        [
+          "nacheinander"
+        ]
+      ]
+    },
+    "aa63970e-3a5a-4421-86d5-2e06a0dfe1c1": {
+      "id": "aa63970e-3a5a-4421-86d5-2e06a0dfe1c1",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "record",
+      "meanings": [
+        [
+          "Rekord"
+        ]
+      ]
+    },
+    "fb47c0da-4ae0-479f-971d-0a39a79dbbd1": {
+      "id": "fb47c0da-4ae0-479f-971d-0a39a79dbbd1",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "due to",
+      "meanings": [
+        [
+          "aufgrund"
+        ],
+        [
+          "infolge"
+        ]
+      ]
+    },
+    "e6c67e5d-ec77-43fe-bc93-d472c9b3396a": {
+      "id": "e6c67e5d-ec77-43fe-bc93-d472c9b3396a",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "pandemic",
+      "meanings": [
+        [
+          "Pandemie (weltweite Epidemie)"
+        ]
+      ]
+    },
+    "12746898-ab4a-4311-aee3-08adc64bff4d": {
+      "id": "12746898-ab4a-4311-aee3-08adc64bff4d",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "successful",
+      "meanings": [
+        [
+          "erfolgreich"
+        ]
+      ]
+    },
+    "a37cc02c-fb4f-436f-9ac6-454e09054373": {
+      "id": "a37cc02c-fb4f-436f-9ac6-454e09054373",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "passionate",
+      "meanings": [
+        [
+          "leidenschaftlich"
+        ]
+      ]
+    },
+    "b4893a1e-8454-4453-899d-f6b415dcc39d": {
+      "id": "b4893a1e-8454-4453-899d-f6b415dcc39d",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "equal",
+      "meanings": [
+        [
+          "gleich"
+        ]
+      ]
+    },
+    "af3097f5-950f-4d0e-b7aa-a770ea97dba9": {
+      "id": "af3097f5-950f-4d0e-b7aa-a770ea97dba9",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "minority",
+      "meanings": [
+        [
+          "Minderheit"
+        ]
+      ]
+    },
+    "b255a825-9178-4805-ac4f-903e9980f86d": {
+      "id": "b255a825-9178-4805-ac4f-903e9980f86d",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "indigenous",
+      "meanings": [
+        [
+          "indigen"
+        ],
+        [
+          "einheimisch"
+        ],
+        [
+          "Ur-"
+        ]
+      ]
+    },
+    "6e72fd46-4e7b-497c-97f0-2dff841a7876": {
+      "id": "6e72fd46-4e7b-497c-97f0-2dff841a7876",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "empower sb.",
+      "meanings": [
+        [
+          "jemanden stärken"
+        ],
+        [
+          "jemanden befähigen (etwas zu tun)"
+        ],
+        [
+          "jemanden in die Lage versetzen (etwas zu tun)"
+        ]
+      ]
+    },
+    "3fc8314a-3fa9-4e25-a592-9bee6b5f8eef": {
+      "id": "3fc8314a-3fa9-4e25-a592-9bee6b5f8eef",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "childhood",
+      "meanings": [
+        [
+          "Kindheit"
+        ]
+      ]
+    },
+    "b8d45ad8-b16e-4289-adfa-c8014dc42a43": {
+      "id": "b8d45ad8-b16e-4289-adfa-c8014dc42a43",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "criticize sb. (for)",
+      "meanings": [
+        [
+          "jemanden kritisieren (wegen)"
+        ]
+      ]
+    },
+    "e214c51e-3b5a-4fa3-9c39-f27e2681b8f8": {
+      "id": "e214c51e-3b5a-4fa3-9c39-f27e2681b8f8",
+      "collectionId": "17168717-1e1f-4be3-bfbe-2f8240679617",
+      "latin": "appearance",
+      "meanings": [
+        [
+          "Erscheinung(sbild)"
+        ],
+        [
+          "Aussehen"
+        ]
+      ]
+    }
+  }
+}

@@ -3,12 +3,13 @@
 .landscape-mode-switch button { position:relative; min-height:42px; padding:.6rem 1.15rem; border:0; border-radius:999px; color:var(--muted); background:transparent; font:inherit; font-size:.875rem; font-weight:650; cursor:pointer; transition:color 160ms ease,background-color 180ms ease,transform 150ms ease; }
 .landscape-mode-switch button[aria-pressed=true] { color:var(--green-dark); background:var(--surface); box-shadow:0 2px 7px #0000000a; }
 .landscape-mode-switch button:active { transform:scale(.97); }
-.landscape-shell { --ls-ease:cubic-bezier(.22,1,.36,1); --ls-spring:cubic-bezier(.2,1.4,.4,1); --ls-line:color-mix(in srgb,var(--green) 20%,var(--border)); position:relative; min-width:0; color:var(--text); padding-bottom:1rem; }
+.landscape-shell { --ls-ease:cubic-bezier(.22,1,.36,1); --ls-spring:cubic-bezier(.2,1.4,.4,1); --ls-line:color-mix(in srgb,var(--green) 20%,var(--border)); position:relative; min-width:0; color:var(--text); }
+.landscape-shell:not(.ls-classic-writing) { padding-bottom:1rem; }
 .landscape-shell *, .ls-motion-ghost * { box-sizing:border-box; }
-.landscape-shell:has(input:focus:not([readonly])) { padding-bottom:calc(2rem + var(--answer-keyboard-inset,0px)); }
+.landscape-shell:not(.ls-classic-writing):has(input:focus:not([readonly])) { padding-bottom:calc(2rem + var(--answer-keyboard-inset,0px)); }
 .landscape-shell :is(button,input) { font-family:inherit; }
 .landscape-shell button { -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
-.landscape-shell button:focus-visible, .landscape-shell input:focus-visible, .landscape-shell [tabindex="0"]:focus-visible { outline:3px solid color-mix(in srgb,var(--green) 62%,transparent); outline-offset:4px; }
+.landscape-shell:not(.ls-classic-writing) button:focus-visible, .landscape-shell:not(.ls-classic-writing) input:focus-visible, .landscape-shell:not(.ls-classic-writing) [tabindex="0"]:focus-visible { outline:3px solid color-mix(in srgb,var(--green) 62%,transparent); outline-offset:4px; }
 .landscape-shell button:disabled { cursor:default; }
 .ls-icon { width:24px; height:24px; flex:none; vertical-align:middle; }
 .ls-eyebrow { margin:0 0 .75rem; color:var(--muted); font-size:.65rem; font-weight:700; letter-spacing:.12em; line-height:1.6; }

@@ -1,4 +1,11 @@
-# Latinio · Version 2.18.0
+# Latinio · Version 2.19.0
+## Neu in 2.19.0: Englische Lernlandschaft und gemeinsame Vokabelabfrage
+Die Lernlandschaft ist jetzt für den Hauptadmin auch in **Englisch** verfügbar. Englisch → Deutsch und Deutsch → Englisch haben getrennte Lernstände: Wiedererkennen ersetzt nicht das eigenständige Schreiben. Vokabelübungen bilden den Schwerpunkt; gelegentliche Satzbausteine üben die aktive Anwendung. Die lateinischen Endungs- und Kasusübungen bleiben auf Latein beschränkt. Lernwege, Prüfungsziele und gespeicherte Runden werden je Fach getrennt.
+Die normale schriftliche Vokabelabfrage verwendet in **Klassisch** und beiden Lernlandschaften dieselbe Darstellung: gleiche Vollbildansicht, einzelne Antwortfelder, „Weitere Bedeutung“, Ergebnisanzeige und Korrekturübung. Nur die schnelle Abfrage behält ihre kompakte Darstellung. Die vorhandene klassische Abfrage in Französisch nutzt ebenfalls die gemeinsame Darstellung, ohne eine französische Lernlandschaft einzuführen.
+Der englische Vorrat enthält 193 geprüfte Satzaufgaben für die acht vorhandenen Lernwochen und deckt sämtliche 189 Vokabeln ab. Die lateinischen 1.900 Satzaufgaben bleiben unverändert.
+753 automatisierte Tests und sieben Installerprüfungen bestanden. Vollständige Browserrunden in Englisch und Latein prüfen beide Richtungen beziehungsweise Latein → Deutsch, Fehlerkorrektur, Checkpoint, Pause, Neuladen, Fortsetzung und Synchronisierung. Die gemeinsame klassische Darstellung wurde zusätzlich gegen Version 2.18.0 in 25 Fällen bytegenau verglichen. Die Bedienung auf einem echten iPhone ist weiterhin ungeprüft.
+Die neue Funktion bleibt in Oberfläche und API auf das Hauptadminprofil beschränkt. Für Englisch wird das Backend 2.19.0 benötigt; es wird vor der Oberfläche aktualisiert.
+
 
 ## Neu in 2.18.0: Deine adaptive Lernlandschaft
 

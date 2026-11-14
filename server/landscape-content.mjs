@@ -3,40 +3,53 @@ import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 
 export const SENTENCE_CATALOGUE_PATH=fileURLToPath(new URL('./content/landscape-sentences.json.gz',import.meta.url));
-let cache=null,stamp=null;
-function readCatalogue(){
-  let next;
-  try{const stat=statSync(SENTENCE_CATALOGUE_PATH);next=`${stat.mtimeMs}:${stat.size}`;}
-  catch(error){if(error.code==='ENOENT')return {schema:1,version:null,collections:[],sentences:[]};throw error;}
-  if(!cache||stamp!==next){cache=JSON.parse(gunzipSync(readFileSync(SENTENCE_CATALOGUE_PATH)).toString('utf8'));stamp=next;}
-  return cache;
+export const SENTENCE_CATALOGUE_PATHS=Object.freeze({
+  latin:SENTENCE_CATALOGUE_PATH,
+  english:fileURLToPath(new URL('./content/landscape-english-sentences.json.gz',import.meta.url)),
+});
+const caches=new Map();
+function contentSubject(subject){
+  if(!Object.hasOwn(SENTENCE_CATALOGUE_PATHS,subject))throw new RangeError('Für dieses Fach gibt es keinen Satzkatalog.');
+  return subject;
 }
-export function readSentenceCatalogue(){return structuredClone(readCatalogue());}
+function readCatalogue(subject='latin'){
+  const path=SENTENCE_CATALOGUE_PATHS[contentSubject(subject)];
+  let next;
+  try{const stat=statSync(path);next=`${stat.mtimeMs}:${stat.size}`;}
+  catch(error){if(error.code==='ENOENT')return {schema:1,subject,version:null,collections:[],sentences:[]};throw error;}
+  if(caches.get(subject)?.stamp!==next)caches.set(subject,{stamp:next,catalogue:JSON.parse(gunzipSync(readFileSync(path)).toString('utf8'))});
+  return caches.get(subject).catalogue;
+}
+export function readSentenceCatalogue(subject='latin'){return structuredClone(readCatalogue(subject));}
 const values=value=>Array.isArray(value)?value:Object.values(value||{});
 const text=value=>typeof value==='string'&&value.trim().length>0&&value.length<=500;
 const tileKey=value=>value.trim().normalize('NFC').toLocaleLowerCase('de');
 const bag=tiles=>tiles.map(tileKey).sort().join('\u0000');
 
-export function getSentenceCatalogue(collections=null){
-  const catalogue=readCatalogue(),counts=new Map();
+export function getSentenceCatalogue(collections=null,subject='latin'){
+  const catalogue=readCatalogue(subject),counts=new Map();
   for(const sentence of catalogue.sentences)counts.set(sentence.collectionId,(counts.get(sentence.collectionId)||0)+1);
   const requested=collections===null?catalogue.collections:values(collections);
-  return {schema:1,version:catalogue.version,total:catalogue.sentences.length,
+  return {schema:1,subject,version:catalogue.version,total:catalogue.sentences.length,
     collections:requested.map(c=>({id:c.id,name:c.name||c.id,count:counts.get(c.id)||0,
       status:counts.get(c.id)?'ready':'missing'}))};
 }
-export function getCollectionSentences(collectionId){
+export function getCollectionSentences(collectionId,subject='latin'){
+  contentSubject(subject);
   if(typeof collectionId!=='string')return [];
-  return structuredClone(readCatalogue().sentences.filter(sentence=>sentence.collectionId===collectionId));
+  return structuredClone(readCatalogue(subject).sentences.filter(sentence=>sentence.collectionId===collectionId));
 }
 
 /** Structural/lexical checks are not a claim of human linguistic review. */
-export function validateSentenceCatalogue(catalogue,vocabulary,{minimumPerCollection=0}={}){
+export function validateSentenceCatalogue(catalogue,vocabulary,{minimumPerCollection=0,subject='latin'}={}){
+  contentSubject(subject);
+  const english=subject==='english';
   const errors=[],warnings=[],counts=new Map(),seenIds=new Set(),seenLatin=new Set();
   const collections=new Map(values(vocabulary?.collections).map(c=>[c.id,c]));
   const words=new Map(values(vocabulary?.words).map(w=>[w.id,w]));
   const covered=new Map();
   if(catalogue?.schema!==1||!Array.isArray(catalogue?.sentences)||!Array.isArray(catalogue?.collections))return {ok:false,errors:['Ungültiges Katalogformat.'],warnings,stats:{total:0,collections:[]}};
+  if((catalogue.subject||'latin')!==subject)errors.push('Katalog und angefordertes Fach stimmen nicht überein.');
   for(const s of catalogue.sentences){
     if(!s||typeof s!=='object'||Array.isArray(s)){errors.push('Ungültige Aufgabe.');continue;}
     const at=typeof s?.id==='string'?s.id:'(ohne ID)';
@@ -45,20 +58,26 @@ export function validateSentenceCatalogue(catalogue,vocabulary,{minimumPerCollec
     seenIds.add(s?.id);
     if(!collections.has(s?.collectionId))fail('Unbekannte Sammlung.');
     counts.set(s?.collectionId,(counts.get(s?.collectionId)||0)+1);
-    const latin=typeof s.latin==='string'?s.latin:'';
-    if(!text(latin)||seenLatin.has(tileKey(latin)))fail('Leerer oder doppelter lateinischer Satz.');
-    seenLatin.add(tileKey(latin));
-    if(!['present','perfect'].includes(s?.tense))fail('Nur Präsens/Perfekt sind freigegeben.');
+    const prompt=typeof (english?s.prompt:s.latin)==='string'?(english?s.prompt:s.latin):'';
+    if(!text(prompt)||seenLatin.has(tileKey(prompt)))fail(`Leerer oder doppelter ${english?'Ausgangssatz':'lateinischer Satz'}.`);
+    seenLatin.add(tileKey(prompt));
+    if(!(english?['present','past','perfect','future']:['present','perfect']).includes(s?.tense))fail(english?'Ungültige englische Zeitform.':'Nur Präsens/Perfekt sind freigegeben.');
+    if(english){
+      if(s.subject!=='english'||!['de-en','en-de'].includes(s.direction))fail('Fach oder Satzrichtung fehlt.');
+      if(s.promptLanguage!==(s.direction==='de-en'?'de':'en')||s.answerLanguage!==(s.direction==='de-en'?'en':'de'))fail('Quell- und Zielsprache passen nicht zur Satzrichtung.');
+      if(s.latin!==undefined&&s.latin!==prompt)fail('Altes Anzeigefeld und neuer Ausgangssatz weichen voneinander ab.');
+    }
     if(![1,2,3].includes(s?.difficulty))fail('Ungültige Schwierigkeit.');
-    if(!Array.isArray(s?.tokens)||!s.tokens.length){fail('Keine lateinischen Wörter.');continue;}
+    if(!Array.isArray(s?.tokens)||!s.tokens.length){fail('Keine Wörter im Ausgangssatz.');continue;}
     const tokenIds=new Set();
     for(const token of s.tokens){
       if(!text(token?.text))fail('Leerer Wortbaustein.');
+      if(english&&token?.kind==='glue'&&token.wordId===null)continue;
       if(!words.has(token?.wordId))fail(`Unbekannte Vokabel-ID für „${token?.text||''}“.`);
       else tokenIds.add(token.wordId);
     }
     const rendered=s.tokens.map(t=>typeof t?.text==='string'?t.text:'').join(' ').replace(/[.?!]+$/,'');
-    if(rendered!==latin.replace(/[.?!]+$/,''))fail('Satz und Wortzuordnung weichen voneinander ab.');
+    if(rendered!==prompt.replace(/[.?!]+$/,''))fail('Satz und Wortzuordnung weichen voneinander ab.');
     if(!Array.isArray(s.focusWordIds)||!s.focusWordIds.length)fail('Keine Schwerpunktvokabel.');
     for(const id of Array.isArray(s.focusWordIds)?s.focusWordIds:[]){
       if(!tokenIds.has(id)||words.get(id)?.collectionId!==s.collectionId)fail('Ungültige Schwerpunktzuordnung.');

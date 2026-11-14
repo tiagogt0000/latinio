@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {evaluate} from '../app/core.js';
 import fs from 'node:fs';
 import {answerFeedback,evaluationCorrection,translationCard} from '../app/feedback.js';
+import {writeAnswerInput,writePracticeView} from '../app/write-practice.js';
 import {accountCard} from '../app/accounts.js';
 import {AppUpdates,APP_VERSION,waitForInstallation,workerVersion} from '../app/updates.js';
 
@@ -82,11 +83,19 @@ test('The complete translation is hidden before grading and appears for every ou
  assert.match(translationCard({meanings:[['<Text>']]},{}),/&lt;Text&gt;/);
 });
 test('German answer inputs allow keyboard correction for initial and added fields',()=>{
- const main=fs.readFileSync(new URL('../app/main.js',import.meta.url),'utf8');
- const input=main.slice(main.indexOf('function answerInput('),main.indexOf('function feedbackView('));
- assert.match(input,/lang="\$\{toEnglish\?subjectInfo\(subject\).code:'de'\}"/);assert.match(input,/autocorrect="\$\{toEnglish\?'off':'on'\}"/);
- assert.match(input,/spellcheck="\$\{toEnglish\?'false':'true'\}"/);assert.match(input,/autocomplete="\$\{toEnglish\?'off':'on'\}"/);
- assert.match(main,/translationCard\(target,feedback,english/);
+ for(const subject of ['latin','english','french'])for(const index of [0,1]){
+  const input=writeAnswerInput('',index,false,{subject,direction:'en-de'});
+  assert.match(input,/lang="de"/);assert.match(input,/autocorrect="on"/);
+  assert.match(input,/spellcheck="true"/);assert.match(input,/autocomplete="on"/);
+ }
+ for(const [subject,code,label] of [['english','en','Englisch'],['french','fr','Französisch']]){
+  const input=writeAnswerInput('',0,false,{subject,direction:'de-en'});
+  assert.match(input,new RegExp(`lang="${code}"`));assert.match(input,/autocorrect="off"/);
+  assert.match(input,/spellcheck="false"/);assert.match(input,/autocomplete="off"/);
+  const word={id:'word',latin:'example',meanings:[['Beispiel']]};
+  const html=writePracticeView({word,subject,direction:'de-en',feedback:evaluate({meanings:[['example']]},['example'])});
+  assert.match(html,new RegExp(`Wie heißt auf ${label}`));assert.match(html,new RegExp(`class="latin-word translation-card" lang="${code}"`));
+ }
 });
 
 test('Deployment mismatch is not reported as current',async()=>{
