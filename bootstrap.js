@@ -1,6 +1,6 @@
 'use strict';
 const API='https://elektrogilbersserver.tail7c7157.ts.net:8443/api';
-const VERSION='2.25.1';
+const VERSION='2.25.2';
 const ACTIVE='latinio-account-v2';
 const STORAGE_WAIT=5000,WORKER_WAIT=10000;
 const $=id=>document.getElementById(id);

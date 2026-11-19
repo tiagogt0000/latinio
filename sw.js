@@ -1,4 +1,4 @@
-const VERSION='2.25.1';
+const VERSION='2.25.2';
 const PUBLIC='latinio-gate-'+VERSION,PRIVATE='latinio-private-'+VERSION,ROUTING='latinio-routing-v1';
 const START=['./','./index.html','./bootstrap.js','./manifest.webmanifest','./icon.svg','./icon-brand-180.png','./icon-brand-192.png','./icon-brand-512.png'];
 const local=path=>new URL(path,self.registration.scope).href;
