@@ -1,4 +1,8 @@
-const VERSION='2.26.0';
+const VERSION='2.26.1';
+if(typeof importScripts==='function'){
+ importScripts('./bootstrap.js?v='+VERSION);
+ if(self.latinioInstallPackage?.version!==VERSION)throw Error('Der Paketinstaller gehört zu einer anderen Version.');
+}
 const PUBLIC='latinio-gate-'+VERSION,PRIVATE='latinio-private-'+VERSION,ROUTING='latinio-routing-v1';
 const START=['./','./index.html','./bootstrap.js','./manifest.webmanifest','./icon.svg','./icon-brand-180.png','./icon-brand-192.png','./icon-brand-512.png'];
 const local=path=>new URL(path,self.registration.scope).href;
@@ -95,6 +99,35 @@ async function savedPackage({current=false,excludeCurrent=false}={}){
  for(const name of names){const candidate=await completePackage(name);if(candidate)return candidate;}
  return null;
 }
+let installation=null,lastAttempt=0,installed=false;
+async function prepareUpdate(token){
+ if(installation)return installation;
+ installation=(async()=>{
+  if(!await savedPackage({current:true})){
+   if(!token || !self.latinioInstallPackage)throw Error('Die neue Version benötigt eine aktive Anmeldung.');
+   await self.latinioInstallPackage(token);
+   if(!await savedPackage({current:true}))throw Error('Die neue Version wurde nicht vollständig gespeichert.');
+  }
+  installed=true;
+  for(const client of await self.clients.matchAll({type:'window'}))client.postMessage({type:'UPDATE_READY',version:VERSION});
+ })().finally(()=>{installation=null;});
+ return installation;
+}
+
+// An open pre-migration client cannot ask the new worker to download a package.
+// Its next normal authenticated request to our own API can stage it without a
+// navigation. Use the bearer only for that server's package, never persist it.
+async function stageForExistingClient(event){
+ if(installed || installation || Date.now()-lastAttempt<15000)return;
+ const client=await self.clients.get(event.clientId);
+ if(!client?.url?.startsWith(self.registration.scope))return;
+ const pin=await inheritedPin(client.id,'');
+ if(!pin || pin.kind==='gate' || pin.version===VERSION)return;
+ const token=event.request.headers.get('Authorization')?.match(/^Bearer ([a-zA-Z0-9_-]{32,200})$/)?.[1];
+ if(!token)return;
+ lastAttempt=Date.now();
+ await prepareUpdate(token);
+}
 async function gatePackage(name=PUBLIC){
  const cache=await caches.open(name),index=await cache.match(local('index.html')),script=await cache.match(local('bootstrap.js'));
  if(!index?.ok||!script?.ok||await cache.match(local('.gate-installing')))return null;
@@ -158,6 +191,7 @@ async function route(event,url,path){
  if(event.request.mode==='navigate'){
   const pin=url.searchParams.has('gate')?await gatePackage():await savedPackage()||await gatePackage();
   if(!pin)return unavailable();
+  if(pin.kind!=='gate' && pin.version!==VERSION)pin.installerVersion=VERSION;
   await persistPin(event.resultingClientId||event.clientId,pin);
   const entry=await (await caches.open(pin.name)).match(local('index.html'));
   if(!entry)return unavailable();
@@ -186,6 +220,9 @@ async function route(event,url,path){
 }
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url),scope=new URL(self.registration.scope);
+ if(event.request.method==='POST' && event.clientId && url.href===self.latinioInstallPackage?.api && event.request.headers.has('Authorization')){
+  event.waitUntil(stageForExistingClient(event).catch(()=>{}));return;
+ }
  if(event.request.method!=='GET'||url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))return;
  const path=url.pathname.slice(scope.pathname.length)||'index.html';
  if(path==='sw.js'||path==='version.json')return;
@@ -193,13 +230,23 @@ self.addEventListener('fetch',event=>{
 });
 self.addEventListener('message',event=>{
  if(event.data?.type==='ACTIVATE_UPDATE')event.waitUntil(self.skipWaiting());
+ if(event.data?.type==='GET_GATE_VERSION')event.ports[0]?.postMessage({version:VERSION});
  if(event.data?.type==='GET_VERSION')event.waitUntil(bounded((async()=>{
-  const pin=await readPin(event.source?.id);
-  // Older clients reload automatically when a new worker reports itself ready.
-  // Report readiness only after the corresponding private files are available.
-  const staged=!pin||pin.kind==='gate'||pin.version===VERSION||await savedPackage({current:true});
-  event.ports[0]?.postMessage({version:staged?VERSION:pin.version});
+  const pin=await readPin(event.source?.id),current=!!await savedPackage({current:true});
+  // A legacy tab opened before activation has no installer. Its own existing
+  // safe-update action can reopen once to mount the helper. A tab which already
+  // has that helper keeps running until the authenticated package is complete.
+  const legacyHandoff=pin?.kind!=='gate' && pin?.version!==VERSION && pin?.installerVersion!==VERSION && self.navigator?.onLine!==false;
+  const version=current || !pin || pin.kind==='gate' || legacyHandoff?VERSION:pin.version;
+  event.ports[0]?.postMessage({version,workerVersion:VERSION,ready:current});
  })()).catch(()=>event.ports[0]?.postMessage({version:null})));
+ if(event.data?.type==='PREPARE_UPDATE')event.waitUntil((async()=>{
+  try{
+   if(!event.source?.url?.startsWith(self.registration.scope) || event.data.version!==VERSION)throw Error('Die Startseite und das Update gehören zu unterschiedlichen Versionen.');
+   await prepareUpdate(event.data.token);
+   event.ports[0]?.postMessage({ready:true,version:VERSION});
+  }catch(error){event.ports[0]?.postMessage({ready:false,error:error.message || 'Das Update konnte nicht geladen werden.'});}
+ })());
  if(event.data?.type==='GET_OFFLINE_STATUS')event.waitUntil(bounded((async()=>{const current=await savedPackage({current:true}),saved=current||await savedPackage();event.ports[0]?.postMessage({available:!!saved,current:!!current,...(saved?{version:saved.version}:{})});})()).catch(()=>event.ports[0]?.postMessage({available:false,current:false,error:'Lokaler Speicher nicht verfügbar.'})));
  if(event.data?.type==='PIN_GATE'&&event.source?.id)event.waitUntil(bounded((async()=>{const pin=await gatePackage('latinio-gate-'+String(event.data.version||VERSION));if(pin)await persistPin(event.source.id,pin);})()).catch(()=>{}));
 });
