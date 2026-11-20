@@ -1,4 +1,4 @@
-const VERSION='2.25.2';
+const VERSION='2.26.0';
 const PUBLIC='latinio-gate-'+VERSION,PRIVATE='latinio-private-'+VERSION,ROUTING='latinio-routing-v1';
 const START=['./','./index.html','./bootstrap.js','./manifest.webmanifest','./icon.svg','./icon-brand-180.png','./icon-brand-192.png','./icon-brand-512.png'];
 const local=path=>new URL(path,self.registration.scope).href;
@@ -79,7 +79,10 @@ async function completePackage(name){
   const text=await marker.text();let manifest;try{manifest=JSON.parse(text);}catch{}
   if(manifest&&typeof manifest==='object'){
    if(manifest.version!==versionOf(name)||!Array.isArray(manifest.files)||!manifest.files.includes('index.html')||!manifest.files.includes('app/main.js')||new Set(manifest.files).size!==manifest.files.length||!manifest.files.every(validPath))return null;
-   if(!(await Promise.all(manifest.files.map(async path=>(await cache.match(local(path)))?.ok===true))).every(Boolean))return null;
+   // The installer writes only successful responses and commits the inventory last.
+   // Listing keys avoids reading every audio file, script and stylesheet at startup.
+   const urls=new Set((await cache.keys()).map(request=>request.url));
+   if(!manifest.files.every(path=>urls.has(local(path))))return null;
    return {name,version:manifest.version,kind:'private'};
   }
   if(text.trim()!==versionOf(name))return null;
@@ -153,11 +156,24 @@ self.addEventListener('activate',event=>event.waitUntil(bounded((async()=>{
 
 async function route(event,url,path){
  if(event.request.mode==='navigate'){
-  const forceGate=url.searchParams.has('gate'),offline=url.searchParams.get('offline')==='1'||self.navigator?.onLine===false;
-  const pin=forceGate?await gatePackage():offline?await savedPackage()||await gatePackage():await savedPackage({current:true})||await gatePackage();
+  const pin=url.searchParams.has('gate')?await gatePackage():await savedPackage()||await gatePackage();
   if(!pin)return unavailable();
   await persistPin(event.resultingClientId||event.clientId,pin);
-  return await (await caches.open(pin.name)).match(local('index.html'))||unavailable();
+  const entry=await (await caches.open(pin.name)).match(local('index.html'));
+  if(!entry)return unavailable();
+  if(pin.kind!=='gate'&&pin.version!==VERSION){
+   // An installed app stays interactive while the signed-in account stages the
+   // new package. Its existing scripts and styles remain pinned to one version.
+   const installer='<script defer data-latinio-update src="./bootstrap.js?background='+VERSION+'"></script>';
+   const html=await entry.text();
+   return new Response(html.includes('</head>')?html.replace('</head>',installer+'</head>'):html+installer,{headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
+  }
+  return entry;
+ }
+ if(path==='bootstrap.js'&&url.searchParams.has('background')){
+  const version=url.searchParams.get('background');
+  if(!/^\d+\.\d+\.\d+$/.test(version))return unavailable();
+  return await (await caches.open('latinio-gate-'+version)).match(local('bootstrap.js'))||unavailable();
  }
  const pin=await inheritedPin(event.clientId,path);
  if(pin){
@@ -177,7 +193,13 @@ self.addEventListener('fetch',event=>{
 });
 self.addEventListener('message',event=>{
  if(event.data?.type==='ACTIVATE_UPDATE')event.waitUntil(self.skipWaiting());
- if(event.data?.type==='GET_VERSION')event.ports[0]?.postMessage({version:VERSION});
+ if(event.data?.type==='GET_VERSION')event.waitUntil(bounded((async()=>{
+  const pin=await readPin(event.source?.id);
+  // Older clients reload automatically when a new worker reports itself ready.
+  // Report readiness only after the corresponding private files are available.
+  const staged=!pin||pin.kind==='gate'||pin.version===VERSION||await savedPackage({current:true});
+  event.ports[0]?.postMessage({version:staged?VERSION:pin.version});
+ })()).catch(()=>event.ports[0]?.postMessage({version:null})));
  if(event.data?.type==='GET_OFFLINE_STATUS')event.waitUntil(bounded((async()=>{const current=await savedPackage({current:true}),saved=current||await savedPackage();event.ports[0]?.postMessage({available:!!saved,current:!!current,...(saved?{version:saved.version}:{})});})()).catch(()=>event.ports[0]?.postMessage({available:false,current:false,error:'Lokaler Speicher nicht verfügbar.'})));
  if(event.data?.type==='PIN_GATE'&&event.source?.id)event.waitUntil(bounded((async()=>{const pin=await gatePackage('latinio-gate-'+String(event.data.version||VERSION));if(pin)await persistPin(event.source.id,pin);})()).catch(()=>{}));
 });

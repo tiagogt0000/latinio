@@ -1,6 +1,6 @@
 'use strict';
 const API='https://elektrogilbersserver.tail7c7157.ts.net:8443/api';
-const VERSION='2.25.2';
+const VERSION='2.26.0';
 const ACTIVE='latinio-account-v2';
 const STORAGE_WAIT=5000,WORKER_WAIT=10000;
 const $=id=>document.getElementById(id);
@@ -8,10 +8,15 @@ let admin=false,busy=false,registration,operation=0;
 const cancelled=()=>Object.assign(Error('Der vorherige Vorgang wurde beendet.'),{cancelled:true});
 function guard(run){if(run!==operation)throw cancelled();}
 function status(message){$('status').textContent=message;}
-function showLogin(message=''){$('login').hidden=false;$('toggle').hidden=false;status(message);globalThis.latinioBootReady?.();}
+function showPanel(message=''){$('gate-panel').hidden=false;status(message);
+ if($('login').hidden){$('heading').textContent='Latinio';$('intro').hidden=true;}
+}
+function showLogin(message=''){$('login').hidden=false;$('toggle').hidden=false;$('heading').textContent=admin?'Admin-Anmeldung':'Willkommen bei Latinio';$('intro').hidden=false;showPanel(message);}
 function failure(error){
  if(error?.nextVersion){const url=new URL(location.href);if(url.searchParams.get('_gateVersion')!==error.nextVersion){url.searchParams.set('gate','1');url.searchParams.set('_gateVersion',error.nextVersion);url.searchParams.delete('offline');status('Die aktuelle App wird geöffnet …');location.replace(url.href);return;}}
- showLogin(error?.message||'Die Verbindung ist gerade nicht verfügbar. Bitte erneut versuchen.');$('retry').hidden=false;
+ const message=error?.message||'Die Verbindung ist gerade nicht verfügbar. Bitte erneut versuchen.';
+ if(error?.login)showLogin(message);else showPanel(message);
+ $('retry').hidden=false;
 }
 function checkWorkerVersion(version){
  const parts=value=>/^\d+\.\d+\.\d+$/.test(value||'')?value.split('.').map(Number):null,a=parts(version),b=parts(VERSION);
@@ -99,8 +104,8 @@ async function findOffline(){
 function probeOffline(){return bounded(findOffline(),STORAGE_WAIT,'Die gespeicherte App konnte gerade nicht geprüft werden.').then(found=>{$('offline').hidden=!found;return found;},()=>false);}
 async function offlineStatus(){const status=await workerMessage('GET_OFFLINE_STATUS');if(status&&typeof status.available==='boolean'){$('offline').hidden=!status.available;return status;}return null;}
 function enterApp(offline=false){const url=new URL(location.href);url.searchParams.delete('gate');url.searchParams.delete('_gateVersion');if(offline)url.searchParams.set('offline','1');else url.searchParams.delete('offline');location.replace(url.href);}
-async function installPackage(token,run){
- guard(run);status('Deine App wird geladen …');
+async function installPackage(token,run,{background=false}={}){
+ guard(run);
  const {response,body:bundle}=await request(API.replace(/\/api$/,'/app-package'),{headers:{Authorization:'Bearer '+token},mode:'cors',credentials:'omit',cache:'no-store'},60000);guard(run);
  if(response.status===401){const error=Error('Bitte melde dich erneut an.');error.login=true;throw error;}
  if(!response.ok)throw Error('Die App konnte gerade nicht geladen werden. Bitte erneut versuchen.');
@@ -114,25 +119,56 @@ async function installPackage(token,run){
   for(const file of bundle.files){guard(run);const bytes=Uint8Array.from(atob(file.body),c=>c.charCodeAt(0));await bounded(cache.put(new URL(file.path,base),new Response(bytes,{headers:{'Content-Type':file.type}})),STORAGE_WAIT,'Die App konnte auf diesem Gerät nicht vollständig gespeichert werden.');}
  }
  guard(run);await bounded(cache.put(new URL('.complete',base),new Response(JSON.stringify({version:VERSION,files:[...paths]}),{headers:{'Content-Type':'application/json'}})),STORAGE_WAIT,'Die App konnte auf diesem Gerät nicht vollständig gespeichert werden.');
- guard(run);enterApp();
+ guard(run);if(!background)enterApp();
 }
+// The worker adds this script only to older installed entries. It never takes
+// over their UI, changes their account, or navigates an active lesson.
+function stageUpdate(){
+ let running=false,complete=false,lastAttempt=0;
+ async function attempt(){
+  if(running||complete||document.hidden||navigator.onLine===false||Date.now()-lastAttempt<15000)return;
+  running=true;lastAttempt=Date.now();
+  try{
+   const session=await savedSession();
+   if(session){await installPackage(session.token,operation,{background:true});complete=true;}
+  }catch{/* The previous package remains active. Retry when the app next opens or reconnects. */}
+  finally{running=false;}
+ }
+ void attempt();window.addEventListener('online',attempt);document.addEventListener('visibilitychange',attempt);
+}
+function setupGate(){
 $('toggle').onclick=()=>{admin=!admin;$('heading').textContent=admin?'Admin-Anmeldung':'Willkommen bei Latinio';$('intro').textContent=admin?'Gib deinen Admin-PIN ein.':'Gib deinen persönlichen vierstelligen Zugangscode ein. Du bekommst ihn vom Admin.';$('credential-label').textContent=admin?'Admin-PIN':'Zugangscode';$('credential').maxLength=admin?12:4;$('credential').pattern=admin?'[0-9]{4,12}':'[0-9]{4}';$('toggle').textContent=admin?'Zur Schüler-Anmeldung':'Admin-Anmeldung';$('credential').value='';};
 $('login').onsubmit=async event=>{event.preventDefault();if(busy)return;const run=++operation;busy=true;$('submit').disabled=true;$('toggle').disabled=true;try{
  status('Anmeldung läuft …');const value=$('credential').value.trim();
  const {response,body}=await request(API,{method:'POST',headers:{'Content-Type':'application/json'},mode:'cors',credentials:'omit',cache:'no-store',body:JSON.stringify({action:'login',...(admin?{admin:true,pin:value}:{code:value})})},20000);guard(run);
  if(!response.ok||body.error)throw Error(body.error||'Die Anmeldung ist fehlgeschlagen.');
  const result=body.result;if(!result?.token||!result.profile?.id)throw Error('Ungültige Anmeldeantwort.');
- $('credential').value='';await saveSession(result,run);guard(run);await workerReady();const saved=await offlineStatus();guard(run);if(saved?.current)enterApp();else await installPackage(result.token,run);
+ $('credential').value='';await saveSession(result,run);guard(run);$('login').hidden=true;$('toggle').hidden=true;$('gate-panel').hidden=true;await workerReady();const saved=await offlineStatus();guard(run);if(saved?.current)enterApp();else await installPackage(result.token,run);
  }catch(error){if(run===operation&&!error.cancelled)failure(error);}finally{if(run===operation){busy=false;$('submit').disabled=false;$('toggle').disabled=false;}void probeOffline();}};
 $('retry').onclick=()=>location.reload();
 $('offline').onclick=async()=>{const run=++operation;busy=true;status('Die Offline App wird geöffnet …');try{await workerReady({exact:false});const saved=await offlineStatus();guard(run);if(!saved?.available)throw Error('Auf diesem Gerät ist gerade keine vollständig gespeicherte App verfügbar. Bitte verbinde dich mit dem Internet und versuche es erneut.');enterApp(true);}catch(error){if(run===operation)failure(error);}finally{if(run===operation){busy=false;$('submit').disabled=false;$('toggle').disabled=false;}}};
-async function start(){const run=++operation;showLogin('Latinio wird geöffnet …');void probeOffline();try{
- const results=await Promise.allSettled([workerReady(),savedSession()]);guard(run);
- for(const result of results)if(result.status==='rejected')throw result.reason;
- const session=results[1].value;
- const saved=await offlineStatus();guard(run);
- if(new URL(location.href).searchParams.get('offline')==='1')throw Error('Die gespeicherte App konnte nicht geöffnet werden. Bitte erneut versuchen oder anmelden.');
- if(session){if(saved?.current){enterApp();return;}await installPackage(session.token,run);return;}
- showLogin();
- }catch(error){if(run===operation&&!error.cancelled)failure(error);}}
-void start();
+}
+async function start(){
+ const run=++operation;
+ // Signal that the loader executed even when device storage or installation
+ // takes longer than the missing-script watchdog.
+ globalThis.latinioBootReady?.();
+ void probeOffline();
+ try{
+  // Start both checks, but an installed app can open without waiting for
+  // the public page's independent read of its account database.
+  const sessionRead=savedSession().then(value=>({value}),error=>({error}));
+  try{await workerReady();}catch(error){
+   const result=await sessionRead;guard(run);
+   if(!result.error&&!result.value)showLogin();
+   throw error;
+  }
+  const saved=await offlineStatus();guard(run);
+  if(saved?.available){enterApp(!saved.current);return;}
+  const session=await sessionRead;guard(run);
+  if(session.error)throw session.error;
+  if(session.value)await installPackage(session.value.token,run);else showLogin();
+ }catch(error){if(run===operation&&!error.cancelled)failure(error);}
+}
+if(document.currentScript?.hasAttribute('data-latinio-update'))stageUpdate();
+else {setupGate();void start();}
