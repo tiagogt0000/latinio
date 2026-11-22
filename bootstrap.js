@@ -1,11 +1,11 @@
 'use strict';
 (()=>{
 const API='https://elektrogilbersserver.tail7c7157.ts.net:8443/api';
-const VERSION='2.27.1';
+const VERSION='2.27.2';
 const ACTIVE='latinio-account-v2';
 const STORAGE_WAIT=5000,WORKER_WAIT=10000;
 const $=id=>document.getElementById(id);
-let admin=false,busy=false,registration,operation=0,pendingLogin=null;
+let admin=false,busy=false,registration,operation=0,pendingLogin=null,retryTimer,retryDelay=1000;
 const onlineEntry=new URL('/latinio/',API);onlineEntry.port='';
 function directMode(){const page=new URL(location.href);return [onlineEntry.origin,new URL(API).origin].includes(page.origin) && ([onlineEntry.pathname.slice(0,-1),onlineEntry.pathname,onlineEntry.pathname+'index.html'].includes(page.pathname));}
 const directURL=path=>new URL('/latinio/'+path,location.href).href;
@@ -28,7 +28,13 @@ function showInstall(message){
 }
 function showLogin(message=''){$('login').hidden=false;$('toggle').hidden=false;$('heading').textContent=admin?'Admin-Anmeldung':'Willkommen bei Latinio';$('intro').hidden=false;showPanel(message);}
 function failure(error){
- if(error?.nextVersion){const url=new URL(location.href);if(/^\d+\.\d+\.\d+$/.test(error.nextVersion)&&url.searchParams.get('_gateVersion')!==error.nextVersion){url.searchParams.set('gate','1');url.searchParams.set('_gateVersion',error.nextVersion);url.searchParams.delete('offline');status('Die aktuelle App wird geöffnet …');location.replace(url.href);return;}}
+ clearTimeout(retryTimer);
+ if(error?.transient && $('login').hidden && !document.hidden && navigator.onLine!==false){
+  const run=operation;
+  retryTimer=setTimeout(()=>{if(run===operation && !busy && !document.hidden)void start();},retryDelay);
+  retryDelay=Math.min(15000,retryDelay*2);
+ }
+ if(error?.nextVersion){const url=new URL(location.href);if(/^\d+\.\d+\.\d+$/.test(error.nextVersion)&&url.searchParams.get('_gateVersion')!==error.nextVersion){url.searchParams.delete('gate');url.searchParams.set('_gateVersion',error.nextVersion);url.searchParams.delete('offline');status('Die aktuelle App wird geöffnet …');location.replace(url.href);return;}}
  const message=error?.message||'Die Verbindung ist gerade nicht verfügbar. Bitte erneut versuchen.';
  if(error?.login){pendingLogin=null;showLogin(message);}else showPanel(message);
  $('retry').hidden=!!error?.login;
@@ -46,7 +52,7 @@ async function request(url,options,ms){
  const controller=new AbortController();
  return bounded((async()=>{let response;
   try{response=await fetch(url,{...options,signal:controller.signal});}
-  catch{throw Error(navigator.onLine===false?'Du bist offline. Für die Anmeldung brauchst du eine Internetverbindung.':'Der Lernserver ist von diesem Browser aus gerade nicht erreichbar.');}
+  catch{throw Object.assign(Error(navigator.onLine===false?'Du bist offline. Für die Anmeldung brauchst du eine Internetverbindung.':'Der Lernserver ist von diesem Browser aus gerade nicht erreichbar.'),{transient:true});}
   if(response.status===204)return {response,body:null};
   let body;try{body=await response.json();}catch{if(response.ok)throw Error('Die Antwort konnte nicht gelesen werden. Bitte erneut versuchen.');body={};}return {response,body};})(),ms,'Die Verbindung antwortet gerade nicht. Bitte erneut versuchen.',()=>controller.abort());
 }
@@ -89,10 +95,10 @@ async function workerReady({exact=true}={}){
  if(navigator.serviceWorker.controller&&(!exact||checkWorkerVersion(await workerVersion()))){
   // Keep version discovery running even when a cached gate already has a
   // working controller. Its update must never delay opening the saved app.
-  Promise.resolve().then(()=>navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'})).then(value=>{if(value.waiting)value.waiting.postMessage({type:'ACTIVATE_UPDATE'});}).catch(()=>{});
+  Promise.resolve().then(()=>navigator.serviceWorker.getRegistration()).then(value=>value?.update()).catch(()=>{});
   navigator.serviceWorker.controller.postMessage({type:'PIN_GATE',version:VERSION});return;
  }
- registration=await bounded(navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}),Math.max(1,deadline-Date.now()),'Die App konnte nicht vorbereitet werden. Bitte erneut versuchen oder die Offline App öffnen.');
+ registration=await bounded(navigator.serviceWorker.register('./sw.js?v='+VERSION,{updateViaCache:'none'}),Math.max(1,deadline-Date.now()),'Die App konnte nicht vorbereitet werden. Bitte erneut versuchen oder die Offline App öffnen.');
  // serviceWorker.ready can remain pending forever on iPad. Observe the actual
  // controller with one deadline, including registration and activation.
  while(Date.now()<deadline){
@@ -135,7 +141,7 @@ async function writePackage(token,run,name,onProgress){
  const {response,body:bundle}=await request(url.href,{headers:{Authorization:'Bearer '+token},mode:'cors',credentials:'omit',cache:'no-store'},60000);guard(run);
  if(response.status===401){const error=Error('Bitte melde dich erneut an.');error.login=true;throw error;}
  if(response.status===409)checkWorkerVersion(bundle?.currentVersion);
- if(!response.ok)throw Error('Das App-Paket konnte gerade nicht geladen werden. Bitte erneut versuchen.');
+ if(!response.ok)throw Object.assign(Error('Das App-Paket konnte gerade nicht geladen werden. Bitte erneut versuchen.'),{transient:response.status>=500});
  if(bundle.version!==VERSION||!Array.isArray(bundle.files))throw Error('Eine neue Version wird gerade bereitgestellt. Bitte gleich erneut versuchen.');
  const paths=new Set();for(const file of bundle.files){if(typeof file.path!=='string'||!/^(?:app\/[a-zA-Z0-9_./-]+|[a-zA-Z0-9_.-]+)$/.test(file.path)||file.path.split('/').some(p=>p==='..'||p==='.')||paths.has(file.path)||typeof file.body!=='string'||typeof file.type!=='string')throw Error('Die App-Dateien sind ungültig.');paths.add(file.path);}
  if(!paths.has('index.html')||!paths.has('app/main.js'))throw Error('Die App-Dateien sind unvollständig.');
@@ -164,46 +170,46 @@ async function installPackage(token,run,{background=false,onProgress}={}){
  }else await write();
  guard(run);if(!background)enterApp();
 }
-// Older installed clients can pick up the staged package at their untouched subject picker.
+// An older page gets this bridge when the new worker serves its pinned bundle.
+// Only reopen an identified idle screen. A lesson can start while the download runs.
 function stageUpdate(){
- let running=false,complete=false,lastAttempt=0,touched=false,observer,observationTimer;
- function cleanup(){
-  observer?.disconnect();clearTimeout(observationTimer);
-  for(const type of ['pointerdown','keydown','click'])document.removeEventListener(type,interacted,true);
- }
- function interacted(){touched=true;cleanup();}
- for(const type of ['pointerdown','keydown','click'])document.addEventListener(type,interacted,{capture:true,passive:true});
- function openAtPicker(){
-  if(touched || document.hidden)return false;
-  const picker=document.querySelector('.subject-entrance');
-  if(!picker?.querySelector('[data-enter-subject]:not(:disabled)')||picker.querySelector('[data-enter-subject]:disabled'))return false;
-  cleanup();location.reload();return true;
- }
- function enterStagedApp(){
-  if(openAtPicker() || touched)return;
+ let running=false,complete=false,reloading=false,observer,retry;
+ function openWhenIdle(){
+  if(!complete || reloading || document.hidden || window.latinioUpdatesStarted)return;
   const root=document.getElementById('app');
-  if(document.hidden || !root?.querySelector('.boot')){cleanup();return;}
-  observer=new MutationObserver(openAtPicker);observer.observe(root,{childList:true,subtree:true});
-  observationTimer=setTimeout(cleanup,10000);
+  if(!root || root.querySelector('.ls-fullscreen-learning,.test-shell,.subject-transition,[aria-busy="true"]') || document.querySelector('#modal-root form,.ls-modal form,.ls-tour-layer'))return;
+  const picker=root.querySelector('.subject-entrance [data-enter-subject]:not(:disabled)');
+  const map=root.querySelector('.ls-overview');
+  if(!picker && !map)return;
+  if(map && document.querySelector('[data-lesson-orbit],.ls-modal-layer'))return;
+  if(map)try{const subject=root.querySelector('[data-landscape-root]')?.dataset.subject;if(subject)sessionStorage.setItem('latinio-direct-subject-switch',subject);}catch{}
+  reloading=true;observer?.disconnect();clearTimeout(retry);location.reload();
  }
  async function attempt(){
-  if(running||complete||document.hidden||navigator.onLine===false||Date.now()-lastAttempt<15000)return;
-  running=true;lastAttempt=Date.now();
+  if(window.latinioUpdatesStarted){observer?.disconnect();clearTimeout(retry);return;}
+  if(complete){openWhenIdle();return;}
+  if(running||document.hidden||navigator.onLine===false)return;
+  clearTimeout(retry);running=true;
   try{
    const session=await savedSession();
-   if(session){await installPackage(session.token,operation,{background:true});complete=true;enterStagedApp();}
-  }catch{/* The previous package remains active. Retry when the app next opens or reconnects. */}
-  finally{running=false;}
+   if(session){
+    await installPackage(session.token,operation,{background:true});complete=true;
+    const root=document.getElementById('app');
+    if(root){observer=new MutationObserver(openWhenIdle);observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-busy','disabled','class']});}
+    openWhenIdle();
+   }
+  }catch{/* Keep using the complete older package during a deployment or connection interruption. */}
+  finally{running=false;if(!complete&&!document.hidden)retry=setTimeout(attempt,4000);}
  }
  void attempt();window.addEventListener('online',attempt);document.addEventListener('visibilitychange',attempt);
 }
 async function openDirect(token,run){
  const {response}=await request(directURL('session'),{method:'POST',headers:{Authorization:'Bearer '+token},credentials:'same-origin',cache:'no-store'},20000);guard(run);
  if(response.status===401)throw Object.assign(Error('Deine Anmeldung ist abgelaufen. Bitte melde dich erneut an.'),{login:true});
- if(response.status!==204)throw Error('Der Lernserver konnte die App gerade nicht öffnen. Bitte erneut versuchen.');
+ if(response.status!==204)throw Object.assign(Error('Der Lernserver konnte die App gerade nicht öffnen. Bitte erneut versuchen.'),{transient:response.status>=500});
  const check=await request(directURL('session'),{credentials:'same-origin',cache:'no-store'},10000);guard(run);
  if(check.response.status===401)throw Error('Der Browser speichert die Anmeldung hier nicht. Erlaube Cookies für diesen Lernserver und tippe auf „Erneut versuchen“.');
- if(check.response.status!==204)throw Error('Die gespeicherte Anmeldung konnte gerade nicht geprüft werden. Bitte erneut versuchen.');
+ if(check.response.status!==204)throw Object.assign(Error('Die gespeicherte Anmeldung konnte gerade nicht geprüft werden. Bitte erneut versuchen.'),{transient:check.response.status>=500});
  enterApp();
 }
 const installProgress=(done,total)=>status(`Die Lernapp wird gespeichert … ${done} von ${total} Dateien`);
@@ -246,6 +252,9 @@ function setupGate(){
   link.textContent='Latinio auf dem Lernserver öffnen';$('gate-panel').append(link);
  }
  $('online-entry').href=onlineEntry.href;
+ const reconnect=()=>{if(!busy && !document.hidden && $('login').hidden && !$('retry').hidden)void start();};
+ globalThis.addEventListener?.('online',reconnect);
+ document.addEventListener?.('visibilitychange',reconnect);
 $('toggle').onclick=()=>{admin=!admin;$('heading').textContent=admin?'Admin-Anmeldung':'Willkommen bei Latinio';$('intro').textContent=admin?'Gib deinen Admin-PIN ein.':'Gib deinen persönlichen vierstelligen Zugangscode ein. Du bekommst ihn vom Admin.';$('credential-label').textContent=admin?'Admin-PIN':'Zugangscode';$('credential').maxLength=admin?12:4;$('credential').pattern=admin?'[0-9]{4,12}':'[0-9]{4}';$('toggle').textContent=admin?'Zur Schüler-Anmeldung':'Admin-Anmeldung';$('credential').value='';};
 $('login').onsubmit=async event=>{event.preventDefault();if(busy)return;const run=++operation;busy=true;$('submit').disabled=true;$('toggle').disabled=true;try{
  $('retry').hidden=true;$('online-entry').hidden=true;
@@ -262,6 +271,7 @@ $('retry').onclick=()=>{if(!busy)void start();};
 $('offline').onclick=async()=>{const run=++operation;busy=true;status('Die Offline App wird geöffnet …');try{await workerReady({exact:false});const saved=await offlineStatus();guard(run);if(!saved?.available)throw Error('Auf diesem Gerät ist gerade keine vollständig gespeicherte App verfügbar. Bitte verbinde dich mit dem Internet und versuche es erneut.');enterApp(true);}catch(error){if(run===operation)failure(error);}finally{if(run===operation){busy=false;$('submit').disabled=false;$('toggle').disabled=false;}}};
 }
 async function start(){
+ clearTimeout(retryTimer);
  const run=++operation;
  // Signal that the loader executed even when device storage or installation
  // takes longer than the missing-script watchdog.
@@ -283,7 +293,15 @@ async function start(){
   void Promise.all([sessionRead,localInstall]).then(([session,installed])=>{
    if(!installed&&!session.value&&!session.error&&run===operation&&!busy)showLogin();
   });
+  // A cached gate, its controller and the published worker can each be one release apart.
+  // The controller that will serve the navigation is authoritative about complete packages.
+  if(navigator.serviceWorker.controller){
+   const saved=await offlineStatus();guard(run);
+   if(saved?.available){navigator.serviceWorker.controller.postMessage({type:'PIN_GATE',version:VERSION});enterApp(!saved.current);return;}
+  }
   try{await workerReady();}catch(error){
+   guard(run);
+   if(navigator.serviceWorker.controller && (await offlineStatus())?.available){guard(run);enterApp();return;}
    const result=await sessionRead;guard(run);
    if(!result.error&&!result.value)showLogin();
    throw error;
