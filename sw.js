@@ -1,4 +1,4 @@
-const VERSION='2.28.3';
+const VERSION='2.29.0';
 if(typeof importScripts==='function'){
  importScripts('./bootstrap.js?v='+VERSION);
  if(self.latinioInstallPackage?.version!==VERSION)throw Error('Der Paketinstaller gehört zu einer anderen Version.');
